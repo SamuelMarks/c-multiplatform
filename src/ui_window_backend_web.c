@@ -56,6 +56,7 @@ static ui_error_t web_create_window(struct ui_window_backend* backend, const cha
     if (!win) {
         return UI_ERROR_OUT_OF_MEMORY;
     }
+    memset(win, 0, sizeof(struct ui_window));
 
     win->canvas_width = width;
     win->canvas_height = height;

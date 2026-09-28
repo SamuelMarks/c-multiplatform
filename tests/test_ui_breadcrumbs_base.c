@@ -458,10 +458,14 @@ int main(void) {
 #endif
 
   /* Targeted test for breadcrumbs null bind */
-  { ui_breadcrumbs_base_bind_active_index(NULL, NULL); }
+  {
+    ui_breadcrumbs_base_bind_active_index(NULL, NULL);
+  }
 
   /* Targeted test for breadcrumbs null bind */
-  { ui_breadcrumbs_base_bind_active_index(NULL, NULL); }
+  {
+    ui_breadcrumbs_base_bind_active_index(NULL, NULL);
+  }
 
   printf("All ui_breadcrumbs_base tests passed.\n");
   return 0;

@@ -38,13 +38,15 @@ struct ui_window {
   EGLContext egl_context;           /**< egl_context */
   EGLSurface egl_surface;           /**< egl_surface */
 
-  void *context;                 /**< context */
-  int is_closing;                /**< is_closing */
-  int width;                     /**< width */
-  int height;                    /**< height */
-  int needs_swap;                /**< needs_swap */
-  struct ui_event pending_event; /**< pending_event */
-  int has_pending_event;         /**< has_pending_event */
+  void *context;                                      /**< context */
+  int is_closing;                                     /**< is_closing */
+  int width;                                          /**< width */
+  int height;                                         /**< height */
+  int needs_swap;                                     /**< needs_swap */
+  struct ui_event pending_event;                      /**< pending_event */
+  int has_pending_event;                              /**< has_pending_event */
+  ui_error_t (*on_resize_callback)(void *, int, int); /**< on_resize_callback */
+  void *on_resize_user_data; /**< on_resize_user_data */
 };
 
 /**
@@ -74,6 +76,13 @@ static void log_xdg_toplevel_configure(void *data,
     win->pending_event.event_data.window.width = width;
     win->pending_event.event_data.window.height = height;
     win->has_pending_event = 1;
+    if (win->on_resize_callback) {
+      ui_error_t cb_rc =
+          win->on_resize_callback(win->on_resize_user_data, width, height);
+      if (cb_rc != UI_ERROR_NONE) {
+        return;
+      }
+    }
   }
 }
 
@@ -455,6 +464,42 @@ static ui_error_t linux_swap_buffers(struct ui_window_backend *backend,
 }
 
 /**
+ * @brief wayland_set_on_resize_callback.
+ * @param backend Parameter backend.
+ * @param window Parameter window.
+ * @param callback Parameter callback.
+ * @param user_data Parameter user_data.
+ * @return Return value.
+ */
+static ui_error_t wayland_set_on_resize_callback(
+    struct ui_window_backend *backend, struct ui_window *window,
+    ui_error_t (*callback)(void *, int, int), void *user_data) {
+  if (!backend || !window) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+  window->on_resize_callback = callback;
+  window->on_resize_user_data = user_data;
+  return UI_ERROR_NONE;
+}
+
+/**
+ * @brief wayland_get_os_handle.
+ * @param backend Parameter backend.
+ * @param window Parameter window.
+ * @param out_handle Parameter out_handle.
+ * @return Return value.
+ */
+static ui_error_t wayland_get_os_handle(struct ui_window_backend *backend,
+                                        struct ui_window *window,
+                                        void **out_handle) {
+  if (!backend || !window || !out_handle) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+  *out_handle = (void *)window->surface;
+  return UI_ERROR_NONE;
+}
+
+/**
  * @brief Creates a Linux Wayland window backend.
  * @param out_backend Parameter out_backend.
  * @return Return value.
@@ -480,8 +525,8 @@ ui_window_backend_linux_wayland_create(struct ui_window_backend **out_backend) {
   backend->poll_events = linux_poll_events;
   backend->swap_buffers = linux_swap_buffers;
   backend->push_deep_link = NULL;
-  backend->get_os_handle = NULL;
-  backend->set_on_resize_callback = NULL;
+  backend->get_os_handle = wayland_get_os_handle;
+  backend->set_on_resize_callback = wayland_set_on_resize_callback;
   backend->user_data = NULL;
 
   *out_backend = backend;

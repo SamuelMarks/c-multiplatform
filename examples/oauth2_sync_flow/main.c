@@ -21,6 +21,7 @@
 #include "ui_renderer.h"
 #include "ui_renderer_gles2.h"
 #include "ui_window_backend.h"
+#include "ui_test_visual.h"
 
 #if defined(__EMSCRIPTEN__)
 #include "ui_window_backend_web.h"
@@ -403,6 +404,96 @@ static ui_error_t draw_layout_node(struct ui_renderer_backend *renderer,
 }
 
 /**
+ * @brief Conditionally saves a screenshot to disk if UI_SCREENSHOT_PATH is set.
+ * @param renderer Pointer to renderer backend.
+ * @param width Window width.
+ * @param height Window height.
+ * @return UI_ERROR_NONE on success or if unconfigured, or an error code on
+ * failure.
+ */
+static ui_error_t maybe_save_screenshot(struct ui_renderer_backend *renderer,
+                                        int width, int height) {
+  const char *shot_path = NULL;
+  unsigned char *pixels = NULL;
+  unsigned char *row_tmp = NULL;
+  int w = width;
+  int h = height;
+  int row;
+  ui_error_t err = UI_ERROR_NONE;
+#if defined(_MSC_VER)
+  char *env_val = NULL;
+  size_t env_len = 0;
+  if (_dupenv_s(&env_val, &env_len, "UI_SCREENSHOT_PATH") == 0 &&
+      env_val != NULL) {
+    shot_path = env_val;
+  }
+#else
+  shot_path = getenv("UI_SCREENSHOT_PATH");
+#endif
+
+  if (!shot_path) {
+#if defined(_MSC_VER)
+    if (env_val) {
+      free(env_val);
+    }
+#endif
+    return UI_ERROR_NONE;
+  }
+
+  if (!renderer || !renderer->read_pixels || w <= 0 || h <= 0) {
+#if defined(_MSC_VER)
+    if (env_val) {
+      free(env_val);
+    }
+#endif
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+
+  pixels = (unsigned char *)malloc((size_t)w * (size_t)h * 4);
+  if (!pixels) {
+#if defined(_MSC_VER)
+    if (env_val) {
+      free(env_val);
+    }
+#endif
+    return UI_ERROR_OUT_OF_MEMORY;
+  }
+
+  err = renderer->read_pixels(renderer, w, h, pixels);
+  if (err != UI_ERROR_NONE) {
+    free(pixels);
+#if defined(_MSC_VER)
+    if (env_val) {
+      free(env_val);
+    }
+#endif
+    return err;
+  }
+
+  row_tmp = (unsigned char *)malloc((size_t)w * 4);
+  if (row_tmp) {
+    for (row = 0; row < h / 2; ++row) {
+      unsigned char *top = pixels + (size_t)row * (size_t)w * 4;
+      unsigned char *bot = pixels + (size_t)(h - 1 - row) * (size_t)w * 4;
+      memcpy(row_tmp, top, (size_t)w * 4);
+      memcpy(top, bot, (size_t)w * 4);
+      memcpy(bot, row_tmp, (size_t)w * 4);
+    }
+    free(row_tmp);
+  }
+
+  err = ui_visual_write_heatmap_to_disk(shot_path, pixels, w, h);
+
+  free(pixels);
+#if defined(_MSC_VER)
+  if (env_val) {
+    free(env_val);
+  }
+#endif
+  return err;
+}
+
+/**
  * @brief Recursively hit-tests the layout tree to identify which element was
  * clicked.
  * @param node Layout node to test.
@@ -613,6 +704,98 @@ static ui_error_t handle_click(struct app_state *state,
 }
 
 /**
+ * @struct oauth2_render_context
+ * @brief Context passed to window resize callback for live re-rendering.
+ */
+struct oauth2_render_context {
+  float *window_width;                  /**< Pointer to window width */
+  float *window_height;                 /**< Pointer to window height */
+  int *needs_layout;                    /**< Pointer to needs_layout flag */
+  struct ui_dom_node *root;             /**< Root DOM node */
+  struct ui_css_stylesheet *stylesheet; /**< Active stylesheet */
+  struct ui_layout_node **layout_tree;  /**< Pointer to layout tree pointer */
+  struct ui_renderer_backend *renderer; /**< Active renderer backend */
+  struct ui_window_backend *backend;    /**< Active window backend */
+  struct ui_window *window;             /**< Active window */
+};
+
+/**
+ * @brief Window resize callback for live re-rendering during window drag.
+ * @param user_data Pointer to oauth2_render_context.
+ * @param width New window width.
+ * @param height New window height.
+ * @return UI_ERROR_NONE on success, or an error code on failure.
+ */
+static ui_error_t oauth2_on_resize_callback(void *user_data, int width,
+                                            int height) {
+  struct oauth2_render_context *rctx =
+      (struct oauth2_render_context *)user_data;
+  ui_error_t err;
+  struct ui_color bg;
+
+  if (!rctx || !rctx->window_width || !rctx->window_height ||
+      !rctx->needs_layout) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+  *rctx->window_width = (float)width;
+  *rctx->window_height = (float)height;
+  *rctx->needs_layout = 1;
+
+  if (rctx->renderer && rctx->backend && rctx->window) {
+    if (*rctx->layout_tree) {
+      err = ui_layout_tree_destroy(*rctx->layout_tree);
+      if (err != UI_ERROR_NONE) {
+        return err;
+      }
+      *rctx->layout_tree = NULL;
+    }
+    err = ui_layout_tree_generate(rctx->root, rctx->stylesheet,
+                                  rctx->layout_tree);
+    if (err != UI_ERROR_NONE) {
+      return err;
+    }
+    if (*rctx->layout_tree) {
+      err = ui_layout_solve_viewport(*rctx->layout_tree, *rctx->window_width,
+                                     *rctx->window_height);
+      if (err != UI_ERROR_NONE) {
+        return err;
+      }
+    }
+    *rctx->needs_layout = 0;
+
+    bg.r = 0.94f;
+    bg.g = 0.95f;
+    bg.b = 0.97f;
+    bg.a = 1.0f;
+    err = rctx->renderer->set_viewport(rctx->renderer, 0, 0,
+                                       (int)*rctx->window_width,
+                                       (int)*rctx->window_height);
+    if (err != UI_ERROR_NONE) {
+      return err;
+    }
+    err = rctx->renderer->clear(rctx->renderer, bg);
+    if (err != UI_ERROR_NONE) {
+      return err;
+    }
+    if (*rctx->layout_tree) {
+      err = draw_layout_node(rctx->renderer, *rctx->layout_tree);
+      if (err != UI_ERROR_NONE) {
+        return err;
+      }
+    }
+    err = rctx->renderer->flush(rctx->renderer);
+    if (err != UI_ERROR_NONE) {
+      return err;
+    }
+    err = rctx->backend->swap_buffers(rctx->backend, rctx->window);
+    if (err != UI_ERROR_NONE) {
+      return err;
+    }
+  }
+  return UI_ERROR_NONE;
+}
+
+/**
  * @brief Application entry point implementation accepting arguments.
  * @param argc Argument count.
  * @param argv Argument vector.
@@ -650,6 +833,9 @@ int example_oauth2_sync_flow_main_args(int argc, char **argv) {
   int demo_frame = 0;
   int needs_layout = 1;
   int exit_code = 0;
+  float window_width = 900.0f;
+  float window_height = 650.0f;
+  struct oauth2_render_context rctx;
   enum oauth2_app_error app_rc;
   ui_error_t err;
   int i;
@@ -819,6 +1005,19 @@ int example_oauth2_sync_flow_main_args(int argc, char **argv) {
         }
       }
       if (renderer != NULL) {
+        if (backend->set_on_resize_callback) {
+          rctx.window_width = &window_width;
+          rctx.window_height = &window_height;
+          rctx.needs_layout = &needs_layout;
+          rctx.root = root;
+          rctx.stylesheet = stylesheet;
+          rctx.layout_tree = &layout_tree;
+          rctx.renderer = renderer;
+          rctx.backend = backend;
+          rctx.window = window;
+          backend->set_on_resize_callback(backend, window,
+                                          oauth2_on_resize_callback, &rctx);
+        }
         err = backend->show_window(backend, window);
         if (err != UI_ERROR_NONE) {
           fprintf(stderr, "Failed to show window: %d\n", (int)err);
@@ -877,6 +1076,11 @@ int example_oauth2_sync_flow_main_args(int argc, char **argv) {
             running = 0;
             break;
           }
+          if (event.type == UI_EVENT_WINDOW_RESIZE) {
+            window_width = (float)event.event_data.window.width;
+            window_height = (float)event.event_data.window.height;
+            needs_layout = 1;
+          }
           if (event.type == UI_EVENT_MOUSE_UP) {
             int click_needs_layout = 0;
             err = handle_click(state, router, router_outlet, layout_tree,
@@ -927,12 +1131,21 @@ int example_oauth2_sync_flow_main_args(int argc, char **argv) {
 
       if (needs_layout) {
         if (layout_tree != NULL) {
-          ui_layout_tree_destroy(layout_tree);
+          err = ui_layout_tree_destroy(layout_tree);
+          if (err != UI_ERROR_NONE) {
+            exit_code = 1;
+            break;
+          }
           layout_tree = NULL;
         }
         err = ui_layout_tree_generate(root, stylesheet, &layout_tree);
         if (err == UI_ERROR_NONE && layout_tree != NULL) {
-          ui_layout_solve_viewport(layout_tree, 900.0f, 650.0f);
+          err = ui_layout_solve_viewport(layout_tree, window_width,
+                                         window_height);
+          if (err != UI_ERROR_NONE) {
+            exit_code = 1;
+            break;
+          }
         }
         needs_layout = 0;
       }
@@ -943,12 +1156,36 @@ int example_oauth2_sync_flow_main_args(int argc, char **argv) {
         bg.g = 0.95f;
         bg.b = 0.97f;
         bg.a = 1.0f;
-        renderer->set_viewport(renderer, 0, 0, 900, 650);
-        renderer->clear(renderer, bg);
+        err = renderer->set_viewport(renderer, 0, 0, (int)window_width,
+                                     (int)window_height);
+        if (err != UI_ERROR_NONE) {
+          exit_code = 1;
+          break;
+        }
+        err = renderer->clear(renderer, bg);
+        if (err != UI_ERROR_NONE) {
+          exit_code = 1;
+          break;
+        }
         if (layout_tree != NULL) {
-          draw_layout_node(renderer, layout_tree);
+          err = draw_layout_node(renderer, layout_tree);
+          if (err != UI_ERROR_NONE) {
+            exit_code = 1;
+            break;
+          }
         }
         err = renderer->flush(renderer);
+        if (err != UI_ERROR_NONE) {
+          exit_code = 1;
+          break;
+        }
+        err = maybe_save_screenshot(renderer, (int)window_width,
+                                    (int)window_height);
+        if (err != UI_ERROR_NONE) {
+          exit_code = 1;
+          break;
+        }
+        err = backend->swap_buffers(backend, window);
         if (err != UI_ERROR_NONE) {
           exit_code = 1;
           break;

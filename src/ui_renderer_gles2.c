@@ -10,6 +10,8 @@
 /** @brief internal */
 #define GL_SILENCE_DEPRECATION
 /* clang-format off */
+#include <stddef.h>
+#include <string.h>
 #include "../include/ui_renderer.h"
 #include "../include/ui_error.h"
 
@@ -653,7 +655,7 @@ static ui_error_t gles2_flush(struct ui_renderer_backend *backend) {
     glEnableVertexAttribArray((GLuint)data->a_color);
     glVertexAttribPointer((GLuint)data->a_color, 4, GL_FLOAT, 0,
                           sizeof(struct ui_vertex),
-                          (void *)(sizeof(float) * 2));
+                          (void *)(size_t)offsetof(struct ui_vertex, color));
 
     glDrawElements(GL_TRIANGLES, data->index_count, GL_UNSIGNED_SHORT, 0);
 

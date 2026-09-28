@@ -22,6 +22,7 @@
 #include "ui_css_parser.h"
 #include "ui_layout.h"
 #include "ui_cssom_view.h"
+#include "ui_test_visual.h"
 
 #if defined(__EMSCRIPTEN__)
 #include "ui_window_backend_web.h"
@@ -290,6 +291,97 @@ struct render_context {
 };
 
 /**
+ * @brief Conditionally saves a screenshot to disk if UI_SCREENSHOT_PATH is set.
+ * @param rctx Pointer to render context.
+ * @param width Window width.
+ * @param height Window height.
+ * @return UI_ERROR_NONE on success or if unconfigured, or an error code on
+ * failure.
+ */
+static ui_error_t maybe_save_screenshot(struct render_context *rctx,
+                                        float width, float height) {
+  const char *shot_path = NULL;
+  unsigned char *pixels = NULL;
+  unsigned char *row_tmp = NULL;
+  int w = (int)width;
+  int h = (int)height;
+  int row;
+  ui_error_t err = UI_ERROR_NONE;
+#if defined(_MSC_VER)
+  char *env_val = NULL;
+  size_t env_len = 0;
+  if (_dupenv_s(&env_val, &env_len, "UI_SCREENSHOT_PATH") == 0 &&
+      env_val != NULL) {
+    shot_path = env_val;
+  }
+#else
+  shot_path = getenv("UI_SCREENSHOT_PATH");
+#endif
+
+  if (!shot_path) {
+#if defined(_MSC_VER)
+    if (env_val) {
+      free(env_val);
+    }
+#endif
+    return UI_ERROR_NONE;
+  }
+
+  if (!rctx || !rctx->renderer || !rctx->renderer->read_pixels || w <= 0 ||
+      h <= 0) {
+#if defined(_MSC_VER)
+    if (env_val) {
+      free(env_val);
+    }
+#endif
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+
+  pixels = (unsigned char *)malloc((size_t)w * (size_t)h * 4);
+  if (!pixels) {
+#if defined(_MSC_VER)
+    if (env_val) {
+      free(env_val);
+    }
+#endif
+    return UI_ERROR_OUT_OF_MEMORY;
+  }
+
+  err = rctx->renderer->read_pixels(rctx->renderer, w, h, pixels);
+  if (err != UI_ERROR_NONE) {
+    free(pixels);
+#if defined(_MSC_VER)
+    if (env_val) {
+      free(env_val);
+    }
+#endif
+    return err;
+  }
+
+  row_tmp = (unsigned char *)malloc((size_t)w * 4);
+  if (row_tmp) {
+    for (row = 0; row < h / 2; ++row) {
+      unsigned char *top = pixels + (size_t)row * (size_t)w * 4;
+      unsigned char *bot = pixels + (size_t)(h - 1 - row) * (size_t)w * 4;
+      memcpy(row_tmp, top, (size_t)w * 4);
+      memcpy(top, bot, (size_t)w * 4);
+      memcpy(bot, row_tmp, (size_t)w * 4);
+    }
+    free(row_tmp);
+  }
+
+  err = ui_visual_write_heatmap_to_disk(shot_path, pixels, w, h);
+
+  free(pixels);
+#if defined(_MSC_VER)
+  if (env_val) {
+    free(env_val);
+  }
+#endif
+  return err;
+}
+
+/**
  * @brief Solves layout and renders the current frame.
  * @param rctx Pointer to render context.
  * @return UI_ERROR_NONE on success, or an error code on failure.
@@ -353,6 +445,11 @@ static ui_error_t do_render(struct render_context *rctx) {
   if (err != UI_ERROR_NONE) {
     return err;
   }
+  err = maybe_save_screenshot(rctx, app_ctx->window_width,
+                              app_ctx->window_height);
+  if (err != UI_ERROR_NONE) {
+    return err;
+  }
   err = rctx->window_backend->swap_buffers(rctx->window_backend, rctx->window);
   if (err != UI_ERROR_NONE) {
     return err;
@@ -369,9 +466,15 @@ static ui_error_t do_render(struct render_context *rctx) {
  */
 static ui_error_t on_resize_callback(void *user_data, int width, int height) {
   struct render_context *rctx = (struct render_context *)user_data;
+  if (!rctx || !rctx->app_ctx) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
   rctx->app_ctx->window_width = (float)width;
   rctx->app_ctx->window_height = (float)height;
   rctx->app_ctx->needs_layout = 1;
+  if (rctx->renderer) {
+    return do_render(rctx);
+  }
   return UI_ERROR_NONE;
 }
 

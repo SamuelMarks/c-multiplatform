@@ -261,6 +261,9 @@ static ui_error_t layout_flex(struct ui_layout_node *node,
   float current_x, current_y;
   int i;
   float container_main_size;
+  float total_cross;
+  float inner_cross;
+  float free_cross;
   ui_error_t rc = UI_ERROR_NONE;
 
   memset(lines, 0, sizeof(lines));
@@ -401,6 +404,48 @@ static ui_error_t layout_flex(struct ui_layout_node *node,
   /* Pass 3: Final Positioning */
   start_x = node->padding[3] + node->border[3];
   start_y = node->padding[0] + node->border[0];
+
+  total_cross = 0.0f;
+  for (i = 0; i < line_count; i++) {
+    total_cross += lines[i].cross_max;
+  }
+
+  if (is_row) {
+    inner_cross = node->content_height;
+    if (inner_cross <= 0.0f && node->height > 0.0f) {
+      inner_cross = node->height - node->padding[0] - node->padding[2] -
+                    node->border[0] - node->border[2];
+    }
+    if (inner_cross > total_cross) {
+      free_cross = inner_cross - total_cross;
+      if (node->align_content == UI_LAYOUT_ALIGN_CENTER ||
+          (line_count == 1 && node->align_items == UI_LAYOUT_ALIGN_CENTER)) {
+        start_y += free_cross / 2.0f;
+      } else if (node->align_content == UI_LAYOUT_ALIGN_END ||
+                 (line_count == 1 &&
+                  node->align_items == UI_LAYOUT_ALIGN_END)) {
+        start_y += free_cross;
+      }
+    }
+  } else {
+    inner_cross = node->content_width;
+    if (inner_cross <= 0.0f && node->width > 0.0f) {
+      inner_cross = node->width - node->padding[1] - node->padding[3] -
+                    node->border[1] - node->border[3];
+    }
+    if (inner_cross > total_cross) {
+      free_cross = inner_cross - total_cross;
+      if (node->align_content == UI_LAYOUT_ALIGN_CENTER ||
+          (line_count == 1 && node->align_items == UI_LAYOUT_ALIGN_CENTER)) {
+        start_x += free_cross / 2.0f;
+      } else if (node->align_content == UI_LAYOUT_ALIGN_END ||
+                 (line_count == 1 &&
+                  node->align_items == UI_LAYOUT_ALIGN_END)) {
+        start_x += free_cross;
+      }
+    }
+  }
+
   current_y = start_y;
   current_x = start_x;
 
@@ -428,6 +473,8 @@ static ui_error_t layout_flex(struct ui_layout_node *node,
       if (node->justify_content == UI_LAYOUT_ALIGN_CENTER) {
         if (is_row)
           line_start_x += free_space / 2.0f;
+        else
+          line_start_y += free_space / 2.0f;
       } else if (node->justify_content == UI_LAYOUT_ALIGN_END) {
         if (is_row)
           line_start_x += free_space;

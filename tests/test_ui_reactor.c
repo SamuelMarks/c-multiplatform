@@ -369,7 +369,7 @@ void test_ui_reactor_oom(void) {
   if (rc == UI_ERROR_NONE && reactor) {
     g_malloc_fail_countdown = 0;
     rc = ui_reactor_register(reactor, (void *)1, UI_REACTOR_EVENT_READ,
-                             (ui_error_t(*)(void *, int, void *))0x1, NULL);
+                             (ui_error_t (*)(void *, int, void *))0x1, NULL);
     if (rc != UI_ERROR_OUT_OF_MEMORY && rc != UI_ERROR_NONE) {
       /* handled */
     }
@@ -377,15 +377,15 @@ void test_ui_reactor_oom(void) {
 
     /* Cover destroy while having tasks and nodes */
     rc = ui_reactor_register(reactor, (void *)1, UI_REACTOR_EVENT_READ,
-                             (ui_error_t(*)(void *, int, void *))0x1, NULL);
+                             (ui_error_t (*)(void *, int, void *))0x1, NULL);
     if (rc != UI_ERROR_NONE) {
       /* handled */
     }
-    rc = ui_reactor_schedule(reactor, (ui_error_t(*)(void *))0x1, NULL);
+    rc = ui_reactor_schedule(reactor, (ui_error_t (*)(void *))0x1, NULL);
     if (rc != UI_ERROR_NONE) {
       /* handled */
     }
-    rc = ui_reactor_schedule(reactor, (ui_error_t(*)(void *))0x1, NULL);
+    rc = ui_reactor_schedule(reactor, (ui_error_t (*)(void *))0x1, NULL);
     if (rc != UI_ERROR_NONE) {
       /* handled */
     }
@@ -414,15 +414,15 @@ void test_ui_reactor_destroy_populated(void) {
   rc = ui_reactor_create(&reactor);
   if (rc == UI_ERROR_NONE && reactor) {
     rc = ui_reactor_register(reactor, (void *)1, UI_REACTOR_EVENT_READ,
-                             (ui_error_t(*)(void *, int, void *))0x1, NULL);
+                             (ui_error_t (*)(void *, int, void *))0x1, NULL);
     if (rc != UI_ERROR_NONE) {
       /* handled */
     }
-    rc = ui_reactor_schedule(reactor, (ui_error_t(*)(void *))0x1, NULL);
+    rc = ui_reactor_schedule(reactor, (ui_error_t (*)(void *))0x1, NULL);
     if (rc != UI_ERROR_NONE) {
       /* handled */
     }
-    rc = ui_reactor_schedule(reactor, (ui_error_t(*)(void *))0x1, NULL);
+    rc = ui_reactor_schedule(reactor, (ui_error_t (*)(void *))0x1, NULL);
     if (rc != UI_ERROR_NONE) {
       /* handled */
     }
@@ -447,7 +447,7 @@ void test_ui_reactor_poll_error(void) {
   rc = ui_reactor_create(&reactor);
   if (rc == UI_ERROR_NONE && reactor) {
     /* To get cb_rc != UI_ERROR_NONE in the task queue */
-    rc = ui_reactor_schedule(reactor, (ui_error_t(*)(void *))0x1, NULL);
+    rc = ui_reactor_schedule(reactor, (ui_error_t (*)(void *))0x1, NULL);
     if (rc != UI_ERROR_NONE) {
       /* handled */
     }

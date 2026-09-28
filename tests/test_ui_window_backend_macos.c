@@ -18,7 +18,23 @@ struct ui_window {
   int height;
   int is_shown;
   int is_closing;
+  int has_resize_event;
+  ui_error_t (*on_resize_callback)(void *, int, int);
+  void *on_resize_user_data;
 };
+
+static int g_test_resize_called = 0;
+static int g_test_resize_w = 0;
+static int g_test_resize_h = 0;
+
+static ui_error_t test_resize_callback(void *user_data, int w, int h) {
+  if (user_data) {
+  }
+  g_test_resize_called++;
+  g_test_resize_w = w;
+  g_test_resize_h = h;
+  return UI_ERROR_NONE;
+}
 
 #if defined(__APPLE__) && defined(__MACH__)
 #if TARGET_OS_MAC && !TARGET_OS_IPHONE
@@ -29,15 +45,15 @@ struct ui_window {
 
 static void post_test_mouse_event(unsigned long type) {
   id appCls = (id)objc_getClass("NSApplication");
-  id app = ((id(*)(id, SEL))objc_msgSend)(
+  id app = ((id (*)(id, SEL))objc_msgSend)(
       appCls, sel_registerName("sharedApplication"));
   id evtCls = (id)objc_getClass("NSEvent");
   CGPoint loc;
   id evt;
   loc.x = 10.0;
   loc.y = 10.0;
-  evt = ((id(*)(id, SEL, unsigned long, CGPoint, unsigned long, double, long,
-                id, long, long, float))objc_msgSend)(
+  evt = ((id (*)(id, SEL, unsigned long, CGPoint, unsigned long, double, long,
+                 id, long, long, float))objc_msgSend)(
       evtCls,
       sel_registerName("mouseEventWithType:location:modifierFlags:timestamp:"
                        "windowNumber:context:eventNumber:clickCount:pressure:"),
@@ -50,18 +66,18 @@ static void post_test_mouse_event(unsigned long type) {
 
 static void post_test_key_event(void) {
   id appCls = (id)objc_getClass("NSApplication");
-  id app = ((id(*)(id, SEL))objc_msgSend)(
+  id app = ((id (*)(id, SEL))objc_msgSend)(
       appCls, sel_registerName("sharedApplication"));
   id evtCls = (id)objc_getClass("NSEvent");
   id strCls = (id)objc_getClass("NSString");
-  id str = ((id(*)(id, SEL, const char *))objc_msgSend)(
+  id str = ((id (*)(id, SEL, const char *))objc_msgSend)(
       strCls, sel_registerName("stringWithUTF8String:"), "a");
   CGPoint loc;
   id evt;
   loc.x = 10.0;
   loc.y = 10.0;
-  evt = ((id(*)(id, SEL, unsigned long, CGPoint, unsigned long, double, long,
-                id, id, id, BOOL, unsigned short))objc_msgSend)(
+  evt = ((id (*)(id, SEL, unsigned long, CGPoint, unsigned long, double, long,
+                 id, id, id, BOOL, unsigned short))objc_msgSend)(
       evtCls,
       sel_registerName(
           "keyEventWithType:location:modifierFlags:timestamp:"
@@ -76,15 +92,15 @@ static void post_test_key_event(void) {
 
 static void post_test_other_event(void) {
   id appCls = (id)objc_getClass("NSApplication");
-  id app = ((id(*)(id, SEL))objc_msgSend)(
+  id app = ((id (*)(id, SEL))objc_msgSend)(
       appCls, sel_registerName("sharedApplication"));
   id evtCls = (id)objc_getClass("NSEvent");
   CGPoint loc;
   id evt;
   loc.x = 10.0;
   loc.y = 10.0;
-  evt = ((id(*)(id, SEL, unsigned long, CGPoint, unsigned long, double, long,
-                id, short, long, long))objc_msgSend)(
+  evt = ((id (*)(id, SEL, unsigned long, CGPoint, unsigned long, double, long,
+                 id, short, long, long))objc_msgSend)(
       evtCls,
       sel_registerName("otherEventWithType:location:modifierFlags:timestamp:"
                        "windowNumber:context:subtype:data1:data2:"),
@@ -194,6 +210,23 @@ int main(void) {
           /* Empty event queue check (event == NULL) */
           backend->poll_events(backend, real_win, &evt, &has_evt);
           failed |= (evt.type != UI_EVENT_NONE || has_evt);
+
+          /* Test resize callback registration and resize detection */
+          failed |= (backend->set_on_resize_callback(backend, real_win,
+                                                     test_resize_callback,
+                                                     NULL) != UI_ERROR_NONE);
+          real_win->width = 100;
+          backend->poll_events(backend, real_win, &evt, &has_evt);
+          failed |= (evt.type != UI_EVENT_WINDOW_RESIZE || !has_evt);
+          failed |= (g_test_resize_called == 0);
+          failed |= (real_win->width != 200);
+
+          {
+            void *real_os_h = NULL;
+            failed |= (backend->get_os_handle(backend, real_win, &real_os_h) !=
+                       UI_ERROR_NONE);
+            failed |= (real_os_h == NULL);
+          }
 #endif
 
           backend->swap_buffers(backend, real_win);
@@ -266,6 +299,28 @@ int main(void) {
         (backend->swap_buffers(backend, NULL) != UI_ERROR_INVALID_ARGUMENT);
     failed |= (backend->swap_buffers(backend, (struct ui_window *)1) !=
                UI_ERROR_NONE);
+
+    failed |=
+        (backend->set_on_resize_callback(NULL, window, test_resize_callback,
+                                         NULL) != UI_ERROR_INVALID_ARGUMENT);
+    failed |=
+        (backend->set_on_resize_callback(backend, NULL, test_resize_callback,
+                                         NULL) != UI_ERROR_INVALID_ARGUMENT);
+    failed |= (backend->set_on_resize_callback(backend, (struct ui_window *)1,
+                                               test_resize_callback,
+                                               NULL) != UI_ERROR_NONE);
+
+    {
+      void *os_h = NULL;
+      failed |= (backend->get_os_handle(NULL, window, &os_h) !=
+                 UI_ERROR_INVALID_ARGUMENT);
+      failed |= (backend->get_os_handle(backend, NULL, &os_h) !=
+                 UI_ERROR_INVALID_ARGUMENT);
+      failed |= (backend->get_os_handle(backend, window, NULL) !=
+                 UI_ERROR_INVALID_ARGUMENT);
+      failed |= (backend->get_os_handle(backend, (struct ui_window *)1,
+                                        &os_h) != UI_ERROR_NONE);
+    }
   }
 
 #ifdef UI_TEST_MOCK_ALLOC

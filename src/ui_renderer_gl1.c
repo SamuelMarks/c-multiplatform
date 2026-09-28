@@ -9,6 +9,10 @@
 
 /** @brief internal */
 #define GL_SILENCE_DEPRECATION
+/* clang-format off */
+#include <stddef.h>
+#include <string.h>
+/* clang-format on */
 #ifndef __EMSCRIPTEN__
 #if defined(_WIN32) || defined(__CYGWIN__)
 /* clang-format off */

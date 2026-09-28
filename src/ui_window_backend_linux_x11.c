@@ -24,12 +24,14 @@
  * \brief ui_window
  */
 struct ui_window {
-  Display *display;      /**< display */
-  Window window;         /**< window */
-  GLXContext glc;        /**< glc */
-  void *context;         /**< context */
-  int is_closing;        /**< is_closing */
-  Atom wm_delete_window; /**< wm_delete_window */
+  Display *display;                                   /**< display */
+  Window window;                                      /**< window */
+  GLXContext glc;                                     /**< glc */
+  void *context;                                      /**< context */
+  int is_closing;                                     /**< is_closing */
+  Atom wm_delete_window;                              /**< wm_delete_window */
+  ui_error_t (*on_resize_callback)(void *, int, int); /**< on_resize_callback */
+  void *on_resize_user_data; /**< on_resize_user_data */
 };
 
 /**
@@ -98,6 +100,7 @@ static ui_error_t linux_create_window(struct ui_window_backend *backend,
     XFree(vi);
     return UI_ERROR_OUT_OF_MEMORY;
   }
+  memset(win_obj, 0, sizeof(struct ui_window));
 
   win_obj->display = dpy;
   win_obj->window = win;
@@ -202,6 +205,14 @@ static ui_error_t linux_poll_events(struct ui_window_backend *backend,
       out_event->type = UI_EVENT_WINDOW_RESIZE;
       out_event->event_data.window.width = xev.xconfigure.width;
       out_event->event_data.window.height = xev.xconfigure.height;
+      if (window->on_resize_callback) {
+        ui_error_t cb_rc = window->on_resize_callback(
+            window->on_resize_user_data, xev.xconfigure.width,
+            xev.xconfigure.height);
+        if (cb_rc != UI_ERROR_NONE) {
+          return cb_rc;
+        }
+      }
     } else if (xev.type == ClientMessage) {
       if ((Atom)xev.xclient.data.l[0] == window->wm_delete_window) {
         out_event->type = UI_EVENT_WINDOW_CLOSE;
@@ -209,6 +220,42 @@ static ui_error_t linux_poll_events(struct ui_window_backend *backend,
     }
   }
 
+  return UI_ERROR_NONE;
+}
+
+/**
+ * @brief linux_set_on_resize_callback.
+ * @param backend Parameter backend.
+ * @param window Parameter window.
+ * @param callback Parameter callback.
+ * @param user_data Parameter user_data.
+ * @return Return value.
+ */
+static ui_error_t linux_set_on_resize_callback(
+    struct ui_window_backend *backend, struct ui_window *window,
+    ui_error_t (*callback)(void *, int, int), void *user_data) {
+  if (!backend || !window) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+  window->on_resize_callback = callback;
+  window->on_resize_user_data = user_data;
+  return UI_ERROR_NONE;
+}
+
+/**
+ * @brief linux_get_os_handle.
+ * @param backend Parameter backend.
+ * @param window Parameter window.
+ * @param out_handle Parameter out_handle.
+ * @return Return value.
+ */
+static ui_error_t linux_get_os_handle(struct ui_window_backend *backend,
+                                      struct ui_window *window,
+                                      void **out_handle) {
+  if (!backend || !window || !out_handle) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+  *out_handle = (void *)(size_t)window->window;
   return UI_ERROR_NONE;
 }
 
@@ -250,8 +297,8 @@ ui_window_backend_linux_create(struct ui_window_backend **out_backend) {
   backend->poll_events = linux_poll_events;
   backend->swap_buffers = linux_swap_buffers;
   backend->push_deep_link = NULL;
-  backend->get_os_handle = NULL;
-  backend->set_on_resize_callback = NULL;
+  backend->get_os_handle = linux_get_os_handle;
+  backend->set_on_resize_callback = linux_set_on_resize_callback;
   backend->user_data = NULL;
 
   *out_backend = backend;
