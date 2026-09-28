@@ -8,6 +8,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifndef CI_TEST_RUN
+#define CI_TEST_RUN 1
+#endif
+
 #define OMIT_MAIN 1
 #include "../examples/responsive_mosaic/main.c"
 #undef OMIT_MAIN

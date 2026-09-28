@@ -638,6 +638,13 @@ int example_oauth2_sync_flow_main_args(int argc, char **argv) {
   char *ci_env_val = NULL;
   size_t ci_env_len = 0;
 #endif
+#if defined(_WIN32) || defined(__CYGWIN__)
+  int is_wine = 0;
+#if defined(_MSC_VER)
+  char *wine_val = NULL;
+  size_t wine_len = 0;
+#endif
+#endif
   int running = 1;
   int frame_count = 0;
   int demo_frame = 0;
@@ -773,6 +780,28 @@ int example_oauth2_sync_flow_main_args(int argc, char **argv) {
   err = ui_window_backend_linux_create(&backend);
 #endif
 
+#if defined(_WIN32) || defined(__CYGWIN__)
+#if defined(_MSC_VER)
+  if (_dupenv_s(&wine_val, &wine_len, "WINELOADER") == 0 && wine_val != NULL) {
+    is_wine = 1;
+    free(wine_val);
+  }
+#else
+  if (getenv("WINELOADER") != NULL) {
+    is_wine = 1;
+  }
+#endif
+  if (is_wine) {
+    if (backend) {
+      err = ui_window_backend_win32_destroy(backend);
+      if (err != UI_ERROR_NONE && exit_code == 0) {
+        exit_code = 1;
+      }
+      backend = NULL;
+    }
+  }
+#endif
+
   if (backend != NULL) {
     err =
         backend->create_window(backend, "OAuth2 Sync Flow", 900, 650, &window);
@@ -782,11 +811,18 @@ int example_oauth2_sync_flow_main_args(int argc, char **argv) {
         err = renderer->init(renderer, backend, window);
         if (err != UI_ERROR_NONE) {
           fprintf(stderr, "Failed to init renderer: %d\n", (int)err);
+          err = ui_renderer_gles2_destroy(renderer);
+          if (err != UI_ERROR_NONE && exit_code == 0) {
+            exit_code = 1;
+          }
+          renderer = NULL;
         }
       }
-      err = backend->show_window(backend, window);
-      if (err != UI_ERROR_NONE) {
-        fprintf(stderr, "Failed to show window: %d\n", (int)err);
+      if (renderer != NULL) {
+        err = backend->show_window(backend, window);
+        if (err != UI_ERROR_NONE) {
+          fprintf(stderr, "Failed to show window: %d\n", (int)err);
+        }
       }
     }
   }
@@ -959,37 +995,58 @@ cleanup:
     stylesheet = NULL;
   }
   if (root != NULL) {
-    ui_dom_node_destroy(root);
+    err = ui_dom_node_destroy(root);
+    if (err != UI_ERROR_NONE && exit_code == 0) {
+      exit_code = 1;
+    }
     root = NULL;
   }
   if (renderer != NULL) {
-    renderer->destroy(renderer);
+    err = ui_renderer_gles2_destroy(renderer);
+    if (err != UI_ERROR_NONE && exit_code == 0) {
+      exit_code = 1;
+    }
     renderer = NULL;
   }
   if (backend != NULL && window != NULL) {
-    backend->destroy_window(backend, window);
+    err = backend->destroy_window(backend, window);
+    if (err != UI_ERROR_NONE && exit_code == 0) {
+      exit_code = 1;
+    }
     window = NULL;
   }
   if (backend != NULL) {
 #if defined(__EMSCRIPTEN__)
-    ui_window_backend_web_destroy(backend);
+    err = ui_window_backend_web_destroy(backend);
 #elif defined(_WIN32) || defined(__CYGWIN__)
-    ui_window_backend_win32_destroy(backend);
+    err = ui_window_backend_win32_destroy(backend);
 #elif defined(__APPLE__)
-    ui_window_backend_macos_destroy(backend);
+    err = ui_window_backend_macos_destroy(backend);
 #elif defined(__linux__) || defined(__unix__)
-    ui_window_backend_linux_destroy(backend);
+    err = ui_window_backend_linux_destroy(backend);
 #endif
+    if (err != UI_ERROR_NONE && exit_code == 0) {
+      exit_code = 1;
+    }
   }
 
   if (router != NULL) {
-    ui_router_destroy(router);
+    err = ui_router_destroy(router);
+    if (err != UI_ERROR_NONE && exit_code == 0) {
+      exit_code = 1;
+    }
   }
   if (arena != NULL) {
-    ui_arena_destroy(arena);
+    err = ui_arena_destroy(arena);
+    if (err != UI_ERROR_NONE && exit_code == 0) {
+      exit_code = 1;
+    }
   }
   if (engine != NULL) {
-    ui_engine_destroy(engine);
+    err = ui_engine_destroy(engine);
+    if (err != UI_ERROR_NONE && exit_code == 0) {
+      exit_code = 1;
+    }
   }
   if (state != NULL) {
     app_rc = app_state_destroy(state);

@@ -401,6 +401,7 @@ static int run_extra_control(void) {
   {
     int iter;
     for (iter = 0; iter < 50; ++iter) {
+      ui_thread_pool_tick(pool);
       ui_reactor_poll(reactor, 10);
       usleep(2000);
     }
@@ -414,6 +415,7 @@ static int run_extra_control(void) {
   {
     int iter;
     for (iter = 0; iter < 50; ++iter) {
+      ui_thread_pool_tick(pool);
       ui_reactor_poll(reactor, 10);
       usleep(2000);
     }
@@ -911,6 +913,7 @@ static int run_target_branch_tests(void) {
     /* Lines 307-308 & 347-348: inline worker cb sets VALID which fails */
     s_mock_fail_on_valid = 1;
     ui_form_control_enable(control2);
+    ui_thread_pool_tick(pool);
     usleep(50000);
     s_mock_fail_on_valid = 0;
 
@@ -928,6 +931,8 @@ static int run_target_branch_tests(void) {
         s_fail_reactor_schedule = 1;
         ui_form_control_add_async_validator(
             control3, validator_trigger_sched_fail, NULL, pool, target_reactor);
+        ui_thread_pool_tick(pool);
+        ui_reactor_poll(target_reactor, 10);
         usleep(50000);
         g_malloc_fail_countdown = -1;
         s_fail_reactor_schedule = 0;
@@ -998,6 +1003,7 @@ int main(void) {
   {
     int iter;
     for (iter = 0; iter < 50; ++iter) {
+      ui_thread_pool_tick(pool);
       ui_reactor_poll(reactor, 100);
       usleep(2000);
       rc = ui_signal_get(sig, &get_val);
@@ -1017,6 +1023,7 @@ int main(void) {
     rc = ui_form_control_set_value(control, new_val);
 
     for (iter = 0; iter < 50; ++iter) {
+      ui_thread_pool_tick(pool);
       ui_reactor_poll(reactor, 100);
       usleep(2000);
       rc = ui_signal_get(sig, &get_val);
@@ -1105,6 +1112,8 @@ int main(void) {
           }
         }
         g_malloc_fail_countdown = -1;
+        ui_thread_pool_tick(pool2);
+        ui_reactor_poll(reactor2, 10);
         {
           ui_error_t rc_cleanup = ui_form_control_destroy(control_oom);
           if (rc_cleanup != UI_ERROR_NONE) {
@@ -1114,6 +1123,7 @@ int main(void) {
       }
     }
     g_malloc_fail_countdown = -1;
+    ui_thread_pool_tick(pool2);
     ui_thread_pool_destroy(pool2);
     ui_reactor_poll(reactor2, 10);
     ui_reactor_destroy(reactor2);

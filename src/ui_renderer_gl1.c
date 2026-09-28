@@ -21,9 +21,9 @@
 #endif
 #endif /* !__EMSCRIPTEN__ */
 
-#if defined(UI_TEST_MOCK_ALLOC) ||                                             \
-    (!defined(_WIN32) && !defined(__APPLE__) && !defined(__EMSCRIPTEN__) &&    \
-     !defined(HAVE_OPENGL))
+#if !defined(__EMSCRIPTEN__) &&                                                \
+    (defined(UI_TEST_MOCK_ALLOC) ||                                            \
+     (!defined(_WIN32) && !defined(__APPLE__) && !defined(HAVE_OPENGL)))
 static void mock_glViewport(int x, int y, int w, int h) {
   int ux = x, uy = y, uw = w, uh = h;
   x = ux;
@@ -145,7 +145,8 @@ ui_error_t ui_renderer_gl1_destroy(struct ui_renderer_backend *backend) {
     return UI_ERROR_UNKNOWN;
   }
 #endif
-  if (backend) {
+  if (!backend) {
+    return UI_ERROR_INVALID_ARGUMENT;
   }
   return UI_ERROR_NONE;
 }

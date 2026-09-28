@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.15)
 
-# Serialize vcpkg applocal post-build dependencies to prevent file lock race conditions
+# Disable vcpkg applocal post-build dependency copying to prevent file lock race conditions
+# across concurrent test executables (error MSB3073 / exit code 32).
+set(VCPKG_APPLOCAL_DEPS OFF CACHE BOOL "" FORCE)
 set(X_VCPKG_APPLOCAL_DEPS_SERIALIZED ON CACHE BOOL "" FORCE)
 
 if (CMAKE_HOST_UNIX AND ((DEFINED CMAKE_C_COMPILER AND CMAKE_C_COMPILER MATCHES "(^|[/\\])cl(\\.exe)?$") OR (DEFINED CMAKE_CXX_COMPILER AND CMAKE_CXX_COMPILER MATCHES "(^|[/\\])cl(\\.exe)?$")))

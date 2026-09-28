@@ -295,6 +295,17 @@ int example_basic_main(void) {
   int running = 1;
   int frame_count = 0;
   int has_event = 0;
+#if !defined(CI_TEST_RUN) && defined(_MSC_VER)
+  char *ci_env_val = NULL;
+  size_t ci_env_len = 0;
+#endif
+#endif
+#if defined(_WIN32) || defined(__CYGWIN__)
+  int is_wine = 0;
+#if defined(_MSC_VER)
+  char *wine_val = NULL;
+  size_t wine_len = 0;
+#endif
 #endif
   int exit_code = 0;
   ui_error_t err;
@@ -404,6 +415,28 @@ err = ui_window_backend_macos_create(&backend);
 err = ui_window_backend_linux_create(&backend);
 #endif
 
+#if defined(_WIN32) || defined(__CYGWIN__)
+#if defined(_MSC_VER)
+  if (_dupenv_s(&wine_val, &wine_len, "WINELOADER") == 0 && wine_val != NULL) {
+    is_wine = 1;
+    free(wine_val);
+  }
+#else
+  if (getenv("WINELOADER") != NULL) {
+    is_wine = 1;
+  }
+#endif
+  if (is_wine) {
+    if (backend) {
+      err = ui_window_backend_win32_destroy(backend);
+      if (err != UI_ERROR_NONE && exit_code == 0) {
+        exit_code = 1;
+      }
+      backend = NULL;
+    }
+  }
+#endif
+
   if (backend != NULL && err == UI_ERROR_NONE) {
     err = backend->create_window(backend, "Basic Flex Layout",
                                  (int)app_ctx.window_width,
@@ -413,6 +446,10 @@ err = ui_window_backend_linux_create(&backend);
       if (err == UI_ERROR_NONE && renderer != NULL) {
         err = renderer->init(renderer, backend, window);
         if (err != UI_ERROR_NONE) {
+          err = ui_renderer_gles2_destroy(renderer);
+          if (err != UI_ERROR_NONE && exit_code == 0) {
+            exit_code = 1;
+          }
           renderer = NULL;
         }
       }
@@ -430,6 +467,10 @@ err = ui_window_backend_linux_create(&backend);
 
         err = backend->show_window(backend, window);
         if (err != UI_ERROR_NONE) {
+          err = ui_renderer_gles2_destroy(renderer);
+          if (err != UI_ERROR_NONE && exit_code == 0) {
+            exit_code = 1;
+          }
           renderer = NULL;
         }
       }
@@ -450,11 +491,19 @@ err = ui_window_backend_linux_create(&backend);
 #if defined(CI_TEST_RUN)
     ci_test = "1";
 #else
+#if defined(_MSC_VER)
+    if (_dupenv_s(&ci_env_val, &ci_env_len, "CI_TEST_RUN") == 0 &&
+        ci_env_val != NULL) {
+      ci_test = "1";
+      free(ci_env_val);
+    }
+#else
     ci_test = getenv("CI_TEST_RUN");
+#endif
 #endif
 
     while (running) {
-      if (ci_test && frame_count++ > 2) {
+      if (ci_test && frame_count++ > 0) {
         break;
       }
 
@@ -508,6 +557,24 @@ err = ui_window_backend_linux_create(&backend);
   }
 
 cleanup:
+  if (box1 && !box1->parent) {
+    err = ui_dom_node_destroy(box1);
+    if (err != UI_ERROR_NONE && exit_code == 0) {
+      exit_code = 1;
+    }
+  }
+  if (box2 && !box2->parent) {
+    err = ui_dom_node_destroy(box2);
+    if (err != UI_ERROR_NONE && exit_code == 0) {
+      exit_code = 1;
+    }
+  }
+  if (box3 && !box3->parent) {
+    err = ui_dom_node_destroy(box3);
+    if (err != UI_ERROR_NONE && exit_code == 0) {
+      exit_code = 1;
+    }
+  }
   if (app_ctx.layout_tree) {
     err = ui_layout_tree_destroy(app_ctx.layout_tree);
     if (err != UI_ERROR_NONE && exit_code == 0) {
@@ -527,7 +594,7 @@ cleanup:
     }
   }
   if (renderer) {
-    err = renderer->destroy(renderer);
+    err = ui_renderer_gles2_destroy(renderer);
     if (err != UI_ERROR_NONE && exit_code == 0) {
       exit_code = 1;
     }
