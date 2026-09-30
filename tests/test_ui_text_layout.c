@@ -138,6 +138,8 @@ static int test_text_layout(void) {
   /* Test RTL direction */
   ACCUM_ERR(failed, ui_text_layout_shape(layout, font, 12.0f, "A", 100.0f,
                                          UI_TEXT_DIRECTION_RTL));
+  ACCUM_ERR(failed, ui_text_layout_shape(layout, font, 12.0f, "ABC\nDEF",
+                                         100.0f, UI_TEXT_DIRECTION_RTL));
 
   /* Test kerning failure */
   g_mock_kerning_fail = 1;

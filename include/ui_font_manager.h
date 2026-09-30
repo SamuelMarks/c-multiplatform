@@ -90,6 +90,19 @@ extern C_MULTIPLATFORM_EXPORT ui_error_t ui_font_manager_load_font_memory(
     size_t data_size, struct ui_font **out_font);
 
 /**
+ * @brief Loads a TrueType or OpenType font from the filesystem into the font
+ * manager.
+ *
+ * @param manager Pointer to the font manager.
+ * @param file_path Path to the TrueType or OpenType font file.
+ * @param out_font Pointer to receive the loaded font handle.
+ * @return `UI_ERROR_NONE` on success, or an appropriate error code.
+ */
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_font_manager_load_font_file(
+    struct ui_font_manager *manager, const char *file_path,
+    struct ui_font **out_font);
+
+/**
  * @brief Sets the CSS properties for a font for tracking.
  *
  * @param font Pointer to the font.

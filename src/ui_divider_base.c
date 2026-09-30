@@ -22,6 +22,16 @@ static ui_error_t mock_divider_dom_node_set_attribute(struct ui_dom_node *node,
   if (g_divider_mock_fail == 1) {
     return UI_ERROR_UNKNOWN;
   }
+  if (g_divider_mock_fail == 4) {
+    if (v[0] == 'v') {
+      return UI_ERROR_UNKNOWN;
+    }
+  }
+  if (g_divider_mock_fail == 5) {
+    if (v[0] == 't') {
+      return UI_ERROR_UNKNOWN;
+    }
+  }
   return (ui_dom_node_set_attribute)(node, k, v);
 }
 #undef ui_dom_node_set_attribute

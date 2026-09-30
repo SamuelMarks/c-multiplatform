@@ -131,11 +131,23 @@ int main(void) {
     int cp[] = {'A'};
     unsigned char *atlas = NULL;
     int w, h;
+    struct ui_font_axis axes_arr[1];
+    struct ui_font_axis *out_ax;
+    int out_c;
+    struct ui_font *file_font = NULL;
 
     ui_font_manager_find_font(NULL, "Arial", 400, 0, &found_font);
     ui_font_manager_find_font(manager, NULL, 400, 0, &found_font);
     ui_font_manager_find_font(manager, "Arial", 400, 0, NULL);
     ui_font_manager_find_font(manager, "Arial", 400, 0, &found_font);
+    ui_font_manager_find_font(manager, "Nonexistent, 'Other', \"Test\"", 400, 1,
+                              &found_font);
+
+    /* Test ui_font_manager_load_font_file validation and missing file */
+    ui_font_manager_load_font_file(NULL, "nonexistent.ttf", &file_font);
+    ui_font_manager_load_font_file(manager, NULL, &file_font);
+    ui_font_manager_load_font_file(manager, "nonexistent.ttf", NULL);
+    ui_font_manager_load_font_file(manager, "nonexistent.ttf", &file_font);
 
     ui_font_set_metadata(NULL, "Arial", 400, 0);
     ui_font_set_metadata(font, NULL, 400, 0);
@@ -178,13 +190,10 @@ int main(void) {
     ui_font_set_status(font, UI_FONT_STATUS_LOADED);
     ui_font_get_status(font, &status);
 
-    struct ui_font_axis axes_arr[1];
     axes_arr[0].tag = 1;
     axes_arr[0].value = 1.0f;
     ui_font_set_variations(font, axes_arr, 1);
 
-    struct ui_font_axis *out_ax;
-    int out_c;
     ui_font_get_variations(font, &out_ax, &out_c);
 
     /* Valid calls */
@@ -215,17 +224,55 @@ int main(void) {
 static int test_oom(void) {
   struct ui_font_manager *manager = NULL;
   struct ui_font *font = NULL;
+  struct ui_font_axis axes[2];
+  ui_error_t rc;
 
-  ui_font_manager_create(&manager);
-
-  /* Load font memory OOM */
+  /* Font manager creation OOM */
   g_malloc_fail_countdown = 0;
-  ui_font_manager_load_font_memory(manager, tests_tiny_ttf,
-                                   sizeof(tests_tiny_ttf), &font);
+  rc = ui_font_manager_create(&manager);
+  if (rc != UI_ERROR_OUT_OF_MEMORY) {
+    return 1;
+  }
+  g_malloc_fail_countdown = -1;
 
+  rc = ui_font_manager_create(&manager);
+  if (rc != UI_ERROR_NONE) {
+    return 1;
+  }
+
+  /* Load font memory OOM - first allocation fails */
+  g_malloc_fail_countdown = 0;
+  rc = ui_font_manager_load_font_memory(manager, tests_tiny_ttf,
+                                        sizeof(tests_tiny_ttf), &font);
+  if (rc != UI_ERROR_OUT_OF_MEMORY) {
+    return 1;
+  }
+
+  /* Load font memory OOM - second allocation fails (font->data) */
   g_malloc_fail_countdown = 1;
-  ui_font_manager_load_font_memory(manager, tests_tiny_ttf,
-                                   sizeof(tests_tiny_ttf), &font);
+  rc = ui_font_manager_load_font_memory(manager, tests_tiny_ttf,
+                                        sizeof(tests_tiny_ttf), &font);
+  if (rc != UI_ERROR_OUT_OF_MEMORY) {
+    return 1;
+  }
+  g_malloc_fail_countdown = -1;
+
+  /* Load font successfully */
+  rc = ui_font_manager_load_font_memory(manager, tests_tiny_ttf,
+                                        sizeof(tests_tiny_ttf), &font);
+  if (rc != UI_ERROR_NONE) {
+    return 1;
+  }
+
+  /* Variations axis allocation OOM */
+  axes[0].tag = 0x77676874; /* 'wght' */
+  axes[0].value = 500.0f;
+
+  g_malloc_fail_countdown = 0;
+  rc = ui_font_set_variations(font, axes, 1);
+  if (rc != UI_ERROR_OUT_OF_MEMORY) {
+    return 1;
+  }
   g_malloc_fail_countdown = -1;
 
   {

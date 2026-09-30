@@ -29,9 +29,15 @@ struct ui_window {
   GLXContext glc;                                     /**< glc */
   void *context;                                      /**< context */
   int is_closing;                                     /**< is_closing */
+  int width;                                          /**< width */
+  int height;                                         /**< height */
+  float scale_factor;                                 /**< scale_factor */
   Atom wm_delete_window;                              /**< wm_delete_window */
   ui_error_t (*on_resize_callback)(void *, int, int); /**< on_resize_callback */
   void *on_resize_user_data; /**< on_resize_user_data */
+  ui_error_t (*on_dpi_change_callback)(void *, float,
+                                       float); /**< on_dpi_change_callback */
+  void *on_dpi_change_user_data;               /**< on_dpi_change_user_data */
 };
 
 /**
@@ -107,6 +113,9 @@ static ui_error_t linux_create_window(struct ui_window_backend *backend,
   win_obj->glc = glc;
   win_obj->context = NULL;
   win_obj->is_closing = 0;
+  win_obj->width = width;
+  win_obj->height = height;
+  win_obj->scale_factor = 1.0f;
   win_obj->wm_delete_window = wm_delete_window;
 
   XFree(vi);
@@ -242,6 +251,51 @@ static ui_error_t linux_set_on_resize_callback(
   return UI_ERROR_NONE;
 }
 
+static ui_error_t linux_x11_get_scale_factor(struct ui_window_backend *backend,
+                                             struct ui_window *window,
+                                             float *out_scale_factor) {
+  if (!backend || !window || !out_scale_factor) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+  if (window->scale_factor > 0.0f) {
+    *out_scale_factor = window->scale_factor;
+  } else {
+    *out_scale_factor = 1.0f;
+  }
+  return UI_ERROR_NONE;
+}
+
+static ui_error_t
+linux_x11_get_framebuffer_size(struct ui_window_backend *backend,
+                               struct ui_window *window, int *out_fb_width,
+                               int *out_fb_height) {
+  float scale;
+  ui_error_t rc;
+
+  if (!backend || !window || !out_fb_width || !out_fb_height) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+  scale = 1.0f;
+  rc = linux_x11_get_scale_factor(backend, window, &scale);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
+  *out_fb_width = (int)((float)window->width * scale);
+  *out_fb_height = (int)((float)window->height * scale);
+  return UI_ERROR_NONE;
+}
+
+static ui_error_t linux_x11_set_on_dpi_change_callback(
+    struct ui_window_backend *backend, struct ui_window *window,
+    ui_error_t (*callback)(void *, float, float), void *user_data) {
+  if (!backend || !window) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+  window->on_dpi_change_callback = callback;
+  window->on_dpi_change_user_data = user_data;
+  return UI_ERROR_NONE;
+}
+
 /**
  * @brief linux_get_os_handle.
  * @param backend Parameter backend.
@@ -299,6 +353,9 @@ ui_window_backend_linux_create(struct ui_window_backend **out_backend) {
   backend->push_deep_link = NULL;
   backend->get_os_handle = linux_get_os_handle;
   backend->set_on_resize_callback = linux_set_on_resize_callback;
+  backend->get_scale_factor = linux_x11_get_scale_factor;
+  backend->get_framebuffer_size = linux_x11_get_framebuffer_size;
+  backend->set_on_dpi_change_callback = linux_x11_set_on_dpi_change_callback;
   backend->user_data = NULL;
 
   *out_backend = backend;

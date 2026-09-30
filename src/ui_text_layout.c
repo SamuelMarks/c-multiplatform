@@ -5,20 +5,9 @@
 
 /* clang-format off */
 #include "../include/ui_text_layout.h"
+#include "ui_text_layout_internal.h"
 #include "ui_internal_mem.h"
 /* clang-format on */
-
-/**
- * @struct ui_text_layout
- * @brief Internal representation of a text layout.
- */
-struct ui_text_layout {
-  struct ui_positioned_glyph *glyphs; /**< Array of positioned glyphs. */
-  size_t capacity;                    /**< Allocated capacity for glyphs. */
-  size_t count;                       /**< Number of active glyphs. */
-  float bounds_width;                 /**< Width of the bounds. */
-  float bounds_height;                /**< Height of the bounds. */
-};
 
 /**
  * @brief Creates a new text layout instance.
@@ -168,6 +157,9 @@ ui_error_t ui_text_layout_shape(struct ui_text_layout *layout,
   float max_x = 0.0f;
   int prev_codepoint = 0;
   float ascent = 0.0f, descent = 0.0f, line_gap = 0.0f;
+  size_t last_break_glyph_idx = (size_t)-1;
+  float last_break_x = 0.0f;
+  float line_height;
   ui_error_t rc;
 
   if (!layout || !font || !text) {
@@ -186,6 +178,7 @@ ui_error_t ui_text_layout_shape(struct ui_text_layout *layout,
     return rc;
   }
 
+  line_height = ascent - descent + line_gap;
   y += ascent;
 
   while (*text) {
@@ -196,8 +189,9 @@ ui_error_t ui_text_layout_shape(struct ui_text_layout *layout,
 
     if (codepoint == '\n') {
       x = 0.0f;
-      y += (ascent - descent + line_gap);
+      y += line_height;
       prev_codepoint = 0;
+      last_break_glyph_idx = (size_t)-1;
       continue;
     }
 
@@ -216,15 +210,38 @@ ui_error_t ui_text_layout_shape(struct ui_text_layout *layout,
 
     x += kerning;
 
-    /* Word wrap logic (simplified per-character wrap for stub) */
+    /* Word wrap check on line boundaries */
     if (max_width > 0.0f && x + (float)metrics.width > max_width && x > 0.0f) {
-      x = 0.0f;
-      y += (ascent - descent + line_gap);
+      if (last_break_glyph_idx != (size_t)-1 &&
+          last_break_glyph_idx + 1 < layout->count) {
+        /* Rewrap words starting after the last whitespace/break opportunity */
+        size_t move_idx;
+        float shift_x = layout->glyphs[last_break_glyph_idx + 1].x;
+        y += line_height;
+        for (move_idx = last_break_glyph_idx + 1; move_idx < layout->count;
+             ++move_idx) {
+          layout->glyphs[move_idx].x -= shift_x;
+          layout->glyphs[move_idx].y = y;
+        }
+        x = x - shift_x;
+        last_break_glyph_idx = (size_t)-1;
+      } else {
+        /* Emergency wrap if word exceeds line length */
+        x = 0.0f;
+        y += line_height;
+        last_break_glyph_idx = (size_t)-1;
+      }
     }
 
     rc = add_glyph(layout, codepoint, x, y, (float)metrics.advance);
     if (rc != UI_ERROR_NONE) {
       return rc;
+    }
+
+    /* Record break opportunities on whitespace */
+    if (codepoint == ' ' || codepoint == '\t') {
+      last_break_glyph_idx = layout->count - 1;
+      last_break_x = x + (float)metrics.advance;
     }
 
     x += (float)metrics.advance;
@@ -233,6 +250,34 @@ ui_error_t ui_text_layout_shape(struct ui_text_layout *layout,
     }
 
     prev_codepoint = codepoint;
+  }
+
+  if (last_break_x > 0.0f) {
+    /* Reference to avoid unused variable warning */
+  }
+
+  if (direction == UI_TEXT_DIRECTION_RTL && layout->count > 0) {
+    size_t line_start = 0;
+    size_t i;
+    for (i = 0; i <= layout->count; ++i) {
+      if (i == layout->count ||
+          (i > line_start &&
+           layout->glyphs[i].y != layout->glyphs[line_start].y)) {
+        float line_w = 0.0f;
+        size_t j;
+        for (j = line_start; j < i; ++j) {
+          float end_x = layout->glyphs[j].x + layout->glyphs[j].advance;
+          if (end_x > line_w) {
+            line_w = end_x;
+          }
+        }
+        for (j = line_start; j < i; ++j) {
+          layout->glyphs[j].x =
+              line_w - (layout->glyphs[j].x + layout->glyphs[j].advance);
+        }
+        line_start = i;
+      }
+    }
   }
 
   layout->bounds_width = max_x;

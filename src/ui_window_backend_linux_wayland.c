@@ -45,8 +45,12 @@ struct ui_window {
   int needs_swap;                                     /**< needs_swap */
   struct ui_event pending_event;                      /**< pending_event */
   int has_pending_event;                              /**< has_pending_event */
+  float scale_factor;                                 /**< scale_factor */
   ui_error_t (*on_resize_callback)(void *, int, int); /**< on_resize_callback */
   void *on_resize_user_data; /**< on_resize_user_data */
+  ui_error_t (*on_dpi_change_callback)(void *, float,
+                                       float); /**< on_dpi_change_callback */
+  void *on_dpi_change_user_data;               /**< on_dpi_change_user_data */
 };
 
 /**
@@ -248,6 +252,7 @@ static ui_error_t linux_create_window(struct ui_window_backend *backend,
   memset(win_obj, 0, sizeof(struct ui_window));
   win_obj->width = width;
   win_obj->height = height;
+  win_obj->scale_factor = 1.0f;
 
   win_obj->display = wl_display_connect(NULL);
   if (!win_obj->display) {
@@ -483,6 +488,74 @@ static ui_error_t wayland_set_on_resize_callback(
 }
 
 /**
+ * @brief wayland_get_scale_factor.
+ * @param backend Parameter backend.
+ * @param window Parameter window.
+ * @param out_scale_factor Parameter out_scale_factor.
+ * @return Return value.
+ */
+static ui_error_t wayland_get_scale_factor(struct ui_window_backend *backend,
+                                           struct ui_window *window,
+                                           float *out_scale_factor) {
+  if (!backend || !window || !out_scale_factor) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+  if (window->scale_factor > 0.0f) {
+    *out_scale_factor = window->scale_factor;
+  } else {
+    *out_scale_factor = 1.0f;
+  }
+  return UI_ERROR_NONE;
+}
+
+/**
+ * @brief wayland_get_framebuffer_size.
+ * @param backend Parameter backend.
+ * @param window Parameter window.
+ * @param out_fb_width Parameter out_fb_width.
+ * @param out_fb_height Parameter out_fb_height.
+ * @return Return value.
+ */
+static ui_error_t
+wayland_get_framebuffer_size(struct ui_window_backend *backend,
+                             struct ui_window *window, int *out_fb_width,
+                             int *out_fb_height) {
+  float scale;
+  ui_error_t rc;
+
+  if (!backend || !window || !out_fb_width || !out_fb_height) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+  scale = 1.0f;
+  rc = wayland_get_scale_factor(backend, window, &scale);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
+  *out_fb_width = (int)((float)window->width * scale);
+  *out_fb_height = (int)((float)window->height * scale);
+  return UI_ERROR_NONE;
+}
+
+/**
+ * @brief wayland_set_on_dpi_change_callback.
+ * @param backend Parameter backend.
+ * @param window Parameter window.
+ * @param callback Parameter callback.
+ * @param user_data Parameter user_data.
+ * @return Return value.
+ */
+static ui_error_t wayland_set_on_dpi_change_callback(
+    struct ui_window_backend *backend, struct ui_window *window,
+    ui_error_t (*callback)(void *, float, float), void *user_data) {
+  if (!backend || !window) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+  window->on_dpi_change_callback = callback;
+  window->on_dpi_change_user_data = user_data;
+  return UI_ERROR_NONE;
+}
+
+/**
  * @brief wayland_get_os_handle.
  * @param backend Parameter backend.
  * @param window Parameter window.
@@ -527,6 +600,9 @@ ui_window_backend_linux_wayland_create(struct ui_window_backend **out_backend) {
   backend->push_deep_link = NULL;
   backend->get_os_handle = wayland_get_os_handle;
   backend->set_on_resize_callback = wayland_set_on_resize_callback;
+  backend->get_scale_factor = wayland_get_scale_factor;
+  backend->get_framebuffer_size = wayland_get_framebuffer_size;
+  backend->set_on_dpi_change_callback = wayland_set_on_dpi_change_callback;
   backend->user_data = NULL;
 
   *out_backend = backend;

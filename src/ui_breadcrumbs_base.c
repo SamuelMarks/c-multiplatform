@@ -68,7 +68,7 @@ struct ui_breadcrumb_segment {
  * @brief Internal representation of a breadcrumbs component.
  */
 #ifdef UI_TEST_MOCK_ALLOC
-extern int g_breadcrumbs_mock_fail;
+int g_breadcrumbs_mock_fail = 0;
 
 /**
  * @brief mock_dom_node_append_child.

@@ -20,10 +20,15 @@ struct ui_window {
     HGLRC hglrc; /**< hglrc */
     int is_closing; /**< is_closing */
     int has_resize; /**< has_resize */
+    int width; /**< width */
+    int height; /**< height */
     int new_width; /**< new_width */
     int new_height; /**< new_height */
+    float scale_factor; /**< scale_factor */
     ui_error_t (*on_resize_callback)(void*, int, int); /**< int) */
     void* on_resize_user_data; /**< on_resize_user_data */
+    ui_error_t (*on_dpi_change_callback)(void*, float, float); /**< on_dpi_change_callback */
+    void* on_dpi_change_user_data; /**< on_dpi_change_user_data */
 };
 
 /**
@@ -61,13 +66,25 @@ static LRESULT CALLBACK window_proc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
                 /* We don't PostQuitMessage because we have multiple windows potentially and don't rely on global thread loop */
                 return 0;
             case WM_SIZE:
-                win->new_width = LOWORD(lParam);
-                win->new_height = HIWORD(lParam);
+                win->width = LOWORD(lParam);
+                win->height = HIWORD(lParam);
+                win->new_width = win->width;
+                win->new_height = win->height;
                 win->has_resize = 1;
                 if (win->on_resize_callback) {
                     win->on_resize_callback(win->on_resize_user_data, win->new_width, win->new_height);
                 }
                 return 0;
+            case 0x02E0: /* WM_DPICHANGED */
+                {
+                    float new_scale = (float)LOWORD(wParam) / 96.0f;
+                    float old_scale = win->scale_factor;
+                    win->scale_factor = new_scale;
+                    if (win->on_dpi_change_callback) {
+                        win->on_dpi_change_callback(win->on_dpi_change_user_data, old_scale, new_scale);
+                    }
+                    return 0;
+                }
         }
     }
     return DefWindowProcA(hwnd, uMsg, wParam, lParam);
@@ -116,10 +133,15 @@ static ui_error_t win32_create_window(struct ui_window_backend* backend, const c
     }
     win->is_closing = 0;
     win->has_resize = 0;
+    win->width = width;
+    win->height = height;
     win->new_width = 0;
     win->new_height = 0;
+    win->scale_factor = 1.0f;
     win->on_resize_callback = NULL;
     win->on_resize_user_data = NULL;
+    win->on_dpi_change_callback = NULL;
+    win->on_dpi_change_user_data = NULL;
     win->hwnd = NULL;
     win->hdc = NULL;
     win->hglrc = NULL;
@@ -327,6 +349,44 @@ static ui_error_t win32_set_on_resize_callback(struct ui_window_backend* backend
     return UI_ERROR_NONE;
 }
 
+static ui_error_t win32_get_scale_factor(struct ui_window_backend* backend, struct ui_window* window, float* out_scale_factor) {
+    if (!backend || !window || !out_scale_factor) {
+        return UI_ERROR_INVALID_ARGUMENT;
+    }
+    if (window->scale_factor > 0.0f) {
+        *out_scale_factor = window->scale_factor;
+    } else {
+        *out_scale_factor = 1.0f;
+    }
+    return UI_ERROR_NONE;
+}
+
+static ui_error_t win32_get_framebuffer_size(struct ui_window_backend* backend, struct ui_window* window, int* out_fb_width, int* out_fb_height) {
+    float scale;
+    ui_error_t rc;
+
+    if (!backend || !window || !out_fb_width || !out_fb_height) {
+        return UI_ERROR_INVALID_ARGUMENT;
+    }
+    scale = 1.0f;
+    rc = win32_get_scale_factor(backend, window, &scale);
+    if (rc != UI_ERROR_NONE) {
+        return rc;
+    }
+    *out_fb_width = (int)((float)window->width * scale);
+    *out_fb_height = (int)((float)window->height * scale);
+    return UI_ERROR_NONE;
+}
+
+static ui_error_t win32_set_on_dpi_change_callback(struct ui_window_backend* backend, struct ui_window* window, ui_error_t (*callback)(void*, float, float), void* user_data) {
+    if (!backend || !window) {
+        return UI_ERROR_INVALID_ARGUMENT;
+    }
+    window->on_dpi_change_callback = callback;
+    window->on_dpi_change_user_data = user_data;
+    return UI_ERROR_NONE;
+}
+
 /**
  * @brief ui_window_backend_win32_create.
  * @param out_backend Parameter out_backend.
@@ -353,6 +413,9 @@ ui_error_t ui_window_backend_win32_create(struct ui_window_backend** out_backend
     backend->push_deep_link = NULL;
     backend->get_os_handle = win32_get_os_handle;
     backend->set_on_resize_callback = win32_set_on_resize_callback;
+    backend->get_scale_factor = win32_get_scale_factor;
+    backend->get_framebuffer_size = win32_get_framebuffer_size;
+    backend->set_on_dpi_change_callback = win32_set_on_dpi_change_callback;
     backend->user_data = NULL;
 
     *out_backend = backend;

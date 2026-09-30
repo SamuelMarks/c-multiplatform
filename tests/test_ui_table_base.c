@@ -21,7 +21,7 @@ struct ui_table_base {
 };
 
 extern int g_malloc_fail_countdown;
-int g_mock_append_child_fail_countdown = -1;
+extern int g_mock_append_child_fail_countdown;
 extern int g_table_mock_fail;
 extern int g_table_mock_set_attr_fail_target;
 

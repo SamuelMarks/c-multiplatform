@@ -204,6 +204,8 @@ struct gdiplus_context {
   GpGraphics *graphics;       /**< graphics */
   int current_width;          /**< current_width */
   int current_height;         /**< current_height */
+  struct ui_color text_color; /**< active text foreground color */
+  float scale_factor;         /**< high-DPI scale factor */
 };
 
 /**
@@ -352,12 +354,14 @@ static ui_error_t gdiplus_draw_text(void *ctx, const char *text,
   size_t font_size_bytes = 0;
   int text_len = 0;
   WCHAR *wtext = NULL;
-  struct ui_color text_color = {
-      0.0f, 0.0f, 0.0f,
-      1.0f}; /* Default to black, we don't pass color in draw_text yet */
+  struct ui_color text_color;
+  float scale_factor;
 
   if (!gctx || !gctx->graphics || !text || !f || !r)
     return UI_ERROR_INVALID_ARGUMENT;
+
+  text_color = gctx->text_color;
+  scale_factor = gctx->scale_factor > 0.0f ? gctx->scale_factor : 1.0f;
 
   /* Get TTF font data */
   ui_font_get_data((struct ui_font *)f, &font_data, &font_size_bytes);
@@ -401,18 +405,17 @@ static ui_error_t gdiplus_draw_text(void *ctx, const char *text,
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  /* Create font using height of rect as emSize for now, assuming UnitPixel = 2
-   */
-  if (GdipCreateFont(family, r->height, 0, 2, &font) != Ok) {
+  /* Create font using height of rect as emSize scaled by scale_factor */
+  if (GdipCreateFont(family, r->height * scale_factor, 0, 2, &font) != Ok) {
     GdipDeletePrivateFontCollection(&collection);
     C_MULTIPLATFORM_FREE(wtext);
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  rect.X = r->x;
-  rect.Y = r->y;
-  rect.Width = r->width;
-  rect.Height = r->height;
+  rect.X = r->x * scale_factor;
+  rect.Y = r->y * scale_factor;
+  rect.Width = r->width * scale_factor;
+  rect.Height = r->height * scale_factor;
 
   {
     ARGB argb = 0;
@@ -796,6 +799,11 @@ ui_error_t ui_renderer_gdiplus_init(struct ui_renderer *renderer) {
   gctx->graphics = NULL;
   gctx->current_width = 0;
   gctx->current_height = 0;
+  gctx->text_color.r = 0.0f;
+  gctx->text_color.g = 0.0f;
+  gctx->text_color.b = 0.0f;
+  gctx->text_color.a = 1.0f;
+  gctx->scale_factor = 1.0f;
 
   renderer->vtable = &gdiplus_vtable;
   renderer->ctx = gctx;

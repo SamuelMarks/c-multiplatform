@@ -27,6 +27,7 @@
 #elif defined(_MSC_VER)
 #endif
 
+#include <stdio.h>
 #include <string.h>
 /* clang-format on */
 
@@ -161,6 +162,74 @@ ui_error_t ui_font_manager_load_font_memory(struct ui_font_manager *manager,
 }
 
 /**
+ * @brief Loads a TrueType or OpenType font from the filesystem into the font
+ * manager.
+ * @param[in,out] manager The font manager.
+ * @param[in] file_path Path to the TrueType or OpenType font file.
+ * @param[out] out_font Pointer to store the loaded font handle.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+ui_error_t ui_font_manager_load_font_file(struct ui_font_manager *manager,
+                                          const char *file_path,
+                                          struct ui_font **out_font) {
+  FILE *f;
+  long file_size;
+  unsigned char *buffer;
+  size_t bytes_read;
+  ui_error_t rc;
+
+  if (!manager || !file_path || !out_font) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+
+#if defined(_MSC_VER)
+  {
+    errno_t err = fopen_s(&f, file_path, "rb");
+    if (err != 0 || !f) {
+      return UI_ERROR_NOT_FOUND;
+    }
+  }
+#else
+  f = fopen(file_path, "rb");
+  if (!f) {
+    return UI_ERROR_NOT_FOUND;
+  }
+#endif
+
+  if (fseek(f, 0, SEEK_END) != 0) {
+    fclose(f);
+    return UI_ERROR_IO_FAILED;
+  }
+  file_size = ftell(f);
+  if (file_size <= 0) {
+    fclose(f);
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+  if (fseek(f, 0, SEEK_SET) != 0) {
+    fclose(f);
+    return UI_ERROR_IO_FAILED;
+  }
+
+  buffer = (unsigned char *)C_MULTIPLATFORM_MALLOC((size_t)file_size);
+  if (!buffer) {
+    fclose(f);
+    return UI_ERROR_OUT_OF_MEMORY;
+  }
+
+  bytes_read = fread(buffer, 1, (size_t)file_size, f);
+  fclose(f);
+  if (bytes_read != (size_t)file_size) {
+    C_MULTIPLATFORM_FREE(buffer);
+    return UI_ERROR_IO_FAILED;
+  }
+
+  rc = ui_font_manager_load_font_memory(manager, buffer, (size_t)file_size,
+                                        out_font);
+  C_MULTIPLATFORM_FREE(buffer);
+  return rc;
+}
+
+/**
  * @brief Retrieves glyph metrics for a codepoint.
  * @param[in] font The font to query.
  * @param[in] codepoint The unicode codepoint.
@@ -222,6 +291,186 @@ ui_error_t ui_font_get_vmetrics(struct ui_font *font, float font_size,
   return UI_ERROR_NONE;
 }
 
+static unsigned short read_u16_be(const unsigned char *p) {
+  return (unsigned short)(((unsigned short)p[0] << 8) | (unsigned short)p[1]);
+}
+
+static short read_s16_be(const unsigned char *p) {
+  return (short)read_u16_be(p);
+}
+
+static unsigned int read_u32_be(const unsigned char *p) {
+  return (((unsigned int)p[0] << 24) | ((unsigned int)p[1] << 16) |
+          ((unsigned int)p[2] << 8) | (unsigned int)p[3]);
+}
+
+static int get_glyph_coverage_index(const unsigned char *data, size_t size,
+                                    size_t cov_offset, int glyph) {
+  unsigned short format;
+  if (cov_offset + 4 > size) {
+    return -1;
+  }
+  format = read_u16_be(data + cov_offset);
+  if (format == 1) {
+    unsigned short glyph_count = read_u16_be(data + cov_offset + 2);
+    size_t i;
+    if (cov_offset + 4 + (size_t)glyph_count * 2 > size) {
+      return -1;
+    }
+    for (i = 0; i < glyph_count; ++i) {
+      if ((int)read_u16_be(data + cov_offset + 4 + i * 2) == glyph) {
+        return (int)i;
+      }
+    }
+  } else if (format == 2) {
+    unsigned short range_count = read_u16_be(data + cov_offset + 2);
+    size_t i;
+    if (cov_offset + 4 + (size_t)range_count * 6 > size) {
+      return -1;
+    }
+    for (i = 0; i < range_count; ++i) {
+      size_t rec = cov_offset + 4 + i * 6;
+      int start = (int)read_u16_be(data + rec);
+      int end = (int)read_u16_be(data + rec + 2);
+      int start_cov = (int)read_u16_be(data + rec + 4);
+      if (glyph >= start && glyph <= end) {
+        return start_cov + (glyph - start);
+      }
+    }
+  }
+  return -1;
+}
+
+static int get_glyph_class(const unsigned char *data, size_t size,
+                           size_t class_def_offset, int glyph) {
+  unsigned short format;
+  if (class_def_offset == 0 || class_def_offset + 4 > size) {
+    return 0;
+  }
+  format = read_u16_be(data + class_def_offset);
+  if (format == 1) {
+    int start_glyph = (int)read_u16_be(data + class_def_offset + 2);
+    unsigned short glyph_count = read_u16_be(data + class_def_offset + 4);
+    if (glyph >= start_glyph && glyph < start_glyph + (int)glyph_count) {
+      size_t idx = (size_t)(glyph - start_glyph);
+      if (class_def_offset + 6 + (idx + 1) * 2 <= size) {
+        return (int)read_u16_be(data + class_def_offset + 6 + idx * 2);
+      }
+    }
+  } else if (format == 2) {
+    unsigned short range_count = read_u16_be(data + class_def_offset + 2);
+    size_t i;
+    if (class_def_offset + 4 + (size_t)range_count * 6 > size) {
+      return 0;
+    }
+    for (i = 0; i < range_count; ++i) {
+      size_t rec = class_def_offset + 4 + i * 6;
+      int start = (int)read_u16_be(data + rec);
+      int end = (int)read_u16_be(data + rec + 2);
+      int cls = (int)read_u16_be(data + rec + 4);
+      if (glyph >= start && glyph <= end) {
+        return cls;
+      }
+    }
+  }
+  return 0;
+}
+
+static int parse_gpos_pair_pos(const unsigned char *data, size_t size,
+                               int glyph1, int glyph2, int *out_kern) {
+  size_t gpos_offset = 0;
+  size_t lookup_list_offset, i, num_tables;
+  unsigned short num_lookups;
+
+  if (size < 12) {
+    return 0;
+  }
+  num_tables = (size_t)read_u16_be(data + 4);
+  if (12 + num_tables * 16 > size) {
+    return 0;
+  }
+  for (i = 0; i < num_tables; ++i) {
+    size_t entry = 12 + i * 16;
+    if (data[entry] == 'G' && data[entry + 1] == 'P' &&
+        data[entry + 2] == 'O' && data[entry + 3] == 'S') {
+      gpos_offset = (size_t)read_u32_be(data + entry + 8);
+      break;
+    }
+  }
+  if (gpos_offset == 0 || gpos_offset + 10 > size) {
+    return 0;
+  }
+  lookup_list_offset =
+      gpos_offset + (size_t)read_u16_be(data + gpos_offset + 8);
+  if (lookup_list_offset + 2 > size) {
+    return 0;
+  }
+  num_lookups = read_u16_be(data + lookup_list_offset);
+  for (i = 0; i < num_lookups; ++i) {
+    size_t l_offset;
+    unsigned short lookup_type, subtable_count, s;
+    if (lookup_list_offset + 2 + (i + 1) * 2 > size) {
+      break;
+    }
+    l_offset = lookup_list_offset +
+               (size_t)read_u16_be(data + lookup_list_offset + 2 + i * 2);
+    if (l_offset + 6 > size) {
+      continue;
+    }
+    lookup_type = read_u16_be(data + l_offset);
+    if (lookup_type != 2) {
+      continue;
+    }
+    subtable_count = read_u16_be(data + l_offset + 4);
+    for (s = 0; s < subtable_count; ++s) {
+      size_t sub_offset;
+      unsigned short pos_format, cov_offset;
+      if (l_offset + 6 + (s + 1) * 2 > size) {
+        break;
+      }
+      sub_offset = l_offset + (size_t)read_u16_be(data + l_offset + 6 + s * 2);
+      if (sub_offset + 4 > size) {
+        continue;
+      }
+      pos_format = read_u16_be(data + sub_offset);
+      cov_offset = read_u16_be(data + sub_offset + 2);
+      if (get_glyph_coverage_index(data, size, sub_offset + cov_offset,
+                                   glyph1) < 0) {
+        continue;
+      }
+      if (pos_format == 2) {
+        unsigned short vfmt1, class_def1_off, class_def2_off, class1_count,
+            class2_count;
+        int cls1, cls2;
+        if (sub_offset + 16 > size) {
+          continue;
+        }
+        vfmt1 = read_u16_be(data + sub_offset + 4);
+        class_def1_off = read_u16_be(data + sub_offset + 8);
+        class_def2_off = read_u16_be(data + sub_offset + 10);
+        class1_count = read_u16_be(data + sub_offset + 12);
+        class2_count = read_u16_be(data + sub_offset + 14);
+        cls1 = get_glyph_class(data, size, sub_offset + class_def1_off, glyph1);
+        cls2 = get_glyph_class(data, size, sub_offset + class_def2_off, glyph2);
+        if (cls1 < (int)class1_count && cls2 < (int)class2_count &&
+            (vfmt1 & 0x0004)) {
+          size_t val_record_offset =
+              sub_offset + 16 +
+              ((size_t)cls1 * (size_t)class2_count + (size_t)cls2) * 2;
+          if (val_record_offset + 2 <= size) {
+            short x_advance = read_s16_be(data + val_record_offset);
+            if (x_advance != 0) {
+              *out_kern = (int)x_advance;
+              return 1;
+            }
+          }
+        }
+      }
+    }
+  }
+  return 0;
+}
+
 /**
  * @brief Retrieves kerning advance between two codepoints.
  * @param[in] font The font to query.
@@ -235,15 +484,24 @@ ui_error_t ui_font_get_kerning(struct ui_font *font, int codepoint1,
                                int codepoint2, float font_size,
                                float *out_kerning) {
   float scale;
-  int kern;
+  int kern = 0;
+  int glyph1, glyph2;
 
   if (!font || !out_kerning) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
   scale = stbtt_ScaleForPixelHeight(&font->info, font_size);
-  kern = stbtt_GetCodepointKernAdvance(&font->info, codepoint1, codepoint2);
+  glyph1 = stbtt_FindGlyphIndex(&font->info, codepoint1);
+  glyph2 = stbtt_FindGlyphIndex(&font->info, codepoint2);
 
+  if (font->data && font->size > 0 &&
+      parse_gpos_pair_pos(font->data, font->size, glyph1, glyph2, &kern)) {
+    *out_kerning = (float)kern * scale;
+    return UI_ERROR_NONE;
+  }
+
+  kern = stbtt_GetCodepointKernAdvance(&font->info, codepoint1, codepoint2);
   *out_kerning = (float)kern * scale;
   return UI_ERROR_NONE;
 }
@@ -439,18 +697,51 @@ ui_error_t ui_font_set_status(struct ui_font *font,
 ui_error_t ui_font_manager_find_font(struct ui_font_manager *manager,
                                      const char *family, int weight,
                                      int is_italic, struct ui_font **out_font) {
+  const char *p;
+  const char *start;
+  char candidate[128];
+  size_t len;
   struct ui_font *curr;
-  if (!manager || !family || !out_font)
-    return UI_ERROR_INVALID_ARGUMENT;
 
-  curr = manager->head;
-  while (curr) {
-    if (strcmp(curr->family, family) == 0 && curr->weight == weight &&
-        curr->is_italic == is_italic) {
-      *out_font = curr;
-      return UI_ERROR_NONE;
+  if (!manager || !family || !out_font) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+
+  p = family;
+  while (*p) {
+    while (*p == ' ' || *p == '\t' || *p == ',') {
+      p++;
     }
-    curr = curr->next;
+    if (*p == '\0') {
+      break;
+    }
+    start = p;
+    while (*p && *p != ',') {
+      p++;
+    }
+    len = (size_t)(p - start);
+    while (len > 0 && (start[len - 1] == ' ' || start[len - 1] == '\t' ||
+                       start[len - 1] == '\'' || start[len - 1] == '\"')) {
+      len--;
+    }
+    while (len > 0 && (*start == '\'' || *start == '\"')) {
+      start++;
+      len--;
+    }
+    if (len > 0 && len < sizeof(candidate)) {
+      memcpy(candidate, start, len);
+      candidate[len] = '\0';
+
+      curr = manager->head;
+      while (curr) {
+        if (strcmp(curr->family, candidate) == 0 && curr->weight == weight &&
+            curr->is_italic == is_italic) {
+          *out_font = curr;
+          return UI_ERROR_NONE;
+        }
+        curr = curr->next;
+      }
+    }
   }
 
   *out_font = NULL;

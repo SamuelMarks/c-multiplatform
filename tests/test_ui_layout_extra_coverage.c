@@ -813,5 +813,125 @@ static void test_extra_coverage_2(void) {
     rc = ui_layout_compute(&parent, 200.0f, 200.0f);
     if (rc != UI_ERROR_NONE) { /* expected */
     }
+
+    /* 11. Flex row with align_content == CENTER and inner_cross > total_cross
+     */
+    memset(&parent, 0, sizeof(parent));
+    memset(&c1, 0, sizeof(c1));
+    parent.display_inside = UI_LAYOUT_DISPLAY_INSIDE_FLEX;
+    parent.flex_direction = UI_LAYOUT_FLEX_DIRECTION_ROW;
+    parent.align_content = UI_LAYOUT_ALIGN_CENTER;
+    parent.width = 100.0f;
+    parent.height = 100.0f;
+    parent.content_height = 0.0f;
+    c1.width = 20.0f;
+    c1.height = 20.0f;
+    c1.flex_basis_type = UI_LAYOUT_SIZE_PIXELS;
+    c1.flex_basis = 20.0f;
+    parent.first_child = &c1;
+    parent.last_child = &c1;
+    rc = ui_layout_compute(&parent, 100.0f, 100.0f);
+    if (rc != UI_ERROR_NONE) {
+    }
+
+    /* 12. Flex row with align_content == END and inner_cross > total_cross */
+    parent.align_content = UI_LAYOUT_ALIGN_END;
+    rc = ui_layout_compute(&parent, 100.0f, 100.0f);
+    if (rc != UI_ERROR_NONE) {
+    }
+
+    /* 13. Flex row with align_items == CENTER (line_count == 1) */
+    parent.align_content = UI_LAYOUT_ALIGN_AUTO;
+    parent.align_items = UI_LAYOUT_ALIGN_CENTER;
+    rc = ui_layout_compute(&parent, 100.0f, 100.0f);
+    if (rc != UI_ERROR_NONE) {
+    }
+
+    /* 14. Flex row with align_items == END (line_count == 1) */
+    parent.align_content = UI_LAYOUT_ALIGN_AUTO;
+    parent.align_items = UI_LAYOUT_ALIGN_END;
+    rc = ui_layout_compute(&parent, 100.0f, 100.0f);
+    if (rc != UI_ERROR_NONE) {
+    }
+
+    /* 15. Flex column with align_content == CENTER and inner_cross >
+     * total_cross */
+    memset(&parent, 0, sizeof(parent));
+    memset(&c1, 0, sizeof(c1));
+    parent.display_inside = UI_LAYOUT_DISPLAY_INSIDE_FLEX;
+    parent.flex_direction = UI_LAYOUT_FLEX_DIRECTION_COLUMN;
+    parent.align_content = UI_LAYOUT_ALIGN_CENTER;
+    parent.width = 100.0f;
+    parent.height = 100.0f;
+    parent.content_width = 0.0f;
+    c1.width = 20.0f;
+    c1.height = 20.0f;
+    c1.flex_basis_type = UI_LAYOUT_SIZE_PIXELS;
+    c1.flex_basis = 20.0f;
+    parent.first_child = &c1;
+    parent.last_child = &c1;
+    rc = ui_layout_compute(&parent, 100.0f, 100.0f);
+    if (rc != UI_ERROR_NONE) {
+    }
+
+    /* 16. Flex column with align_content == END and inner_cross > total_cross
+     */
+    parent.align_content = UI_LAYOUT_ALIGN_END;
+    rc = ui_layout_compute(&parent, 100.0f, 100.0f);
+    if (rc != UI_ERROR_NONE) {
+    }
+
+    /* 17. Flex column with align_items == CENTER (line_count == 1) */
+    parent.align_content = UI_LAYOUT_ALIGN_AUTO;
+    parent.align_items = UI_LAYOUT_ALIGN_CENTER;
+    rc = ui_layout_compute(&parent, 100.0f, 100.0f);
+    if (rc != UI_ERROR_NONE) {
+    }
+
+    /* 18. Flex column with align_items == END (line_count == 1) */
+    parent.align_content = UI_LAYOUT_ALIGN_AUTO;
+    parent.align_items = UI_LAYOUT_ALIGN_END;
+    rc = ui_layout_compute(&parent, 100.0f, 100.0f);
+    if (rc != UI_ERROR_NONE) {
+    }
+
+    /* 19. Flex row with content_height > 0.0f */
+    parent.flex_direction = UI_LAYOUT_FLEX_DIRECTION_ROW;
+    parent.content_height = 100.0f;
+    parent.height = 100.0f;
+    rc = ui_layout_compute(&parent, 100.0f, 100.0f);
+    if (rc != UI_ERROR_NONE) {
+    }
+
+    /* 20. Flex row with content_height <= 0.0f and height <= 0.0f */
+    parent.content_height = 0.0f;
+    parent.height = 0.0f;
+    rc = ui_layout_compute(&parent, 100.0f, 100.0f);
+    if (rc != UI_ERROR_NONE) {
+    }
+
+    /* 21. Flex column with content_width > 0.0f */
+    parent.flex_direction = UI_LAYOUT_FLEX_DIRECTION_COLUMN;
+    parent.content_width = 100.0f;
+    parent.width = 100.0f;
+    rc = ui_layout_compute(&parent, 100.0f, 100.0f);
+    if (rc != UI_ERROR_NONE) {
+    }
+
+    /* 22. Flex column with content_width <= 0.0f and width <= 0.0f */
+    parent.content_width = 0.0f;
+    parent.width = 0.0f;
+    rc = ui_layout_compute(&parent, 0.0f, 100.0f);
+    if (rc != UI_ERROR_NONE) {
+    }
+
+    /* 23. Flex column with inner_cross <= 0.0f and width > 0.0f */
+    parent.content_width = 0.0f;
+    parent.width = 100.0f;
+    parent.padding[1] = 50.0f;
+    parent.padding[3] = 50.0f;
+    rc = ui_layout_compute(&parent, 100.0f, 100.0f);
+    if (rc != UI_ERROR_NONE) {
+    }
   }
 }

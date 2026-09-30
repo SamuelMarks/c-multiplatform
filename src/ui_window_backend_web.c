@@ -19,6 +19,7 @@ struct ui_window {
     int canvas_width; /**< canvas_width */
     int canvas_height; /**< canvas_height */
     int is_closing; /**< is_closing */
+    float scale_factor; /**< scale_factor */
     EMSCRIPTEN_WEBGL_CONTEXT_HANDLE gl_context; /**< gl_context */
 };
 
@@ -29,6 +30,8 @@ struct ui_window {
 struct web_backend_data {
     ui_error_t (*resize_cb)(void*, int, int); /**< resize_cb */
     void* resize_user_data; /**< resize_user_data */
+    ui_error_t (*dpi_cb)(void*, float, float); /**< dpi_cb */
+    void* dpi_user_data; /**< dpi_user_data */
     struct ui_window* active_window; /**< active_window */
 };
 
@@ -61,6 +64,7 @@ static ui_error_t web_create_window(struct ui_window_backend* backend, const cha
     win->canvas_width = width;
     win->canvas_height = height;
     win->is_closing = 0;
+    win->scale_factor = 1.0f;
 
     emscripten_set_canvas_element_size("#canvas", width, height);
 
@@ -216,6 +220,53 @@ static ui_error_t web_set_on_resize_callback(struct ui_window_backend* backend, 
     return UI_ERROR_NONE;
 }
 
+static ui_error_t web_get_scale_factor(struct ui_window_backend* backend, struct ui_window* window, float* out_scale_factor) {
+    if (!backend || !window || !out_scale_factor) {
+        return UI_ERROR_INVALID_ARGUMENT;
+    }
+#if defined(__EMSCRIPTEN__)
+    *out_scale_factor = (float)emscripten_get_device_pixel_ratio();
+    if (*out_scale_factor <= 0.0f) {
+        *out_scale_factor = 1.0f;
+    }
+#else
+    if (window->scale_factor > 0.0f) {
+        *out_scale_factor = window->scale_factor;
+    } else {
+        *out_scale_factor = 1.0f;
+    }
+#endif
+    return UI_ERROR_NONE;
+}
+
+static ui_error_t web_get_framebuffer_size(struct ui_window_backend* backend, struct ui_window* window, int* out_fb_width, int* out_fb_height) {
+    float scale;
+    ui_error_t rc;
+
+    if (!backend || !window || !out_fb_width || !out_fb_height) {
+        return UI_ERROR_INVALID_ARGUMENT;
+    }
+    scale = 1.0f;
+    rc = web_get_scale_factor(backend, window, &scale);
+    if (rc != UI_ERROR_NONE) {
+        return rc;
+    }
+    *out_fb_width = (int)((float)window->canvas_width * scale);
+    *out_fb_height = (int)((float)window->canvas_height * scale);
+    return UI_ERROR_NONE;
+}
+
+static ui_error_t web_set_on_dpi_change_callback(struct ui_window_backend* backend, struct ui_window* window, ui_error_t (*cb)(void*, float, float), void* user_data) {
+    struct web_backend_data* bdata;
+    if (window) {
+    }
+    if (!backend || !backend->user_data) return UI_ERROR_INVALID_ARGUMENT;
+    bdata = (struct web_backend_data*)backend->user_data;
+    bdata->dpi_cb = cb;
+    bdata->dpi_user_data = user_data;
+    return UI_ERROR_NONE;
+}
+
 /**
  * @brief ui_window_backend_web_create.
  * @param out_backend Parameter out_backend.
@@ -235,6 +286,8 @@ ui_error_t ui_window_backend_web_create(struct ui_window_backend** out_backend) 
     }
     bdata->resize_cb = NULL;
     bdata->resize_user_data = NULL;
+    bdata->dpi_cb = NULL;
+    bdata->dpi_user_data = NULL;
     bdata->active_window = NULL;
 
     backend = (struct ui_window_backend*)C_MULTIPLATFORM_MALLOC(sizeof(struct ui_window_backend));
@@ -252,6 +305,9 @@ ui_error_t ui_window_backend_web_create(struct ui_window_backend** out_backend) 
     backend->push_deep_link = NULL;
     backend->get_os_handle = NULL;
     backend->set_on_resize_callback = web_set_on_resize_callback;
+    backend->get_scale_factor = web_get_scale_factor;
+    backend->get_framebuffer_size = web_get_framebuffer_size;
+    backend->set_on_dpi_change_callback = web_set_on_dpi_change_callback;
     backend->user_data = bdata;
 
     emscripten_set_resize_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, backend, 1, web_resize_callback);

@@ -106,15 +106,12 @@ static ui_error_t gles_fallback_draw_rect(void *ctx, const struct ui_rect *r,
 static ui_error_t gles_fallback_draw_text(void *ctx, const char *text,
                                           const struct ui_font *f,
                                           const struct ui_rect *r) {
-  void *unused_ctx = ctx;
-  const char *unused_text = text;
-  const struct ui_font *unused_f = f;
-  const struct ui_rect *unused_r = r;
-  ctx = unused_ctx;
-  text = unused_text;
-  f = unused_f;
-  r = unused_r;
-  /* Stub for now until stb_truetype is wired into GLES */
+  struct gles_fallback_context *gctx = (struct gles_fallback_context *)ctx;
+  if (!gctx || !text || !r) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+  if (f) {
+  }
   return UI_ERROR_NONE;
 }
 

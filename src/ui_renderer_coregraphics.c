@@ -44,9 +44,11 @@ extern int g_mock_cg_fail;
  * \brief cg_context
  */
 struct cg_context {
-  CGContextRef context; /**< context */
-  int current_width;    /**< current_width */
-  int current_height;   /**< current_height */
+  CGContextRef context;       /**< context */
+  int current_width;          /**< current_width */
+  int current_height;         /**< current_height */
+  struct ui_color text_color; /**< active text foreground color */
+  float scale_factor;         /**< high-DPI backing scale factor */
 };
 
 /**
@@ -149,13 +151,17 @@ static ui_error_t cg_draw_text(void *ctx, const char *text,
   CFDictionaryRef attributes = NULL;
   CFAttributedStringRef attrString = NULL;
   CTLineRef line = NULL;
-  struct ui_color text_color = {0.0f, 0.0f, 0.0f, 1.0f}; /* Default */
+  struct ui_color text_color;
   CGColorSpaceRef colorSpace = NULL;
   CGFloat components[4];
   CGColorRef cgColor = NULL;
+  float scale_factor;
 
   if (!cgc || !cgc->context || !text || !r)
     return UI_ERROR_INVALID_ARGUMENT;
+
+  text_color = cgc->text_color;
+  scale_factor = cgc->scale_factor > 0.0f ? cgc->scale_factor : 1.0f;
 
   ui_font_get_data((struct ui_font *)f, &font_data, &font_size_bytes);
   if (!font_data || font_size_bytes == 0)
@@ -171,7 +177,8 @@ static ui_error_t cg_draw_text(void *ctx, const char *text,
   if (!cgFont)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  ctFont = CTFontCreateWithGraphicsFont(cgFont, r->height, NULL, NULL);
+  ctFont = CTFontCreateWithGraphicsFont(cgFont, r->height * scale_factor, NULL,
+                                        NULL);
   CGFontRelease(cgFont);
   if (!ctFont)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -215,12 +222,16 @@ static ui_error_t cg_draw_text(void *ctx, const char *text,
     return UI_ERROR_INVALID_ARGUMENT;
 
   CGContextSaveGState(cgc->context);
+  CGContextSetShouldAntialias(cgc->context, true);
+  CGContextSetShouldSmoothFonts(cgc->context, true);
+  CGContextSetAllowsFontSmoothing(cgc->context, true);
   CGContextSetTextMatrix(cgc->context, CGAffineTransformIdentity);
   /* In CoreGraphics text is drawn from the baseline. We flip the text matrix to
      draw properly if the context is flipped. Normally, context might be flipped
      (y goes down). CoreText expects standard Cartesian (y goes up). We
      translate to the rect's x/y, flip the y-axis, and draw. */
-  CGContextTranslateCTM(cgc->context, r->x, r->y + r->height);
+  CGContextTranslateCTM(cgc->context, r->x * scale_factor,
+                        (r->y + r->height) * scale_factor);
   CGContextScaleCTM(cgc->context, 1.0, -1.0);
   CGContextSetTextPosition(cgc->context, 0, 0);
   CTLineDraw(line, cgc->context);
@@ -538,6 +549,11 @@ ui_error_t ui_renderer_native_init(struct ui_renderer *renderer) {
   cgc->context = NULL;
   cgc->current_width = 0;
   cgc->current_height = 0;
+  cgc->text_color.r = 0.0f;
+  cgc->text_color.g = 0.0f;
+  cgc->text_color.b = 0.0f;
+  cgc->text_color.a = 1.0f;
+  cgc->scale_factor = 1.0f;
 
   renderer->vtable = &cg_vtable;
   renderer->ctx = cgc;

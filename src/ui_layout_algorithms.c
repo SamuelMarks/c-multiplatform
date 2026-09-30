@@ -412,35 +412,43 @@ static ui_error_t layout_flex(struct ui_layout_node *node,
 
   if (is_row) {
     inner_cross = node->content_height;
-    if (inner_cross <= 0.0f && node->height > 0.0f) {
-      inner_cross = node->height - node->padding[0] - node->padding[2] -
-                    node->border[0] - node->border[2];
+    if (inner_cross <= 0.0f) {
+      if (node->height > 0.0f) {
+        inner_cross = node->height - node->padding[0] - node->padding[2] -
+                      node->border[0] - node->border[2];
+      }
     }
     if (inner_cross > total_cross) {
       free_cross = inner_cross - total_cross;
-      if (node->align_content == UI_LAYOUT_ALIGN_CENTER ||
-          (line_count == 1 && node->align_items == UI_LAYOUT_ALIGN_CENTER)) {
+      if (node->align_content == UI_LAYOUT_ALIGN_CENTER) {
         start_y += free_cross / 2.0f;
-      } else if (node->align_content == UI_LAYOUT_ALIGN_END ||
-                 (line_count == 1 &&
-                  node->align_items == UI_LAYOUT_ALIGN_END)) {
+      } else if (line_count == 1 &&
+                 node->align_items == UI_LAYOUT_ALIGN_CENTER) {
+        start_y += free_cross / 2.0f;
+      } else if (node->align_content == UI_LAYOUT_ALIGN_END) {
+        start_y += free_cross;
+      } else if (line_count == 1 && node->align_items == UI_LAYOUT_ALIGN_END) {
         start_y += free_cross;
       }
     }
   } else {
     inner_cross = node->content_width;
-    if (inner_cross <= 0.0f && node->width > 0.0f) {
-      inner_cross = node->width - node->padding[1] - node->padding[3] -
-                    node->border[1] - node->border[3];
+    if (inner_cross <= 0.0f) {
+      if (node->width > 0.0f) {
+        inner_cross = node->width - node->padding[1] - node->padding[3] -
+                      node->border[1] - node->border[3];
+      }
     }
     if (inner_cross > total_cross) {
       free_cross = inner_cross - total_cross;
-      if (node->align_content == UI_LAYOUT_ALIGN_CENTER ||
-          (line_count == 1 && node->align_items == UI_LAYOUT_ALIGN_CENTER)) {
+      if (node->align_content == UI_LAYOUT_ALIGN_CENTER) {
         start_x += free_cross / 2.0f;
-      } else if (node->align_content == UI_LAYOUT_ALIGN_END ||
-                 (line_count == 1 &&
-                  node->align_items == UI_LAYOUT_ALIGN_END)) {
+      } else if (line_count == 1 &&
+                 node->align_items == UI_LAYOUT_ALIGN_CENTER) {
+        start_x += free_cross / 2.0f;
+      } else if (node->align_content == UI_LAYOUT_ALIGN_END) {
+        start_x += free_cross;
+      } else if (line_count == 1 && node->align_items == UI_LAYOUT_ALIGN_END) {
         start_x += free_cross;
       }
     }

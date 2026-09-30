@@ -25,8 +25,16 @@
 #if TARGET_OS_MAC && !TARGET_OS_IPHONE
 
 #ifdef UI_TEST_MOCK_ALLOC
+/** @brief Global flag to simulate absence of NSOpenGLView. */
 int g_mock_macos_no_nsopenglview = 0;
+/** @brief Global flag to simulate specific Cocoa event types. */
 int g_mock_macos_event_type = 0;
+/** @brief Global flag to simulate delegate creation failure. */
+int g_mock_macos_fail_delegate = 0;
+/** @brief Global flag to simulate window with no content view. */
+int g_mock_macos_no_view = 0;
+/** @brief Global flag to simulate failure allocating delegate class pair. */
+int g_mock_macos_fail_allocate_class = 0;
 
 static Class mock_objc_getClass(const char *name) {
   if (g_mock_macos_no_nsopenglview && strcmp(name, "NSOpenGLView") == 0) {
@@ -53,8 +61,12 @@ struct ui_window {
   int is_shown;                                       /**< is_shown */
   int is_closing;                                     /**< is_closing */
   int has_resize_event;                               /**< has_resize_event */
+  float scale_factor;                                 /**< scale_factor */
   ui_error_t (*on_resize_callback)(void *, int, int); /**< on_resize_callback */
   void *on_resize_user_data; /**< on_resize_user_data */
+  ui_error_t (*on_dpi_change_callback)(void *, float,
+                                       float); /**< on_dpi_change_callback */
+  void *on_dpi_change_user_data;               /**< on_dpi_change_user_data */
 };
 
 /**
@@ -77,7 +89,7 @@ static void macos_on_window_did_resize(id self, SEL _cmd, id notif) {
   if (!notif) {
     return;
   }
-  win = ((id (*)(id, SEL))objc_msgSend)(notif, sel_registerName("object"));
+  win = ((id(*)(id, SEL))objc_msgSend)(notif, sel_registerName("object"));
   if (!win) {
     return;
   }
@@ -86,7 +98,7 @@ static void macos_on_window_did_resize(id self, SEL _cmd, id notif) {
     return;
   }
 
-  cur_rect = ((CGRect (*)(id, SEL))objc_msgSend)(
+  cur_rect = ((CGRect(*)(id, SEL))objc_msgSend)(
       win, sel_registerName("contentLayoutRect"));
   cur_w = (int)cur_rect.size.width;
   cur_h = (int)cur_rect.size.height;
@@ -126,7 +138,7 @@ static void macos_on_window_will_close(id self, SEL _cmd, id notif) {
   if (!notif) {
     return;
   }
-  win = ((id (*)(id, SEL))objc_msgSend)(notif, sel_registerName("object"));
+  win = ((id(*)(id, SEL))objc_msgSend)(notif, sel_registerName("object"));
   if (!win) {
     return;
   }
@@ -145,6 +157,11 @@ static Class macos_get_window_delegate_class(void) {
   if (!delCls) {
     Class superCls = (Class)objc_getClass("NSObject");
     delCls = objc_allocateClassPair(superCls, "UIWindowDelegate", 0);
+#ifdef UI_TEST_MOCK_ALLOC
+    if (g_mock_macos_fail_allocate_class) {
+      delCls = (Class)0;
+    }
+#endif
     if (delCls) {
       class_addMethod(delCls, sel_registerName("windowDidResize:"),
                       (IMP)macos_on_window_did_resize, "v@:@");
@@ -208,21 +225,21 @@ static ui_error_t macos_create_window(struct ui_window_backend *backend,
   memset(w, 0, sizeof(struct ui_window));
 
   appCls = (id)objc_getClass("NSApplication");
-  app = ((id (*)(id, SEL))objc_msgSend)(appCls,
-                                        sel_registerName("sharedApplication"));
+  app = ((id(*)(id, SEL))objc_msgSend)(appCls,
+                                       sel_registerName("sharedApplication"));
   ((void (*)(id, SEL, long))objc_msgSend)(
       app, sel_registerName("setActivationPolicy:"), 0);
   ((void (*)(id, SEL))objc_msgSend)(app, sel_registerName("finishLaunching"));
 
   strCls = (id)objc_getClass("NSString");
-  titleStr = ((id (*)(id, SEL, const char *))objc_msgSend)(
+  titleStr = ((id(*)(id, SEL, const char *))objc_msgSend)(
       strCls, sel_registerName("stringWithUTF8String:"), title);
 
   winCls = (id)objc_getClass("NSWindow");
-  winAlloc = ((id (*)(id, SEL))objc_msgSend)(winCls, sel_registerName("alloc"));
+  winAlloc = ((id(*)(id, SEL))objc_msgSend)(winCls, sel_registerName("alloc"));
   rect = CGRectMake(150.0, 150.0, (CGFloat)width, (CGFloat)height);
   win = ((
-      id (*)(id, SEL, CGRect, unsigned long, unsigned long, BOOL))objc_msgSend)(
+      id(*)(id, SEL, CGRect, unsigned long, unsigned long, BOOL))objc_msgSend)(
       winAlloc,
       sel_registerName("initWithContentRect:styleMask:backing:defer:"), rect,
       15, 2, (BOOL)0);
@@ -238,8 +255,8 @@ static ui_error_t macos_create_window(struct ui_window_backend *backend,
   attrs[4] = 0;
 
   pfCls = (id)objc_getClass("NSOpenGLPixelFormat");
-  pfAlloc = ((id (*)(id, SEL))objc_msgSend)(pfCls, sel_registerName("alloc"));
-  pf = ((id (*)(id, SEL, const unsigned int *))objc_msgSend)(
+  pfAlloc = ((id(*)(id, SEL))objc_msgSend)(pfCls, sel_registerName("alloc"));
+  pf = ((id(*)(id, SEL, const unsigned int *))objc_msgSend)(
       pfAlloc, sel_registerName("initWithAttributes:"), attrs);
 
   ctx = (id)0;
@@ -248,8 +265,8 @@ static ui_error_t macos_create_window(struct ui_window_backend *backend,
   if (glViewCls != (id)0) {
     viewRect = CGRectMake(0.0, 0.0, (CGFloat)width, (CGFloat)height);
     glViewAlloc =
-        ((id (*)(id, SEL))objc_msgSend)(glViewCls, sel_registerName("alloc"));
-    view = ((id (*)(id, SEL, CGRect, id))objc_msgSend)(
+        ((id(*)(id, SEL))objc_msgSend)(glViewCls, sel_registerName("alloc"));
+    view = ((id(*)(id, SEL, CGRect, id))objc_msgSend)(
         glViewAlloc, sel_registerName("initWithFrame:pixelFormat:"), viewRect,
         pf);
     ((void (*)(id, SEL, BOOL))objc_msgSend)(
@@ -257,17 +274,16 @@ static ui_error_t macos_create_window(struct ui_window_backend *backend,
         (BOOL)0);
     ((void (*)(id, SEL, id))objc_msgSend)(
         win, sel_registerName("setContentView:"), view);
-    ctx = ((id (*)(id, SEL))objc_msgSend)(view,
-                                          sel_registerName("openGLContext"));
+    ctx =
+        ((id(*)(id, SEL))objc_msgSend)(view, sel_registerName("openGLContext"));
   }
   if (ctx == (id)0) {
     ctxCls = (id)objc_getClass("NSOpenGLContext");
     ctxAlloc =
-        ((id (*)(id, SEL))objc_msgSend)(ctxCls, sel_registerName("alloc"));
-    ctx = ((id (*)(id, SEL, id, id))objc_msgSend)(
+        ((id(*)(id, SEL))objc_msgSend)(ctxCls, sel_registerName("alloc"));
+    ctx = ((id(*)(id, SEL, id, id))objc_msgSend)(
         ctxAlloc, sel_registerName("initWithFormat:shareContext:"), pf, (id)0);
-    view =
-        ((id (*)(id, SEL))objc_msgSend)(win, sel_registerName("contentView"));
+    view = ((id(*)(id, SEL))objc_msgSend)(win, sel_registerName("contentView"));
     ((void (*)(id, SEL, id))objc_msgSend)(ctx, sel_registerName("setView:"),
                                           view);
   }
@@ -280,6 +296,12 @@ static ui_error_t macos_create_window(struct ui_window_backend *backend,
   minSize.height = 100.0;
   ((void (*)(id, SEL, CGSize))objc_msgSend)(
       win, sel_registerName("setMinSize:"), minSize);
+
+#ifdef UI_TEST_MOCK_ALLOC
+  if (g_mock_macos_no_view) {
+    view = (id)0;
+  }
+#endif
 
   if (view) {
     ((void (*)(id, SEL, unsigned long))objc_msgSend)(
@@ -294,12 +316,35 @@ static ui_error_t macos_create_window(struct ui_window_backend *backend,
   w->is_shown = 0;
   w->is_closing = 0;
   w->has_resize_event = 0;
+  w->scale_factor = 1.0f;
+  if (win) {
+    SEL sel_bsf = sel_registerName("backingScaleFactor");
+    SEL sel_rts = sel_registerName("respondsToSelector:");
+    if (((BOOL(*)(id, SEL, SEL))objc_msgSend)(win, sel_rts, sel_bsf)) {
+      CGFloat scale = ((CGFloat(*)(id, SEL))objc_msgSend)(win, sel_bsf);
+      if (scale > 0.0) {
+        w->scale_factor = (float)scale;
+      }
+    }
+  }
   w->on_resize_callback = NULL;
   w->on_resize_user_data = NULL;
+  w->on_dpi_change_callback = NULL;
+  w->on_dpi_change_user_data = NULL;
 
   delCls = macos_get_window_delegate_class();
+#ifdef UI_TEST_MOCK_ALLOC
+  if (g_mock_macos_fail_delegate == 1) {
+    delCls = NULL;
+  }
+#endif
   if (delCls) {
-    del = ((id (*)(id, SEL))objc_msgSend)((id)delCls, sel_registerName("new"));
+    del = ((id(*)(id, SEL))objc_msgSend)((id)delCls, sel_registerName("new"));
+#ifdef UI_TEST_MOCK_ALLOC
+    if (g_mock_macos_fail_delegate == 2) {
+      del = NULL;
+    }
+#endif
     if (del) {
       objc_setAssociatedObject(win, "ui_window_ptr", (id)w,
                                OBJC_ASSOCIATION_ASSIGN);
@@ -364,20 +409,20 @@ static ui_error_t macos_show_window(struct ui_window_backend *backend,
     ((void (*)(id, SEL, id))objc_msgSend)(
         window->window, sel_registerName("makeKeyAndOrderFront:"), (id)0);
     appCls = (id)objc_getClass("NSApplication");
-    app = ((id (*)(id, SEL))objc_msgSend)(
-        appCls, sel_registerName("sharedApplication"));
+    app = ((id(*)(id, SEL))objc_msgSend)(appCls,
+                                         sel_registerName("sharedApplication"));
     ((void (*)(id, SEL, BOOL))objc_msgSend)(
         app, sel_registerName("activateIgnoringOtherApps:"), (BOOL)1);
 
     strCls = (id)objc_getClass("NSString");
-    modeStr = ((id (*)(id, SEL, const char *))objc_msgSend)(
+    modeStr = ((id(*)(id, SEL, const char *))objc_msgSend)(
         strCls, sel_registerName("stringWithUTF8String:"),
         "kCFRunLoopDefaultMode");
     dateCls = (id)objc_getClass("NSDate");
-    date = ((id (*)(id, SEL, double))objc_msgSend)(
+    date = ((id(*)(id, SEL, double))objc_msgSend)(
         dateCls, sel_registerName("dateWithTimeIntervalSinceNow:"), 0.02);
 
-    event = ((id (*)(id, SEL, unsigned long, id, id, BOOL))objc_msgSend)(
+    event = ((id(*)(id, SEL, unsigned long, id, id, BOOL))objc_msgSend)(
         app,
         sel_registerName("nextEventMatchingMask:untilDate:inMode:dequeue:"),
         (unsigned long)-1, date, modeStr, (BOOL)1);
@@ -466,17 +511,17 @@ static ui_error_t macos_poll_events(struct ui_window_backend *backend,
   }
 
   appCls = (id)objc_getClass("NSApplication");
-  app = ((id (*)(id, SEL))objc_msgSend)(appCls,
-                                        sel_registerName("sharedApplication"));
+  app = ((id(*)(id, SEL))objc_msgSend)(appCls,
+                                       sel_registerName("sharedApplication"));
   strCls = (id)objc_getClass("NSString");
-  modeStr = ((id (*)(id, SEL, const char *))objc_msgSend)(
+  modeStr = ((id(*)(id, SEL, const char *))objc_msgSend)(
       strCls, sel_registerName("stringWithUTF8String:"),
       "kCFRunLoopDefaultMode");
   dateCls = (id)objc_getClass("NSDate");
-  date = ((id (*)(id, SEL, double))objc_msgSend)(
+  date = ((id(*)(id, SEL, double))objc_msgSend)(
       dateCls, sel_registerName("dateWithTimeIntervalSinceNow:"), 0.005);
 
-  event = ((id (*)(id, SEL, unsigned long, id, id, BOOL))objc_msgSend)(
+  event = ((id(*)(id, SEL, unsigned long, id, id, BOOL))objc_msgSend)(
       app, sel_registerName("nextEventMatchingMask:untilDate:inMode:dequeue:"),
       (unsigned long)-1, date, modeStr, (BOOL)1);
 
@@ -487,7 +532,7 @@ static ui_error_t macos_poll_events(struct ui_window_backend *backend,
         event, sel_registerName("type"));
     if (evtType == 1 || evtType == 2) {
       CGPoint loc;
-      loc = ((CGPoint (*)(id, SEL))objc_msgSend)(
+      loc = ((CGPoint(*)(id, SEL))objc_msgSend)(
           event, sel_registerName("locationInWindow"));
       out_event->type =
           (evtType == 1) ? UI_EVENT_MOUSE_DOWN : UI_EVENT_MOUSE_UP;
@@ -503,6 +548,32 @@ static ui_error_t macos_poll_events(struct ui_window_backend *backend,
     }
   }
 
+  if (window->window && window->window != (void *)1) {
+    SEL sel_bsf = sel_registerName("backingScaleFactor");
+    SEL sel_rts = sel_registerName("respondsToSelector:");
+    if (((BOOL(*)(id, SEL, SEL))objc_msgSend)(window->window, sel_rts,
+                                              sel_bsf)) {
+      CGFloat cur_scale =
+          ((CGFloat(*)(id, SEL))objc_msgSend)(window->window, sel_bsf);
+      if (cur_scale > 0.0 && (float)cur_scale != window->scale_factor) {
+        float old_scale = window->scale_factor;
+        window->scale_factor = (float)cur_scale;
+        if (window->on_dpi_change_callback) {
+          ui_error_t cb_rc = window->on_dpi_change_callback(
+              window->on_dpi_change_user_data, old_scale, window->scale_factor);
+          if (cb_rc != UI_ERROR_NONE) {
+            return cb_rc;
+          }
+        }
+        out_event->type = UI_EVENT_WINDOW_DPI_CHANGED;
+        out_event->event_data.dpi.old_scale_factor = old_scale;
+        out_event->event_data.dpi.new_scale_factor = window->scale_factor;
+        *out_has_event = 1;
+        return UI_ERROR_NONE;
+      }
+    }
+  }
+
   cur_w = 0;
   cur_h = 0;
   if (window->view && window->view != (void *)1) {
@@ -510,8 +581,8 @@ static ui_error_t macos_poll_events(struct ui_window_backend *backend,
     ((void (*)(CGRect *, id, SEL))objc_msgSend_stret)(
         &cur_rect, window->view, sel_registerName("bounds"));
 #else
-    cur_rect = ((CGRect (*)(id, SEL))objc_msgSend)(window->view,
-                                                   sel_registerName("bounds"));
+    cur_rect = ((CGRect(*)(id, SEL))objc_msgSend)(window->view,
+                                                  sel_registerName("bounds"));
 #endif
     cur_w = (int)cur_rect.size.width;
     cur_h = (int)cur_rect.size.height;
@@ -520,7 +591,7 @@ static ui_error_t macos_poll_events(struct ui_window_backend *backend,
     ((void (*)(CGRect *, id, SEL))objc_msgSend_stret)(
         &cur_rect, window->window, sel_registerName("contentLayoutRect"));
 #else
-    cur_rect = ((CGRect (*)(id, SEL))objc_msgSend)(
+    cur_rect = ((CGRect(*)(id, SEL))objc_msgSend)(
         window->window, sel_registerName("contentLayoutRect"));
 #endif
     cur_w = (int)cur_rect.size.width;
@@ -573,6 +644,88 @@ static ui_error_t macos_set_on_resize_callback(
   }
   window->on_resize_callback = callback;
   window->on_resize_user_data = user_data;
+  return UI_ERROR_NONE;
+}
+
+/**
+ * @brief macos_get_scale_factor.
+ * @param backend Parameter backend.
+ * @param window Parameter window.
+ * @param out_scale_factor Parameter out_scale_factor.
+ * @return Return value.
+ */
+static ui_error_t macos_get_scale_factor(struct ui_window_backend *backend,
+                                         struct ui_window *window,
+                                         float *out_scale_factor) {
+  if (!backend || !window || !out_scale_factor) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+  if (window == (struct ui_window *)1) {
+    *out_scale_factor = 1.0f;
+    return UI_ERROR_NONE;
+  }
+  if (window->scale_factor > 0.0f) {
+    *out_scale_factor = window->scale_factor;
+  } else {
+    *out_scale_factor = 1.0f;
+  }
+  return UI_ERROR_NONE;
+}
+
+/**
+ * @brief macos_get_framebuffer_size.
+ * @param backend Parameter backend.
+ * @param window Parameter window.
+ * @param out_fb_width Parameter out_fb_width.
+ * @param out_fb_height Parameter out_fb_height.
+ * @return Return value.
+ */
+static ui_error_t macos_get_framebuffer_size(struct ui_window_backend *backend,
+                                             struct ui_window *window,
+                                             int *out_fb_width,
+                                             int *out_fb_height) {
+  float scale;
+  ui_error_t rc;
+
+  if (!backend || !window || !out_fb_width || !out_fb_height) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+  if (window == (struct ui_window *)1) {
+    *out_fb_width = 100;
+    *out_fb_height = 100;
+    return UI_ERROR_NONE;
+  }
+
+  scale = 1.0f;
+  rc = macos_get_scale_factor(backend, window, &scale);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
+
+  *out_fb_width = (int)((float)window->width * scale);
+  *out_fb_height = (int)((float)window->height * scale);
+  return UI_ERROR_NONE;
+}
+
+/**
+ * @brief macos_set_on_dpi_change_callback.
+ * @param backend Parameter backend.
+ * @param window Parameter window.
+ * @param callback Parameter callback.
+ * @param user_data Parameter user_data.
+ * @return Return value.
+ */
+static ui_error_t macos_set_on_dpi_change_callback(
+    struct ui_window_backend *backend, struct ui_window *window,
+    ui_error_t (*callback)(void *, float, float), void *user_data) {
+  if (!backend || !window) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+  if (window == (struct ui_window *)1) {
+    return UI_ERROR_NONE;
+  }
+  window->on_dpi_change_callback = callback;
+  window->on_dpi_change_user_data = user_data;
   return UI_ERROR_NONE;
 }
 
@@ -648,6 +801,9 @@ ui_window_backend_macos_create(struct ui_window_backend **out_backend) {
   backend->push_deep_link = NULL;
   backend->get_os_handle = macos_get_os_handle;
   backend->set_on_resize_callback = macos_set_on_resize_callback;
+  backend->get_scale_factor = macos_get_scale_factor;
+  backend->get_framebuffer_size = macos_get_framebuffer_size;
+  backend->set_on_dpi_change_callback = macos_set_on_dpi_change_callback;
   backend->user_data = NULL;
 
   *out_backend = backend;
@@ -666,6 +822,32 @@ ui_error_t ui_window_backend_macos_destroy(struct ui_window_backend *backend) {
   C_MULTIPLATFORM_FREE(backend);
   return UI_ERROR_NONE;
 }
+
+#ifdef UI_TEST_MOCK_ALLOC
+/**
+ * @brief Test helper to invoke macos_on_window_did_resize.
+ * @param self Delegate instance.
+ * @param _cmd Selector.
+ * @param notif NSNotification instance.
+ */
+void ui_test_macos_on_window_did_resize(id self, SEL _cmd, id notif);
+
+/**
+ * @brief Test helper to invoke macos_on_window_will_close.
+ * @param self Delegate instance.
+ * @param _cmd Selector.
+ * @param notif NSNotification instance.
+ */
+void ui_test_macos_on_window_will_close(id self, SEL _cmd, id notif);
+
+void ui_test_macos_on_window_did_resize(id self, SEL _cmd, id notif) {
+  macos_on_window_did_resize(self, _cmd, notif);
+}
+
+void ui_test_macos_on_window_will_close(id self, SEL _cmd, id notif) {
+  macos_on_window_will_close(self, _cmd, notif);
+}
+#endif
 
 #else
 /* Apple platform but not macOS (e.g. iOS) */
@@ -690,6 +872,7 @@ ui_error_t ui_window_backend_macos_destroy(struct ui_window_backend *backend) {
   }
   return UI_ERROR_UNKNOWN;
 }
+
 #endif
 #else
 /* Non-Apple Platform Stub */

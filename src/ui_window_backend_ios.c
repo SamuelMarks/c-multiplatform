@@ -142,6 +142,9 @@ ui_error_t ui_window_backend_ios_create(struct ui_window_backend** out_backend) 
     backend->push_deep_link = NULL;
     backend->get_os_handle = NULL;
     backend->set_on_resize_callback = NULL;
+    backend->get_scale_factor = NULL;
+    backend->get_framebuffer_size = NULL;
+    backend->set_on_dpi_change_callback = NULL;
     backend->user_data = NULL;
 
     *out_backend = backend;

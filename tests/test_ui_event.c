@@ -516,6 +516,10 @@ int main(void) {
   /* Unhandled event type to trigger final else branch */
   ev.type = UI_EVENT_CLICK;
   ui_event_dispatch(&root_layout, &ev, &mouse_state, focus_mgr);
+  ev.type = UI_EVENT_WINDOW_DPI_CHANGED;
+  ev.event_data.dpi.old_scale_factor = 1.0f;
+  ev.event_data.dpi.new_scale_factor = 2.0f;
+  ui_event_dispatch(&root_layout, &ev, &mouse_state, focus_mgr);
   /* Tab with NULL focus_mgr */
   ev.type = UI_EVENT_KEY_DOWN;
   ev.event_data.keyboard.key_code = UI_KEY_TAB;

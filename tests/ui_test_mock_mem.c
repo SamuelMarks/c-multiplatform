@@ -10,9 +10,11 @@ int g_ui_timer_clock_gettime_fail = 0;
 int g_ui_clipboard_force_fallback = 0;
 int g_mock_io_fail = 0;
 int g_mock_thread_fail = 0;
+int g_mock_append_child_fail_countdown = -1;
+int g_mock_reactive_graph_fail = 0;
 
 void *ui_mock_malloc(size_t size) {
-  g_malloc_called = 1;
+  g_malloc_called++;
   if (g_malloc_fail_countdown == 0) {
     return NULL;
   }
@@ -23,7 +25,7 @@ void *ui_mock_malloc(size_t size) {
 }
 
 void *ui_mock_realloc(void *ptr, size_t size) {
-  g_malloc_called = 1;
+  g_malloc_called++;
   if (g_malloc_fail_countdown == 0) {
     return NULL;
   }

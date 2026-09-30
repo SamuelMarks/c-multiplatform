@@ -140,6 +140,49 @@ struct ui_window_backend {
       ui_error_t (*callback)(void *user_data, int width, int height),
       void *user_data);
 
+  /**
+   * @brief Retrieves the display scale factor (DPI ratio) for the window.
+   *
+   * @param backend The backend instance.
+   * @param window The window instance.
+   * @param out_scale_factor Pointer to store the scale factor (e.g. 1.0f for
+   * standard 96 DPI, 2.0f for Retina).
+   * @return UI_ERROR_NONE on success, or an appropriate error code.
+   */
+  ui_error_t (*get_scale_factor)(struct ui_window_backend *backend,
+                                 struct ui_window *window,
+                                 float *out_scale_factor);
+
+  /**
+   * @brief Retrieves the physical framebuffer dimensions in pixels.
+   *
+   * @param backend The backend instance.
+   * @param window The window instance.
+   * @param out_fb_width Pointer to store the framebuffer width in physical
+   * pixels.
+   * @param out_fb_height Pointer to store the framebuffer height in physical
+   * pixels.
+   * @return UI_ERROR_NONE on success, or an appropriate error code.
+   */
+  ui_error_t (*get_framebuffer_size)(struct ui_window_backend *backend,
+                                     struct ui_window *window,
+                                     int *out_fb_width, int *out_fb_height);
+
+  /**
+   * @brief Sets a callback to be invoked when the window DPI or display scale
+   * factor changes.
+   *
+   * @param backend The backend instance.
+   * @param window The window instance.
+   * @param callback The callback function.
+   * @param user_data User data for the callback.
+   * @return UI_ERROR_NONE on success, or an appropriate error code.
+   */
+  ui_error_t (*set_on_dpi_change_callback)(
+      struct ui_window_backend *backend, struct ui_window *window,
+      ui_error_t (*callback)(void *user_data, float old_scale, float new_scale),
+      void *user_data);
+
   void *user_data; /**< Opaque user data for the specific backend
                       implementation. */
 };

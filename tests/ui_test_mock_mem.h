@@ -22,9 +22,11 @@ extern int g_mock_gles2_flush_fail;
 extern int g_native_init_fail;
 extern int g_gles_init_fail;
 extern int g_mock_append_child_fail;
+extern int g_mock_append_child_fail_countdown;
 extern int g_mock_strcpy_fail;
 extern int g_mock_lock_contention;
 extern int g_mock_cg_fail;
+extern int g_mock_reactive_graph_fail;
 
 void *ui_mock_malloc(size_t size);
 void *ui_mock_realloc(void *ptr, size_t size);

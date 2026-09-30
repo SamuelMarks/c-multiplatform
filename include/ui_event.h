@@ -42,7 +42,8 @@ enum ui_event_type {
   UI_EVENT_GAMEPAD_BUTTON_DOWN, /**< Gamepad button down event. */
   UI_EVENT_GAMEPAD_BUTTON_UP,   /**< Gamepad button up event. */
   UI_EVENT_GAMEPAD_AXIS,        /**< Gamepad axis move event. */
-  UI_EVENT_OS_DEEP_LINK         /**< OS deep link event. */
+  UI_EVENT_OS_DEEP_LINK,        /**< OS deep link event. */
+  UI_EVENT_WINDOW_DPI_CHANGED   /**< Window display scale / DPI change event. */
 };
 
 /**
@@ -157,6 +158,14 @@ struct ui_os_deep_link_event {
 };
 
 /**
+ * @brief Window DPI / display scale factor change event data.
+ */
+struct ui_window_dpi_event {
+  float old_scale_factor; /**< Previous display scale factor. */
+  float new_scale_factor; /**< New display scale factor. */
+};
+
+/**
  * @brief Unified input event structure.
  */
 struct ui_event {
@@ -170,6 +179,7 @@ struct ui_event {
     struct ui_gamepad_event gamepad;        /**< Data for gamepad events. */
     struct ui_window_event window;          /**< Data for window events. */
     struct ui_os_deep_link_event deep_link; /**< Data for deep link events. */
+    struct ui_window_dpi_event dpi;         /**< Data for window DPI events. */
   } event_data;                             /**< The event data union */
 };
 

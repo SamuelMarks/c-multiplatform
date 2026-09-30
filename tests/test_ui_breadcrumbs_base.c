@@ -5,7 +5,7 @@
 /* clang-format on */
 
 extern int g_malloc_fail_countdown;
-int g_breadcrumbs_mock_fail = 0;
+extern int g_breadcrumbs_mock_fail;
 int g_breadcrumbs_mock_target = 0;
 int g_breadcrumbs_mock_current = 0;
 
@@ -458,14 +458,10 @@ int main(void) {
 #endif
 
   /* Targeted test for breadcrumbs null bind */
-  {
-    ui_breadcrumbs_base_bind_active_index(NULL, NULL);
-  }
+  { ui_breadcrumbs_base_bind_active_index(NULL, NULL); }
 
   /* Targeted test for breadcrumbs null bind */
-  {
-    ui_breadcrumbs_base_bind_active_index(NULL, NULL);
-  }
+  { ui_breadcrumbs_base_bind_active_index(NULL, NULL); }
 
   printf("All ui_breadcrumbs_base tests passed.\n");
   return 0;
