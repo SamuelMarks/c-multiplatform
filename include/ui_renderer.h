@@ -506,6 +506,22 @@ struct ui_renderer_backend {
                              float width, float height, float opacity);
 
   /**
+   * @brief Draws text with a given font.
+   *
+   * @param backend The renderer backend.
+   * @param text The text to render.
+   * @param f The font to use.
+   * @param x Dest X origin.
+   * @param y Dest Y origin.
+   * @param font_size Font size in pixels.
+   * @param color Text color.
+   * @return UI_ERROR_NONE on success, or an appropriate error code.
+   */
+  ui_error_t (*draw_text)(struct ui_renderer_backend *backend, const char *text,
+                          const struct ui_font *f, float x, float y,
+                          float font_size, struct ui_color color);
+
+  /**
    * @brief Reads pixels from the current render target.
    *
    * @param backend The renderer backend.

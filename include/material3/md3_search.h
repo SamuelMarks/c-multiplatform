@@ -21,7 +21,13 @@ extern "C" {
 
 struct ui_engine;
 
+/**
+ * @brief Maximum number of history entries retained in search view.
+ */
 #define MD3_SEARCH_MAX_HISTORY 16
+/**
+ * @brief Maximum character length of each search history entry.
+ */
 #define MD3_SEARCH_HISTORY_LEN 128
 
 /**

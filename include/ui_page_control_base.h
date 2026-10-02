@@ -42,6 +42,15 @@ extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_page_control_base_create(struct ui_page_control_base **out_control);
 
 /**
+ * @brief Destroys a base page control component.
+ *
+ * @param control The page control component.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_page_control_base_destroy(struct ui_page_control_base *control);
+
+/**
  * @brief Sets the total number of pages.
  *
  * @param control The page control component.

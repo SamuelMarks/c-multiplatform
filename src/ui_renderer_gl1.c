@@ -12,10 +12,8 @@
 /* clang-format off */
 #include <stddef.h>
 #include <string.h>
-/* clang-format on */
 #ifndef __EMSCRIPTEN__
 #if defined(_WIN32) || defined(__CYGWIN__)
-/* clang-format off */
 #include <winsock2.h>
 #include <GL/gl.h>
 #elif defined(__APPLE__)
@@ -24,6 +22,38 @@
 #include <GL/gl.h>
 #endif
 #endif /* !__EMSCRIPTEN__ */
+#include "ui_renderer_gl1.h"
+#include "ui_window_backend.h"
+#include "ui_font_manager.h"
+#include "ui_internal_mem.h"
+/* clang-format on */
+
+#ifdef UI_TEST_MOCK_ALLOC
+int g_mock_gl1_glyph_box = 0;
+int g_mock_gl1_glyph_metrics_fail = 0;
+
+static ui_error_t
+mock_ui_font_get_glyph_metrics(struct ui_font *font, int codepoint,
+                               float font_size,
+                               struct ui_glyph_metrics *out_metrics) {
+  if (g_mock_gl1_glyph_metrics_fail) {
+    return UI_ERROR_NOT_FOUND;
+  }
+  if (g_mock_gl1_glyph_box) {
+    out_metrics->width = 10;
+    out_metrics->height = (codepoint == 'H') ? 0 : 10;
+    out_metrics->bearing_x = 0;
+    out_metrics->bearing_y = 10;
+    out_metrics->advance = 12;
+    return UI_ERROR_NONE;
+  }
+  return ui_font_get_glyph_metrics(font, codepoint, font_size, out_metrics);
+}
+#undef ui_font_get_glyph_metrics
+/** @cond */
+#define ui_font_get_glyph_metrics mock_ui_font_get_glyph_metrics
+/** @endcond */
+#endif
 
 #if !defined(__EMSCRIPTEN__) &&                                                \
     (defined(UI_TEST_MOCK_ALLOC) ||                                            \
@@ -39,9 +69,9 @@ static void mock_glMatrixMode(int m) {
   int um = m;
   m = um;
 }
-static void mock_glLoadIdentity(void) {
-}
-static void mock_glOrtho(double l, double r, double b, double t, double n, double f) {
+static void mock_glLoadIdentity(void) {}
+static void mock_glOrtho(double l, double r, double b, double t, double n,
+                         double f) {
   double ul = l, ur = r, ub = b, ut = t, un = n, uf = f;
   l = ul;
   r = ur;
@@ -77,9 +107,9 @@ static void mock_glVertex2f(float x, float y) {
   x = ux;
   y = uy;
 }
-static void mock_glEnd(void) {
-}
-static void mock_glReadPixels(int x, int y, int w, int h, unsigned int f, unsigned int t, void *d) {
+static void mock_glEnd(void) {}
+static void mock_glReadPixels(int x, int y, int w, int h, unsigned int f,
+                              unsigned int t, void *d) {
   int ux = x, uy = y, uw = w, uh = h;
   unsigned int uf = f, ut = t;
   void *ud = d;
@@ -114,11 +144,6 @@ static void mock_glReadPixels(int x, int y, int w, int h, unsigned int f, unsign
 #undef glReadPixels
 #define glReadPixels mock_glReadPixels
 #endif
-
-#include "ui_renderer_gl1.h"
-#include "ui_window_backend.h"
-#include "ui_internal_mem.h"
-/* clang-format on */
 
 #ifdef __EMSCRIPTEN__
 
@@ -233,8 +258,11 @@ static ui_error_t gl1_flush(struct ui_renderer_backend *backend) {
   int i;
 #ifdef UI_TEST_MOCK_ALLOC
   extern int g_mock_gles2_flush_fail;
-  if (g_mock_gles2_flush_fail) {
+  if (g_mock_gles2_flush_fail == 1) {
     return UI_ERROR_UNKNOWN;
+  }
+  if (g_mock_gles2_flush_fail > 1) {
+    g_mock_gles2_flush_fail--;
   }
 #endif
   if (!backend || !backend->user_data) {
@@ -711,6 +739,48 @@ static ui_error_t gl1_draw_texture(struct ui_renderer_backend *backend,
   return gl1_draw_rect(backend, x, y, width, height, color);
 }
 
+static ui_error_t gl1_draw_text(struct ui_renderer_backend *backend,
+                                const char *text, const struct ui_font *f,
+                                float x, float y, float font_size,
+                                struct ui_color color) {
+  float cur_x = x;
+  const char *p;
+  ui_error_t rc;
+
+  if (!backend || !text || !f || font_size <= 0.0f) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+
+  rc = gl1_flush(backend);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
+
+  for (p = text; *p; ++p) {
+    int codepoint = (int)(unsigned char)*p;
+    struct ui_glyph_metrics metrics;
+
+    rc = ui_font_get_glyph_metrics((struct ui_font *)f, codepoint, font_size,
+                                   &metrics);
+    if (rc != UI_ERROR_NONE) {
+      continue;
+    }
+
+    if (metrics.width > 0 && metrics.height > 0) {
+      float gx = cur_x + (float)metrics.bearing_x;
+      float gy = y - (float)metrics.bearing_y;
+      rc = gl1_draw_rect(backend, gx, gy, (float)metrics.width,
+                         (float)metrics.height, color);
+      if (rc != UI_ERROR_NONE) {
+        return rc;
+      }
+    }
+    cur_x += (float)metrics.advance;
+  }
+
+  return UI_ERROR_NONE;
+}
+
 /**
  * \brief Reads pixels from the current render target.
  *
@@ -773,6 +843,7 @@ ui_error_t ui_renderer_gl1_create(struct ui_renderer_backend **out_backend) {
   backend->destroy_texture = gl1_destroy_texture;
   backend->set_render_target = gl1_set_render_target;
   backend->draw_texture = gl1_draw_texture;
+  backend->draw_text = gl1_draw_text;
   backend->read_pixels = gl1_read_pixels;
   backend->user_data = NULL;
 

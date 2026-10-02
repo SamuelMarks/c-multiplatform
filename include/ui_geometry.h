@@ -124,6 +124,40 @@ ui_dom_quad_init(struct ui_dom_quad *quad, const struct ui_dom_point *p1,
 extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_dom_matrix_init_identity(struct ui_dom_matrix *matrix);
 
+/**
+ * @brief Transforms device-independent logical points to physical framebuffer
+ * pixels.
+ *
+ * @param logical_x Logical X coordinate in points.
+ * @param logical_y Logical Y coordinate in points.
+ * @param scale_factor Device pixel ratio / DPI scale factor.
+ * @param out_physical_x Pointer to receive physical X pixel coordinate.
+ * @param out_physical_y Pointer to receive physical Y pixel coordinate.
+ * @return `UI_ERROR_NONE` on success, or `UI_ERROR_INVALID_ARGUMENT`.
+ */
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_geometry_transform_logical_to_physical(float logical_x, float logical_y,
+                                          float scale_factor,
+                                          int *out_physical_x,
+                                          int *out_physical_y);
+
+/**
+ * @brief Transforms physical framebuffer pixels to device-independent logical
+ * points.
+ *
+ * @param physical_x Physical X coordinate in pixels.
+ * @param physical_y Physical Y coordinate in pixels.
+ * @param scale_factor Device pixel ratio / DPI scale factor.
+ * @param out_logical_x Pointer to receive logical X coordinate.
+ * @param out_logical_y Pointer to receive logical Y coordinate.
+ * @return `UI_ERROR_NONE` on success, or `UI_ERROR_INVALID_ARGUMENT`.
+ */
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_geometry_transform_physical_to_logical(int physical_x, int physical_y,
+                                          float scale_factor,
+                                          float *out_logical_x,
+                                          float *out_logical_y);
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

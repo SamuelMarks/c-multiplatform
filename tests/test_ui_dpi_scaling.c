@@ -12,6 +12,7 @@
 #include "../include/ui_window_backend.h"
 #include "../include/ui_event.h"
 #include "../include/ui_error.h"
+#include "../include/ui_geometry.h"
 /* clang-format on */
 
 /**
@@ -203,26 +204,46 @@ int main(void) {
     return 12;
   }
 
-  /* 4. Test transform_logical_to_physical coordinates */
-  rc = transform_logical_to_physical(100.0f, 200.0f, 0.0f, &phys_x, &phys_y);
+  /* 4. Test ui_geometry_transform_logical_to_physical & physical_to_logical */
+  rc = ui_geometry_transform_logical_to_physical(100.0f, 200.0f, 0.0f, &phys_x,
+                                                 &phys_y);
   if (rc != UI_ERROR_INVALID_ARGUMENT) {
     return 13;
   }
-  rc = transform_logical_to_physical(100.0f, 200.0f, -1.0f, &phys_x, &phys_y);
+  rc = ui_geometry_transform_logical_to_physical(100.0f, 200.0f, -1.0f, &phys_x,
+                                                 &phys_y);
   if (rc != UI_ERROR_INVALID_ARGUMENT) {
     return 14;
   }
-  rc = transform_logical_to_physical(100.0f, 200.0f, 1.5f, NULL, &phys_y);
+  rc = ui_geometry_transform_logical_to_physical(100.0f, 200.0f, 1.5f, NULL,
+                                                 &phys_y);
   if (rc != UI_ERROR_INVALID_ARGUMENT) {
     return 15;
   }
-  rc = transform_logical_to_physical(100.0f, 200.0f, 1.5f, &phys_x, NULL);
+  rc = ui_geometry_transform_logical_to_physical(100.0f, 200.0f, 1.5f, &phys_x,
+                                                 NULL);
   if (rc != UI_ERROR_INVALID_ARGUMENT) {
     return 16;
   }
-  rc = transform_logical_to_physical(100.0f, 200.0f, 2.0f, &phys_x, &phys_y);
+  rc = ui_geometry_transform_logical_to_physical(100.0f, 200.0f, 2.0f, &phys_x,
+                                                 &phys_y);
   if (rc != UI_ERROR_NONE || phys_x != 200 || phys_y != 400) {
     return 17;
+  }
+
+  {
+    float log_x = 0.0f;
+    float log_y = 0.0f;
+    rc = ui_geometry_transform_physical_to_logical(200, 400, 2.0f, &log_x,
+                                                   &log_y);
+    if (rc != UI_ERROR_NONE || log_x != 100.0f || log_y != 200.0f) {
+      return 18;
+    }
+    rc = ui_geometry_transform_physical_to_logical(200, 400, 0.0f, &log_x,
+                                                   &log_y);
+    if (rc != UI_ERROR_INVALID_ARGUMENT) {
+      return 19;
+    }
   }
 
   /* 5. Test UI_EVENT_WINDOW_DPI_CHANGED payload */

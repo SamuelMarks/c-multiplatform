@@ -24,8 +24,14 @@ static const char *const g_shape_scale_names[MD3_SHAPE_SCALE_COUNT] = {
     "none",         "corner-extra-small", "corner-small", "corner-medium",
     "corner-large", "corner-extra-large", "corner-full"};
 
+/**
+ * @struct md3_cut_shape_entry
+ * @brief Mapping entry between cut corner token names and corner radii.
+ */
 struct md3_cut_shape_entry {
+  /** @brief Design token name for cut corner shape. */
   const char *name;
+  /** @brief Cut radius in pixels/dp. */
   float radius;
 };
 

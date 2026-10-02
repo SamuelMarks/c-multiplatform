@@ -19,12 +19,23 @@
 
 static int g_md3_high_contrast_enabled = 0;
 
+/**
+ * @struct md3_roving_tabindex
+ * @brief Internal state for Material 3 roving tabindex management.
+ */
 struct md3_roving_tabindex {
+  /** @brief Total number of focusable items. */
   size_t item_count;
+  /** @brief Currently focused item index. */
   size_t focused_index;
 };
 
+/**
+ * @struct md3_announcer
+ * @brief Internal state for Material 3 live announcer.
+ */
 struct md3_announcer {
+  /** @brief Pointer to base UI live announcer instance. */
   struct ui_live_announcer *base;
 };
 

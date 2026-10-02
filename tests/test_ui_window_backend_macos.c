@@ -19,8 +19,11 @@ struct ui_window {
   int is_shown;
   int is_closing;
   int has_resize_event;
+  float scale_factor;
   ui_error_t (*on_resize_callback)(void *, int, int);
   void *on_resize_user_data;
+  ui_error_t (*on_dpi_change_callback)(void *, float, float);
+  void *on_dpi_change_user_data;
 };
 
 static int g_test_resize_called = 0;
@@ -40,6 +43,29 @@ static ui_error_t test_resize_fail_callback(void *user_data, int w, int h) {
   if (user_data) {
   }
   if (w || h) {
+  }
+  return UI_ERROR_UNKNOWN;
+}
+
+static int g_test_dpi_called = 0;
+static float g_test_dpi_old = 0.0f;
+static float g_test_dpi_new = 0.0f;
+
+static ui_error_t test_dpi_callback(void *user_data, float old_scale,
+                                    float new_scale) {
+  if (user_data) {
+  }
+  g_test_dpi_called++;
+  g_test_dpi_old = old_scale;
+  g_test_dpi_new = new_scale;
+  return UI_ERROR_NONE;
+}
+
+static ui_error_t test_dpi_fail_callback(void *user_data, float old_scale,
+                                         float new_scale) {
+  if (user_data) {
+  }
+  if (old_scale > 0.0f || new_scale > 0.0f) {
   }
   return UI_ERROR_UNKNOWN;
 }
@@ -501,6 +527,122 @@ int main(void) {
             failed |= (backend->get_os_handle(backend, real_win, &real_os_h) !=
                        UI_ERROR_NONE);
             failed |= (real_os_h == NULL);
+          }
+
+          /* Test real_win scale factor, framebuffer size, and dpi change
+           * callback */
+          {
+            float s = 0.0f;
+            int fb_w = 0, fb_h = 0;
+            extern int g_mock_macos_fail_scale;
+            extern int g_mock_macos_no_backing_scale;
+
+            failed |= (backend->get_scale_factor(backend, real_win, &s) !=
+                       UI_ERROR_NONE);
+            failed |= (s <= 0.0f);
+
+            /* Scale factor when <= 0.0f */
+            real_win->scale_factor = 0.0f;
+            failed |= (backend->get_scale_factor(backend, real_win, &s) !=
+                       UI_ERROR_NONE);
+            failed |= (s != 1.0f);
+            real_win->scale_factor = 2.0f;
+            failed |= (backend->get_scale_factor(backend, real_win, &s) !=
+                       UI_ERROR_NONE);
+            failed |= (s != 2.0f);
+
+            /* Framebuffer size */
+            failed |= (backend->get_framebuffer_size(backend, real_win, &fb_w,
+                                                     &fb_h) != UI_ERROR_NONE);
+            failed |= (fb_w != (int)((float)real_win->width * s));
+            failed |= (fb_h != (int)((float)real_win->height * s));
+
+            /* Framebuffer size failure */
+            g_mock_macos_fail_scale = 1;
+            failed |=
+                (backend->get_framebuffer_size(backend, real_win, &fb_w,
+                                               &fb_h) != UI_ERROR_UNKNOWN);
+            g_mock_macos_fail_scale = 0;
+
+            /* DPI callback setting */
+            failed |= (backend->set_on_dpi_change_callback(
+                           backend, real_win, test_dpi_callback, NULL) !=
+                       UI_ERROR_NONE);
+
+            /* DPI change event with failing callback */
+            real_win->scale_factor = 0.1f;
+            failed |= (backend->set_on_dpi_change_callback(
+                           backend, real_win, test_dpi_fail_callback, NULL) !=
+                       UI_ERROR_NONE);
+            err = backend->poll_events(backend, real_win, &evt, &has_evt);
+            failed |= (err != UI_ERROR_UNKNOWN);
+
+            /* DPI change event with successful callback */
+            real_win->scale_factor = 0.1f;
+            failed |= (backend->set_on_dpi_change_callback(
+                           backend, real_win, test_dpi_callback, NULL) !=
+                       UI_ERROR_NONE);
+            g_test_dpi_called = 0;
+            err = backend->poll_events(backend, real_win, &evt, &has_evt);
+            failed |= (err != UI_ERROR_NONE);
+            failed |= (!has_evt || evt.type != UI_EVENT_WINDOW_DPI_CHANGED);
+            failed |= (g_test_dpi_called != 1);
+
+            /* DPI change event with NULL callback */
+            real_win->scale_factor = 0.1f;
+            failed |= (backend->set_on_dpi_change_callback(
+                           backend, real_win, NULL, NULL) != UI_ERROR_NONE);
+            err = backend->poll_events(backend, real_win, &evt, &has_evt);
+            failed |= (err != UI_ERROR_NONE);
+            failed |= (!has_evt || evt.type != UI_EVENT_WINDOW_DPI_CHANGED);
+
+            /* Poll events when backingScaleFactor not supported */
+            g_mock_macos_no_backing_scale = 1;
+            err = backend->poll_events(backend, real_win, &evt, &has_evt);
+            failed |= (err != UI_ERROR_NONE);
+            g_mock_macos_no_backing_scale = 0;
+
+            /* Poll events when cur_scale <= 0.0 */
+            extern int g_mock_macos_zero_scale;
+            g_mock_macos_zero_scale = 1;
+            err = backend->poll_events(backend, real_win, &evt, &has_evt);
+            failed |= (err != UI_ERROR_NONE);
+            g_mock_macos_zero_scale = 0;
+          }
+
+          /* Window creation mock branches */
+          {
+            struct ui_window *mock_win = NULL;
+            extern int g_mock_macos_no_window;
+            extern int g_mock_macos_no_backing_scale;
+            extern int g_mock_macos_zero_scale;
+
+            g_mock_macos_no_window = 1;
+            failed |= (backend->create_window(backend, "Mock", 100, 100,
+                                              &mock_win) != UI_ERROR_NONE);
+            if (mock_win) {
+              backend->destroy_window(backend, mock_win);
+              mock_win = NULL;
+            }
+            g_mock_macos_no_window = 0;
+
+            g_mock_macos_no_backing_scale = 1;
+            failed |= (backend->create_window(backend, "Mock", 100, 100,
+                                              &mock_win) != UI_ERROR_NONE);
+            if (mock_win) {
+              backend->destroy_window(backend, mock_win);
+              mock_win = NULL;
+            }
+            g_mock_macos_no_backing_scale = 0;
+
+            g_mock_macos_zero_scale = 1;
+            failed |= (backend->create_window(backend, "Mock", 100, 100,
+                                              &mock_win) != UI_ERROR_NONE);
+            if (mock_win) {
+              backend->destroy_window(backend, mock_win);
+              mock_win = NULL;
+            }
+            g_mock_macos_zero_scale = 0;
           }
 #endif
 

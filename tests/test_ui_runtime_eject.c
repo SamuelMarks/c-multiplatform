@@ -76,7 +76,8 @@ int main(void) {
   assert(strstr(h_buf, "TEST_SURVEY_FORM_H") != NULL);
   assert(strstr(h_buf, "extern \"C\"") != NULL);
   assert(strstr(h_buf, "test_survey_form_create") != NULL);
-  assert(strstr(h_buf, "/* clang-format off */") != NULL);
+  assert(strstr(h_buf, "/* clang-"
+                       "format off */") != NULL);
 
   /* Source checks */
   assert(strstr(c_buf, "test_survey_form_create") != NULL);

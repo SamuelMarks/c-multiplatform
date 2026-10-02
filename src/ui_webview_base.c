@@ -68,6 +68,10 @@ static ui_error_t mock_webview_component_destroy(struct ui_component *comp) {
 /** @endcond */
 #endif
 
+/**
+ * @struct ui_webview_base
+ * @brief Concrete structure for webview component holding signals and state.
+ */
 struct ui_webview_base {
   struct ui_component *component;       /**< component */
   struct ui_signal *url_signal;         /**< url_signal */

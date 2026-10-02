@@ -1,9 +1,36 @@
 /* clang-format off */
 #include <stdio.h>
+#include <string.h>
 #include "../include/ui_renderer_gles2.h"
+#include "../include/ui_font_manager.h"
 #include "../include/ui_error.h"
 #include "../include/ui_window_backend.h"
 /* clang-format on */
+
+static const unsigned char test_ttf_bytes[] = {
+    0x00, 0x01, 0x00, 0x00, 0x00, 0x07, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x63, 0x6d, 0x61, 0x70, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x7c,
+    0x00, 0x00, 0x00, 0x14, 0x68, 0x65, 0x61, 0x64, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x90, 0x00, 0x00, 0x00, 0x36, 0x68, 0x68, 0x65, 0x61,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xc6, 0x00, 0x00, 0x00, 0x24,
+    0x68, 0x6d, 0x74, 0x78, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xea,
+    0x00, 0x00, 0x00, 0x08, 0x67, 0x6c, 0x79, 0x66, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0xf2, 0x00, 0x00, 0x00, 0x01, 0x6c, 0x6f, 0x63, 0x61,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf3, 0x00, 0x00, 0x00, 0x04,
+    0x6d, 0x61, 0x78, 0x70, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf7,
+    0x00, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x01, 0x00, 0x03, 0x00, 0x01,
+    0x00, 0x00, 0x00, 0x0c, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
 void dummy_test_destroy_fail(void);
 
@@ -108,6 +135,123 @@ int main(void) {
     rc = backend->read_pixels(backend, 1, 1, buf);
     if (rc != UI_ERROR_NONE) {
       printf("Failed to read pixels.\n");
+      return 1;
+    }
+  }
+
+  /* Test text rendering */
+  {
+    struct ui_font_manager *fm = NULL;
+    struct ui_font *font = NULL;
+    struct ui_color text_col = {1.0f, 0.0f, 0.0f, 1.0f};
+
+    rc = ui_font_manager_create(&fm);
+    if (rc != UI_ERROR_NONE) {
+      return 1;
+    }
+
+    rc = backend->draw_text(NULL, "Test", (struct ui_font *)1, 0.0f, 0.0f,
+                            16.0f, text_col);
+    if (rc != UI_ERROR_INVALID_ARGUMENT) {
+      ui_font_manager_destroy(fm);
+      return 1;
+    }
+
+    rc = backend->draw_text(backend, NULL, (struct ui_font *)1, 0.0f, 0.0f,
+                            16.0f, text_col);
+    if (rc != UI_ERROR_INVALID_ARGUMENT) {
+      ui_font_manager_destroy(fm);
+      return 1;
+    }
+
+    rc = backend->draw_text(backend, "Test", NULL, 0.0f, 0.0f, 16.0f, text_col);
+    if (rc != UI_ERROR_INVALID_ARGUMENT) {
+      ui_font_manager_destroy(fm);
+      return 1;
+    }
+
+    rc = backend->draw_text(backend, "Test", (struct ui_font *)1, 0.0f, 0.0f,
+                            0.0f, text_col);
+    if (rc != UI_ERROR_INVALID_ARGUMENT) {
+      ui_font_manager_destroy(fm);
+      return 1;
+    }
+
+    rc = backend->draw_text(backend, "Test", (struct ui_font *)1, 0.0f, 0.0f,
+                            -1.0f, text_col);
+    if (rc != UI_ERROR_INVALID_ARGUMENT) {
+      ui_font_manager_destroy(fm);
+      return 1;
+    }
+
+    if (ui_font_manager_load_font_memory(fm, test_ttf_bytes,
+                                         sizeof(test_ttf_bytes),
+                                         &font) != UI_ERROR_NONE) {
+      ui_font_manager_destroy(fm);
+      return 1;
+    }
+
+    /* Valid font with dummy box (width=0, height=0) */
+    rc = backend->draw_text(backend, "A B", font, 0.0f, 0.0f, 16.0f, text_col);
+    if (rc != UI_ERROR_NONE) {
+      ui_font_manager_destroy(fm);
+      return 1;
+    }
+
+#ifdef UI_TEST_MOCK_ALLOC
+    {
+      extern int g_mock_gles2_glyph_box;
+      extern int g_mock_gles2_glyph_metrics_fail;
+      extern int g_mock_gles2_flush_fail;
+
+      /* Flush failure at start */
+      g_mock_gles2_flush_fail = 1;
+      rc = backend->draw_text(backend, "A", font, 0.0f, 0.0f, 16.0f, text_col);
+      if (rc != UI_ERROR_UNKNOWN) {
+        ui_font_manager_destroy(fm);
+        return 1;
+      }
+      g_mock_gles2_flush_fail = 0;
+
+      /* Metrics query failure */
+      g_mock_gles2_glyph_metrics_fail = 1;
+      rc = backend->draw_text(backend, "A", font, 0.0f, 0.0f, 16.0f, text_col);
+      if (rc != UI_ERROR_NONE) {
+        ui_font_manager_destroy(fm);
+        return 1;
+      }
+      g_mock_gles2_glyph_metrics_fail = 0;
+
+      /* Valid glyph boxes (width > 0, height > 0) and height 0 for 'H' */
+      g_mock_gles2_glyph_box = 1;
+      rc =
+          backend->draw_text(backend, "ABH", font, 0.0f, 0.0f, 16.0f, text_col);
+      if (rc != UI_ERROR_NONE) {
+        ui_font_manager_destroy(fm);
+        return 1;
+      }
+
+      /* Draw rect failure inside draw_text */
+      {
+        char long_text[2050];
+        memset(long_text, 'A', 2049);
+        long_text[2049] = '\0';
+        g_mock_gles2_flush_fail = 2;
+        rc = backend->draw_text(backend, long_text, font, 0.0f, 0.0f, 16.0f,
+                                text_col);
+        if (rc != UI_ERROR_UNKNOWN) {
+          ui_font_manager_destroy(fm);
+          return 1;
+        }
+        g_mock_gles2_flush_fail = 0;
+      }
+      g_mock_gles2_glyph_box = 0;
+      backend->flush(backend);
+    }
+#endif
+
+    rc = ui_font_manager_destroy(fm);
+    if (rc != UI_ERROR_NONE) {
       return 1;
     }
   }

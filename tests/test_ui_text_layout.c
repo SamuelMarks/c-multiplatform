@@ -41,6 +41,12 @@ ui_error_t ui_font_get_glyph_metrics(struct ui_font *font, int codepoint,
       (g_mock_glyph_metrics_fail == 2 && codepoint == 'B')) {
     return UI_ERROR_UNKNOWN;
   }
+  if (codepoint == 'Z') {
+    out_metrics->width = 10;
+    out_metrics->height = 10;
+    out_metrics->advance = 0.0f;
+    return UI_ERROR_NONE;
+  }
   out_metrics->width = 10;
   out_metrics->height = 10;
   out_metrics->advance = 12.0f;
@@ -136,10 +142,22 @@ static int test_text_layout(void) {
              UI_ERROR_INVALID_ARGUMENT);
 
   /* Test RTL direction */
+  ACCUM_ERR(failed, ui_text_layout_shape(layout, font, 12.0f, "", 100.0f,
+                                         UI_TEXT_DIRECTION_RTL));
   ACCUM_ERR(failed, ui_text_layout_shape(layout, font, 12.0f, "A", 100.0f,
                                          UI_TEXT_DIRECTION_RTL));
   ACCUM_ERR(failed, ui_text_layout_shape(layout, font, 12.0f, "ABC\nDEF",
                                          100.0f, UI_TEXT_DIRECTION_RTL));
+  ACCUM_ERR(failed, ui_text_layout_shape(layout, font, 12.0f, "AZ", 100.0f,
+                                         UI_TEXT_DIRECTION_RTL));
+
+  /* Test word wrapping with spaces, tabs, and emergency wraps */
+  ACCUM_ERR(failed, ui_text_layout_shape(layout, font, 12.0f,
+                                         "Hello world\tthis is long text",
+                                         50.0f, UI_TEXT_DIRECTION_LTR));
+  ACCUM_ERR(failed, ui_text_layout_shape(layout, font, 12.0f,
+                                         "EmergencyWrapWithoutSpaces12345",
+                                         40.0f, UI_TEXT_DIRECTION_LTR));
 
   /* Test kerning failure */
   g_mock_kerning_fail = 1;

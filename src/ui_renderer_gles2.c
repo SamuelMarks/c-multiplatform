@@ -13,6 +13,7 @@
 #include <stddef.h>
 #include <string.h>
 #include "../include/ui_renderer.h"
+#include "../include/ui_font_manager.h"
 #include "../include/ui_error.h"
 
 #if defined(_WIN32) || defined(__CYGWIN__)
@@ -460,6 +461,33 @@ static void mock_glReadPixels(int x, int y, int w, int h, unsigned int f,
 /* clang-format on */
 #endif
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_mock_gles2_glyph_box = 0;
+int g_mock_gles2_glyph_metrics_fail = 0;
+
+static ui_error_t
+mock_ui_font_get_glyph_metrics(struct ui_font *font, int codepoint,
+                               float font_size,
+                               struct ui_glyph_metrics *out_metrics) {
+  if (g_mock_gles2_glyph_metrics_fail) {
+    return UI_ERROR_NOT_FOUND;
+  }
+  if (g_mock_gles2_glyph_box) {
+    out_metrics->width = 10;
+    out_metrics->height = (codepoint == 'H') ? 0 : 10;
+    out_metrics->bearing_x = 0;
+    out_metrics->bearing_y = 10;
+    out_metrics->advance = 12;
+    return UI_ERROR_NONE;
+  }
+  return ui_font_get_glyph_metrics(font, codepoint, font_size, out_metrics);
+}
+#undef ui_font_get_glyph_metrics
+/** @cond */
+#define ui_font_get_glyph_metrics mock_ui_font_get_glyph_metrics
+/** @endcond */
+#endif
+
 #ifndef GL_COLOR_BUFFER_BIT
 /** @def GL_COLOR_BUFFER_BIT
  * @brief Fallback GL_COLOR_BUFFER_BIT
@@ -609,8 +637,11 @@ static ui_error_t gles2_flush(struct ui_renderer_backend *backend) {
   struct gles2_renderer_data *data;
 #ifdef UI_TEST_MOCK_ALLOC
   extern int g_mock_gles2_flush_fail;
-  if (g_mock_gles2_flush_fail) {
+  if (g_mock_gles2_flush_fail == 1) {
     return UI_ERROR_UNKNOWN;
+  }
+  if (g_mock_gles2_flush_fail > 1) {
+    g_mock_gles2_flush_fail--;
   }
 #endif
   if (!backend || !backend->user_data) {
@@ -1305,6 +1336,48 @@ static ui_error_t gles2_draw_texture(struct ui_renderer_backend *backend,
   return gles2_draw_rect(backend, x, y, width, height, color);
 }
 
+static ui_error_t gles2_draw_text(struct ui_renderer_backend *backend,
+                                  const char *text, const struct ui_font *f,
+                                  float x, float y, float font_size,
+                                  struct ui_color color) {
+  float cur_x = x;
+  const char *p;
+  ui_error_t rc;
+
+  if (!backend || !text || !f || font_size <= 0.0f) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+
+  rc = gles2_flush(backend);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
+
+  for (p = text; *p; ++p) {
+    int codepoint = (int)(unsigned char)*p;
+    struct ui_glyph_metrics metrics;
+
+    rc = ui_font_get_glyph_metrics((struct ui_font *)f, codepoint, font_size,
+                                   &metrics);
+    if (rc != UI_ERROR_NONE) {
+      continue;
+    }
+
+    if (metrics.width > 0 && metrics.height > 0) {
+      float gx = cur_x + (float)metrics.bearing_x;
+      float gy = y - (float)metrics.bearing_y;
+      rc = gles2_draw_rect(backend, gx, gy, (float)metrics.width,
+                           (float)metrics.height, color);
+      if (rc != UI_ERROR_NONE) {
+        return rc;
+      }
+    }
+    cur_x += (float)metrics.advance;
+  }
+
+  return UI_ERROR_NONE;
+}
+
 /**
  * \brief Reads pixels from the current render target.
  *
@@ -1368,6 +1441,7 @@ ui_error_t ui_renderer_gles2_create(struct ui_renderer_backend **out_backend) {
   backend->destroy_texture = gles2_destroy_texture;
   backend->set_render_target = gles2_set_render_target;
   backend->draw_texture = gles2_draw_texture;
+  backend->draw_text = gles2_draw_text;
   backend->read_pixels = gles2_read_pixels;
   backend->user_data = NULL;
 

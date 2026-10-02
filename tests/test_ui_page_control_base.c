@@ -101,13 +101,37 @@ static void test_page_control_base_errors(void) {
       UI_ERROR_INVALID_ARGUMENT)
     exit(1);
 
+  /* Test ui_page_control_base_destroy */
+  if (ui_page_control_base_destroy(NULL) != UI_ERROR_INVALID_ARGUMENT)
+    exit(1);
+
+#ifdef UI_TEST_MOCK_ALLOC
   {
-    ui_error_t rc_cleanup =
-        ui_component_destroy((struct ui_component *)control);
-    if (rc_cleanup != UI_ERROR_NONE) {
+    extern int g_page_control_mock_fail;
+    g_page_control_mock_fail = 2;
+    if (ui_page_control_base_destroy(control) != UI_ERROR_UNKNOWN)
       exit(1);
-    }
+    g_page_control_mock_fail = 0;
   }
+#endif
+
+  err = ui_page_control_base_destroy(control);
+  if (err != UI_ERROR_NONE)
+    exit(1);
+
+  /* Test destroy with NULL shadow_root */
+  err = ui_page_control_base_create(&control);
+  if (err != UI_ERROR_NONE)
+    exit(1);
+  if (control->base.shadow_root) {
+    ui_error_t rc_sr = ui_dom_node_destroy(control->base.shadow_root);
+    if (rc_sr != UI_ERROR_NONE)
+      exit(1);
+    control->base.shadow_root = NULL;
+  }
+  err = ui_page_control_base_destroy(control);
+  if (err != UI_ERROR_NONE)
+    exit(1);
 }
 
 static void test_page_control_base_oom(void) {

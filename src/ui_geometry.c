@@ -167,3 +167,49 @@ ui_error_t ui_dom_matrix_init_identity(struct ui_dom_matrix *matrix) {
   matrix->m44 = 1.0;
   return UI_ERROR_NONE;
 }
+
+/**
+ * @brief Transforms device-independent logical points to physical framebuffer
+ * pixels.
+ * @param logical_x Logical X coordinate in points.
+ * @param logical_y Logical Y coordinate in points.
+ * @param scale_factor Device pixel ratio / DPI scale factor.
+ * @param out_physical_x Pointer to receive physical X pixel coordinate.
+ * @param out_physical_y Pointer to receive physical Y pixel coordinate.
+ * @return UI_ERROR_NONE on success, or UI_ERROR_INVALID_ARGUMENT.
+ */
+ui_error_t ui_geometry_transform_logical_to_physical(float logical_x,
+                                                     float logical_y,
+                                                     float scale_factor,
+                                                     int *out_physical_x,
+                                                     int *out_physical_y) {
+  if (!out_physical_x || !out_physical_y || scale_factor <= 0.0f) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+  *out_physical_x = (int)(logical_x * scale_factor);
+  *out_physical_y = (int)(logical_y * scale_factor);
+  return UI_ERROR_NONE;
+}
+
+/**
+ * @brief Transforms physical framebuffer pixels to device-independent logical
+ * points.
+ * @param physical_x Physical X coordinate in pixels.
+ * @param physical_y Physical Y coordinate in pixels.
+ * @param scale_factor Device pixel ratio / DPI scale factor.
+ * @param out_logical_x Pointer to receive logical X coordinate.
+ * @param out_logical_y Pointer to receive logical Y coordinate.
+ * @return UI_ERROR_NONE on success, or UI_ERROR_INVALID_ARGUMENT.
+ */
+ui_error_t ui_geometry_transform_physical_to_logical(int physical_x,
+                                                     int physical_y,
+                                                     float scale_factor,
+                                                     float *out_logical_x,
+                                                     float *out_logical_y) {
+  if (!out_logical_x || !out_logical_y || scale_factor <= 0.0f) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+  *out_logical_x = (float)physical_x / scale_factor;
+  *out_logical_y = (float)physical_y / scale_factor;
+  return UI_ERROR_NONE;
+}

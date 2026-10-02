@@ -9,6 +9,7 @@
 #include <string.h>
 
 #include "../include/ui_font_manager.h"
+#include "../include/ui_font_provider.h"
 #include "../include/ui_error.h"
 /* clang-format on */
 
@@ -154,10 +155,180 @@ static ui_error_t test_font_file_loading_paths(void) {
   return UI_ERROR_NONE;
 }
 
+static ui_error_t test_system_font_discovery(void) {
+  struct ui_font_manager *manager = NULL;
+  struct ui_font *font = NULL;
+  ui_error_t rc;
+
+  /* Invalid arguments */
+  rc = ui_font_provider_load_system_font(NULL, "sans-serif", 400, 0, &font);
+  if (rc != UI_ERROR_INVALID_ARGUMENT) {
+    return 20;
+  }
+  rc = ui_font_manager_create(&manager);
+  if (rc != UI_ERROR_NONE || !manager) {
+    return 21;
+  }
+
+  rc = ui_font_provider_load_system_font(manager, NULL, 400, 0, &font);
+  if (rc != UI_ERROR_INVALID_ARGUMENT) {
+    ui_font_manager_destroy(manager);
+    return 22;
+  }
+
+  rc = ui_font_provider_load_system_font(manager, "sans-serif", 400, 0, NULL);
+  if (rc != UI_ERROR_INVALID_ARGUMENT) {
+    ui_font_manager_destroy(manager);
+    return 23;
+  }
+
+  /* Query known fonts (either succeeds with font or returns NOT_FOUND on
+   * headless CI) */
+  rc = ui_font_provider_load_system_font(manager, "sans-serif", 400, 0, &font);
+  if (rc != UI_ERROR_NONE && rc != UI_ERROR_NOT_FOUND) {
+    ui_font_manager_destroy(manager);
+    return 24;
+  }
+
+  rc = ui_font_provider_load_system_font(manager, "system-ui", 400, 0, &font);
+  if (rc != UI_ERROR_NONE && rc != UI_ERROR_NOT_FOUND) {
+    ui_font_manager_destroy(manager);
+    return 25;
+  }
+
+  rc = ui_font_provider_load_system_font(manager, "-apple-system", 400, 0,
+                                         &font);
+  if (rc != UI_ERROR_NONE && rc != UI_ERROR_NOT_FOUND) {
+    ui_font_manager_destroy(manager);
+    return 26;
+  }
+
+  rc = ui_font_provider_load_system_font(manager, "serif", 400, 0, &font);
+  if (rc != UI_ERROR_NONE && rc != UI_ERROR_NOT_FOUND) {
+    ui_font_manager_destroy(manager);
+    return 27;
+  }
+
+  rc = ui_font_provider_load_system_font(manager, "monospace", 400, 0, &font);
+  if (rc != UI_ERROR_NONE && rc != UI_ERROR_NOT_FOUND) {
+    ui_font_manager_destroy(manager);
+    return 28;
+  }
+
+  rc = ui_font_provider_load_system_font(manager, "CustomNonGeneric", 400, 0,
+                                         &font);
+  if (rc != UI_ERROR_NONE && rc != UI_ERROR_NOT_FOUND) {
+    ui_font_manager_destroy(manager);
+    return 29;
+  }
+
+#if defined(__APPLE__) && defined(UI_TEST_MOCK_ALLOC)
+  {
+    extern int g_mock_macos_font_cfname_fail;
+    extern int g_mock_macos_font_desc_fail;
+    extern int g_mock_macos_font_font_fail;
+    extern int g_mock_macos_font_url_fail;
+    extern int g_mock_macos_font_url_not_ok;
+    extern int g_mock_macos_font_load_fail;
+    extern int g_mock_macos_font_set_metadata_fail;
+
+    g_mock_macos_font_cfname_fail = 1;
+    rc =
+        ui_font_provider_load_system_font(manager, "sans-serif", 400, 0, &font);
+    g_mock_macos_font_cfname_fail = 0;
+    if (rc != UI_ERROR_OUT_OF_MEMORY) {
+      ui_font_manager_destroy(manager);
+      return 30;
+    }
+
+    g_mock_macos_font_desc_fail = 1;
+    rc =
+        ui_font_provider_load_system_font(manager, "sans-serif", 400, 0, &font);
+    g_mock_macos_font_desc_fail = 0;
+    if (rc != UI_ERROR_NOT_FOUND) {
+      ui_font_manager_destroy(manager);
+      return 31;
+    }
+
+    g_mock_macos_font_font_fail = 1;
+    rc =
+        ui_font_provider_load_system_font(manager, "sans-serif", 400, 0, &font);
+    g_mock_macos_font_font_fail = 0;
+    if (rc != UI_ERROR_NOT_FOUND) {
+      ui_font_manager_destroy(manager);
+      return 32;
+    }
+
+    g_mock_macos_font_url_fail = 1;
+    rc =
+        ui_font_provider_load_system_font(manager, "sans-serif", 400, 0, &font);
+    g_mock_macos_font_url_fail = 0;
+    if (rc != UI_ERROR_NOT_FOUND) {
+      ui_font_manager_destroy(manager);
+      return 33;
+    }
+
+    g_mock_macos_font_url_not_ok = 1;
+    rc =
+        ui_font_provider_load_system_font(manager, "sans-serif", 400, 0, &font);
+    g_mock_macos_font_url_not_ok = 0;
+    if (rc != UI_ERROR_NOT_FOUND) {
+      ui_font_manager_destroy(manager);
+      return 34;
+    }
+
+    g_mock_macos_font_load_fail = 1;
+    rc =
+        ui_font_provider_load_system_font(manager, "sans-serif", 400, 0, &font);
+    g_mock_macos_font_load_fail = 0;
+    if (rc != UI_ERROR_NOT_FOUND) {
+      ui_font_manager_destroy(manager);
+      return 35;
+    }
+
+    g_mock_macos_font_set_metadata_fail = 1;
+    rc =
+        ui_font_provider_load_system_font(manager, "sans-serif", 400, 0, &font);
+    g_mock_macos_font_set_metadata_fail = 0;
+    if (rc != UI_ERROR_UNKNOWN) {
+      ui_font_manager_destroy(manager);
+      return 36;
+    }
+  }
+#endif
+
+#if defined(__APPLE__) || defined(_WIN32) || defined(_WIN64)
+  rc = ui_font_provider_linux_dummy();
+  if (rc != UI_ERROR_NONE) {
+    ui_font_manager_destroy(manager);
+    return 37;
+  }
+#endif
+
+#if !defined(_WIN32) && !defined(_WIN64)
+  rc = ui_font_provider_win32_dummy();
+  if (rc != UI_ERROR_NONE) {
+    ui_font_manager_destroy(manager);
+    return 38;
+  }
+#endif
+
+  rc = ui_font_manager_destroy(manager);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
+  return UI_ERROR_NONE;
+}
+
 int main(void) {
   ui_error_t rc;
 
   rc = test_font_file_loading_paths();
+  if (rc != UI_ERROR_NONE) {
+    return (int)rc;
+  }
+
+  rc = test_system_font_discovery();
   if (rc != UI_ERROR_NONE) {
     return (int)rc;
   }

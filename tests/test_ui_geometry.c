@@ -90,6 +90,54 @@ static int test_dom_matrix_init(void) {
   return 0;
 }
 
+static int test_transforms(void) {
+  int px = 0;
+  int py = 0;
+  float lx = 0.0f;
+  float ly = 0.0f;
+  ui_error_t rc;
+
+  /* Logical to physical error branches */
+  rc = ui_geometry_transform_logical_to_physical(10.0f, 20.0f, 2.0f, NULL, &py);
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return 1;
+  rc = ui_geometry_transform_logical_to_physical(10.0f, 20.0f, 2.0f, &px, NULL);
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return 1;
+  rc = ui_geometry_transform_logical_to_physical(10.0f, 20.0f, 0.0f, &px, &py);
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return 1;
+  rc = ui_geometry_transform_logical_to_physical(10.0f, 20.0f, -1.0f, &px, &py);
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return 1;
+
+  /* Logical to physical success */
+  rc = ui_geometry_transform_logical_to_physical(10.0f, 20.0f, 2.0f, &px, &py);
+  if (rc != UI_ERROR_NONE || px != 20 || py != 40)
+    return 1;
+
+  /* Physical to logical error branches */
+  rc = ui_geometry_transform_physical_to_logical(20, 40, 2.0f, NULL, &ly);
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return 1;
+  rc = ui_geometry_transform_physical_to_logical(20, 40, 2.0f, &lx, NULL);
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return 1;
+  rc = ui_geometry_transform_physical_to_logical(20, 40, 0.0f, &lx, &ly);
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return 1;
+  rc = ui_geometry_transform_physical_to_logical(20, 40, -1.0f, &lx, &ly);
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return 1;
+
+  /* Physical to logical success */
+  rc = ui_geometry_transform_physical_to_logical(20, 40, 2.0f, &lx, &ly);
+  if (rc != UI_ERROR_NONE || lx != 10.0f || ly != 20.0f)
+    return 1;
+
+  return 0;
+}
+
 static int run_extra_geometry(void);
 
 int main(void) {
@@ -100,6 +148,7 @@ int main(void) {
   failures += test_dom_rect_init_negative();
   failures += test_dom_quad_init();
   failures += test_dom_matrix_init();
+  failures += test_transforms();
   failures += run_extra_geometry();
 
   if (failures == 0) {

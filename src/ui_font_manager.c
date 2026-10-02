@@ -31,6 +31,23 @@
 #include <string.h>
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_mock_font_fseek_fail = 0;
+int g_mock_font_fread_fail = 0;
+
+static int mock_fseek(FILE *stream, long offset, int whence) {
+  if ((whence == SEEK_END && g_mock_font_fseek_fail == 1) ||
+      (whence == SEEK_SET && g_mock_font_fseek_fail == 2)) {
+    return -1;
+  }
+  return fseek(stream, offset, whence);
+}
+#undef fseek
+/** @cond */
+#define fseek mock_fseek
+/** @endcond */
+#endif
+
 /**
  * @struct ui_font
  * @brief Represents a loaded font instance.
@@ -218,6 +235,11 @@ ui_error_t ui_font_manager_load_font_file(struct ui_font_manager *manager,
 
   bytes_read = fread(buffer, 1, (size_t)file_size, f);
   fclose(f);
+#ifdef UI_TEST_MOCK_ALLOC
+  if (g_mock_font_fread_fail) {
+    bytes_read = 0;
+  }
+#endif
   if (bytes_read != (size_t)file_size) {
     C_MULTIPLATFORM_FREE(buffer);
     return UI_ERROR_IO_FAILED;
@@ -781,6 +803,14 @@ ui_error_t ui_font_set_variations(struct ui_font *font,
     }
     for (i = 0; i < axis_count; ++i) {
       font->axes[i] = axes[i];
+      /* Normalize and clamp variation values */
+      if (axes[i].tag == 0x77676874) { /* 'wght' */
+        if (font->axes[i].value < 100.0f) {
+          font->axes[i].value = 100.0f;
+        } else if (font->axes[i].value > 900.0f) {
+          font->axes[i].value = 900.0f;
+        }
+      }
     }
     font->axis_count = axis_count;
   }
@@ -871,6 +901,353 @@ ui_error_t ui_test_font_manager_coverage_in_src(void) {
 
   ui_font_set_metadata(font, "MyFont", 400, 1);
   ui_font_manager_find_font(manager, "MyFont", 400, 1, &found);
+  ui_font_manager_find_font(manager, "NonExistent, ", 400, 1, &found);
+  ui_font_manager_find_font(manager, "", 400, 1, &found);
+  ui_font_manager_find_font(manager, ",,", 400, 1, &found);
+  ui_font_manager_find_font(manager, " 'A' , \"B\" , C ", 400, 1, &found);
+  ui_font_manager_find_font(manager, "\t'Single'\t, \"Double\" , \t", 400, 1,
+                            &found);
+  ui_font_manager_find_font(manager, "'   '", 400, 1, &found);
+  ui_font_manager_find_font(manager, "\"   \"", 400, 1, &found);
+  {
+    char huge_name[256];
+    memset(huge_name, 'X', 200);
+    huge_name[200] = '\0';
+    ui_font_manager_find_font(manager, huge_name, 400, 1, &found);
+  }
+
+  /* Variation clamping tests */
+  axes[0].tag = 0x77676874; /* 'wght' */
+  axes[0].value = 50.0f;
+  ui_font_set_variations(font, axes, 1);
+  axes[0].value = 1000.0f;
+  ui_font_set_variations(font, axes, 1);
+  axes[0].value = 400.0f;
+  ui_font_set_variations(font, axes, 1);
+
+  /* File loading error branches */
+  {
+    FILE *ef;
+    struct ui_font *f_temp = NULL;
+
+#if defined(_MSC_VER)
+    fopen_s(&ef, "empty_test.ttf", "wb");
+#else
+    ef = fopen("empty_test.ttf", "wb");
+#endif
+    fclose(ef);
+    ui_font_manager_load_font_file(manager, "empty_test.ttf", &f_temp);
+    remove("empty_test.ttf");
+
+#if defined(_MSC_VER)
+    fopen_s(&ef, "temp_test.ttf", "wb");
+#else
+    ef = fopen("temp_test.ttf", "wb");
+#endif
+    fputc(0, ef);
+    fclose(ef);
+
+    g_mock_font_fseek_fail = 1;
+    ui_font_manager_load_font_file(manager, "temp_test.ttf", &f_temp);
+    g_mock_font_fseek_fail = 2;
+    ui_font_manager_load_font_file(manager, "temp_test.ttf", &f_temp);
+    g_mock_font_fseek_fail = 0;
+
+    g_malloc_fail_countdown = 0;
+    ui_font_manager_load_font_file(manager, "temp_test.ttf", &f_temp);
+    g_malloc_fail_countdown = -1;
+
+    g_mock_font_fread_fail = 1;
+    ui_font_manager_load_font_file(manager, "temp_test.ttf", &f_temp);
+    g_mock_font_fread_fail = 0;
+    remove("temp_test.ttf");
+  }
+
+  /* get_glyph_coverage_index coverage tests */
+  {
+    unsigned char c1[] = {0, 1, 0, 2, 0, 5, 0, 10};
+    unsigned char c2[] = {0, 2, 0, 1, 0, 10, 0, 20, 0, 5};
+    unsigned char c3[] = {0, 3, 0, 0};
+    get_glyph_coverage_index(c1, 2, 0, 1);
+    get_glyph_coverage_index(c1, sizeof(c1), 0, 10);
+    get_glyph_coverage_index(c1, sizeof(c1), 0, 99);
+    get_glyph_coverage_index(c1, 6, 0, 10);
+    get_glyph_coverage_index(c2, sizeof(c2), 0, 5);
+    get_glyph_coverage_index(c2, sizeof(c2), 0, 15);
+    get_glyph_coverage_index(c2, sizeof(c2), 0, 99);
+    get_glyph_coverage_index(c2, 6, 0, 15);
+    get_glyph_coverage_index(c3, sizeof(c3), 0, 1);
+  }
+
+  /* get_glyph_class coverage tests */
+  {
+    unsigned char cl1[] = {0, 0, 0, 1, 0, 10, 0, 2, 0, 1, 0, 2};
+    unsigned char cl2[] = {0, 0, 0, 2, 0, 1, 0, 10, 0, 20, 0, 3};
+    unsigned char cl3[] = {0, 0, 0, 3, 0, 0};
+    get_glyph_class(cl1, 10, 0, 1);
+    get_glyph_class(cl1, 4, 2, 1);
+    get_glyph_class(cl1, sizeof(cl1), 2, 5);
+    get_glyph_class(cl1, sizeof(cl1), 2, 10);
+    get_glyph_class(cl1, sizeof(cl1), 2, 11);
+    get_glyph_class(cl1, sizeof(cl1), 2, 99);
+    get_glyph_class(cl1, 8, 2, 11);
+    get_glyph_class(cl2, sizeof(cl2), 2, 5);
+    get_glyph_class(cl2, sizeof(cl2), 2, 15);
+    get_glyph_class(cl2, sizeof(cl2), 2, 99);
+    get_glyph_class(cl2, 8, 2, 15);
+    get_glyph_class(cl3, sizeof(cl3), 2, 1);
+  }
+
+  /* parse_gpos_pair_pos and kerning coverage tests */
+  {
+    int k = 0;
+    unsigned char b[256];
+    unsigned char *saved_data;
+    size_t saved_size;
+    memset(b, 0, sizeof(b));
+
+    /* size < 12 */
+    parse_gpos_pair_pos(b, 10, 1, 2, &k);
+
+    /* 12 + num_tables * 16 > size */
+    b[4] = 0;
+    b[5] = 10;
+    parse_gpos_pair_pos(b, 20, 1, 2, &k);
+
+    /* table tag not GPOS: test tags "GLYF", "GPXX", "GPOX" for short-circuit
+     * branches */
+    b[4] = 0;
+    b[5] = 4;
+    b[12] = 'G';
+    b[13] = 'L';
+    b[14] = 'Y';
+    b[15] = 'F';
+    b[28] = 'G';
+    b[29] = 'P';
+    b[30] = 'X';
+    b[31] = 'X';
+    b[44] = 'G';
+    b[45] = 'P';
+    b[46] = 'O';
+    b[47] = 'X';
+    b[60] = 'c';
+    b[61] = 'm';
+    b[62] = 'a';
+    b[63] = 'p';
+    parse_gpos_pair_pos(b, 80, 1, 2, &k);
+
+    /* gpos_offset == 0 */
+    b[4] = 0;
+    b[5] = 1;
+    b[12] = 'G';
+    b[13] = 'P';
+    b[14] = 'O';
+    b[15] = 'S';
+    b[20] = 0;
+    b[21] = 0;
+    b[22] = 0;
+    b[23] = 0;
+    parse_gpos_pair_pos(b, 30, 1, 2, &k);
+
+    /* GPOS table offset + 10 > size */
+    b[23] = 28;
+    parse_gpos_pair_pos(b, 30, 1, 2, &k);
+
+    /* lookup_list_offset + 2 > size */
+    b[36] = 0;
+    b[37] = 20;
+    parse_gpos_pair_pos(b, 45, 1, 2, &k);
+
+    /* lookup_list_offset + 2 + (i + 1)*2 > size */
+    b[36] = 0;
+    b[37] = 10;
+    b[38] = 0;
+    b[39] = 2;
+    parse_gpos_pair_pos(b, 41, 1, 2, &k);
+
+    /* l_offset + 6 > size */
+    b[40] = 0;
+    b[41] = 4;
+    parse_gpos_pair_pos(b, 45, 1, 2, &k);
+
+    /* lookup_type != 2 */
+    b[42] = 0;
+    b[43] = 1;
+    b[46] = 0;
+    b[47] = 1;
+    parse_gpos_pair_pos(b, 60, 1, 2, &k);
+
+    /* lookup_type == 2: subtable truncated */
+    b[42] = 0;
+    b[43] = 2;
+    b[46] = 0;
+    b[47] = 2;
+    parse_gpos_pair_pos(b, 49, 1, 2, &k);
+
+    /* sub_offset + 4 > size */
+    b[46] = 0;
+    b[47] = 1;
+    b[48] = 0;
+    b[49] = 8;
+    parse_gpos_pair_pos(b, 52, 1, 2, &k);
+
+    /* Coverage format 1 with glyph 0 and glyph 1 at offset 80 (cov_offset = 30)
+     */
+    b[50] = 0;
+    b[51] = 2; /* pos_format = 2 */
+    b[52] = 0;
+    b[53] = 30; /* cov_offset = 30 -> 80 */
+    b[80] = 0;
+    b[81] = 1; /* format 1 */
+    b[82] = 0;
+    b[83] = 2; /* glyph_count = 2 */
+    b[84] = 0;
+    b[85] = 0; /* glyph 0 */
+    b[86] = 0;
+    b[87] = 1; /* glyph 1 */
+
+    /* coverage not found */
+    parse_gpos_pair_pos(b, 150, 99, 1, &k);
+
+    /* coverage found, but pos_format != 2 */
+    b[50] = 0;
+    b[51] = 1; /* pos_format = 1 */
+    parse_gpos_pair_pos(b, 150, 0, 1, &k);
+
+    /* pos_format == 2, but sub_offset + 16 > size */
+    b[50] = 0;
+    b[51] = 2;
+    b[52] = 0;
+    b[53] = 4; /* cov_offset = 4 -> 54 */
+    b[54] = 0;
+    b[55] = 1; /* format 1 */
+    b[56] = 0;
+    b[57] = 1; /* count 1 */
+    b[58] = 0;
+    b[59] = 0; /* glyph 0 */
+    parse_gpos_pair_pos(b, 62, 0, 1, &k);
+
+    /* val_record_offset + 2 > size branch (line 482) */
+    b[50] = 0;
+    b[51] = 2; /* pos_format = 2 */
+    b[52] = 0;
+    b[53] = 30; /* cov_offset = 30 -> 80 */
+    b[54] = 0;
+    b[55] = 4; /* vfmt1 = 4 */
+    b[58] = 0;
+    b[59] = 50; /* class_def1 = 100 */
+    b[60] = 0;
+    b[61] = 60; /* class_def2 = 110 */
+    b[62] = 0;
+    b[63] = 10; /* class1_count = 10 */
+    b[64] = 0;
+    b[65] = 10; /* class2_count = 10 */
+    b[100] = 0;
+    b[101] = 1;
+    b[102] = 0;
+    b[103] = 0;
+    b[104] = 0;
+    b[105] = 1;
+    b[106] = 0;
+    b[107] = 9;
+    b[110] = 0;
+    b[111] = 1;
+    b[112] = 0;
+    b[113] = 0;
+    b[114] = 0;
+    b[115] = 1;
+    b[116] = 0;
+    b[117] = 9;
+    parse_gpos_pair_pos(b, 200, 0, 0, &k);
+
+    /* Class definitions at offsets 100 and 120 */
+    /* vfmt1 = 0 (vfmt1 & 0x0004 is false when cls1 and cls2 are valid) */
+    b[54] = 0;
+    b[55] = 0; /* vfmt1 = 0 */
+    b[58] = 0;
+    b[59] = 50; /* class_def1 = 50 + 50 = 100 */
+    b[60] = 0;
+    b[61] = 70; /* class_def2 = 50 + 70 = 120 */
+    b[62] = 0;
+    b[63] = 20; /* class1_count = 20 */
+    b[64] = 0;
+    b[65] = 20; /* class2_count = 20 */
+    parse_gpos_pair_pos(b, 150, 0, 1, &k);
+
+    /* vfmt1 = 4, but class counts 0 */
+    b[54] = 0;
+    b[55] = 4; /* vfmt1 = 4 */
+    b[62] = 0;
+    b[63] = 0; /* class1_count = 0 */
+    parse_gpos_pair_pos(b, 150, 0, 1, &k);
+    b[62] = 0;
+    b[63] = 20;
+    b[64] = 0;
+    b[65] = 0; /* class2_count = 0 */
+    parse_gpos_pair_pos(b, 150, 0, 1, &k);
+    b[62] = 0;
+    b[63] = 2;
+    b[64] = 0;
+    b[65] = 2;
+
+    /* ClassDef1 at offset 100 (format 1, start 0, count 2, classes [0, 1]) */
+    b[100] = 0;
+    b[101] = 1;
+    b[102] = 0;
+    b[103] = 0;
+    b[104] = 0;
+    b[105] = 2;
+    b[106] = 0;
+    b[107] = 0;
+    b[108] = 0;
+    b[109] = 1;
+
+    /* ClassDef2 at offset 120 (format 1, start 0, count 2, classes [0, 1]) */
+    b[120] = 0;
+    b[121] = 1;
+    b[122] = 0;
+    b[123] = 0;
+    b[124] = 0;
+    b[125] = 2;
+    b[126] = 0;
+    b[127] = 0;
+    b[128] = 0;
+    b[129] = 1;
+
+    /* Set up val records at 66:
+       cls0, cls0: 0
+       cls0, cls1: -50 (0xFF, 0xCE) */
+    b[66] = 0;
+    b[67] = 0;
+    b[68] = 0xFF;
+    b[69] = 0xCE;
+
+    /* x_advance == 0 (glyph 0, glyph 0) */
+    parse_gpos_pair_pos(b, 150, 0, 0, &k);
+
+    /* x_advance != 0: returns 1! (glyph 0, glyph 1) */
+    parse_gpos_pair_pos(b, 150, 0, 1, &k);
+
+    /* Set cls0, cls0 to -50 so (glyph 0, glyph 0) also returns 1 */
+    b[66] = 0xFF;
+    b[67] = 0xCE;
+
+    /* Test lines 518-519 and font->data == NULL / size == 0 branches */
+    saved_data = font->data;
+    saved_size = font->size;
+
+    font->data = NULL;
+    ui_font_get_kerning(font, 'A', 'B', 16.0f, &kern);
+
+    font->data = b;
+    font->size = 0;
+    ui_font_get_kerning(font, 'A', 'B', 16.0f, &kern);
+
+    font->size = 150;
+    ui_font_get_kerning(font, 0, 0, 16.0f, &kern);
+    font->data = saved_data;
+    font->size = saved_size;
+  }
 
   axes[0].tag = 1;
   axes[0].value = 1.0f;

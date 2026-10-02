@@ -48,12 +48,14 @@ int main(void) {
   if (rc == UI_ERROR_NONE && renderer.vtable) {
     struct ui_rect rect = {0.0f, 0.0f, 10.0f, 10.0f};
     struct ui_color color = {1.0f, 0.0f, 0.0f, 0.5f};
+    const struct ui_font *dummy_font = (const struct ui_font *)1;
     unsigned char buf[4];
 
     /* Valid cases */
     renderer.vtable->begin_frame(renderer.ctx, 800, 600);
     renderer.vtable->draw_rect(renderer.ctx, &rect, &color);
     renderer.vtable->draw_text(renderer.ctx, "test", NULL, &rect);
+    renderer.vtable->draw_text(renderer.ctx, "test", dummy_font, &rect);
     renderer.vtable->draw_image(renderer.ctx, NULL, &rect);
     renderer.vtable->draw_gradient(renderer.ctx, &rect, NULL);
     renderer.vtable->draw_path(renderer.ctx, NULL, &color);

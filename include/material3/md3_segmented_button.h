@@ -20,6 +20,9 @@ extern "C" {
 
 struct ui_engine;
 
+/**
+ * @brief Maximum number of segments allowed in a segmented button group.
+ */
 #define MD3_SEGMENTED_BUTTON_MAX_SEGMENTS 16
 
 /**

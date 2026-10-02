@@ -35,6 +35,14 @@ int g_mock_macos_fail_delegate = 0;
 int g_mock_macos_no_view = 0;
 /** @brief Global flag to simulate failure allocating delegate class pair. */
 int g_mock_macos_fail_allocate_class = 0;
+/** @brief Global flag to simulate window creation returning nil. */
+int g_mock_macos_no_window = 0;
+/** @brief Global flag to simulate backingScaleFactor not supported. */
+int g_mock_macos_no_backing_scale = 0;
+/** @brief Global flag to simulate zero scale factor in window creation. */
+int g_mock_macos_zero_scale = 0;
+/** @brief Global flag to simulate scale factor failure in framebuffer size. */
+int g_mock_macos_fail_scale = 0;
 
 static Class mock_objc_getClass(const char *name) {
   if (g_mock_macos_no_nsopenglview && strcmp(name, "NSOpenGLView") == 0) {
@@ -244,6 +252,12 @@ static ui_error_t macos_create_window(struct ui_window_backend *backend,
       sel_registerName("initWithContentRect:styleMask:backing:defer:"), rect,
       15, 2, (BOOL)0);
 
+#ifdef UI_TEST_MOCK_ALLOC
+  if (g_mock_macos_no_window) {
+    win = (id)0;
+  }
+#endif
+
   ((void (*)(id, SEL, id))objc_msgSend)(win, sel_registerName("setTitle:"),
                                         titleStr);
 
@@ -320,8 +334,20 @@ static ui_error_t macos_create_window(struct ui_window_backend *backend,
   if (win) {
     SEL sel_bsf = sel_registerName("backingScaleFactor");
     SEL sel_rts = sel_registerName("respondsToSelector:");
-    if (((BOOL(*)(id, SEL, SEL))objc_msgSend)(win, sel_rts, sel_bsf)) {
+    BOOL responds =
+        ((BOOL(*)(id, SEL, SEL))objc_msgSend)(win, sel_rts, sel_bsf);
+#ifdef UI_TEST_MOCK_ALLOC
+    if (g_mock_macos_no_backing_scale) {
+      responds = (BOOL)0;
+    }
+#endif
+    if (responds) {
       CGFloat scale = ((CGFloat(*)(id, SEL))objc_msgSend)(win, sel_bsf);
+#ifdef UI_TEST_MOCK_ALLOC
+      if (g_mock_macos_zero_scale) {
+        scale = 0.0;
+      }
+#endif
       if (scale > 0.0) {
         w->scale_factor = (float)scale;
       }
@@ -346,10 +372,12 @@ static ui_error_t macos_create_window(struct ui_window_backend *backend,
     }
 #endif
     if (del) {
-      objc_setAssociatedObject(win, "ui_window_ptr", (id)w,
-                               OBJC_ASSOCIATION_ASSIGN);
-      ((void (*)(id, SEL, id))objc_msgSend)(
-          win, sel_registerName("setDelegate:"), del);
+      if (win) {
+        objc_setAssociatedObject(win, "ui_window_ptr", (id)w,
+                                 OBJC_ASSOCIATION_ASSIGN);
+        ((void (*)(id, SEL, id))objc_msgSend)(
+            win, sel_registerName("setDelegate:"), del);
+      }
     }
   }
 
@@ -551,10 +579,21 @@ static ui_error_t macos_poll_events(struct ui_window_backend *backend,
   if (window->window && window->window != (void *)1) {
     SEL sel_bsf = sel_registerName("backingScaleFactor");
     SEL sel_rts = sel_registerName("respondsToSelector:");
-    if (((BOOL(*)(id, SEL, SEL))objc_msgSend)(window->window, sel_rts,
-                                              sel_bsf)) {
+    BOOL responds =
+        ((BOOL(*)(id, SEL, SEL))objc_msgSend)(window->window, sel_rts, sel_bsf);
+#ifdef UI_TEST_MOCK_ALLOC
+    if (g_mock_macos_no_backing_scale) {
+      responds = (BOOL)0;
+    }
+#endif
+    if (responds) {
       CGFloat cur_scale =
           ((CGFloat(*)(id, SEL))objc_msgSend)(window->window, sel_bsf);
+#ifdef UI_TEST_MOCK_ALLOC
+      if (g_mock_macos_zero_scale) {
+        cur_scale = 0.0;
+      }
+#endif
       if (cur_scale > 0.0 && (float)cur_scale != window->scale_factor) {
         float old_scale = window->scale_factor;
         window->scale_factor = (float)cur_scale;
@@ -698,6 +737,11 @@ static ui_error_t macos_get_framebuffer_size(struct ui_window_backend *backend,
 
   scale = 1.0f;
   rc = macos_get_scale_factor(backend, window, &scale);
+#ifdef UI_TEST_MOCK_ALLOC
+  if (g_mock_macos_fail_scale) {
+    rc = UI_ERROR_UNKNOWN;
+  }
+#endif
   if (rc != UI_ERROR_NONE) {
     return rc;
   }

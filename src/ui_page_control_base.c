@@ -105,6 +105,30 @@ ui_page_control_base_create(struct ui_page_control_base **out_control) {
 }
 
 /**
+ * @brief ui_page_control_base_destroy.
+ * @param control Parameter control.
+ * @return Return value.
+ */
+ui_error_t ui_page_control_base_destroy(struct ui_page_control_base *control) {
+  ui_error_t rc;
+
+  if (!control) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+
+  if (control->base.shadow_root) {
+    rc = ui_dom_node_destroy(control->base.shadow_root);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
+    }
+    control->base.shadow_root = NULL;
+  }
+
+  C_MULTIPLATFORM_FREE(control);
+  return UI_ERROR_NONE;
+}
+
+/**
  * @brief update_page_control_dom.
  * @param control Parameter control.
  * @return Return value.

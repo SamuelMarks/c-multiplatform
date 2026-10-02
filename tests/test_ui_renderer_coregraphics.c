@@ -21,6 +21,14 @@ extern int g_mock_cg_fail;
 /* Dummy font struct for testing if backend doesn't care or uses mock */
 struct ui_font;
 
+struct cg_context_test {
+  void *context;
+  int current_width;
+  int current_height;
+  struct ui_color text_color;
+  float scale_factor;
+};
+
 int main(void) {
   struct ui_renderer renderer;
   struct ui_rect rect = {0.0f, 0.0f, 10.0f, 10.0f};
@@ -137,6 +145,10 @@ int main(void) {
 
   /* Text - pass font if it loaded */
   if (font) {
+    struct cg_context_test *cgc = (struct cg_context_test *)renderer.ctx;
+    cgc->scale_factor = -1.0f;
+    renderer.vtable->draw_text(renderer.ctx, "test", font, &rect);
+    cgc->scale_factor = 1.0f;
     renderer.vtable->draw_text(renderer.ctx, "test", font, &rect);
 #ifdef UI_TEST_MOCK_ALLOC
     {
