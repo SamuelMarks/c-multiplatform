@@ -1,37 +1,28 @@
 /* clang-format off */
+#include "greatest.h"
 #include "../include/ui_video_decoder.h"
 #include "../include/ui_error.h"
-#include <stdio.h>
-#include <stdlib.h>
 /* clang-format on */
 
-int main(void) {
+TEST test_mediacodec_unsupported(void) {
   struct ui_video_decoder_backend backend;
-
-  if (ui_video_decoder_mediacodec_get_backend(NULL) !=
-      UI_ERROR_INVALID_ARGUMENT) {
-    fprintf(stderr, "Expected UI_ERROR_INVALID_ARGUMENT for NULL backend\n");
-    return 1;
-  }
-
-  if (ui_video_decoder_mediacodec_get_backend(&backend) != UI_ERROR_UNKNOWN) {
-    fprintf(stderr, "Expected UI_ERROR_UNKNOWN for MediaCodec stub\n");
-    return 1;
-  }
-
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_video_decoder_mediacodec_get_backend(NULL));
 #if defined(__ANDROID__)
-  if (ui_video_decoder_get_default_backend(NULL) != UI_ERROR_INVALID_ARGUMENT) {
-    fprintf(stderr,
-            "Expected UI_ERROR_INVALID_ARGUMENT for NULL default backend\n");
-    return 1;
-  }
-
-  if (ui_video_decoder_get_default_backend(&backend) != UI_ERROR_UNKNOWN) {
-    fprintf(stderr, "Expected UI_ERROR_UNKNOWN for default MediaCodec stub\n");
-    return 1;
-  }
+  ASSERT_EQ(UI_ERROR_NONE, ui_video_decoder_mediacodec_get_backend(&backend));
+#else
+  ASSERT_EQ(UI_ERROR_UNSUPPORTED,
+            ui_video_decoder_mediacodec_get_backend(&backend));
 #endif
+  PASS();
+}
 
-  printf("test_ui_video_mediacodec passed\n");
-  return 0;
+SUITE(mediacodec_suite) { RUN_TEST(test_mediacodec_unsupported); }
+
+GREATEST_MAIN_DEFS();
+
+int main(int argc, char **argv) {
+  GREATEST_MAIN_BEGIN();
+  RUN_SUITE(mediacodec_suite);
+  GREATEST_MAIN_END();
 }

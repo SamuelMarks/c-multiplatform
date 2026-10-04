@@ -11,6 +11,7 @@
 #include "ui_dom_node.h"
 #include "material3/md3_a11y.h"
 #include "material3/md3_action_widgets.h"
+#include "material3/md3_fab_menu.h"
 #include "material3/md3_button.h"
 #include "material3/md3_card.h"
 #include "material3/md3_carousel.h"
@@ -23,6 +24,7 @@
 #include "material3/md3_navigation.h"
 #include "material3/md3_overlay.h"
 #include "material3/md3_overlay_menus.h"
+#include "material3/md3_date_time_pickers.h"
 #include "material3/md3_progress.h"
 #include "material3/md3_radio_button.h"
 #include "material3/md3_search.h"
@@ -473,20 +475,20 @@ TEST test_md3_oom_action_widgets(void) {
 #ifdef UI_TEST_MOCK_ALLOC
   /* FAB Menu creation OOM */
   g_malloc_fail_countdown = 0;
-  rc = md3_fab_menu_create(dummy_engine, fab, MD3_FAB_MENU_DIRECTION_UP, &menu);
+  rc = md3_fab_menu_create(dummy_engine, MD3_FAB_MENU_DIRECTION_UP, &menu);
+  md3_fab_menu_set_primary_fab(menu, fab);
   ASSERT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
   g_malloc_fail_countdown = -1;
 
   /* FAB Menu add action OOM */
-  rc = md3_fab_menu_create(dummy_engine, fab, MD3_FAB_MENU_DIRECTION_UP, &menu);
+  rc = md3_fab_menu_create(dummy_engine, MD3_FAB_MENU_DIRECTION_UP, &menu);
+  md3_fab_menu_set_primary_fab(menu, fab);
   ASSERT_EQ(UI_ERROR_NONE, rc);
   g_malloc_fail_countdown = 0;
   rc = md3_fab_menu_add_action(menu, 1, fab, "Photo");
   ASSERT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
   g_malloc_fail_countdown = -1;
   /* Destroy menu without freeing shared fab */
-  menu->items = NULL;
-  menu->primary_fab = NULL;
   rc = md3_fab_menu_destroy(menu);
   ASSERT_EQ(UI_ERROR_NONE, rc);
 
@@ -771,7 +773,7 @@ TEST test_md3_oom_overlay_menus(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   g_malloc_fail_countdown = 0;
-  rc = md3_date_range_picker_create(dummy_engine, &drp, NULL);
+  rc = md3_date_range_picker_create(dummy_engine, &drp);
   ASSERT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
 
   g_malloc_fail_countdown = 0;

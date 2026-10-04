@@ -900,9 +900,7 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
       {
         parse_overflow(val, &node->overflow_x);
       }
-      {
-        parse_overflow(val, &node->overflow_y);
-      }
+      { parse_overflow(val, &node->overflow_y); }
     }
   }
   {

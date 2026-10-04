@@ -107,6 +107,18 @@ extern C_MULTIPLATFORM_EXPORT ui_error_t ui_top_app_bar_base_get_state_signal(
 extern C_MULTIPLATFORM_EXPORT ui_error_t ui_top_app_bar_base_get_height_signal(
     struct ui_top_app_bar_base *bar, ui_signal_t **out_signal);
 
+struct ui_component;
+
+/**
+ * @brief Retrieves the associated UI component.
+ *
+ * @param bar The component.
+ * @param out_component Pointer to receive the UI component.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_top_app_bar_base_get_component(
+    struct ui_top_app_bar_base *bar, struct ui_component **out_component);
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

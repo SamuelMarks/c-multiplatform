@@ -1,36 +1,28 @@
 /* clang-format off */
+#include "greatest.h"
 #include "../include/ui_audio_sink.h"
 #include "../include/ui_error.h"
 #include <stdio.h>
-#include <stdlib.h>
 /* clang-format on */
 
-int main(void) {
+TEST test_opensles_unsupported(void) {
   struct ui_audio_sink_backend backend;
-
-  if (ui_audio_sink_opensles_get_backend(NULL) != UI_ERROR_INVALID_ARGUMENT) {
-    fprintf(stderr, "Expected UI_ERROR_INVALID_ARGUMENT for NULL backend\n");
-    return 1;
-  }
-
-  if (ui_audio_sink_opensles_get_backend(&backend) != UI_ERROR_UNKNOWN) {
-    fprintf(stderr, "Expected UI_ERROR_UNKNOWN for OpenSL ES stub\n");
-    return 1;
-  }
-
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_audio_sink_opensles_get_backend(NULL));
 #if defined(__ANDROID__)
-  if (ui_audio_sink_get_default_backend(NULL) != UI_ERROR_INVALID_ARGUMENT) {
-    fprintf(stderr,
-            "Expected UI_ERROR_INVALID_ARGUMENT for NULL default backend\n");
-    return 1;
-  }
-
-  if (ui_audio_sink_get_default_backend(&backend) != UI_ERROR_UNKNOWN) {
-    fprintf(stderr, "Expected UI_ERROR_UNKNOWN for default OpenSL ES stub\n");
-    return 1;
-  }
+  ASSERT_EQ(UI_ERROR_NONE, ui_audio_sink_opensles_get_backend(&backend));
+#else
+  ASSERT_EQ(UI_ERROR_UNSUPPORTED, ui_audio_sink_opensles_get_backend(&backend));
 #endif
+  PASS();
+}
 
-  printf("test_ui_audio_opensles passed\n");
-  return 0;
+SUITE(opensles_suite) { RUN_TEST(test_opensles_unsupported); }
+
+GREATEST_MAIN_DEFS();
+
+int main(int argc, char **argv) {
+  GREATEST_MAIN_BEGIN();
+  RUN_SUITE(opensles_suite);
+  GREATEST_MAIN_END();
 }

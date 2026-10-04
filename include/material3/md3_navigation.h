@@ -241,66 +241,6 @@ extern C_MULTIPLATFORM_EXPORT ui_error_t md3_navigation_suite_update_size_class(
     struct md3_navigation_suite *suite, enum md3_window_size_class size_class);
 
 /* -------------------------------------------------------------------------
- * MD3 Top App Bar (Small, Center-aligned, Medium, Large)
- * ------------------------------------------------------------------------- */
-
-/**
- * @enum md3_top_app_bar_variant
- * @brief Material 3 Top App Bar size variants.
- */
-enum md3_top_app_bar_variant {
-  MD3_TOP_APP_BAR_CENTER_ALIGNED = 0, /**< 64dp centered title */
-  MD3_TOP_APP_BAR_SMALL,              /**< 64dp left-aligned title */
-  MD3_TOP_APP_BAR_MEDIUM,             /**< 112dp two-tier collapsible title */
-  MD3_TOP_APP_BAR_LARGE               /**< 152dp prominent editorial title */
-};
-
-/**
- * @struct md3_top_app_bar
- * @brief Material 3 Top App Bar wrapping ui_top_app_bar_base.
- */
-struct md3_top_app_bar {
-  struct ui_top_app_bar_base *base;
-  struct ui_arena *arena;
-  enum md3_top_app_bar_variant variant;
-  char title[128];
-  float scroll_offset;
-};
-
-/**
- * @brief Creates a Material 3 Top App Bar.
- *
- * @param engine Pointer to ui_engine.
- * @param variant Visual variant (Center-aligned, Small, Medium, Large).
- * @param title Bar title string.
- * @param out_bar Pointer to receive newly created top app bar.
- * @return UI_ERROR_NONE on success, or an error code.
- */
-extern C_MULTIPLATFORM_EXPORT ui_error_t md3_top_app_bar_create(
-    struct ui_engine *engine, enum md3_top_app_bar_variant variant,
-    const char *title, struct md3_top_app_bar **out_bar);
-
-/**
- * @brief Destroys a Material 3 Top App Bar.
- *
- * @param bar Top app bar to destroy.
- * @return UI_ERROR_NONE on success, or UI_ERROR_INVALID_ARGUMENT.
- */
-extern C_MULTIPLATFORM_EXPORT ui_error_t
-md3_top_app_bar_destroy(struct md3_top_app_bar *bar);
-
-/**
- * @brief Sets scroll offset to trigger dynamic elevation and collapsible font
- * sizing.
- *
- * @param bar Top app bar.
- * @param scroll_offset Scroll offset in pixels.
- * @return UI_ERROR_NONE on success, or UI_ERROR_INVALID_ARGUMENT.
- */
-extern C_MULTIPLATFORM_EXPORT ui_error_t md3_top_app_bar_set_scroll_offset(
-    struct md3_top_app_bar *bar, float scroll_offset);
-
-/* -------------------------------------------------------------------------
  * MD3 Bottom App Bar (80dp height, action icons + FAB cradle)
  * ------------------------------------------------------------------------- */
 

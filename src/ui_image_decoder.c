@@ -66,21 +66,25 @@ get_backend_for_format(enum ui_image_format format,
 ui_error_t ui_image_decode_memory(enum ui_image_format format, const void *data,
                                   size_t size, struct ui_image *out_image) {
   struct ui_image_decoder_backend *backend;
+  ui_error_t backend_rc;
 
   if (!data || size == 0 || !out_image) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  {
-    ui_error_t backend_rc = get_backend_for_format(format, &backend);
-    if (backend_rc != UI_ERROR_NONE)
-      return backend_rc;
-  }
+  backend_rc = get_backend_for_format(format, &backend);
+  if (backend_rc != UI_ERROR_NONE)
+    return backend_rc;
+
   if (!backend) {
     return UI_ERROR_UNKNOWN;
   }
 
-  return backend->decode_memory(data, size, out_image);
+  backend_rc = backend->decode_memory(data, size, out_image);
+  if (backend_rc == UI_ERROR_NONE) {
+    out_image->format = format;
+  }
+  return backend_rc;
 }
 
 /**
@@ -89,14 +93,22 @@ ui_error_t ui_image_decode_memory(enum ui_image_format format, const void *data,
  * @return Return value.
  */
 ui_error_t ui_image_free(struct ui_image *image) {
-  /* For a real implementation, we might need to store which backend allocated
-     the image, but for now we'll just dispatch to a generic free or let the
-     backend do it. In this stub, we just safely null it out. */
+  struct ui_image_decoder_backend *backend = NULL;
+  ui_error_t rc;
+
   if (!image)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  /* TODO: Call appropriate backend free_image */
-  image->pixels = NULL;
+  rc = get_backend_for_format(image->format, &backend);
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
+  if (backend && backend->free_image) {
+    rc = backend->free_image(image);
+    if (rc != UI_ERROR_NONE)
+      return rc;
+  }
+
+  image->pixels = NULL;
   return UI_ERROR_NONE;
 }

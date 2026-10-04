@@ -40,6 +40,11 @@ ui_error_t md3_search_bar_create(struct ui_engine *engine,
   }
 
   rc = ui_search_bar_base_init(&sb->base, &sb->component, &sb->cva);
+  if (rc != UI_ERROR_NONE) {
+    C_MULTIPLATFORM_FREE(sb);
+    return rc;
+  }
+
   if (out_cva) {
     *out_cva = &sb->cva;
   }
@@ -56,6 +61,7 @@ ui_error_t md3_search_bar_destroy(struct md3_search_bar *search_bar) {
   }
 
   rc = ui_search_bar_base_cleanup(&search_bar->base);
+  /* component is value, don't destroy pointer */
   C_MULTIPLATFORM_FREE(search_bar);
   return rc;
 }

@@ -35,9 +35,10 @@ enum ui_image_format {
  * @brief Structure representing a decoded image.
  */
 struct ui_image {
-  void *pixels;     /**< RGBA 8888 pixel data. */
-  int width;        /**< Width of the image in pixels. */
-  int height;       /**< Height of the image in pixels. */
+  enum ui_image_format format; /**< Format of the image. */
+  void *pixels;                /**< RGBA 8888 pixel data. */
+  int width;                   /**< Width of the image in pixels. */
+  int height;                  /**< Height of the image in pixels. */
   int channels;     /**< Number of color channels (usually 4 for RGBA). */
   size_t data_size; /**< Total size of the pixel buffer in bytes. */
 };

@@ -340,6 +340,66 @@ static ui_error_t mock_selection_model_select(struct ui_selection_model *m,
 #define ui_selection_model_select mock_selection_model_select
 /** @endcond */
 
+/**
+ * @brief mock_selection_model_get_selected_count.
+ * @param m Parameter m.
+ * @param out Parameter out.
+ * @return Return value.
+ */
+static ui_error_t
+mock_selection_model_get_selected_count(struct ui_selection_model *m,
+                                        int *out) {
+  if (g_ac_mock_fail == 20)
+    return UI_ERROR_UNKNOWN;
+  return (ui_selection_model_get_selected_count)(m, out);
+}
+#undef ui_selection_model_get_selected_count
+/** @cond */
+#define ui_selection_model_get_selected_count                                  \
+  mock_selection_model_get_selected_count
+/** @endcond */
+
+/**
+ * @brief mock_selection_model_get_selected.
+ * @param m Parameter m.
+ * @param items Parameter items.
+ * @param limit Parameter limit.
+ * @return Return value.
+ */
+static ui_error_t
+mock_selection_model_get_selected(struct ui_selection_model *m, void **items,
+                                  int capacity) {
+  if (g_ac_mock_fail == 21)
+    return UI_ERROR_UNKNOWN;
+  return (ui_selection_model_get_selected)(m, items, capacity);
+}
+#undef ui_selection_model_get_selected
+/** @cond */
+#define ui_selection_model_get_selected mock_selection_model_get_selected
+/** @endcond */
+
+ui_selection_model_on_change_t g_ac_captured_on_change = NULL;
+
+/**
+ * @brief mock_selection_model_set_on_change.
+ * @param m Parameter m.
+ * @param cb Parameter cb.
+ * @param user_data Parameter user_data.
+ * @return Return value.
+ */
+static ui_error_t
+mock_selection_model_set_on_change(struct ui_selection_model *m,
+                                   ui_selection_model_on_change_t cb,
+                                   void *user_data) {
+  g_ac_captured_on_change = cb;
+  if (g_ac_mock_fail == 22)
+    return UI_ERROR_UNKNOWN;
+  return (ui_selection_model_set_on_change)(m, cb, user_data);
+}
+#undef ui_selection_model_set_on_change
+/** @cond */
+#define ui_selection_model_set_on_change mock_selection_model_set_on_change
+/** @endcond */
 #endif
 
 /**
@@ -498,6 +558,43 @@ destroy_partially_created_autocomplete(struct ui_autocomplete_base *ac,
 }
 
 /**
+ * @brief on_listbox_selection_change.
+ * @param model Parameter model.
+ * @param user_data Parameter user_data.
+ * @return Return value.
+ */
+static ui_error_t on_listbox_selection_change(struct ui_selection_model *model,
+                                              void *user_data) {
+  struct ui_autocomplete_base *ac = (struct ui_autocomplete_base *)user_data;
+  void *selected_ids[1] = {NULL};
+  int count = 0;
+  ui_error_t rc;
+  int index;
+
+  if (!ac)
+    return UI_ERROR_INVALID_ARGUMENT;
+
+  rc = ui_selection_model_get_selected_count(model, &count);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+
+  if (count > 0) {
+    rc = ui_selection_model_get_selected(model, selected_ids, 1);
+    if (rc != UI_ERROR_NONE)
+      return rc;
+    index = (int)(size_t)selected_ids[0];
+
+    if (ac->on_selection) {
+      rc = ac->on_selection(ac, index, ac->selection_user_data);
+      if (rc != UI_ERROR_NONE)
+        return rc;
+    }
+  }
+
+  return UI_ERROR_NONE;
+}
+
+/**
  * @brief ui_autocomplete_base_create.
  * @param out_autocomplete Parameter out_autocomplete.
  * @param out_cva Parameter out_cva.
@@ -585,7 +682,17 @@ ui_autocomplete_base_create(struct ui_autocomplete_base **out_autocomplete,
   rc = ui_input_base_set_on_change(ac->input, on_input_text_change, ac);
   if (rc != UI_ERROR_NONE)
     goto cleanup;
-  /* TODO: hook up selection model on_change */
+
+  {
+    struct ui_selection_model *model = NULL;
+    rc = ui_listbox_base_get_selection_model(ac->listbox, &model);
+    if (rc != UI_ERROR_NONE)
+      goto cleanup;
+    rc = ui_selection_model_set_on_change(model, on_listbox_selection_change,
+                                          ac);
+    if (rc != UI_ERROR_NONE)
+      goto cleanup;
+  }
 
   if (out_cva) {
     out_cva->write_value = autocomplete_cva_write_value;

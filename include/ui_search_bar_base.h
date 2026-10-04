@@ -91,6 +91,16 @@ extern C_MULTIPLATFORM_EXPORT ui_error_t ui_search_bar_base_set_loading(
 extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_search_bar_base_cleanup(struct ui_search_bar_base *search_bar);
 
+/**
+ * @brief Retrieves the associated UI component.
+ *
+ * @param search_bar Pointer to the search bar base struct.
+ * @param out_component Pointer to receive the UI component.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_search_bar_base_get_component(
+    struct ui_search_bar_base *search_bar, struct ui_component **out_component);
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

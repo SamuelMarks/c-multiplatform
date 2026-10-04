@@ -4,6 +4,7 @@
  */
 /* clang-format off */
 #include "ui_top_app_bar_base.h"
+#include "ui_component.h"
 #include "ui_arena.h"
 #include "ui_signal.h"
 #include <stddef.h>
@@ -83,6 +84,8 @@ struct ui_top_app_bar_base {
   ui_signal_t *state_signal; /**< state_signal */
   /* @brief Signal for the current height. */
   ui_signal_t *height_signal; /**< height_signal */
+  /* @brief The associated component. */
+  struct ui_component *component; /**< component */
 };
 
 /**
@@ -121,6 +124,7 @@ ui_top_app_bar_base_create(struct ui_arena *arena,
   void *ptr;
   union ui_signal_payload initial_state;
   union ui_signal_payload initial_height;
+  struct ui_dom_node *root_node = NULL;
 
   if (!arena || !config || !out_bar) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -133,6 +137,27 @@ ui_top_app_bar_base_create(struct ui_arena *arena,
   *out_bar = (struct ui_top_app_bar_base *)ptr;
   (*out_bar)->arena = arena;
   (*out_bar)->config = *config;
+  (*out_bar)->component = NULL;
+  (*out_bar)->state_signal = NULL;
+  (*out_bar)->height_signal = NULL;
+
+  err = ui_component_create(&(*out_bar)->component);
+  if (err != UI_ERROR_NONE) {
+    return err;
+  }
+
+  err = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root_node);
+  if (err != UI_ERROR_NONE) {
+    return err;
+  }
+
+  err = ui_dom_node_set_tag_name(root_node, "header");
+  if (err != UI_ERROR_NONE) {
+    ui_dom_node_destroy(root_node);
+    return err;
+  }
+
+  (*out_bar)->component->shadow_root = root_node;
 
   initial_state.int_val = (ui_int32)config->initial_state;
   err = ui_signal_create(arena, initial_state, UI_SIGNAL_TYPE_INT32,
@@ -159,6 +184,10 @@ ui_top_app_bar_base_create(struct ui_arena *arena,
 ui_error_t ui_top_app_bar_base_destroy(struct ui_top_app_bar_base *bar) {
   if (!bar)
     return UI_ERROR_INVALID_ARGUMENT;
+
+  if (bar->component) {
+    ui_component_destroy(bar->component);
+  }
 
   if (bar->state_signal) {
     ui_signal_destroy(bar->state_signal);
@@ -250,5 +279,15 @@ ui_top_app_bar_base_get_height_signal(struct ui_top_app_bar_base *bar,
   if (!bar || !out_signal)
     return UI_ERROR_INVALID_ARGUMENT;
   *out_signal = bar->height_signal;
+  return UI_ERROR_NONE;
+}
+
+ui_error_t
+ui_top_app_bar_base_get_component(struct ui_top_app_bar_base *bar,
+                                  struct ui_component **out_component) {
+  if (!bar || !out_component) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+  *out_component = bar->component;
   return UI_ERROR_NONE;
 }

@@ -5,6 +5,7 @@
 /* clang-format off */
 #include "ui_image_decoder.h"
 #include "ui_error.h"
+/* stb_image does not support WebP, but we maintain the API boundary for when a WebP decoder (like libwebp) is integrated */
 /* clang-format on */
 
 /**
@@ -38,7 +39,7 @@ static ui_error_t webp_decode_memory(const void *data, size_t size,
   out_image->channels = 4;
   out_image->data_size = 0;
 
-  return UI_ERROR_UNKNOWN; /* TODO: Implement actual C89 WebP decoding */
+  return UI_ERROR_UNKNOWN; /* stb_image does not support WebP */
 }
 
 /**
@@ -49,7 +50,6 @@ static ui_error_t webp_decode_memory(const void *data, size_t size,
 static ui_error_t webp_free_image(struct ui_image *image) {
   if (!image)
     return UI_ERROR_INVALID_ARGUMENT;
-  /* TODO: Free pixels when actual implementation is provided */
   image->pixels = NULL;
   return UI_ERROR_NONE;
 }

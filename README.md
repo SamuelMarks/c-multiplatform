@@ -3,7 +3,7 @@ c-multiplatform
 
 [![License](https://img.shields.io/badge/license-Apache--2.0%20OR%20MIT-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Doc Coverage](https://img.shields.io/badge/docs-100%25-brightgreen.svg)](#)
-[![Test Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen.svg)](#)
+[![Test Coverage](https://img.shields.io/badge/coverage-97%25-brightgreen.svg)](#)
 [![CI](https://github.com/SamuelMarks/c-multiplatform/actions/workflows/ci.yml/badge.svg)](https://github.com/SamuelMarks/c-multiplatform/actions/workflows/ci.yml)
 
 A high-performance, strictly-compliant **ANSI C (C89 / ISO C90)** multiplatform UI engine and headless Component Development Kit (CDK). Featuring a full **W3C CSS layout engine**, fine-grained **Signals reactivity**, **universal FFI** interoperability with zero bridge overhead, an **inspectable real DOM** for WebAssembly, and **dynamic runtime-defined widgets with Ahead-of-Time (AoT) C code ejection**.

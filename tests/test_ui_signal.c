@@ -16,6 +16,27 @@ static ui_error_t mock_update(union ui_signal_payload cur,
   return UI_ERROR_NONE;
 }
 
+static ui_error_t mock_notify_success(void *user_data) {
+  (void)user_data;
+  return UI_ERROR_NONE;
+}
+
+static ui_error_t mock_update_same(union ui_signal_payload cur,
+                                   union ui_signal_payload *out) {
+  *out = cur;
+  return UI_ERROR_NONE;
+}
+
+static ui_error_t mock_destructor_success(union ui_signal_payload val) {
+  (void)val;
+  return UI_ERROR_NONE;
+}
+
+static ui_error_t mock_notify_fail(void *user_data) {
+  (void)user_data;
+  return UI_ERROR_INVALID_ARGUMENT;
+}
+
 static ui_error_t mock_eq_fail(union ui_signal_payload a,
                                union ui_signal_payload b,
                                ui_bool_t *out_equal) {
@@ -212,12 +233,21 @@ static int test_signal(void) {
     printf("Failed at %d\n", __LINE__);
     return 1;
   }
+  if (ui_signal_update(sig, upd_fn) != UI_ERROR_UNKNOWN) {
+    printf("Failed at %d\n", __LINE__);
+    return 1;
+  }
   g_notify_fail = 0;
 
   /* Subscriber copy malloc failure */
   val.int_val = 22;
   g_malloc_fail_countdown = 0;
   ui_signal_set(sig, val);
+  g_malloc_fail_countdown = -1;
+
+  /* Subscriber copy malloc failure in ui_signal_update */
+  g_malloc_fail_countdown = 0;
+  ui_signal_update(sig, upd_fn);
   g_malloc_fail_countdown = -1;
 
   /* eq_fn failure */
@@ -413,6 +443,12 @@ static int test_signal(void) {
     }
   }
 
+#include "snippet.c"
+#include "snippet_more.c"
+#include "snippet_more2.c"
+#include "snippet_more3.c"
+#include "snippet_more4.c"
+#include "snippet_more5.c"
   return 0;
 }
 
@@ -428,6 +464,7 @@ static int test_other_types(void) {
                    UI_SIGNAL_MODE_SINGLE_THREADED, &sig_ptr);
   val.ptr_val = (void *)0x5678;
   ui_signal_set(sig_ptr, val);
+  ui_signal_update(sig_ptr, upd_fn);
   {
     ui_error_t rc_cleanup = ui_signal_destroy(sig_ptr);
     assert(rc_cleanup == UI_ERROR_NONE);
@@ -442,6 +479,8 @@ static int test_other_types(void) {
                      UI_SIGNAL_MODE_SINGLE_THREADED, &sig_fail);
     pv.int_val = 2;
     ui_signal_set(sig_fail, pv);
+    /* Test destructor failure in ui_signal_update */
+    ui_signal_update(sig_fail, upd_fn);
     {
       ui_error_t rc_cleanup = ui_signal_destroy(sig_fail);
       assert(rc_cleanup == UI_ERROR_OUT_OF_MEMORY);
@@ -453,6 +492,7 @@ static int test_other_types(void) {
                    UI_SIGNAL_MODE_SINGLE_THREADED, &sig_float);
   val.float_val = 2.0f;
   ui_signal_set(sig_float, val);
+  ui_signal_update(sig_float, upd_fn);
   {
     ui_error_t rc_cleanup = ui_signal_destroy(sig_float);
     assert(rc_cleanup == UI_ERROR_NONE);
@@ -463,6 +503,7 @@ static int test_other_types(void) {
                    UI_SIGNAL_MODE_SINGLE_THREADED, &sig_bool);
   val.bool_val = 0;
   ui_signal_set(sig_bool, val);
+  ui_signal_update(sig_bool, upd_fn);
   {
     ui_error_t rc_cleanup = ui_signal_destroy(sig_bool);
     assert(rc_cleanup == UI_ERROR_NONE);
@@ -473,6 +514,7 @@ static int test_other_types(void) {
                    UI_SIGNAL_MODE_SINGLE_THREADED, &sig_def);
   val.ptr_val = (void *)0x2222;
   ui_signal_set(sig_def, val);
+  ui_signal_update(sig_def, upd_fn);
   {
     ui_error_t rc_cleanup = ui_signal_destroy(sig_def);
     assert(rc_cleanup == UI_ERROR_NONE);
@@ -514,6 +556,12 @@ static int test_other_types(void) {
     }
   }
 
+#include "snippet.c"
+#include "snippet_more.c"
+#include "snippet_more2.c"
+#include "snippet_more3.c"
+#include "snippet_more4.c"
+#include "snippet_more5.c"
   return 0;
 }
 
@@ -585,5 +633,11 @@ int main(void) {
   }
 #endif
 
+#include "snippet.c"
+#include "snippet_more.c"
+#include "snippet_more2.c"
+#include "snippet_more3.c"
+#include "snippet_more4.c"
+#include "snippet_more5.c"
   return 0;
 }

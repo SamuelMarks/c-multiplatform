@@ -306,8 +306,10 @@ ui_error_t ui_signal_set(ui_signal_t *signal,
     for (i = 0; i < subs_count; i++) {
       if (subs_copy[i]->notify_fn) {
         ui_error_t notify_rc = subs_copy[i]->notify_fn(subs_copy[i]->user_data);
-        if (notify_rc != UI_ERROR_NONE && rc == UI_ERROR_NONE) {
-          rc = notify_rc;
+        if (notify_rc != UI_ERROR_NONE) {
+          if (rc == UI_ERROR_NONE) {
+            rc = notify_rc;
+          }
         }
       }
     }
@@ -325,24 +327,90 @@ ui_error_t ui_signal_set(ui_signal_t *signal,
  */
 ui_error_t ui_signal_update(ui_signal_t *signal, ui_update_fn update_fn) {
   union ui_signal_payload new_val;
+  ui_bool_t equal = UI_FALSE;
+  size_t i;
+  struct ui_reactive_node **subs_copy = NULL;
+  size_t subs_count = 0;
   ui_error_t rc = UI_ERROR_NONE;
+  ui_error_t update_rc = UI_ERROR_NONE;
 
   if (!signal || !update_fn) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  /* TODO: thread safe lock for update */
+  ui_signal_lock(signal);
   new_val.ptr_val = NULL;
-  rc = update_fn(signal->value, &new_val);
-  if (rc != UI_ERROR_NONE) {
-    return rc;
+  update_rc = update_fn(signal->value, &new_val);
+  if (update_rc != UI_ERROR_NONE) {
+    ui_signal_unlock(signal);
+    return update_rc;
   }
 
-  rc = ui_signal_set(signal, new_val);
-  if (rc != UI_ERROR_NONE)
-    return rc;
+  if (signal->equality_fn) {
+    ui_error_t eq_rc = signal->equality_fn(signal->value, new_val, &equal);
+    if (eq_rc != UI_ERROR_NONE) {
+      ui_signal_unlock(signal);
+      return eq_rc;
+    }
+  } else {
+    switch (signal->type) {
+    case UI_SIGNAL_TYPE_POINTER:
+      equal = (signal->value.ptr_val == new_val.ptr_val);
+      break;
+    case UI_SIGNAL_TYPE_INT32:
+      equal = (signal->value.int_val == new_val.int_val);
+      break;
+    case UI_SIGNAL_TYPE_FLOAT32:
+      equal = (signal->value.float_val == new_val.float_val);
+      break;
+    case UI_SIGNAL_TYPE_BOOL:
+      equal = (signal->value.bool_val == new_val.bool_val);
+      break;
+    default:
+      equal = (signal->value.ptr_val == new_val.ptr_val);
+      break;
+    }
+  }
 
-  return UI_ERROR_NONE;
+  if (!equal) {
+    if (signal->destructor_fn) {
+      ui_error_t dest_rc = signal->destructor_fn(signal->value);
+      if (dest_rc != UI_ERROR_NONE) {
+        ui_signal_unlock(signal);
+        return dest_rc;
+      }
+    }
+    signal->value = new_val;
+    if (signal->subscribers_count > 0) {
+      subs_copy = (struct ui_reactive_node **)C_MULTIPLATFORM_MALLOC(
+          signal->subscribers_count * sizeof(struct ui_reactive_node *));
+      if (!subs_copy) {
+        ui_signal_unlock(signal);
+        return UI_ERROR_OUT_OF_MEMORY;
+      }
+      for (i = 0; i < signal->subscribers_count; i++) {
+        subs_copy[i] = signal->subscribers[i];
+      }
+      subs_count = signal->subscribers_count;
+    }
+  }
+  ui_signal_unlock(signal);
+
+  if (subs_copy) {
+    for (i = 0; i < subs_count; i++) {
+      if (subs_copy[i]->notify_fn) {
+        ui_error_t notify_rc = subs_copy[i]->notify_fn(subs_copy[i]->user_data);
+        if (notify_rc != UI_ERROR_NONE) {
+          if (rc == UI_ERROR_NONE) {
+            rc = notify_rc;
+          }
+        }
+      }
+    }
+    C_MULTIPLATFORM_FREE(subs_copy);
+  }
+
+  return rc;
 }
 
 /**

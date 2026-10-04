@@ -641,9 +641,7 @@ static ui_error_t parse_selectors(struct ui_css_tokenizer *tz,
             while (last->next)
               last = last->next;
             last->nested_selector = nested;
-            {
-              next_token(tz, &token);
-            }
+            { next_token(tz, &token); }
           } else {
             int paren_depth = 1;
             next_token(tz, &token);
@@ -656,9 +654,7 @@ static ui_error_t parse_selectors(struct ui_css_tokenizer *tz,
                 next_token(tz, &token);
               }
             }
-            {
-              next_token(tz, &token);
-            }
+            { next_token(tz, &token); }
           }
         }
 
@@ -845,9 +841,7 @@ static ui_error_t parse_rule_list(struct ui_css_tokenizer *tz,
           rc = parse_selectors(tz, &token, &scope_start);
           if (rc != UI_ERROR_NONE)
             goto cleanup;
-          {
-            next_token(tz, &token);
-          }
+          { next_token(tz, &token); }
         }
 
         /* Parse optional 'to' followed by scope end */
@@ -860,9 +854,7 @@ static ui_error_t parse_rule_list(struct ui_css_tokenizer *tz,
               ui_css_selector_destroy(scope_start);
               goto cleanup;
             }
-            {
-              next_token(tz, &token);
-            }
+            { next_token(tz, &token); }
           }
         }
 

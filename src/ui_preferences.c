@@ -108,14 +108,14 @@ EM_JS(void, set_local_storage_js, (const char *key, const char *value), {
   try {
     const k = UTF8ToString(key), v = UTF8ToString(value);
     if (typeof localStorage != 'undefined') {
-  localStorage.setItem(k, v);
+      localStorage.setItem(k, v);
     } else {
-  if (!globalThis._mock_ls)
-    globalThis._mock_ls = new Map();
-  globalThis._mock_ls.set(k, v);
+      if (!globalThis._mock_ls)
+        globalThis._mock_ls = new Map();
+      globalThis._mock_ls.set(k, v);
     }
-}
-catch(e) {}
+  } catch (e) {
+  }
 })
 
 EM_JS(char *, get_local_storage_js, (const char *key), {
@@ -123,20 +123,21 @@ EM_JS(char *, get_local_storage_js, (const char *key), {
     const k = UTF8ToString(key);
     let val = null;
     if (typeof localStorage != 'undefined') {
-  val = localStorage.getItem(k);
+      val = localStorage.getItem(k);
     } else if (globalThis._mock_ls) {
-  val = globalThis._mock_ls.get(k) || null;
+      val = globalThis._mock_ls.get(k) || null;
     }
     if (!val)
       return 0;
     const lengthBytes = lengthBytesUTF8(val) + 1;
     const stringOnWasmHeap = _malloc(lengthBytes);
     if (stringOnWasmHeap) {
-  stringToUTF8(val, stringOnWasmHeap, lengthBytes);
+      stringToUTF8(val, stringOnWasmHeap, lengthBytes);
     }
     return stringOnWasmHeap;
-}
-catch(e) { return 0; }
+  } catch (e) {
+    return 0;
+  }
 })
 #endif
 

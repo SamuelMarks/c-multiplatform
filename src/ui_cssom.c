@@ -1464,9 +1464,7 @@ static ui_error_t eval_cond_term(const char **p, int *out_matched) {
       ui_error_t rc = eval_cond_or(p, &res);
       if (rc != UI_ERROR_NONE)
         return rc;
-      {
-        cond_skip_ws(p);
-      }
+      { cond_skip_ws(p); }
       if (**p == ')')
         (*p)++;
       *out_matched = res;

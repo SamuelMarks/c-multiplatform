@@ -161,7 +161,7 @@ static int test_preferences_save_binary(void) {
 #if defined(__EMSCRIPTEN__)
   /* Resolves eventually via JS */
 #else
-  /* Rejected natively currently */
+    /* Rejected natively currently */
 #endif
 
   {

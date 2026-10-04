@@ -225,3 +225,14 @@ ui_error_t ui_search_bar_base_cleanup(struct ui_search_bar_base *search_bar) {
   search_bar->is_loading = 0;
   return UI_ERROR_NONE;
 }
+
+ui_error_t
+ui_search_bar_base_get_component(struct ui_search_bar_base *search_bar,
+                                 struct ui_component **out_component) {
+  if (!search_bar || !out_component) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+
+  *out_component = search_bar->component;
+  return UI_ERROR_NONE;
+}

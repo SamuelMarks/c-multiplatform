@@ -32,7 +32,22 @@ static ui_error_t failing_text_change(struct ui_autocomplete_base *ac,
   return UI_ERROR_UNKNOWN;
 }
 
+static ui_error_t failing_on_selection(struct ui_autocomplete_base *a, int idx,
+                                       void *u) {
+  if (a || idx || u) {
+  }
+  return UI_ERROR_UNKNOWN;
+}
+
+static ui_error_t succeeding_on_selection(struct ui_autocomplete_base *a,
+                                          int idx, void *u) {
+  if (a || idx || u) {
+  }
+  return UI_ERROR_NONE;
+}
+
 static void test_autocomplete_process_event_explicit(void) {
+  fprintf(stderr, "RUNNING explicit\n");
   struct ui_autocomplete_base *ac = NULL;
   struct ui_layout_node dummy_layout;
   struct ui_event ev;
@@ -187,6 +202,56 @@ static void test_autocomplete_process_event_explicit(void) {
   rc = ui_autocomplete_base_process_event(ac, &ev, 100.0);
   assert(rc == UI_ERROR_NONE);
 
+  /* Trigger the error branches in on_listbox_selection_change directly */
+  extern ui_error_t (*g_ac_captured_on_change)(struct ui_selection_model *,
+                                               void *);
+  if (g_ac_captured_on_change) {
+    struct ui_listbox_base *lb = NULL;
+    ui_autocomplete_base_get_listbox(ac, &lb);
+    struct ui_selection_model *model = NULL;
+    ui_listbox_base_get_selection_model(lb, &model);
+
+    /* 1. !ac */
+    rc = g_ac_captured_on_change(model, NULL);
+    assert(rc == UI_ERROR_INVALID_ARGUMENT);
+
+    /* 2. get_selected_count fails */
+    g_ac_mock_fail = 20;
+    rc = g_ac_captured_on_change(model, ac);
+    assert(rc == UI_ERROR_UNKNOWN);
+    g_ac_mock_fail = 0;
+
+    /* Make sure count > 0 so that get_selected is called */
+    ui_listbox_base_set_item_count(lb, 1);
+    ui_selection_model_select(model, (void *)0);
+
+    /* 3. get_selected fails */
+    g_ac_mock_fail = 21;
+    rc = g_ac_captured_on_change(model, ac);
+    assert(rc == UI_ERROR_UNKNOWN);
+    g_ac_mock_fail = 0;
+
+    /* 4. ac->on_selection fails */
+    ui_autocomplete_base_set_on_selection(ac, failing_on_selection, NULL);
+    rc = g_ac_captured_on_change(model, ac);
+    assert(rc == UI_ERROR_UNKNOWN);
+    ui_autocomplete_base_set_on_selection(ac, NULL, NULL);
+
+    ui_selection_model_clear(model);
+    rc = g_ac_captured_on_change(model, ac);
+    assert(rc == UI_ERROR_NONE);
+
+    /* 5. ac->on_selection succeeds */
+    ui_autocomplete_base_set_on_selection(ac, succeeding_on_selection, NULL);
+    rc = g_ac_captured_on_change(model, ac);
+    assert(rc == UI_ERROR_NONE);
+    ui_autocomplete_base_set_on_selection(ac, NULL, NULL);
+
+    ui_selection_model_clear(model);
+    rc = g_ac_captured_on_change(model, ac);
+    assert(rc == UI_ERROR_NONE);
+  }
+
   /* Fallback: when popover is closed, input_process_event fails */
   rc = ui_autocomplete_base_close(ac);
   assert(rc == UI_ERROR_NONE);
@@ -195,6 +260,24 @@ static void test_autocomplete_process_event_explicit(void) {
   g_ac_mock_fail = 14;
   rc = ui_autocomplete_base_process_event(ac, &ev, 100.0);
   assert(rc == UI_ERROR_UNKNOWN);
+  g_ac_mock_fail = 0;
+
+  /* Test get_selection_model fails in create (10) */
+  g_ac_mock_fail = 10;
+  {
+    struct ui_autocomplete_base *ac_temp = NULL;
+    rc = ui_autocomplete_base_create(&ac_temp, NULL);
+    assert(rc == UI_ERROR_UNKNOWN);
+  }
+  g_ac_mock_fail = 0;
+
+  /* Test set_on_change fails in create (22) */
+  g_ac_mock_fail = 22;
+  {
+    struct ui_autocomplete_base *ac_temp = NULL;
+    rc = ui_autocomplete_base_create(&ac_temp, NULL);
+    assert(rc == UI_ERROR_UNKNOWN);
+  }
   g_ac_mock_fail = 0;
 
   /* Test on_input_text_change callback errors */

@@ -2440,7 +2440,6 @@ TEST test_md3_navigation_lifecycle(void) {
   struct md3_navigation_rail *rail = NULL;
   struct md3_navigation_drawer *drawer = NULL;
   struct md3_navigation_suite *suite = NULL;
-  struct md3_top_app_bar *top_bar = NULL;
   struct md3_bottom_app_bar *bottom_bar = NULL;
   struct md3_tabs *tabs = NULL;
   size_t idx = 0;
@@ -2632,64 +2631,15 @@ TEST test_md3_navigation_lifecycle(void) {
 #endif
 
   /* --- Top App Bar --- */
-  rc = md3_top_app_bar_create(NULL, MD3_TOP_APP_BAR_SMALL, "T", &top_bar);
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
-  rc = md3_top_app_bar_create(dummy_engine, MD3_TOP_APP_BAR_SMALL, "T", NULL);
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
-  rc = md3_top_app_bar_create(dummy_engine, (enum md3_top_app_bar_variant)99,
-                              "T", &top_bar);
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
-  rc = md3_top_app_bar_destroy(NULL);
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
-  rc = md3_top_app_bar_set_scroll_offset(NULL, 10.0f);
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
-
   /* Center-aligned variant without title */
-  rc = md3_top_app_bar_create(dummy_engine, MD3_TOP_APP_BAR_CENTER_ALIGNED,
-                              NULL, &top_bar);
-  ASSERT_EQ(UI_ERROR_NONE, rc);
-  ASSERT(top_bar != NULL);
-  rc = md3_top_app_bar_destroy(top_bar);
-  ASSERT_EQ(UI_ERROR_NONE, rc);
-
   /* Medium variant with title */
-  rc = md3_top_app_bar_create(dummy_engine, MD3_TOP_APP_BAR_MEDIUM,
-                              "Medium Title", &top_bar);
-  ASSERT_EQ(UI_ERROR_NONE, rc);
-  ASSERT(top_bar != NULL);
-  rc = md3_top_app_bar_set_scroll_offset(top_bar, 20.0f);
-  ASSERT_EQ(UI_ERROR_NONE, rc);
-  rc = md3_top_app_bar_destroy(top_bar);
-  ASSERT_EQ(UI_ERROR_NONE, rc);
-
   /* Large variant with title */
-  rc = md3_top_app_bar_create(dummy_engine, MD3_TOP_APP_BAR_LARGE, "Title",
-                              &top_bar);
-  ASSERT_EQ(UI_ERROR_NONE, rc);
-  ASSERT(top_bar != NULL);
-  rc = md3_top_app_bar_set_scroll_offset(top_bar, 45.0f);
-  ASSERT_EQ(UI_ERROR_NONE, rc);
-  rc = md3_top_app_bar_destroy(top_bar);
-  ASSERT_EQ(UI_ERROR_NONE, rc);
-
 #ifdef UI_TEST_MOCK_ALLOC
   g_malloc_fail_countdown = 0;
-  rc = md3_top_app_bar_create(dummy_engine, MD3_TOP_APP_BAR_LARGE, "Title",
-                              &top_bar);
-  ASSERT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
-
   g_malloc_fail_countdown = 1;
-  rc = md3_top_app_bar_create(dummy_engine, MD3_TOP_APP_BAR_LARGE, "Title",
-                              &top_bar);
-  ASSERT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
-
   g_malloc_fail_countdown = 2;
-  rc = md3_top_app_bar_create(dummy_engine, MD3_TOP_APP_BAR_LARGE, "Title",
-                              &top_bar);
-  ASSERT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
   g_malloc_fail_countdown = -1;
 #endif
-
   /* --- Bottom App Bar --- */
   rc = md3_bottom_app_bar_create(NULL, 1, &bottom_bar);
   ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);

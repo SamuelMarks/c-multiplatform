@@ -20,6 +20,15 @@ endif()
 
 project(c-multiplatform-engine C)
 
+# iOS Bundle and Signing Defaults
+if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
+    set(CMAKE_MACOSX_BUNDLE ON)
+    set(CMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_ALLOWED "NO")
+    set(CMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "")
+    set(CMAKE_MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Info.plist.in")
+    set(CMAKE_MACOSX_BUNDLE_GUI_IDENTIFIER "com.example.uiengine")
+endif()
+
 if (MSVC AND CMAKE_HOST_UNIX)
     string(REGEX REPLACE "/[dD][eE][bB][uU][gG](:[a-zA-Z]+)?" "/DEBUG:NONE" CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG}")
     string(REGEX REPLACE "/[dD][eE][bB][uU][gG](:[a-zA-Z]+)?" "/DEBUG:NONE" CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG}")
@@ -67,6 +76,7 @@ option(UI_SHARED_LIB "Build as Shared Library" OFF)
 option(UI_MSVC_RUNTIME_CHECKS "Enable MSVC /RTC1, /RTCs, /RTCu" OFF)
 option(UI_ENABLE_DESIGN_SYSTEM_M3 "Enable Material Design 3 system" ON)
 option(UI_ENABLE_DESIGN_SYSTEM_M3_EXPRESSIVE "Enable Material 3 Expressive system" ON)
+option(UI_ENABLE_DESIGN_SYSTEM_M2 "Enable Material Design 2 system" ON)
 option(UI_ENABLE_DESIGN_SYSTEM_CUPERTINO "Enable Cupertino (Apple HIG) design system" ON)
 option(BUILD_VISUAL_TESTS "Build and run visual fuzzy-match tests" ON)
 option(UI_ENABLE_ASAN "Enable AddressSanitizer (ASAN)" OFF)
@@ -341,7 +351,29 @@ if(UI_ENABLE_DESIGN_SYSTEM_M3)
         src/material3/md3_shell_layout.c
         src/material3/md3_overlay_menus.c
         src/material3/md3_data_hierarchy.c
-        src/material3/md3_media_workspace.c)
+        src/material3/md3_media_workspace.c
+        src/material3/md3_top_app_bar.c
+        src/material3/md3_floating_toolbar.c
+        src/material3/md3_fab_menu.c
+        src/material3/md3_date_time_pickers.c
+        src/material3/md3_adaptive.c)
+endif()
+
+set(UI_DESIGN_SYSTEM_M2_SRC "")
+if(UI_ENABLE_DESIGN_SYSTEM_M2)
+    list(APPEND UI_DESIGN_SYSTEM_M2_SRC
+        src/material2/md2_theme.c
+        src/material2/md2_elevation.c
+        src/material2/md2_shape.c
+        src/material2/md2_button.c
+        src/material2/md2_card.c
+        src/material2/md2_fab.c
+        src/material2/md2_top_app_bar.c
+        src/material2/md2_bottom_navigation.c
+        src/material2/md2_navigation_drawer.c
+        src/material2/md2_selection_controls.c
+        src/material2/md2_text_field.c
+        src/material2/md2_overlays.c)
 endif()
 
 set(UI_DESIGN_SYSTEM_CUPERTINO_SRC "")
@@ -419,10 +451,10 @@ endif()
 # Library Target
 if(UI_SHARED_LIB)
     add_library(ui_engine SHARED src/ui_execution_context.c src/ui_tick_engine.c src/ui_thread_pool.c src/ui_reactor.c src/ui_promise.c src/ui_atomic.c src/ui_ring_buffer.c src/ui_timer.c src/ui_arena.c src/ui_pool.c src/ui_engine_core.c src/ui_event.c src/ui_signal.c src/ui_reactive_graph.c src/ui_computed.c src/ui_effect.c src/ui_color_space.c src/ui_color_quantization.c src/ui_design_tokens.c src/ui_tonal_palette.c src/ui_theme_provider.c src/ui_theme_manager.c src/ui_safe_area_manager.c src/ui_shape_family.c src/ui_typography_scale.c src/ui_state_layer.c src/ui_elevation.c src/ui_focus_ring.c src/ui_handle_manager.c src/ui_window_backend_win32.c src/ui_window_backend_macos.c src/ui_window_backend_ios.c src/ui_window_backend_android.c ${UI_WINDOW_BACKEND_LINUX_SRC} src/ui_window_backend_web.c src/ui_dom_node.c
-    src/ui_fs.c src/ui_web_bridge.c src/ui_cssom.c src/ui_layout.c src/ui_css_parser.c src/ui_css_values.c src/ui_css_env.c src/ui_css_contain.c src/ui_css_overflow.c src/ui_css_lists.c src/ui_css_content.c src/ui_css_logical.c src/ui_css_scrollbars.c src/ui_css_round_display.c src/ui_css_ui.c src/ui_css_forms.c src/ui_css_motion.c src/ui_css_view_transition.c src/ui_css_speech.c src/ui_css_scroll_snap.c src/ui_css_scroll_anchoring.c src/ui_css_spatial_nav.c src/ui_css_highlight_api.c src/ui_css_page.c src/ui_css_gcpm.c src/ui_css_page_floats.c src/ui_cssom_api.c src/ui_cssom_view.c src/ui_component.c src/ui_modifier.c src/ui_drag_drop.c src/ui_list_base.c src/ui_data_source.c src/ui_input_mask.c src/ui_i18n.c src/ui_tree_grid_base.c src/ui_side_sheet_base.c src/ui_dockable_layout_base.c src/ui_hotkey_registry.c src/ui_scroll_spy.c src/ui_resizable_behavior.c src/ui_virtual_keyboard.c src/ui_predictive_back.c src/ui_nav_rail_base.c src/ui_bottom_nav_base.c src/ui_segmented_control_base.c src/ui_listbox_base.c src/ui_autocomplete_base.c src/ui_popover_base.c src/ui_clipboard.c src/ui_layout_observer.c src/ui_scroll_dispatcher.c src/ui_key_manager.c src/ui_textarea_autosize.c src/ui_ripple_base.c src/ui_alert_base.c src/ui_button_base.c src/ui_split_button_base.c src/ui_top_app_bar_base.c src/ui_bottom_app_bar_base.c src/ui_section_index_base.c src/ui_toolbar_base.c src/ui_split_pane_base.c src/ui_grid_list_base.c src/ui_fab_base.c src/ui_icon_base.c src/ui_skeleton_base.c src/ui_avatar_group_base.c src/ui_avatar_base.c src/ui_timeline_base.c src/ui_slide_toggle_base.c src/ui_timepicker_base.c src/ui_toggle_base.c src/ui_checkbox_base.c src/ui_file_uploader_base.c src/ui_os_dialogs.c src/ui_tray_manager.c src/ui_auth.c src/ui_share.c src/ui_sensor_manager.c src/ui_intersection_observer.c src/ui_mutation_observer.c src/ui_coercion_utils.c src/ui_form_validators.c src/ui_runtime_schema.c src/ui_component_registry.c src/ui_app_state_registry.c src/ui_dynamic_context.c src/ui_workflow_engine.c src/ui_runtime_router.c src/ui_runtime_builder.c src/ui_runtime_eject.c src/ui_app_load.c src/ui_ffi_runtime.c src/ui_focus_trap.c src/ui_platform_detector.c src/ui_card_base.c src/ui_divider_base.c src/ui_input_base.c src/ui_form_field_base.c src/ui_sidenav_base.c src/ui_bottom_sheet_base.c src/ui_action_sheet_base.c src/ui_snackbar_base.c src/ui_scroll_base.c src/ui_slider_base.c src/ui_range_slider_base.c src/ui_wheel_picker_base.c src/ui_pull_to_refresh_base.c src/ui_text_node_base.c src/ui_spin_button_base.c src/ui_select_base.c src/ui_dialog_base.c src/ui_disclosure_base.c src/ui_svg.c src/ui_asset_streamer.c src/ui_shader_manager.c src/ui_renderer.c src/ui_renderer_gdiplus.c src/ui_renderer_coregraphics.c src/ui_renderer_gles_fallback.c src/ui_renderer_gl1.c src/ui_renderer_gles2.c src/ui_font_manager.c src/ui_font_provider_macos.c src/ui_font_provider_win32.c src/ui_font_provider_linux.c src/ui_stb_impl.c src/ui_text_layout.c src/ui_text_layout_hb.c src/ui_video_shaders.c src/ui_effects_shaders.c src/ui_vibrancy.c src/ui_focus_manager.c src/ui_keyboard_responder.c src/ui_aria.c src/ui_gesture.c src/ui_haptics.c src/ui_overlay_director.c src/ui_geometry.c src/ui_geometry_anchor.c src/ui_backdrop.c src/ui_router.c src/ui_e2e_headless.c src/ui_e2e_headful.c src/ui_web_animation.c src/ui_spring.c src/ui_test_visual.c src/ui_audio_alsa.c src/ui_audio_alsa.c src/ui_audio_coreaudio.c src/ui_audio_opensles.c src/ui_audio_wasapi.c src/ui_audio_webaudio.c src/ui_av_sync.c src/ui_image_decoder.c src/ui_image_base.c src/ui_transfer_list_base.c src/ui_search_bar_base.c src/ui_swipe_action_base.c src/ui_speed_dial_base.c src/ui_video_player_base.c src/ui_command_palette_base.c src/ui_image_jpeg.c src/ui_image_png.c src/ui_image_webp.c src/ui_menu_base.c src/ui_stepper_base.c src/ui_table_base.c src/ui_tabs_base.c src/ui_toast_manager_base.c src/ui_tooltip_base.c src/ui_tree_base.c src/ui_selection_model.c src/ui_pagination_base.c src/ui_sort_header_base.c src/ui_calendar_base.c src/ui_datepicker_base.c src/ui_date_range_picker_base.c src/ui_radio_group_base.c src/ui_chips_base.c src/ui_color_picker_base.c src/ui_video_avfoundation.c src/ui_video_ffmpeg.c src/ui_video_mediacodec.c src/ui_video_mf.c src/ui_virtual_scroll_base.c src/ui_breakpoint_observer.c src/ui_carousel_base.c src/ui_breadcrumbs_base.c src/ui_portal.c src/ui_context_menu_base.c src/ui_live_announcer.c src/ui_bidi_manager.c src/ui_progress_base.c src/ui_accordion_base.c src/ui_surface_base.c src/ui_link_base.c src/ui_meter_base.c src/ui_page_control_base.c src/ui_banner_base.c src/ui_button_group_base.c src/ui_empty_state_base.c src/ui_scaffold_base.c src/ui_menubar_base.c src/ui_badge_base.c src/ui_ink_base.c src/ui_webview_base.c src/ui_camera_base.c src/ui_map_view_base.c src/ui_rating_base.c src/ui_coachmark_base.c src/ui_rich_text_base.c src/ui_label_base.c src/ui_aspect_ratio_base.c src/ui_masonry_layout_base.c src/ui_preferences.c src/ui_pin_input_base.c src/ui_hover_card_base.c src/ui_titlebar_base.c src/ui_window_manager_base.c src/ui_rich_text_editor_base.c src/ui_datagrid_base.c src/ui_canonical_layout_base.c src/ui_window_controls_base.c src/ui_compositor_material_base.c src/ui_loupe_base.c src/ui_ribbon_base.c src/ui_miller_columns_base.c src/ui_property_grid_base.c src/ui_syntax_surface_base.c src/ui_node_graph_base.c src/ui_chart_base.c src/ui_chat_bubble_base.c src/ui_form_control.c src/ui_form_node.c src/ui_form_group.c src/ui_form_array.c src/ui_form_builder.c ${UI_DESIGN_SYSTEM_SRC} ${UI_DESIGN_SYSTEM_M3_SRC} ${UI_DESIGN_SYSTEM_CUPERTINO_SRC})
+    src/ui_fs.c src/ui_web_bridge.c src/ui_cssom.c src/ui_layout.c src/ui_css_parser.c src/ui_css_values.c src/ui_css_env.c src/ui_css_contain.c src/ui_css_overflow.c src/ui_css_lists.c src/ui_css_content.c src/ui_css_logical.c src/ui_css_scrollbars.c src/ui_css_round_display.c src/ui_css_ui.c src/ui_css_forms.c src/ui_css_motion.c src/ui_css_view_transition.c src/ui_css_speech.c src/ui_css_scroll_snap.c src/ui_css_scroll_anchoring.c src/ui_css_spatial_nav.c src/ui_css_highlight_api.c src/ui_css_page.c src/ui_css_gcpm.c src/ui_css_page_floats.c src/ui_cssom_api.c src/ui_cssom_view.c src/ui_component.c src/ui_modifier.c src/ui_drag_drop.c src/ui_list_base.c src/ui_data_source.c src/ui_input_mask.c src/ui_i18n.c src/ui_tree_grid_base.c src/ui_side_sheet_base.c src/ui_dockable_layout_base.c src/ui_hotkey_registry.c src/ui_scroll_spy.c src/ui_resizable_behavior.c src/ui_virtual_keyboard.c src/ui_predictive_back.c src/ui_nav_rail_base.c src/ui_bottom_nav_base.c src/ui_segmented_control_base.c src/ui_listbox_base.c src/ui_autocomplete_base.c src/ui_popover_base.c src/ui_clipboard.c src/ui_layout_observer.c src/ui_scroll_dispatcher.c src/ui_key_manager.c src/ui_textarea_autosize.c src/ui_ripple_base.c src/ui_alert_base.c src/ui_button_base.c src/ui_split_button_base.c src/ui_top_app_bar_base.c src/ui_bottom_app_bar_base.c src/ui_section_index_base.c src/ui_toolbar_base.c src/ui_floating_toolbar_base.c src/ui_adaptive_pane_scaffold_base.c src/ui_scroll_field_base.c src/ui_split_pane_base.c src/ui_grid_list_base.c src/ui_fab_base.c src/ui_icon_base.c src/ui_skeleton_base.c src/ui_avatar_group_base.c src/ui_avatar_base.c src/ui_timeline_base.c src/ui_slide_toggle_base.c src/ui_timepicker_base.c src/ui_toggle_base.c src/ui_checkbox_base.c src/ui_file_uploader_base.c src/ui_os_dialogs.c src/ui_tray_manager.c src/ui_auth.c src/ui_share.c src/ui_sensor_manager.c src/ui_intersection_observer.c src/ui_mutation_observer.c src/ui_coercion_utils.c src/ui_form_validators.c src/ui_runtime_schema.c src/ui_component_registry.c src/ui_app_state_registry.c src/ui_dynamic_context.c src/ui_workflow_engine.c src/ui_runtime_router.c src/ui_runtime_builder.c src/ui_runtime_eject.c src/ui_app_load.c src/ui_ffi_runtime.c src/ui_focus_trap.c src/ui_platform_detector.c src/ui_card_base.c src/ui_divider_base.c src/ui_input_base.c src/ui_form_field_base.c src/ui_sidenav_base.c src/ui_bottom_sheet_base.c src/ui_action_sheet_base.c src/ui_snackbar_base.c src/ui_scroll_base.c src/ui_slider_base.c src/ui_range_slider_base.c src/ui_wheel_picker_base.c src/ui_pull_to_refresh_base.c src/ui_text_node_base.c src/ui_spin_button_base.c src/ui_select_base.c src/ui_dialog_base.c src/ui_disclosure_base.c src/ui_svg.c src/ui_asset_streamer.c src/ui_shader_manager.c src/ui_renderer.c src/ui_renderer_gdiplus.c src/ui_renderer_coregraphics.c src/ui_renderer_gles_fallback.c src/ui_renderer_gl1.c src/ui_renderer_gles2.c src/ui_font_manager.c src/ui_font_provider_macos.c src/ui_font_provider_win32.c src/ui_font_provider_linux.c src/ui_stb_impl.c src/ui_text_layout.c src/ui_text_layout_hb.c src/ui_video_shaders.c src/ui_effects_shaders.c src/ui_vibrancy.c src/ui_focus_manager.c src/ui_keyboard_responder.c src/ui_aria.c src/ui_gesture.c src/ui_haptics.c src/ui_overlay_director.c src/ui_geometry.c src/ui_geometry_anchor.c src/ui_backdrop.c src/ui_router.c src/ui_e2e_headless.c src/ui_e2e_headful.c src/ui_web_animation.c src/ui_spring.c src/ui_test_visual.c src/ui_audio_alsa.c src/ui_audio_alsa.c src/ui_audio_coreaudio.c src/ui_audio_opensles.c src/ui_audio_wasapi.c src/ui_audio_webaudio.c src/ui_av_sync.c src/ui_image_decoder.c src/ui_image_base.c src/ui_transfer_list_base.c src/ui_search_bar_base.c src/ui_swipe_action_base.c src/ui_speed_dial_base.c src/ui_video_player_base.c src/ui_command_palette_base.c src/ui_image_jpeg.c src/ui_image_png.c src/ui_image_webp.c src/ui_menu_base.c src/ui_stepper_base.c src/ui_table_base.c src/ui_tabs_base.c src/ui_toast_manager_base.c src/ui_tooltip_base.c src/ui_tree_base.c src/ui_selection_model.c src/ui_pagination_base.c src/ui_sort_header_base.c src/ui_calendar_base.c src/ui_datepicker_base.c src/ui_date_range_picker_base.c src/ui_radio_group_base.c src/ui_chips_base.c src/ui_color_picker_base.c src/ui_video_avfoundation.c src/ui_video_ffmpeg.c src/ui_video_mediacodec.c src/ui_video_mf.c src/ui_virtual_scroll_base.c src/ui_breakpoint_observer.c src/ui_carousel_base.c src/ui_breadcrumbs_base.c src/ui_portal.c src/ui_context_menu_base.c src/ui_live_announcer.c src/ui_bidi_manager.c src/ui_progress_base.c src/ui_accordion_base.c src/ui_surface_base.c src/ui_link_base.c src/ui_meter_base.c src/ui_page_control_base.c src/ui_banner_base.c src/ui_button_group_base.c src/ui_empty_state_base.c src/ui_scaffold_base.c src/ui_menubar_base.c src/ui_badge_base.c src/ui_ink_base.c src/ui_webview_base.c src/ui_camera_base.c src/ui_map_view_base.c src/ui_rating_base.c src/ui_coachmark_base.c src/ui_rich_text_base.c src/ui_label_base.c src/ui_aspect_ratio_base.c src/ui_masonry_layout_base.c src/ui_preferences.c src/ui_pin_input_base.c src/ui_hover_card_base.c src/ui_titlebar_base.c src/ui_window_manager_base.c src/ui_rich_text_editor_base.c src/ui_datagrid_base.c src/ui_canonical_layout_base.c src/ui_window_controls_base.c src/ui_compositor_material_base.c src/ui_loupe_base.c src/ui_ribbon_base.c src/ui_miller_columns_base.c src/ui_property_grid_base.c src/ui_syntax_surface_base.c src/ui_node_graph_base.c src/ui_chart_base.c src/ui_chat_bubble_base.c src/ui_form_control.c src/ui_form_node.c src/ui_form_group.c src/ui_form_array.c src/ui_form_builder.c ${UI_DESIGN_SYSTEM_SRC} ${UI_DESIGN_SYSTEM_M3_SRC} ${UI_DESIGN_SYSTEM_M2_SRC} ${UI_DESIGN_SYSTEM_CUPERTINO_SRC})
 else()
     add_library(ui_engine STATIC src/ui_execution_context.c src/ui_tick_engine.c src/ui_thread_pool.c src/ui_reactor.c src/ui_promise.c src/ui_atomic.c src/ui_ring_buffer.c src/ui_timer.c src/ui_arena.c src/ui_pool.c src/ui_engine_core.c src/ui_event.c src/ui_signal.c src/ui_reactive_graph.c src/ui_computed.c src/ui_effect.c src/ui_color_space.c src/ui_color_quantization.c src/ui_design_tokens.c src/ui_tonal_palette.c src/ui_theme_provider.c src/ui_theme_manager.c src/ui_safe_area_manager.c src/ui_shape_family.c src/ui_typography_scale.c src/ui_state_layer.c src/ui_elevation.c src/ui_focus_ring.c src/ui_handle_manager.c src/ui_window_backend_win32.c src/ui_window_backend_macos.c src/ui_window_backend_ios.c src/ui_window_backend_android.c ${UI_WINDOW_BACKEND_LINUX_SRC} src/ui_window_backend_web.c src/ui_dom_node.c
-    src/ui_fs.c src/ui_web_bridge.c src/ui_cssom.c src/ui_layout.c src/ui_css_parser.c src/ui_css_values.c src/ui_css_env.c src/ui_css_contain.c src/ui_css_overflow.c src/ui_css_lists.c src/ui_css_content.c src/ui_css_logical.c src/ui_css_scrollbars.c src/ui_css_round_display.c src/ui_css_ui.c src/ui_css_forms.c src/ui_css_motion.c src/ui_css_view_transition.c src/ui_css_speech.c src/ui_css_scroll_snap.c src/ui_css_scroll_anchoring.c src/ui_css_spatial_nav.c src/ui_css_highlight_api.c src/ui_css_page.c src/ui_css_gcpm.c src/ui_css_page_floats.c src/ui_cssom_api.c src/ui_cssom_view.c src/ui_component.c src/ui_modifier.c src/ui_drag_drop.c src/ui_list_base.c src/ui_data_source.c src/ui_input_mask.c src/ui_i18n.c src/ui_tree_grid_base.c src/ui_side_sheet_base.c src/ui_dockable_layout_base.c src/ui_hotkey_registry.c src/ui_scroll_spy.c src/ui_resizable_behavior.c src/ui_virtual_keyboard.c src/ui_predictive_back.c src/ui_nav_rail_base.c src/ui_bottom_nav_base.c src/ui_segmented_control_base.c src/ui_listbox_base.c src/ui_autocomplete_base.c src/ui_popover_base.c src/ui_clipboard.c src/ui_layout_observer.c src/ui_scroll_dispatcher.c src/ui_key_manager.c src/ui_textarea_autosize.c src/ui_ripple_base.c src/ui_alert_base.c src/ui_button_base.c src/ui_split_button_base.c src/ui_top_app_bar_base.c src/ui_bottom_app_bar_base.c src/ui_section_index_base.c src/ui_toolbar_base.c src/ui_split_pane_base.c src/ui_grid_list_base.c src/ui_fab_base.c src/ui_icon_base.c src/ui_skeleton_base.c src/ui_avatar_group_base.c src/ui_avatar_base.c src/ui_timeline_base.c src/ui_slide_toggle_base.c src/ui_timepicker_base.c src/ui_toggle_base.c src/ui_checkbox_base.c src/ui_file_uploader_base.c src/ui_os_dialogs.c src/ui_tray_manager.c src/ui_auth.c src/ui_share.c src/ui_sensor_manager.c src/ui_intersection_observer.c src/ui_mutation_observer.c src/ui_coercion_utils.c src/ui_form_validators.c src/ui_runtime_schema.c src/ui_component_registry.c src/ui_app_state_registry.c src/ui_dynamic_context.c src/ui_workflow_engine.c src/ui_runtime_router.c src/ui_runtime_builder.c src/ui_runtime_eject.c src/ui_app_load.c src/ui_ffi_runtime.c src/ui_focus_trap.c src/ui_platform_detector.c src/ui_card_base.c src/ui_divider_base.c src/ui_input_base.c src/ui_form_field_base.c src/ui_sidenav_base.c src/ui_bottom_sheet_base.c src/ui_action_sheet_base.c src/ui_snackbar_base.c src/ui_scroll_base.c src/ui_slider_base.c src/ui_range_slider_base.c src/ui_wheel_picker_base.c src/ui_pull_to_refresh_base.c src/ui_text_node_base.c src/ui_spin_button_base.c src/ui_select_base.c src/ui_dialog_base.c src/ui_disclosure_base.c src/ui_svg.c src/ui_asset_streamer.c src/ui_shader_manager.c src/ui_renderer.c src/ui_renderer_gdiplus.c src/ui_renderer_coregraphics.c src/ui_renderer_gles_fallback.c src/ui_renderer_gl1.c src/ui_renderer_gles2.c src/ui_font_manager.c src/ui_font_provider_macos.c src/ui_font_provider_win32.c src/ui_font_provider_linux.c src/ui_stb_impl.c src/ui_text_layout.c src/ui_text_layout_hb.c src/ui_video_shaders.c src/ui_effects_shaders.c src/ui_vibrancy.c src/ui_focus_manager.c src/ui_keyboard_responder.c src/ui_aria.c src/ui_gesture.c src/ui_haptics.c src/ui_overlay_director.c src/ui_geometry.c src/ui_geometry_anchor.c src/ui_backdrop.c src/ui_router.c src/ui_e2e_headless.c src/ui_e2e_headful.c src/ui_web_animation.c src/ui_spring.c src/ui_test_visual.c src/ui_audio_alsa.c src/ui_audio_alsa.c src/ui_audio_coreaudio.c src/ui_audio_opensles.c src/ui_audio_wasapi.c src/ui_audio_webaudio.c src/ui_av_sync.c src/ui_image_decoder.c src/ui_image_base.c src/ui_transfer_list_base.c src/ui_search_bar_base.c src/ui_swipe_action_base.c src/ui_speed_dial_base.c src/ui_video_player_base.c src/ui_command_palette_base.c src/ui_image_jpeg.c src/ui_image_png.c src/ui_image_webp.c src/ui_menu_base.c src/ui_stepper_base.c src/ui_table_base.c src/ui_tabs_base.c src/ui_toast_manager_base.c src/ui_tooltip_base.c src/ui_tree_base.c src/ui_selection_model.c src/ui_pagination_base.c src/ui_sort_header_base.c src/ui_calendar_base.c src/ui_datepicker_base.c src/ui_date_range_picker_base.c src/ui_radio_group_base.c src/ui_chips_base.c src/ui_color_picker_base.c src/ui_video_avfoundation.c src/ui_video_ffmpeg.c src/ui_video_mediacodec.c src/ui_video_mf.c src/ui_virtual_scroll_base.c src/ui_breakpoint_observer.c src/ui_carousel_base.c src/ui_breadcrumbs_base.c src/ui_portal.c src/ui_context_menu_base.c src/ui_live_announcer.c src/ui_bidi_manager.c src/ui_progress_base.c src/ui_accordion_base.c src/ui_surface_base.c src/ui_link_base.c src/ui_meter_base.c src/ui_page_control_base.c src/ui_banner_base.c src/ui_button_group_base.c src/ui_empty_state_base.c src/ui_scaffold_base.c src/ui_menubar_base.c src/ui_badge_base.c src/ui_ink_base.c src/ui_webview_base.c src/ui_camera_base.c src/ui_map_view_base.c src/ui_rating_base.c src/ui_coachmark_base.c src/ui_rich_text_base.c src/ui_label_base.c src/ui_aspect_ratio_base.c src/ui_masonry_layout_base.c src/ui_preferences.c src/ui_pin_input_base.c src/ui_hover_card_base.c src/ui_titlebar_base.c src/ui_window_manager_base.c src/ui_rich_text_editor_base.c src/ui_datagrid_base.c src/ui_canonical_layout_base.c src/ui_window_controls_base.c src/ui_compositor_material_base.c src/ui_loupe_base.c src/ui_ribbon_base.c src/ui_miller_columns_base.c src/ui_property_grid_base.c src/ui_syntax_surface_base.c src/ui_node_graph_base.c src/ui_chart_base.c src/ui_chat_bubble_base.c src/ui_form_control.c src/ui_form_node.c src/ui_form_group.c src/ui_form_array.c src/ui_form_builder.c ${UI_DESIGN_SYSTEM_SRC} ${UI_DESIGN_SYSTEM_M3_SRC} ${UI_DESIGN_SYSTEM_CUPERTINO_SRC})
+    src/ui_fs.c src/ui_web_bridge.c src/ui_cssom.c src/ui_layout.c src/ui_css_parser.c src/ui_css_values.c src/ui_css_env.c src/ui_css_contain.c src/ui_css_overflow.c src/ui_css_lists.c src/ui_css_content.c src/ui_css_logical.c src/ui_css_scrollbars.c src/ui_css_round_display.c src/ui_css_ui.c src/ui_css_forms.c src/ui_css_motion.c src/ui_css_view_transition.c src/ui_css_speech.c src/ui_css_scroll_snap.c src/ui_css_scroll_anchoring.c src/ui_css_spatial_nav.c src/ui_css_highlight_api.c src/ui_css_page.c src/ui_css_gcpm.c src/ui_css_page_floats.c src/ui_cssom_api.c src/ui_cssom_view.c src/ui_component.c src/ui_modifier.c src/ui_drag_drop.c src/ui_list_base.c src/ui_data_source.c src/ui_input_mask.c src/ui_i18n.c src/ui_tree_grid_base.c src/ui_side_sheet_base.c src/ui_dockable_layout_base.c src/ui_hotkey_registry.c src/ui_scroll_spy.c src/ui_resizable_behavior.c src/ui_virtual_keyboard.c src/ui_predictive_back.c src/ui_nav_rail_base.c src/ui_bottom_nav_base.c src/ui_segmented_control_base.c src/ui_listbox_base.c src/ui_autocomplete_base.c src/ui_popover_base.c src/ui_clipboard.c src/ui_layout_observer.c src/ui_scroll_dispatcher.c src/ui_key_manager.c src/ui_textarea_autosize.c src/ui_ripple_base.c src/ui_alert_base.c src/ui_button_base.c src/ui_split_button_base.c src/ui_top_app_bar_base.c src/ui_bottom_app_bar_base.c src/ui_section_index_base.c src/ui_toolbar_base.c src/ui_floating_toolbar_base.c src/ui_adaptive_pane_scaffold_base.c src/ui_scroll_field_base.c src/ui_split_pane_base.c src/ui_grid_list_base.c src/ui_fab_base.c src/ui_icon_base.c src/ui_skeleton_base.c src/ui_avatar_group_base.c src/ui_avatar_base.c src/ui_timeline_base.c src/ui_slide_toggle_base.c src/ui_timepicker_base.c src/ui_toggle_base.c src/ui_checkbox_base.c src/ui_file_uploader_base.c src/ui_os_dialogs.c src/ui_tray_manager.c src/ui_auth.c src/ui_share.c src/ui_sensor_manager.c src/ui_intersection_observer.c src/ui_mutation_observer.c src/ui_coercion_utils.c src/ui_form_validators.c src/ui_runtime_schema.c src/ui_component_registry.c src/ui_app_state_registry.c src/ui_dynamic_context.c src/ui_workflow_engine.c src/ui_runtime_router.c src/ui_runtime_builder.c src/ui_runtime_eject.c src/ui_app_load.c src/ui_ffi_runtime.c src/ui_focus_trap.c src/ui_platform_detector.c src/ui_card_base.c src/ui_divider_base.c src/ui_input_base.c src/ui_form_field_base.c src/ui_sidenav_base.c src/ui_bottom_sheet_base.c src/ui_action_sheet_base.c src/ui_snackbar_base.c src/ui_scroll_base.c src/ui_slider_base.c src/ui_range_slider_base.c src/ui_wheel_picker_base.c src/ui_pull_to_refresh_base.c src/ui_text_node_base.c src/ui_spin_button_base.c src/ui_select_base.c src/ui_dialog_base.c src/ui_disclosure_base.c src/ui_svg.c src/ui_asset_streamer.c src/ui_shader_manager.c src/ui_renderer.c src/ui_renderer_gdiplus.c src/ui_renderer_coregraphics.c src/ui_renderer_gles_fallback.c src/ui_renderer_gl1.c src/ui_renderer_gles2.c src/ui_font_manager.c src/ui_font_provider_macos.c src/ui_font_provider_win32.c src/ui_font_provider_linux.c src/ui_stb_impl.c src/ui_text_layout.c src/ui_text_layout_hb.c src/ui_video_shaders.c src/ui_effects_shaders.c src/ui_vibrancy.c src/ui_focus_manager.c src/ui_keyboard_responder.c src/ui_aria.c src/ui_gesture.c src/ui_haptics.c src/ui_overlay_director.c src/ui_geometry.c src/ui_geometry_anchor.c src/ui_backdrop.c src/ui_router.c src/ui_e2e_headless.c src/ui_e2e_headful.c src/ui_web_animation.c src/ui_spring.c src/ui_test_visual.c src/ui_audio_alsa.c src/ui_audio_alsa.c src/ui_audio_coreaudio.c src/ui_audio_opensles.c src/ui_audio_wasapi.c src/ui_audio_webaudio.c src/ui_av_sync.c src/ui_image_decoder.c src/ui_image_base.c src/ui_transfer_list_base.c src/ui_search_bar_base.c src/ui_swipe_action_base.c src/ui_speed_dial_base.c src/ui_video_player_base.c src/ui_command_palette_base.c src/ui_image_jpeg.c src/ui_image_png.c src/ui_image_webp.c src/ui_menu_base.c src/ui_stepper_base.c src/ui_table_base.c src/ui_tabs_base.c src/ui_toast_manager_base.c src/ui_tooltip_base.c src/ui_tree_base.c src/ui_selection_model.c src/ui_pagination_base.c src/ui_sort_header_base.c src/ui_calendar_base.c src/ui_datepicker_base.c src/ui_date_range_picker_base.c src/ui_radio_group_base.c src/ui_chips_base.c src/ui_color_picker_base.c src/ui_video_avfoundation.c src/ui_video_ffmpeg.c src/ui_video_mediacodec.c src/ui_video_mf.c src/ui_virtual_scroll_base.c src/ui_breakpoint_observer.c src/ui_carousel_base.c src/ui_breadcrumbs_base.c src/ui_portal.c src/ui_context_menu_base.c src/ui_live_announcer.c src/ui_bidi_manager.c src/ui_progress_base.c src/ui_accordion_base.c src/ui_surface_base.c src/ui_link_base.c src/ui_meter_base.c src/ui_page_control_base.c src/ui_banner_base.c src/ui_button_group_base.c src/ui_empty_state_base.c src/ui_scaffold_base.c src/ui_menubar_base.c src/ui_badge_base.c src/ui_ink_base.c src/ui_webview_base.c src/ui_camera_base.c src/ui_map_view_base.c src/ui_rating_base.c src/ui_coachmark_base.c src/ui_rich_text_base.c src/ui_label_base.c src/ui_aspect_ratio_base.c src/ui_masonry_layout_base.c src/ui_preferences.c src/ui_pin_input_base.c src/ui_hover_card_base.c src/ui_titlebar_base.c src/ui_window_manager_base.c src/ui_rich_text_editor_base.c src/ui_datagrid_base.c src/ui_canonical_layout_base.c src/ui_window_controls_base.c src/ui_compositor_material_base.c src/ui_loupe_base.c src/ui_ribbon_base.c src/ui_miller_columns_base.c src/ui_property_grid_base.c src/ui_syntax_surface_base.c src/ui_node_graph_base.c src/ui_chart_base.c src/ui_chat_bubble_base.c src/ui_form_control.c src/ui_form_node.c src/ui_form_group.c src/ui_form_array.c src/ui_form_builder.c ${UI_DESIGN_SYSTEM_SRC} ${UI_DESIGN_SYSTEM_M3_SRC} ${UI_DESIGN_SYSTEM_M2_SRC} ${UI_DESIGN_SYSTEM_CUPERTINO_SRC})
 endif()
 
 target_link_platform_libraries(ui_engine PUBLIC)
@@ -432,6 +464,9 @@ if(UI_ENABLE_DESIGN_SYSTEM_M3)
 endif()
 if(UI_ENABLE_DESIGN_SYSTEM_M3_EXPRESSIVE)
     target_compile_definitions(ui_engine PUBLIC UI_HAS_DESIGN_SYSTEM_M3_EXPRESSIVE)
+endif()
+if(UI_ENABLE_DESIGN_SYSTEM_M2)
+    target_compile_definitions(ui_engine PUBLIC UI_HAS_DESIGN_SYSTEM_M2)
 endif()
 if(UI_ENABLE_DESIGN_SYSTEM_CUPERTINO)
     target_compile_definitions(ui_engine PUBLIC UI_HAS_DESIGN_SYSTEM_CUPERTINO)
@@ -619,6 +654,9 @@ if(TARGET cfs AND MSVC)
 endif()
 
 target_link_libraries(ui_engine PRIVATE c-abstract-http cfs c-orm)
+if(WIN32 OR MSVC)
+    target_link_libraries(ui_engine PRIVATE mfplat mfuuid ole32 user32 gdi32 gdiplus opengl32 windowscodecs)
+endif()
 target_include_directories(ui_engine PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>" "$<INSTALL_INTERFACE:include>")
 target_include_directories(ui_engine PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src")
 
@@ -642,7 +680,7 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
 
     # Recompile library with mock allocator injected for OOM tests
     add_library(ui_engine_test STATIC src/ui_execution_context.c src/ui_tick_engine.c src/ui_thread_pool.c src/ui_reactor.c src/ui_promise.c src/ui_atomic.c src/ui_ring_buffer.c src/ui_timer.c src/ui_arena.c src/ui_pool.c src/ui_engine_core.c src/ui_event.c src/ui_signal.c src/ui_reactive_graph.c src/ui_computed.c src/ui_effect.c src/ui_color_space.c src/ui_color_quantization.c src/ui_design_tokens.c src/ui_tonal_palette.c src/ui_theme_provider.c src/ui_theme_manager.c src/ui_safe_area_manager.c src/ui_shape_family.c src/ui_typography_scale.c src/ui_state_layer.c src/ui_elevation.c src/ui_focus_ring.c src/ui_handle_manager.c src/ui_window_backend_win32.c src/ui_window_backend_macos.c src/ui_window_backend_ios.c src/ui_window_backend_android.c ${UI_WINDOW_BACKEND_LINUX_SRC} src/ui_window_backend_web.c src/ui_dom_node.c
-    src/ui_fs.c src/ui_web_bridge.c src/ui_cssom.c src/ui_layout.c src/ui_css_parser.c src/ui_css_values.c src/ui_css_env.c src/ui_css_contain.c src/ui_css_overflow.c src/ui_css_lists.c src/ui_css_content.c src/ui_css_logical.c src/ui_css_scrollbars.c src/ui_css_round_display.c src/ui_css_ui.c src/ui_css_forms.c src/ui_css_motion.c src/ui_css_view_transition.c src/ui_css_speech.c src/ui_css_scroll_snap.c src/ui_css_scroll_anchoring.c src/ui_css_spatial_nav.c src/ui_css_highlight_api.c src/ui_css_page.c src/ui_css_gcpm.c src/ui_css_page_floats.c src/ui_cssom_api.c src/ui_cssom_view.c src/ui_component.c src/ui_modifier.c src/ui_drag_drop.c src/ui_list_base.c src/ui_data_source.c src/ui_input_mask.c src/ui_i18n.c src/ui_tree_grid_base.c src/ui_side_sheet_base.c src/ui_dockable_layout_base.c src/ui_hotkey_registry.c src/ui_scroll_spy.c src/ui_resizable_behavior.c src/ui_virtual_keyboard.c src/ui_predictive_back.c src/ui_nav_rail_base.c src/ui_bottom_nav_base.c src/ui_segmented_control_base.c src/ui_listbox_base.c src/ui_autocomplete_base.c src/ui_popover_base.c src/ui_clipboard.c src/ui_layout_observer.c src/ui_scroll_dispatcher.c src/ui_key_manager.c src/ui_textarea_autosize.c src/ui_ripple_base.c src/ui_alert_base.c src/ui_button_base.c src/ui_split_button_base.c src/ui_top_app_bar_base.c src/ui_bottom_app_bar_base.c src/ui_section_index_base.c src/ui_toolbar_base.c src/ui_split_pane_base.c src/ui_grid_list_base.c src/ui_fab_base.c src/ui_icon_base.c src/ui_skeleton_base.c src/ui_avatar_group_base.c src/ui_avatar_base.c src/ui_timeline_base.c src/ui_slide_toggle_base.c src/ui_timepicker_base.c src/ui_toggle_base.c src/ui_checkbox_base.c src/ui_file_uploader_base.c src/ui_os_dialogs.c src/ui_tray_manager.c src/ui_auth.c src/ui_share.c src/ui_sensor_manager.c src/ui_intersection_observer.c src/ui_mutation_observer.c src/ui_coercion_utils.c src/ui_form_validators.c src/ui_runtime_schema.c src/ui_component_registry.c src/ui_app_state_registry.c src/ui_dynamic_context.c src/ui_workflow_engine.c src/ui_runtime_router.c src/ui_runtime_builder.c src/ui_runtime_eject.c src/ui_app_load.c src/ui_ffi_runtime.c src/ui_focus_trap.c src/ui_platform_detector.c src/ui_card_base.c src/ui_divider_base.c src/ui_input_base.c src/ui_form_field_base.c src/ui_sidenav_base.c src/ui_bottom_sheet_base.c src/ui_action_sheet_base.c src/ui_snackbar_base.c src/ui_scroll_base.c src/ui_slider_base.c src/ui_range_slider_base.c src/ui_wheel_picker_base.c src/ui_pull_to_refresh_base.c src/ui_text_node_base.c src/ui_spin_button_base.c src/ui_select_base.c src/ui_dialog_base.c src/ui_disclosure_base.c src/ui_audio_wasapi.c src/ui_audio_coreaudio.c src/ui_audio_alsa.c src/ui_audio_opensles.c src/ui_audio_webaudio.c src/ui_video_mf.c src/ui_video_avfoundation.c src/ui_video_mediacodec.c src/ui_video_ffmpeg.c src/ui_av_sync.c src/ui_image_decoder.c src/ui_image_base.c src/ui_transfer_list_base.c src/ui_search_bar_base.c src/ui_swipe_action_base.c src/ui_speed_dial_base.c src/ui_video_player_base.c src/ui_command_palette_base.c src/ui_image_png.c src/ui_image_jpeg.c src/ui_image_webp.c src/ui_svg.c src/ui_asset_streamer.c src/ui_shader_manager.c src/ui_renderer.c src/ui_renderer_gdiplus.c src/ui_renderer_coregraphics.c src/ui_renderer_gles_fallback.c src/ui_renderer_gl1.c src/ui_renderer_gles2.c src/ui_font_manager.c src/ui_font_provider_macos.c src/ui_font_provider_win32.c src/ui_font_provider_linux.c src/ui_stb_impl.c src/ui_text_layout.c src/ui_text_layout_hb.c src/ui_video_shaders.c src/ui_effects_shaders.c src/ui_vibrancy.c src/ui_focus_manager.c src/ui_keyboard_responder.c src/ui_aria.c src/ui_gesture.c src/ui_haptics.c src/ui_overlay_director.c src/ui_geometry.c src/ui_geometry_anchor.c src/ui_backdrop.c src/ui_router.c src/ui_e2e_headless.c src/ui_e2e_headful.c src/ui_web_animation.c src/ui_spring.c src/ui_test_visual.c src/ui_audio_alsa.c src/ui_menu_base.c src/ui_stepper_base.c src/ui_table_base.c src/ui_tabs_base.c src/ui_toast_manager_base.c src/ui_tooltip_base.c src/ui_tree_base.c src/ui_selection_model.c src/ui_pagination_base.c src/ui_sort_header_base.c src/ui_calendar_base.c src/ui_datepicker_base.c src/ui_date_range_picker_base.c src/ui_radio_group_base.c src/ui_chips_base.c src/ui_color_picker_base.c src/ui_virtual_scroll_base.c src/ui_breakpoint_observer.c src/ui_carousel_base.c src/ui_breadcrumbs_base.c src/ui_portal.c src/ui_context_menu_base.c src/ui_live_announcer.c src/ui_bidi_manager.c src/ui_progress_base.c src/ui_accordion_base.c src/ui_surface_base.c src/ui_link_base.c src/ui_meter_base.c src/ui_page_control_base.c src/ui_banner_base.c src/ui_button_group_base.c src/ui_empty_state_base.c src/ui_scaffold_base.c src/ui_menubar_base.c src/ui_badge_base.c src/ui_ink_base.c src/ui_webview_base.c src/ui_camera_base.c src/ui_map_view_base.c src/ui_rating_base.c src/ui_coachmark_base.c src/ui_rich_text_base.c src/ui_label_base.c src/ui_aspect_ratio_base.c src/ui_masonry_layout_base.c src/ui_preferences.c src/ui_pin_input_base.c src/ui_hover_card_base.c src/ui_titlebar_base.c src/ui_window_manager_base.c src/ui_rich_text_editor_base.c src/ui_datagrid_base.c src/ui_canonical_layout_base.c src/ui_window_controls_base.c src/ui_compositor_material_base.c src/ui_loupe_base.c src/ui_ribbon_base.c src/ui_miller_columns_base.c src/ui_property_grid_base.c src/ui_syntax_surface_base.c src/ui_node_graph_base.c src/ui_chart_base.c src/ui_chat_bubble_base.c src/ui_form_control.c src/ui_form_node.c src/ui_form_group.c src/ui_form_array.c src/ui_form_builder.c ${UI_DESIGN_SYSTEM_SRC} ${UI_DESIGN_SYSTEM_M3_SRC} ${UI_DESIGN_SYSTEM_CUPERTINO_SRC})
+    src/ui_fs.c src/ui_web_bridge.c src/ui_cssom.c src/ui_layout.c src/ui_css_parser.c src/ui_css_values.c src/ui_css_env.c src/ui_css_contain.c src/ui_css_overflow.c src/ui_css_lists.c src/ui_css_content.c src/ui_css_logical.c src/ui_css_scrollbars.c src/ui_css_round_display.c src/ui_css_ui.c src/ui_css_forms.c src/ui_css_motion.c src/ui_css_view_transition.c src/ui_css_speech.c src/ui_css_scroll_snap.c src/ui_css_scroll_anchoring.c src/ui_css_spatial_nav.c src/ui_css_highlight_api.c src/ui_css_page.c src/ui_css_gcpm.c src/ui_css_page_floats.c src/ui_cssom_api.c src/ui_cssom_view.c src/ui_component.c src/ui_modifier.c src/ui_drag_drop.c src/ui_list_base.c src/ui_data_source.c src/ui_input_mask.c src/ui_i18n.c src/ui_tree_grid_base.c src/ui_side_sheet_base.c src/ui_dockable_layout_base.c src/ui_hotkey_registry.c src/ui_scroll_spy.c src/ui_resizable_behavior.c src/ui_virtual_keyboard.c src/ui_predictive_back.c src/ui_nav_rail_base.c src/ui_bottom_nav_base.c src/ui_segmented_control_base.c src/ui_listbox_base.c src/ui_autocomplete_base.c src/ui_popover_base.c src/ui_clipboard.c src/ui_layout_observer.c src/ui_scroll_dispatcher.c src/ui_key_manager.c src/ui_textarea_autosize.c src/ui_ripple_base.c src/ui_alert_base.c src/ui_button_base.c src/ui_split_button_base.c src/ui_top_app_bar_base.c src/ui_bottom_app_bar_base.c src/ui_section_index_base.c src/ui_toolbar_base.c src/ui_floating_toolbar_base.c src/ui_adaptive_pane_scaffold_base.c src/ui_scroll_field_base.c src/ui_split_pane_base.c src/ui_grid_list_base.c src/ui_fab_base.c src/ui_icon_base.c src/ui_skeleton_base.c src/ui_avatar_group_base.c src/ui_avatar_base.c src/ui_timeline_base.c src/ui_slide_toggle_base.c src/ui_timepicker_base.c src/ui_toggle_base.c src/ui_checkbox_base.c src/ui_file_uploader_base.c src/ui_os_dialogs.c src/ui_tray_manager.c src/ui_auth.c src/ui_share.c src/ui_sensor_manager.c src/ui_intersection_observer.c src/ui_mutation_observer.c src/ui_coercion_utils.c src/ui_form_validators.c src/ui_runtime_schema.c src/ui_component_registry.c src/ui_app_state_registry.c src/ui_dynamic_context.c src/ui_workflow_engine.c src/ui_runtime_router.c src/ui_runtime_builder.c src/ui_runtime_eject.c src/ui_app_load.c src/ui_ffi_runtime.c src/ui_focus_trap.c src/ui_platform_detector.c src/ui_card_base.c src/ui_divider_base.c src/ui_input_base.c src/ui_form_field_base.c src/ui_sidenav_base.c src/ui_bottom_sheet_base.c src/ui_action_sheet_base.c src/ui_snackbar_base.c src/ui_scroll_base.c src/ui_slider_base.c src/ui_range_slider_base.c src/ui_wheel_picker_base.c src/ui_pull_to_refresh_base.c src/ui_text_node_base.c src/ui_spin_button_base.c src/ui_select_base.c src/ui_dialog_base.c src/ui_disclosure_base.c src/ui_audio_wasapi.c src/ui_audio_coreaudio.c src/ui_audio_alsa.c src/ui_audio_opensles.c src/ui_audio_webaudio.c src/ui_video_mf.c src/ui_video_avfoundation.c src/ui_video_mediacodec.c src/ui_video_ffmpeg.c src/ui_av_sync.c src/ui_image_decoder.c src/ui_image_base.c src/ui_transfer_list_base.c src/ui_search_bar_base.c src/ui_swipe_action_base.c src/ui_speed_dial_base.c src/ui_video_player_base.c src/ui_command_palette_base.c src/ui_image_png.c src/ui_image_jpeg.c src/ui_image_webp.c src/ui_svg.c src/ui_asset_streamer.c src/ui_shader_manager.c src/ui_renderer.c src/ui_renderer_gdiplus.c src/ui_renderer_coregraphics.c src/ui_renderer_gles_fallback.c src/ui_renderer_gl1.c src/ui_renderer_gles2.c src/ui_font_manager.c src/ui_font_provider_macos.c src/ui_font_provider_win32.c src/ui_font_provider_linux.c src/ui_stb_impl.c src/ui_text_layout.c src/ui_text_layout_hb.c src/ui_video_shaders.c src/ui_effects_shaders.c src/ui_vibrancy.c src/ui_focus_manager.c src/ui_keyboard_responder.c src/ui_aria.c src/ui_gesture.c src/ui_haptics.c src/ui_overlay_director.c src/ui_geometry.c src/ui_geometry_anchor.c src/ui_backdrop.c src/ui_router.c src/ui_e2e_headless.c src/ui_e2e_headful.c src/ui_web_animation.c src/ui_spring.c src/ui_test_visual.c src/ui_audio_alsa.c src/ui_menu_base.c src/ui_stepper_base.c src/ui_table_base.c src/ui_tabs_base.c src/ui_toast_manager_base.c src/ui_tooltip_base.c src/ui_tree_base.c src/ui_selection_model.c src/ui_pagination_base.c src/ui_sort_header_base.c src/ui_calendar_base.c src/ui_datepicker_base.c src/ui_date_range_picker_base.c src/ui_radio_group_base.c src/ui_chips_base.c src/ui_color_picker_base.c src/ui_virtual_scroll_base.c src/ui_breakpoint_observer.c src/ui_carousel_base.c src/ui_breadcrumbs_base.c src/ui_portal.c src/ui_context_menu_base.c src/ui_live_announcer.c src/ui_bidi_manager.c src/ui_progress_base.c src/ui_accordion_base.c src/ui_surface_base.c src/ui_link_base.c src/ui_meter_base.c src/ui_page_control_base.c src/ui_banner_base.c src/ui_button_group_base.c src/ui_empty_state_base.c src/ui_scaffold_base.c src/ui_menubar_base.c src/ui_badge_base.c src/ui_ink_base.c src/ui_webview_base.c src/ui_camera_base.c src/ui_map_view_base.c src/ui_rating_base.c src/ui_coachmark_base.c src/ui_rich_text_base.c src/ui_label_base.c src/ui_aspect_ratio_base.c src/ui_masonry_layout_base.c src/ui_preferences.c src/ui_pin_input_base.c src/ui_hover_card_base.c src/ui_titlebar_base.c src/ui_window_manager_base.c src/ui_rich_text_editor_base.c src/ui_datagrid_base.c src/ui_canonical_layout_base.c src/ui_window_controls_base.c src/ui_compositor_material_base.c src/ui_loupe_base.c src/ui_ribbon_base.c src/ui_miller_columns_base.c src/ui_property_grid_base.c src/ui_syntax_surface_base.c src/ui_node_graph_base.c src/ui_chart_base.c src/ui_chat_bubble_base.c src/ui_form_control.c src/ui_form_node.c src/ui_form_group.c src/ui_form_array.c src/ui_form_builder.c ${UI_DESIGN_SYSTEM_SRC} ${UI_DESIGN_SYSTEM_M3_SRC} ${UI_DESIGN_SYSTEM_M2_SRC} ${UI_DESIGN_SYSTEM_CUPERTINO_SRC})
     target_include_directories(ui_engine_test PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>")
     target_include_directories(ui_engine_test PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src")
     target_compile_definitions(ui_engine_test PUBLIC C_MULTIPLATFORM_MALLOC=ui_mock_malloc C_MULTIPLATFORM_FREE=ui_mock_free C_MULTIPLATFORM_REALLOC=ui_mock_realloc C_MULTIPLATFORM_STRDUP=ui_mock_strdup UI_TEST_MOCK_ALLOC=1)
@@ -651,6 +689,9 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
     endif()
     if(UI_ENABLE_DESIGN_SYSTEM_M3_EXPRESSIVE)
         target_compile_definitions(ui_engine_test PUBLIC UI_HAS_DESIGN_SYSTEM_M3_EXPRESSIVE)
+    endif()
+    if(UI_ENABLE_DESIGN_SYSTEM_M2)
+        target_compile_definitions(ui_engine_test PUBLIC UI_HAS_DESIGN_SYSTEM_M2)
     endif()
     if(UI_ENABLE_DESIGN_SYSTEM_CUPERTINO)
         target_compile_definitions(ui_engine_test PUBLIC UI_HAS_DESIGN_SYSTEM_CUPERTINO)
@@ -662,6 +703,9 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
     endif()
 
     target_link_libraries(ui_engine_test PRIVATE c-abstract-http cfs c-orm)
+    if(WIN32 OR MSVC)
+        target_link_libraries(ui_engine_test PRIVATE mfplat mfuuid ole32 user32 gdi32 gdiplus opengl32 windowscodecs)
+    endif()
 
     if(MSVC)
         target_compile_options(ui_engine_test PRIVATE /W4 /WX /Gy)
@@ -1077,6 +1121,18 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
     add_executable(test_ui_toolbar_base tests/test_ui_toolbar_base.c tests/ui_test_mock_mem.c)
     target_link_libraries(test_ui_toolbar_base ui_engine_test)
     add_test(NAME test_ui_toolbar_base COMMAND test_ui_toolbar_base)
+
+    add_executable(test_ui_floating_toolbar_base tests/test_ui_floating_toolbar_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_floating_toolbar_base ui_engine_test)
+    add_test(NAME test_ui_floating_toolbar_base COMMAND test_ui_floating_toolbar_base)
+
+    add_executable(test_ui_adaptive_pane_scaffold_base tests/test_ui_adaptive_pane_scaffold_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_adaptive_pane_scaffold_base ui_engine_test)
+    add_test(NAME test_ui_adaptive_pane_scaffold_base COMMAND test_ui_adaptive_pane_scaffold_base)
+
+    add_executable(test_ui_scroll_field_base tests/test_ui_scroll_field_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_scroll_field_base ui_engine_test)
+    add_test(NAME test_ui_scroll_field_base COMMAND test_ui_scroll_field_base)
 
     add_executable(test_ui_split_pane_base tests/test_ui_split_pane_base.c tests/ui_test_mock_mem.c)
     target_link_libraries(test_ui_split_pane_base ui_engine_test)
@@ -1703,6 +1759,9 @@ add_test(NAME test_ui_breakpoint_observer COMMAND test_ui_breakpoint_observer)
         add_test(NAME test_ui_visual COMMAND test_ui_visual)
     add_executable(test_ui_audio_coreaudio tests/test_ui_audio_coreaudio.c tests/ui_test_mock_mem.c)
     target_link_libraries(test_ui_audio_coreaudio ui_engine_test)
+    if(APPLE)
+        target_link_libraries(test_ui_audio_coreaudio "-framework AudioToolbox" "-framework CoreFoundation")
+    endif()
     add_test(NAME test_ui_audio_coreaudio COMMAND test_ui_audio_coreaudio)
 
     add_executable(test_ui_audio_opensles tests/test_ui_audio_opensles.c tests/ui_test_mock_mem.c)
@@ -1719,6 +1778,9 @@ add_test(NAME test_ui_breakpoint_observer COMMAND test_ui_breakpoint_observer)
 
     add_executable(test_ui_video_avfoundation tests/test_ui_video_avfoundation.c tests/ui_test_mock_mem.c)
     target_link_libraries(test_ui_video_avfoundation ui_engine_test)
+    if(APPLE)
+        target_link_libraries(test_ui_video_avfoundation "-framework VideoToolbox" "-framework CoreMedia" "-framework CoreFoundation")
+    endif()
     add_test(NAME test_ui_video_avfoundation COMMAND test_ui_video_avfoundation)
 
     add_executable(test_ui_video_mediacodec tests/test_ui_video_mediacodec.c tests/ui_test_mock_mem.c)
@@ -1866,6 +1928,76 @@ add_test(NAME test_ui_breakpoint_observer COMMAND test_ui_breakpoint_observer)
         add_executable(test_material3_visual_catalog tests/test_material3_visual_catalog.c tests/ui_test_mock_mem.c)
         target_link_libraries(test_material3_visual_catalog ui_engine_test)
         add_test(NAME test_material3_visual_catalog COMMAND test_material3_visual_catalog)
+
+        add_executable(test_material3_top_app_bar tests/test_material3_top_app_bar.c tests/ui_test_mock_mem.c)
+        target_link_libraries(test_material3_top_app_bar ui_engine_test)
+        add_test(NAME test_material3_top_app_bar COMMAND test_material3_top_app_bar)
+
+        add_executable(test_material3_floating_toolbar tests/test_material3_floating_toolbar.c tests/ui_test_mock_mem.c)
+        target_link_libraries(test_material3_floating_toolbar ui_engine_test)
+        add_test(NAME test_material3_floating_toolbar COMMAND test_material3_floating_toolbar)
+
+        add_executable(test_material3_fab_menu tests/test_material3_fab_menu.c tests/ui_test_mock_mem.c)
+        target_link_libraries(test_material3_fab_menu ui_engine_test)
+        add_test(NAME test_material3_fab_menu COMMAND test_material3_fab_menu)
+
+        add_executable(test_material3_date_time_pickers tests/test_material3_date_time_pickers.c tests/ui_test_mock_mem.c)
+        target_link_libraries(test_material3_date_time_pickers ui_engine_test)
+        add_test(NAME test_material3_date_time_pickers COMMAND test_material3_date_time_pickers)
+
+        add_executable(test_material3_adaptive tests/test_material3_adaptive.c tests/ui_test_mock_mem.c)
+        target_link_libraries(test_material3_adaptive ui_engine_test)
+        add_test(NAME test_material3_adaptive COMMAND test_material3_adaptive)
+    endif()
+
+    if(UI_ENABLE_DESIGN_SYSTEM_M2)
+        add_executable(test_material2_elevation tests/test_material2_elevation.c tests/ui_test_mock_mem.c)
+        target_link_libraries(test_material2_elevation ui_engine_test)
+        add_test(NAME test_material2_elevation COMMAND test_material2_elevation)
+
+        add_executable(test_material2_shape tests/test_material2_shape.c tests/ui_test_mock_mem.c)
+        target_link_libraries(test_material2_shape ui_engine_test)
+        add_test(NAME test_material2_shape COMMAND test_material2_shape)
+
+        add_executable(test_material2_navigation_drawer tests/test_material2_navigation_drawer.c tests/ui_test_mock_mem.c)
+        target_link_libraries(test_material2_navigation_drawer ui_engine_test)
+        add_test(NAME test_material2_navigation_drawer COMMAND test_material2_navigation_drawer)
+
+        add_executable(test_material2_selection_controls tests/test_material2_selection_controls.c tests/ui_test_mock_mem.c)
+        target_link_libraries(test_material2_selection_controls ui_engine_test)
+        add_test(NAME test_material2_selection_controls COMMAND test_material2_selection_controls)
+
+        add_executable(test_material2_text_field tests/test_material2_text_field.c tests/ui_test_mock_mem.c)
+        target_link_libraries(test_material2_text_field ui_engine_test)
+        add_test(NAME test_material2_text_field COMMAND test_material2_text_field)
+
+        add_executable(test_material2_overlays tests/test_material2_overlays.c tests/ui_test_mock_mem.c)
+        target_link_libraries(test_material2_overlays ui_engine_test)
+        add_test(NAME test_material2_overlays COMMAND test_material2_overlays)
+
+        add_executable(test_material2_theme_card tests/test_material2_theme_card.c tests/ui_test_mock_mem.c)
+        target_link_libraries(test_material2_theme_card ui_engine_test)
+        add_test(NAME test_material2_theme_card COMMAND test_material2_theme_card)
+
+        add_executable(test_material2_button tests/test_material2_button.c tests/ui_test_mock_mem.c)
+        target_link_libraries(test_material2_button ui_engine_test)
+        add_test(NAME test_material2_button COMMAND test_material2_button)
+
+        add_executable(test_material2_fab tests/test_material2_fab.c tests/ui_test_mock_mem.c)
+        target_link_libraries(test_material2_fab ui_engine_test)
+        add_test(NAME test_material2_fab COMMAND test_material2_fab)
+
+        add_executable(test_material2_card tests/test_material2_card.c tests/ui_test_mock_mem.c)
+        target_link_libraries(test_material2_card ui_engine_test)
+        add_test(NAME test_material2_card COMMAND test_material2_card)
+
+        add_executable(test_material2_top_app_bar tests/test_material2_top_app_bar.c tests/ui_test_mock_mem.c)
+        target_link_libraries(test_material2_top_app_bar ui_engine_test)
+        add_test(NAME test_material2_top_app_bar COMMAND test_material2_top_app_bar)
+
+        add_executable(test_material2_bottom_navigation tests/test_material2_bottom_navigation.c tests/ui_test_mock_mem.c)
+        target_link_libraries(test_material2_bottom_navigation ui_engine_test)
+        add_test(NAME test_material2_bottom_navigation COMMAND test_material2_bottom_navigation)
     endif()
 
     if(UI_ENABLE_DESIGN_SYSTEM_CUPERTINO)
@@ -2284,4 +2416,55 @@ if ((CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING) OR C_MULTIPLATF
     endif()
     target_link_libraries(test_example_oauth2_sync_flow PRIVATE ui_engine_test parson)
     add_test(NAME test_example_oauth2_sync_flow COMMAND test_example_oauth2_sync_flow)
+
+    add_executable(test_compose_material_catalog
+        tests/test_compose_material_catalog.c
+        tests/test_sampler_home.c
+        tests/ui_test_mock_mem.c
+        src/sampler/sampler_error.c
+        src/sampler/sampler_models.c
+        src/sampler/sampler_theme.c
+        src/sampler/sampler_preferences.c
+        src/sampler/sampler_nav.c
+        src/sampler/sampler_top_app_bar.c
+        src/sampler/sampler_specification_screen.c
+        src/sampler/sampler_home.c
+        src/sampler/sampler_component_screen.c
+        src/sampler/sampler_example_screen.c
+        src/sampler/sampler_theme_picker.c
+        src/sampler/m2/m2_home.c
+        src/sampler/samples/sample_buttons.c
+        src/sampler/samples/sample_stub.c
+    )
+    target_include_directories(test_compose_material_catalog PRIVATE include vendor tests src)
+    target_compile_definitions(test_compose_material_catalog PRIVATE
+        C_MULTIPLATFORM_MALLOC=ui_mock_malloc
+        C_MULTIPLATFORM_FREE=ui_mock_free
+        C_MULTIPLATFORM_REALLOC=ui_mock_realloc
+        C_MULTIPLATFORM_STRDUP=ui_mock_strdup
+        UI_TEST_MOCK_ALLOC=1
+    )
+    if(MSVC)
+        target_compile_options(test_compose_material_catalog PRIVATE /W4 /WX /Za)
+    else()
+        target_compile_options(test_compose_material_catalog PRIVATE -Wall -Wextra -Wpedantic -Werror -Wdeclaration-after-statement -std=c89)
+    endif()
+    target_link_libraries(test_compose_material_catalog PRIVATE ui_engine)
+    if(NOT MSVC)
+        target_link_libraries(test_compose_material_catalog PRIVATE m)
+    endif()
+    add_test(NAME test_compose_material_catalog COMMAND test_compose_material_catalog)
+endif()
+
+
+if(APPLE)
+
+
+endif()
+
+
+
+if(APPLE)
+    target_link_libraries(ui_engine PRIVATE "-framework AudioToolbox" "-framework VideoToolbox" "-framework CoreMedia" "-framework CoreFoundation")
+    target_link_libraries(ui_engine_test PRIVATE "-framework AudioToolbox" "-framework VideoToolbox" "-framework CoreMedia" "-framework CoreFoundation")
 endif()

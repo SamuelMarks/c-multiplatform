@@ -766,21 +766,11 @@ ui_error_t ui_form_control_destroy(ui_form_control_t *control) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  {
-    ui_signal_destroy(control->value_signal);
-  }
-  {
-    ui_signal_destroy(control->status_signal);
-  }
-  {
-    ui_signal_destroy(control->touched_signal);
-  }
-  {
-    ui_signal_destroy(control->dirty_signal);
-  }
-  {
-    ui_signal_destroy(control->errors_signal);
-  }
+  { ui_signal_destroy(control->value_signal); }
+  { ui_signal_destroy(control->status_signal); }
+  { ui_signal_destroy(control->touched_signal); }
+  { ui_signal_destroy(control->dirty_signal); }
+  { ui_signal_destroy(control->errors_signal); }
   if (control->error_str)
     C_MULTIPLATFORM_FREE(control->error_str);
 

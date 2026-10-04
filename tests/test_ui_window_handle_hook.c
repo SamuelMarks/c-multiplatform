@@ -502,6 +502,13 @@ static int test_backend_handle_hook(void) {
     }
   }
 
+  /* Pump messages briefly to ensure Wine/Windows doesn't hang on destruction */
+  if (backend->poll_events) {
+    struct ui_event ev;
+    int has_event = 0;
+    backend->poll_events(backend, window, &ev, &has_event);
+  }
+
   rc = backend->destroy_window(backend, window);
   if (rc != UI_ERROR_NONE) {
     return 6;

@@ -1,6 +1,9 @@
 /* clang-format off */
 #include "ui_image_decoder.h"
 #include <stdio.h>
+
+#include "min_jpg.h"
+#include "min_png.h"
 /* clang-format on */
 
 extern struct ui_image_decoder_backend ui_image_decoder_png;
@@ -33,6 +36,12 @@ static ui_error_t mock_webp_supports_fail(enum ui_image_format format,
   return UI_ERROR_UNKNOWN;
 }
 
+static ui_error_t mock_png_free_fail(struct ui_image *img) {
+  if (img) {
+  } /* unused */
+  return UI_ERROR_UNKNOWN;
+}
+
 int main(void) {
   struct ui_image image;
   ui_error_t err;
@@ -58,13 +67,17 @@ int main(void) {
                              &image) != UI_ERROR_UNKNOWN)
     return 1;
 
-  err = ui_image_decode_memory(UI_IMAGE_FORMAT_PNG, dummy_data, 5, &image);
-  if (err != UI_ERROR_UNKNOWN && err != UI_ERROR_NONE)
+  err = ui_image_decode_memory(UI_IMAGE_FORMAT_PNG, tests_min_png,
+                               tests_min_png_len, &image);
+  if (err != UI_ERROR_NONE)
     return 1;
+  ui_image_free(&image);
 
-  err = ui_image_decode_memory(UI_IMAGE_FORMAT_JPEG, dummy_data, 5, &image);
-  if (err != UI_ERROR_UNKNOWN && err != UI_ERROR_NONE)
+  err = ui_image_decode_memory(UI_IMAGE_FORMAT_JPEG, tests_min_jpg,
+                               tests_min_jpg_len, &image);
+  if (err != UI_ERROR_NONE)
     return 1;
+  ui_image_free(&image);
 
   err = ui_image_decode_memory(UI_IMAGE_FORMAT_WEBP, dummy_data, 5, &image);
   if (err != UI_ERROR_UNKNOWN && err != UI_ERROR_NONE)
@@ -95,9 +108,37 @@ int main(void) {
   if (ui_image_free(NULL) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
 
+  image.format = UI_IMAGE_FORMAT_UNKNOWN;
   err = ui_image_free(&image);
   if (err != UI_ERROR_NONE)
     return 1;
+
+  /* Test ui_image_free when get_backend_for_format fails */
+  ui_image_decoder_png.supports_format = mock_png_supports_fail;
+  image.format = UI_IMAGE_FORMAT_PNG;
+  err = ui_image_free(&image);
+  if (err != UI_ERROR_UNKNOWN)
+    return 1;
+  ui_image_decoder_png.supports_format = orig_png_supports; /* Restore */
+
+  /* Test ui_image_free when backend->free_image fails */
+  {
+    ui_error_t (*orig_png_free)(struct ui_image *) =
+        ui_image_decoder_png.free_image;
+    struct ui_image temp_image;
+    ui_image_decoder_png.free_image = mock_png_free_fail;
+    temp_image.format = UI_IMAGE_FORMAT_PNG;
+    err = ui_image_free(&temp_image);
+    if (err != UI_ERROR_UNKNOWN)
+      return 1;
+    ui_image_decoder_png.free_image = orig_png_free; /* Restore */
+    ui_image_decoder_png.free_image = NULL;
+    temp_image.format = UI_IMAGE_FORMAT_PNG;
+    err = ui_image_free(&temp_image);
+    if (err != UI_ERROR_NONE)
+      return 1;
+    ui_image_decoder_png.free_image = orig_png_free;
+  }
 
   /* Direct testing of backends to ensure full branch coverage of their methods
    */

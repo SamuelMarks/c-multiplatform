@@ -1,7 +1,8 @@
 /* clang-format off */
-#include "../include/ui_image_decoder.h"
-#include "../include/ui_error.h"
+#include "ui_image_decoder.h"
+#include "ui_error.h"
 #include <stdio.h>
+#include "min_png.h"
 /* clang-format on */
 
 extern struct ui_image_decoder_backend ui_image_decoder_png;
@@ -39,17 +40,18 @@ int main(void) {
 
   rc = ui_image_decoder_png.decode_memory(dummy_data, 4, &img);
   if (rc != UI_ERROR_UNKNOWN) {
-    printf("Expected UI_ERROR_UNKNOWN from png decoder stub\n");
+    printf("Expected UI_ERROR_UNKNOWN from invalid data decode\n");
     return 1;
   }
 
-  /* Validate PNG transparency logic (mocked check) */
-  if (img.channels != 4) {
-    /* In a real scenario, this would be validated from actual decode output */
+  rc = ui_image_decoder_png.decode_memory(tests_min_png, tests_min_png_len,
+                                          &img);
+  if (rc != UI_ERROR_NONE) {
+    printf("Expected UI_ERROR_NONE from valid PNG\n");
+    return 1;
   }
 
-  if (img.width != 0 || img.height != 0 || img.channels != 4 ||
-      img.data_size != 0)
+  if (img.width != 1 || img.height != 1 || img.channels != 4)
     return 1;
 
   /* Test free_image */

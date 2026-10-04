@@ -318,6 +318,14 @@ ui_error_t ui_rich_text_base_set_text(struct ui_rich_text_base *editor,
     if (editor->component && editor->component->shadow_root) {
       ui_error_t txt_rc;
       struct ui_dom_node *text_node = NULL;
+      struct ui_dom_node *child = editor->component->shadow_root->first_child;
+      while (child) {
+        struct ui_dom_node *next = child->next_sibling;
+        ui_dom_node_remove_child(editor->component->shadow_root, child);
+        ui_dom_node_destroy(child);
+        child = next;
+      }
+
       txt_rc = ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &text_node);
       if (txt_rc != UI_ERROR_NONE)
         return txt_rc;
@@ -326,7 +334,6 @@ ui_error_t ui_rich_text_base_set_text(struct ui_rich_text_base *editor,
         ui_dom_node_destroy(text_node);
         return txt_rc;
       }
-      /* TODO: clear existing children of shadow_root first */
       txt_rc =
           ui_dom_node_append_child(editor->component->shadow_root, text_node);
       if (txt_rc != UI_ERROR_NONE) {

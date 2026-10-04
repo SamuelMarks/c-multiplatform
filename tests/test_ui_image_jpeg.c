@@ -1,7 +1,9 @@
 /* clang-format off */
-#include "../include/ui_image_decoder.h"
-#include "../include/ui_error.h"
+#include "ui_image_decoder.h"
+#include "ui_error.h"
 #include <stdio.h>
+#include "min_jpg.h"
+#include "stb_image.h"
 /* clang-format on */
 
 extern struct ui_image_decoder_backend ui_image_decoder_jpeg;
@@ -39,14 +41,19 @@ int main(void) {
 
   rc = ui_image_decoder_jpeg.decode_memory(dummy_data, 4, &img);
   if (rc != UI_ERROR_UNKNOWN) {
-    printf("Expected UI_ERROR_UNKNOWN from jpeg decoder stub\n");
+    printf("Expected UI_ERROR_UNKNOWN from invalid data decode\n");
     return 1;
   }
 
-  /* Validate JPEG EXIF orientation (rotation/flipping) mocked check */
-  /* If we had EXIF metadata, we'd verify rotation is applied correctly */
-  if (img.width != 0 || img.height != 0 || img.channels != 4 ||
-      img.data_size != 0)
+  rc = ui_image_decoder_jpeg.decode_memory(tests_min_jpg, tests_min_jpg_len,
+                                           &img);
+  if (rc != UI_ERROR_NONE) {
+    printf("Expected UI_ERROR_NONE from valid JPEG. stbi failure reason: %s\n",
+           stbi_failure_reason());
+    return 1;
+  }
+
+  if (img.width != 1 || img.height != 1 || img.channels != 4)
     return 1;
 
   /* Test free_image */

@@ -278,6 +278,16 @@ static int test_search_bar_cva(void) {
   return 0;
 }
 
+static int test_search_bar_base_get_component_invalid(void) {
+  struct ui_search_bar_base search_bar;
+  struct ui_component *comp;
+  assert(UI_ERROR_INVALID_ARGUMENT ==
+         ui_search_bar_base_get_component(NULL, &comp));
+  assert(UI_ERROR_INVALID_ARGUMENT ==
+         ui_search_bar_base_get_component(&search_bar, NULL));
+  return 0;
+}
+
 int main(void) {
   int failed = 0;
   printf("Running ui_search_bar_base tests...\n");
@@ -285,6 +295,7 @@ int main(void) {
   failed |= test_search_bar_init();
   failed |= test_search_bar_operations();
   failed |= test_search_bar_cva();
+  failed |= test_search_bar_base_get_component_invalid();
 
   if (failed) {
     printf("Tests failed.\n");

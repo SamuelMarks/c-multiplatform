@@ -34,6 +34,16 @@
 #define STBIW_FREE(x)      C_MULTIPLATFORM_FREE(x)
 #include "stb_image_write.h"
 
+/** @brief internal */
+#define STB_IMAGE_IMPLEMENTATION
+/** @brief internal */
+#define STBI_MALLOC(x)    C_MULTIPLATFORM_MALLOC(x)
+/** @brief internal */
+#define STBI_REALLOC(p,x) C_MULTIPLATFORM_REALLOC(p,x)
+/** @brief internal */
+#define STBI_FREE(x)      C_MULTIPLATFORM_FREE(x)
+#include "stb_image.h"
+
 #if defined(_MSC_VER)
 #endif
 
