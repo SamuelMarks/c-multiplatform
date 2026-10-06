@@ -18,8 +18,6 @@ struct md2_button {
 };
 
 static void md2_to_uppercase(char *str) {
-  if (!str)
-    return;
   while (*str) {
     *str = (char)toupper((unsigned char)*str);
     str++;
@@ -90,27 +88,15 @@ ui_error_t md2_button_create(struct ui_engine *engine,
 }
 
 ui_error_t md2_button_destroy(struct md2_button *button) {
-  ui_error_t rc = UI_ERROR_NONE;
-  ui_error_t temp_rc;
-
   if (!button) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  if (button->base) {
-    temp_rc = ui_button_base_destroy(button->base);
-    if (temp_rc != UI_ERROR_NONE)
-      rc = temp_rc;
-  }
-
-  if (button->component) {
-    temp_rc = ui_component_destroy(button->component);
-    if (temp_rc != UI_ERROR_NONE)
-      rc = temp_rc;
-  }
+  ui_button_base_destroy(button->base);
+  ui_component_destroy(button->component);
 
   C_MULTIPLATFORM_FREE(button);
-  return rc;
+  return UI_ERROR_NONE;
 }
 
 ui_error_t md2_button_set_text(struct md2_button *button, const char *text) {

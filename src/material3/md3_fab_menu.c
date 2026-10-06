@@ -9,6 +9,59 @@
 #include "ui_component.h"
 #include <string.h>
 /* clang-format on */
+#ifdef UI_TEST_MOCK_ALLOC
+int g_md3_fab_menu_mock_fail = 0;
+
+static ui_error_t mock_component_create(struct ui_component **out) {
+  if (g_md3_fab_menu_mock_fail == 1)
+    return UI_ERROR_UNKNOWN;
+  return ui_component_create(out);
+}
+static ui_error_t mock_speed_dial_base_init(struct ui_speed_dial_base *b,
+                                            struct ui_component *c) {
+  if (g_md3_fab_menu_mock_fail == 2)
+    return UI_ERROR_UNKNOWN;
+  return ui_speed_dial_base_init(b, c);
+}
+static ui_error_t mock_speed_dial_base_cleanup(struct ui_speed_dial_base *b) {
+  if (g_md3_fab_menu_mock_fail == 3)
+    return UI_ERROR_UNKNOWN;
+  return ui_speed_dial_base_cleanup(b);
+}
+static ui_error_t mock_component_destroy(struct ui_component *c) {
+  if (g_md3_fab_menu_mock_fail == 4) {
+    (ui_component_destroy)(c);
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_component_destroy)(c);
+}
+static ui_error_t mock_md3_fab_get_base(struct md3_fab *f,
+                                        struct ui_fab_base **out) {
+  if (g_md3_fab_menu_mock_fail == 5)
+    return UI_ERROR_UNKNOWN;
+  return md3_fab_get_base(f, out);
+}
+static ui_error_t mock_speed_dial_base_add_action(struct ui_speed_dial_base *b,
+                                                  int id,
+                                                  struct ui_fab_base *fb) {
+  if (g_md3_fab_menu_mock_fail == 6)
+    return UI_ERROR_UNKNOWN;
+  return ui_speed_dial_base_add_action(b, id, fb);
+}
+
+#undef ui_component_create
+#define ui_component_create mock_component_create
+#undef ui_speed_dial_base_init
+#define ui_speed_dial_base_init mock_speed_dial_base_init
+#undef ui_speed_dial_base_cleanup
+#define ui_speed_dial_base_cleanup mock_speed_dial_base_cleanup
+#undef ui_component_destroy
+#define ui_component_destroy mock_component_destroy
+#undef md3_fab_get_base
+#define md3_fab_get_base mock_md3_fab_get_base
+#undef ui_speed_dial_base_add_action
+#define ui_speed_dial_base_add_action mock_speed_dial_base_add_action
+#endif
 
 struct md3_fab_menu_action {
   int id;
@@ -45,14 +98,13 @@ ui_error_t md3_fab_menu_create(struct ui_engine *engine,
 
   rc = ui_component_create(&menu->component);
   if (rc != UI_ERROR_NONE) {
-    C_MULTIPLATFORM_FREE(menu);
+    md3_fab_menu_destroy(menu);
     return rc;
   }
 
   rc = ui_speed_dial_base_init(&menu->base, menu->component);
   if (rc != UI_ERROR_NONE) {
-    ui_component_destroy(menu->component);
-    C_MULTIPLATFORM_FREE(menu);
+    md3_fab_menu_destroy(menu);
     return rc;
   }
 

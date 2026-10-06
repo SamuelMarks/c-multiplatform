@@ -45,17 +45,16 @@ ui_error_t md2_card_create(struct ui_engine *engine,
     return rc;
   }
 
-  rc = ui_card_base_get_component(card->base, &comp);
-  if (rc == UI_ERROR_NONE && comp != NULL && comp->shadow_root != NULL) {
-    const char *cls = (variant == MD2_CARD_OUTLINED)
-                          ? "md2-card md2-card-outlined"
-                          : "md2-card md2-card-elevated";
-    rc = ui_dom_node_set_attribute(comp->shadow_root, "class", cls);
-    if (rc != UI_ERROR_NONE) {
-      ui_card_base_destroy(card->base);
-      C_MULTIPLATFORM_FREE(card);
-      return rc;
-    }
+  ui_card_base_get_component(card->base, &comp);
+
+  const char *cls = (variant == MD2_CARD_OUTLINED)
+                        ? "md2-card md2-card-outlined"
+                        : "md2-card md2-card-elevated";
+  rc = ui_dom_node_set_attribute(comp->shadow_root, "class", cls);
+  if (rc != UI_ERROR_NONE) {
+    ui_card_base_destroy(card->base);
+    C_MULTIPLATFORM_FREE(card);
+    return rc;
   }
 
   *out_card = card;
@@ -87,53 +86,31 @@ ui_error_t md2_card_get_base(struct md2_card *card,
 }
 
 ui_error_t md2_card_set_title(struct md2_card *card, const char *title) {
-  ui_error_t rc;
-
-  if (card == NULL) {
+  if (card == NULL || title == NULL) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  if (title != NULL) {
 #if defined(_MSC_VER)
-    strncpy_s(card->title, sizeof(card->title), title, _TRUNCATE);
+  strncpy_s(card->title, sizeof(card->title), title, _TRUNCATE);
 #else
-    strncpy(card->title, title, sizeof(card->title) - 1);
-    card->title[sizeof(card->title) - 1] = '\0';
+  strncpy(card->title, title, sizeof(card->title) - 1);
+  card->title[sizeof(card->title) - 1] = '\0';
 #endif
-  } else {
-    card->title[0] = '\0';
-  }
 
-  rc = ui_card_base_set_title(card->base, title);
-  if (rc != UI_ERROR_NONE) {
-    return rc;
-  }
-
-  return UI_ERROR_NONE;
+  return ui_card_base_set_title(card->base, title);
 }
 
 ui_error_t md2_card_set_subtitle(struct md2_card *card, const char *subtitle) {
-  ui_error_t rc;
-
-  if (card == NULL) {
+  if (card == NULL || subtitle == NULL) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  if (subtitle != NULL) {
 #if defined(_MSC_VER)
-    strncpy_s(card->subtitle, sizeof(card->subtitle), subtitle, _TRUNCATE);
+  strncpy_s(card->subtitle, sizeof(card->subtitle), subtitle, _TRUNCATE);
 #else
-    strncpy(card->subtitle, subtitle, sizeof(card->subtitle) - 1);
-    card->subtitle[sizeof(card->subtitle) - 1] = '\0';
+  strncpy(card->subtitle, subtitle, sizeof(card->subtitle) - 1);
+  card->subtitle[sizeof(card->subtitle) - 1] = '\0';
 #endif
-  } else {
-    card->subtitle[0] = '\0';
-  }
 
-  rc = ui_card_base_set_subtitle(card->base, subtitle);
-  if (rc != UI_ERROR_NONE) {
-    return rc;
-  }
-
-  return UI_ERROR_NONE;
+  return ui_card_base_set_subtitle(card->base, subtitle);
 }

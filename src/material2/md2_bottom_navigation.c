@@ -59,12 +59,9 @@ ui_error_t md2_bottom_navigation_destroy(struct md2_bottom_navigation *nav) {
   }
 
   rc = ui_bottom_nav_base_destroy(nav->base);
-  if (rc != UI_ERROR_NONE) {
-    return rc;
-  }
 
   C_MULTIPLATFORM_FREE(nav);
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 ui_error_t
@@ -81,18 +78,11 @@ md2_bottom_navigation_get_base(struct md2_bottom_navigation *nav,
 ui_error_t
 md2_bottom_navigation_append_item(struct md2_bottom_navigation *nav,
                                   struct md2_bottom_navigation_item *item) {
-  ui_error_t rc;
-
   if (!nav || !item) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  rc = ui_bottom_nav_base_append_item(nav->base, item->base);
-  if (rc != UI_ERROR_NONE) {
-    return rc;
-  }
-
-  return UI_ERROR_NONE;
+  return ui_bottom_nav_base_append_item(nav->base, item->base);
 }
 
 ui_error_t md2_bottom_navigation_item_create(
@@ -174,9 +164,6 @@ md2_bottom_navigation_item_destroy(struct md2_bottom_navigation_item *item) {
   }
 
   rc = ui_bottom_nav_item_base_destroy(item->base);
-  if (rc != UI_ERROR_NONE) {
-    return rc;
-  }
 
   if (item->label) {
     C_MULTIPLATFORM_FREE(item->label);
@@ -186,7 +173,7 @@ md2_bottom_navigation_item_destroy(struct md2_bottom_navigation_item *item) {
   }
 
   C_MULTIPLATFORM_FREE(item);
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 ui_error_t

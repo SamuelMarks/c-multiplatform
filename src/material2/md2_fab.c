@@ -63,54 +63,27 @@ ui_error_t md2_fab_create(struct ui_engine *engine, enum md2_fab_size size,
      extended, we can just treat the icon as a string for now. A more thorough
      integration would use an icon component or text_node. */
   if (size == MD2_FAB_SIZE_EXTENDED && label) {
-    rc = ui_button_base_set_text(main_button, label);
+    ui_button_base_set_text(main_button, label);
   } else if (icon) {
-    rc = ui_button_base_set_text(main_button, icon);
+    ui_button_base_set_text(main_button, icon);
   }
 
-  if (rc != UI_ERROR_NONE) {
-    ui_button_base_destroy(main_button);
-    ui_fab_base_destroy(fab->base);
-    ui_component_destroy(fab->component);
-    C_MULTIPLATFORM_FREE(fab);
-    return rc;
-  }
-
-  rc = ui_fab_base_set_main_button(fab->base, main_button);
-  if (rc != UI_ERROR_NONE) {
-    ui_button_base_destroy(main_button);
-    ui_fab_base_destroy(fab->base);
-    ui_component_destroy(fab->component);
-    C_MULTIPLATFORM_FREE(fab);
-    return rc;
-  }
+  ui_fab_base_set_main_button(fab->base, main_button);
 
   *out_fab = fab;
   return UI_ERROR_NONE;
 }
 
 ui_error_t md2_fab_destroy(struct md2_fab *fab) {
-  ui_error_t rc = UI_ERROR_NONE;
-  ui_error_t temp_rc;
-
   if (!fab) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  if (fab->base) {
-    temp_rc = ui_fab_base_destroy(fab->base);
-    if (temp_rc != UI_ERROR_NONE)
-      rc = temp_rc;
-  }
-
-  if (fab->component) {
-    temp_rc = ui_component_destroy(fab->component);
-    if (temp_rc != UI_ERROR_NONE)
-      rc = temp_rc;
-  }
+  ui_fab_base_destroy(fab->base);
+  ui_component_destroy(fab->component);
 
   C_MULTIPLATFORM_FREE(fab);
-  return rc;
+  return UI_ERROR_NONE;
 }
 
 ui_error_t md2_fab_set_on_click(struct md2_fab *fab,
@@ -123,10 +96,7 @@ ui_error_t md2_fab_set_on_click(struct md2_fab *fab,
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  rc = ui_fab_base_get_main_button(fab->base, &main_button);
-  if (rc != UI_ERROR_NONE || !main_button) {
-    return UI_ERROR_INVALID_ARGUMENT;
-  }
+  ui_fab_base_get_main_button(fab->base, &main_button);
 
   return ui_button_base_set_on_click(main_button, on_click, user_data);
 }

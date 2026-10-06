@@ -82,11 +82,7 @@ ui_error_t md2_top_app_bar_create(struct ui_engine *engine,
       C_MULTIPLATFORM_FREE(bar);
       return UI_ERROR_OUT_OF_MEMORY;
     }
-#if defined(_MSC_VER)
-    strcpy_s(bar->title, len + 1, title);
-#else
-    strcpy(bar->title, title);
-#endif
+    UI_STRCPY(bar->title, len + 1, title);
   }
 
   *out_bar = bar;
@@ -106,19 +102,49 @@ ui_error_t md2_top_app_bar_destroy(struct md2_top_app_bar *bar) {
   }
 
   if (bar->base) {
-    temp_rc = ui_top_app_bar_base_destroy(bar->base);
+#ifdef UI_TEST_MOCK_ALLOC
+    extern int g_md2_top_app_bar_mock_destroy_fail;
+    if (g_md2_top_app_bar_mock_destroy_fail) {
+      temp_rc = UI_ERROR_UNKNOWN;
+    } else {
+#endif
+      temp_rc = ui_top_app_bar_base_destroy(bar->base);
+#ifdef UI_TEST_MOCK_ALLOC
+    }
+#endif
+
     if (temp_rc != UI_ERROR_NONE)
       rc = temp_rc;
   }
 
   if (bar->arena) {
-    temp_rc = ui_arena_destroy(bar->arena);
+#ifdef UI_TEST_MOCK_ALLOC
+    extern int g_md2_top_app_bar_mock_destroy_fail;
+    if (g_md2_top_app_bar_mock_destroy_fail) {
+      temp_rc = UI_ERROR_UNKNOWN;
+    } else {
+#endif
+      temp_rc = ui_arena_destroy(bar->arena);
+#ifdef UI_TEST_MOCK_ALLOC
+    }
+#endif
+
     if (temp_rc != UI_ERROR_NONE)
       rc = temp_rc;
   }
 
   if (bar->component) {
-    temp_rc = ui_component_destroy(bar->component);
+#ifdef UI_TEST_MOCK_ALLOC
+    extern int g_md2_top_app_bar_mock_destroy_fail;
+    if (g_md2_top_app_bar_mock_destroy_fail) {
+      temp_rc = UI_ERROR_UNKNOWN;
+    } else {
+#endif
+      temp_rc = ui_component_destroy(bar->component);
+#ifdef UI_TEST_MOCK_ALLOC
+    }
+#endif
+
     if (temp_rc != UI_ERROR_NONE)
       rc = temp_rc;
   }
@@ -146,11 +172,7 @@ ui_error_t md2_top_app_bar_set_title(struct md2_top_app_bar *bar,
     return UI_ERROR_OUT_OF_MEMORY;
   }
 
-#if defined(_MSC_VER)
-  strcpy_s(bar->title, len + 1, title);
-#else
-  strcpy(bar->title, title);
-#endif
+  UI_STRCPY(bar->title, len + 1, title);
 
   return UI_ERROR_NONE;
 }

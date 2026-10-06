@@ -55,13 +55,27 @@ ui_error_t md3_list_detail_pane_scaffold_create(
   }
 
   rc = ui_adaptive_pane_scaffold_base_get_component(s->base, &comp);
-  if (rc == UI_ERROR_NONE && comp != NULL && comp->shadow_root != NULL) {
-    rc = ui_dom_node_set_attribute(comp->shadow_root, "class",
-                                   "md3-list-detail-pane-scaffold");
-    if (rc != UI_ERROR_NONE) {
-      ui_adaptive_pane_scaffold_base_destroy(s->base);
-      C_MULTIPLATFORM_FREE(s);
-      return rc;
+#ifdef UI_TEST_MOCK_ALLOC
+  extern int g_md3_adaptive_mock_comp_null;
+  if (g_md3_adaptive_mock_comp_null == 1)
+    rc = UI_ERROR_UNKNOWN;
+  if (g_md3_adaptive_mock_comp_null == 2)
+    comp = NULL;
+  if (g_md3_adaptive_mock_comp_null == 3) {
+    comp->shadow_root = NULL;
+  }
+#endif
+  if (rc == UI_ERROR_NONE) {
+    if (comp != NULL) {
+      if (comp->shadow_root != NULL) {
+        rc = ui_dom_node_set_attribute(comp->shadow_root, "class",
+                                       "md3-list-detail-pane-scaffold");
+        if (rc != UI_ERROR_NONE) {
+          ui_adaptive_pane_scaffold_base_destroy(s->base);
+          C_MULTIPLATFORM_FREE(s);
+          return rc;
+        }
+      }
     }
   }
 
@@ -154,13 +168,27 @@ ui_error_t md3_supporting_pane_scaffold_create(
   }
 
   rc = ui_adaptive_pane_scaffold_base_get_component(s->base, &comp);
-  if (rc == UI_ERROR_NONE && comp != NULL && comp->shadow_root != NULL) {
-    rc = ui_dom_node_set_attribute(comp->shadow_root, "class",
-                                   "md3-supporting-pane-scaffold");
-    if (rc != UI_ERROR_NONE) {
-      ui_adaptive_pane_scaffold_base_destroy(s->base);
-      C_MULTIPLATFORM_FREE(s);
-      return rc;
+#ifdef UI_TEST_MOCK_ALLOC
+  extern int g_md3_adaptive_mock_comp_null;
+  if (g_md3_adaptive_mock_comp_null == 1)
+    rc = UI_ERROR_UNKNOWN;
+  if (g_md3_adaptive_mock_comp_null == 2)
+    comp = NULL;
+  if (g_md3_adaptive_mock_comp_null == 3) {
+    comp->shadow_root = NULL;
+  }
+#endif
+  if (rc == UI_ERROR_NONE) {
+    if (comp != NULL) {
+      if (comp->shadow_root != NULL) {
+        rc = ui_dom_node_set_attribute(comp->shadow_root, "class",
+                                       "md3-supporting-pane-scaffold");
+        if (rc != UI_ERROR_NONE) {
+          ui_adaptive_pane_scaffold_base_destroy(s->base);
+          C_MULTIPLATFORM_FREE(s);
+          return rc;
+        }
+      }
     }
   }
 

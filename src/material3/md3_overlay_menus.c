@@ -514,7 +514,7 @@ ui_error_t md3_hover_card_create(struct ui_engine *engine,
 
   rc = ui_hover_card_base_create(&hc->base);
   if (rc != UI_ERROR_NONE) {
-    C_MULTIPLATFORM_FREE(hc);
+    md3_hover_card_destroy(hc);
     return rc;
   }
 
@@ -599,7 +599,7 @@ ui_error_t md3_popover_create(struct ui_engine *engine,
 
   rc = ui_popover_base_create(&pop->base);
   if (rc != UI_ERROR_NONE) {
-    C_MULTIPLATFORM_FREE(pop);
+    md3_popover_destroy(pop);
     return rc;
   }
 
@@ -684,7 +684,7 @@ ui_error_t md3_banner_create(struct ui_engine *engine,
 
   rc = ui_banner_base_create(&b->base);
   if (rc != UI_ERROR_NONE) {
-    C_MULTIPLATFORM_FREE(b);
+    md3_banner_destroy(b);
     return rc;
   }
 
@@ -814,7 +814,7 @@ ui_error_t md3_inline_alert_create(struct ui_engine *engine,
 
   rc = ui_alert_base_create(&alt->base);
   if (rc != UI_ERROR_NONE) {
-    C_MULTIPLATFORM_FREE(alt);
+    md3_inline_alert_destroy(alt);
     return rc;
   }
 
@@ -825,8 +825,7 @@ ui_error_t md3_inline_alert_create(struct ui_engine *engine,
     rc = ui_alert_base_set_role(alt->base, UI_ALERT_ROLE_STATUS);
   }
   if (rc != UI_ERROR_NONE) {
-    ui_alert_base_destroy(alt->base);
-    C_MULTIPLATFORM_FREE(alt);
+    md3_inline_alert_destroy(alt);
     return rc;
   }
 
@@ -923,7 +922,7 @@ ui_error_t md3_menubar_create(struct ui_engine *engine,
 
   rc = ui_menubar_base_create(&mb->base);
   if (rc != UI_ERROR_NONE) {
-    C_MULTIPLATFORM_FREE(mb);
+    md3_menubar_destroy(mb);
     return rc;
   }
 
@@ -996,7 +995,7 @@ ui_error_t md3_context_menu_create(struct ui_engine *engine,
 
   rc = ui_context_menu_base_create(&cm->base);
   if (rc != UI_ERROR_NONE) {
-    C_MULTIPLATFORM_FREE(cm);
+    md3_context_menu_destroy(cm);
     return rc;
   }
 
@@ -1059,7 +1058,7 @@ ui_error_t md3_action_sheet_create(struct ui_engine *engine,
 
   rc = ui_action_sheet_base_create(&as->base);
   if (rc != UI_ERROR_NONE) {
-    C_MULTIPLATFORM_FREE(as);
+    md3_action_sheet_destroy(as);
     return rc;
   }
 
@@ -1295,7 +1294,7 @@ ui_error_t md3_color_picker_create(struct ui_engine *engine,
 
   rc = ui_color_picker_base_create(&cp->base, &cp->cva);
   if (rc != UI_ERROR_NONE) {
-    C_MULTIPLATFORM_FREE(cp);
+    md3_color_picker_destroy(cp);
     return rc;
   }
 

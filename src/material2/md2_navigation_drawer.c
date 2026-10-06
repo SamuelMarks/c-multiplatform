@@ -6,7 +6,13 @@
 /* clang-format off */
 #include "material2/md2_navigation_drawer.h"
 #include <stdlib.h>
+#include "ui_internal_mem.h"
 /* clang-format on */
+
+#ifdef UI_TEST_MOCK_ALLOC
+extern int g_md2_nav_mock_set_on_close_fail;
+int g_md2_nav_mock_set_on_close_fail = 0;
+#endif
 
 struct md2_navigation_drawer {
   struct ui_sidenav_base *base;
@@ -18,11 +24,6 @@ struct md2_navigation_drawer {
 static ui_error_t on_base_close(struct ui_sidenav_base *sidenav,
                                 void *user_data) {
   struct md2_navigation_drawer *drawer;
-
-  (void)sidenav;
-  if (user_data == NULL) {
-    return UI_ERROR_INVALID_ARGUMENT;
-  }
 
   drawer = (struct md2_navigation_drawer *)user_data;
   if (drawer->on_close != NULL) {
@@ -42,7 +43,7 @@ md2_navigation_drawer_create(enum md2_navigation_drawer_type type,
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  drawer = (struct md2_navigation_drawer *)malloc(
+  drawer = (struct md2_navigation_drawer *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct md2_navigation_drawer));
   if (drawer == NULL) {
     return UI_ERROR_OUT_OF_MEMORY;
@@ -54,7 +55,7 @@ md2_navigation_drawer_create(enum md2_navigation_drawer_type type,
 
   rc = ui_sidenav_base_create(&drawer->base);
   if (rc != UI_ERROR_NONE) {
-    free(drawer);
+    C_MULTIPLATFORM_FREE(drawer);
     return rc;
   }
 
@@ -65,14 +66,23 @@ md2_navigation_drawer_create(enum md2_navigation_drawer_type type,
   }
   if (rc != UI_ERROR_NONE) {
     ui_sidenav_base_destroy(drawer->base);
-    free(drawer);
+    C_MULTIPLATFORM_FREE(drawer);
     return rc;
   }
 
-  rc = ui_sidenav_base_set_on_close(drawer->base, on_base_close, drawer);
+#ifdef UI_TEST_MOCK_ALLOC
+  if (g_md2_nav_mock_set_on_close_fail) {
+    rc = UI_ERROR_INVALID_ARGUMENT;
+  } else {
+#endif
+    rc = ui_sidenav_base_set_on_close(drawer->base, on_base_close, drawer);
+#ifdef UI_TEST_MOCK_ALLOC
+  }
+#endif
+
   if (rc != UI_ERROR_NONE) {
     ui_sidenav_base_destroy(drawer->base);
-    free(drawer);
+    C_MULTIPLATFORM_FREE(drawer);
     return rc;
   }
 
@@ -86,7 +96,7 @@ ui_error_t md2_navigation_drawer_destroy(struct md2_navigation_drawer *drawer) {
   }
 
   ui_sidenav_base_destroy(drawer->base);
-  free(drawer);
+  C_MULTIPLATFORM_FREE(drawer);
   return UI_ERROR_NONE;
 }
 

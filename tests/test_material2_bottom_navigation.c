@@ -16,6 +16,15 @@
 extern int g_malloc_fail_countdown;
 #endif
 
+/* Hacks to access internal structure for branch coverage testing */
+struct md2_bottom_navigation_hack {
+  struct ui_bottom_nav_base *base;
+};
+
+struct md2_bottom_navigation_item_hack {
+  struct ui_bottom_nav_item_base *base;
+};
+
 SUITE(md2_bottom_navigation_suite);
 
 TEST test_md2_bottom_navigation_lifecycle(void) {
@@ -39,13 +48,14 @@ TEST test_md2_bottom_navigation_lifecycle(void) {
   ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
   rc = md2_bottom_navigation_get_base(NULL, &base);
   ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
-  rc = md2_bottom_navigation_get_base(nav, NULL);
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
 
   /* Create successful */
   rc = md2_bottom_navigation_create(engine, MD2_BOTTOM_NAVIGATION_FIXED, &nav);
   ASSERT_EQ(UI_ERROR_NONE, rc);
   ASSERT(nav != NULL);
+
+  rc = md2_bottom_navigation_get_base(nav, NULL);
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
 
   /* Get base */
   rc = md2_bottom_navigation_get_base(nav, &base);
@@ -83,13 +93,14 @@ TEST test_md2_bottom_navigation_item_lifecycle(void) {
   ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
   rc = md2_bottom_navigation_item_get_base(NULL, &base);
   ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
-  rc = md2_bottom_navigation_item_get_base(item, NULL);
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
 
   /* Create items with diff combinations of label/icon */
   rc = md2_bottom_navigation_item_create(engine, "Home", "ic_home", &item);
   ASSERT_EQ(UI_ERROR_NONE, rc);
   ASSERT(item != NULL);
+
+  rc = md2_bottom_navigation_item_get_base(item, NULL);
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
 
   rc = md2_bottom_navigation_item_get_base(item, &base);
   ASSERT_EQ(UI_ERROR_NONE, rc);
@@ -173,8 +184,28 @@ TEST test_md2_bottom_navigation_item_oom(void) {
   rc = md2_bottom_navigation_item_create(engine, "Label", "Icon", &item);
   ASSERT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
 
+  g_malloc_fail_countdown = 1; /* label alloc skipped, icon alloc fails */
+  rc = md2_bottom_navigation_item_create(engine, NULL, "Icon", &item);
+  ASSERT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
+
   g_malloc_fail_countdown = 3;
   rc = md2_bottom_navigation_item_create(engine, "Label", "Icon", &item);
+  ASSERT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
+
+  g_malloc_fail_countdown = 1; /* label alloc skipped, base alloc fails */
+  rc = md2_bottom_navigation_item_create(engine, NULL, "Icon", &item);
+  ASSERT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
+
+  g_malloc_fail_countdown = 2; /* icon alloc skipped, base alloc fails */
+  rc = md2_bottom_navigation_item_create(engine, "Label", NULL, &item);
+  ASSERT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
+
+  g_malloc_fail_countdown = 2; /* label alloc skipped, base alloc fails */
+  rc = md2_bottom_navigation_item_create(engine, NULL, "Icon", &item);
+  ASSERT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
+
+  g_malloc_fail_countdown = 1; /* both skipped, base alloc fails */
+  rc = md2_bottom_navigation_item_create(engine, NULL, NULL, &item);
   ASSERT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
 
   g_malloc_fail_countdown = -1;

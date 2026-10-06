@@ -11,25 +11,118 @@
 #include <string.h>
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+/** @brief Mock failure flag for ui_floating_toolbar_base testing. */
+int g_floating_toolbar_mock_fail = 0;
+/** @brief Mock destroy failure flag for ui_floating_toolbar_base testing. */
+int g_floating_toolbar_destroy_mock_fail = 0;
+
+/**
+ * @brief Mock implementation of ui_dom_node_append_child for failure testing.
+ * @param parent The parent DOM node.
+ * @param child The child DOM node to append.
+ * @return UI_ERROR_UNKNOWN on injected mock failure, or result of
+ * ui_dom_node_append_child.
+ */
+static ui_error_t
+mock_floating_toolbar_append_child(struct ui_dom_node *parent,
+                                   struct ui_dom_node *child) {
+  if (g_floating_toolbar_mock_fail == 1) {
+    return UI_ERROR_UNKNOWN;
+  }
+  if (g_floating_toolbar_mock_fail == 2) {
+    g_floating_toolbar_mock_fail = 1;
+    return ui_dom_node_append_child(parent, child);
+  }
+  return ui_dom_node_append_child(parent, child);
+}
+#undef ui_dom_node_append_child
+/** @cond */
+#define ui_dom_node_append_child mock_floating_toolbar_append_child
+/** @endcond */
+
+/**
+ * @brief Mock implementation of ui_component_mount for failure testing.
+ * @param comp The component to mount.
+ * @param host The host DOM node.
+ * @return UI_ERROR_UNKNOWN on injected mock failure, or result of
+ * ui_component_mount.
+ */
+static ui_error_t mock_floating_toolbar_mount(struct ui_component *comp,
+                                              struct ui_dom_node *host) {
+  if (g_floating_toolbar_mock_fail == 3 || g_floating_toolbar_mock_fail == 4) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return ui_component_mount(comp, host);
+}
+#undef ui_component_mount
+/** @cond */
+#define ui_component_mount mock_floating_toolbar_mount
+/** @endcond */
+
+/**
+ * @brief Mock implementation of ui_dom_node_destroy for failure testing.
+ * @param n DOM node to destroy.
+ * @return UI_ERROR_UNKNOWN on injected mock failure, or result of
+ * ui_dom_node_destroy.
+ */
+static ui_error_t mock_floating_toolbar_dom_destroy(struct ui_dom_node *n) {
+  if (g_floating_toolbar_destroy_mock_fail == 1) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return ui_dom_node_destroy(n);
+}
+#undef ui_dom_node_destroy
+/** @cond */
+#define ui_dom_node_destroy mock_floating_toolbar_dom_destroy
+/** @endcond */
+
+/**
+ * @brief Mock implementation of ui_component_destroy for failure testing.
+ * @param c Component to destroy.
+ * @return UI_ERROR_UNKNOWN on injected mock failure, or result of
+ * ui_component_destroy.
+ */
+static ui_error_t mock_floating_toolbar_comp_destroy(struct ui_component *c) {
+  if (g_floating_toolbar_destroy_mock_fail == 2) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return ui_component_destroy(c);
+}
+#undef ui_component_destroy
+/** @cond */
+#define ui_component_destroy mock_floating_toolbar_comp_destroy
+/** @endcond */
+#endif
+
 #define UI_FLOATING_TOOLBAR_INITIAL_CAPACITY 4
 
+/**
+ * @struct ui_floating_toolbar_base
+ * @brief Internal implementation structure for the base floating toolbar
+ * component.
+ */
 struct ui_floating_toolbar_base {
-  struct ui_component *component;
-  struct ui_dom_node *root_node;
-  struct ui_dom_node *fab_slot_node;
-  struct ui_dom_node *actions_container_node;
-  struct ui_component *fab_component;
-  struct ui_component **action_components;
-  size_t action_count;
-  size_t action_capacity;
-  enum ui_floating_toolbar_orientation orientation;
-  enum ui_floating_toolbar_state state;
+  struct ui_component *component;    /**< Underlying UI component. */
+  struct ui_dom_node *root_node;     /**< Root DOM node container. */
+  struct ui_dom_node *fab_slot_node; /**< Slot container for primary FAB. */
+  struct ui_dom_node
+      *actions_container_node; /**< Slot container for action components. */
+  struct ui_component
+      *fab_component; /**< Reference to primary FAB component. */
+  struct ui_component **action_components; /**< Array of action components. */
+  size_t action_count;    /**< Current count of action components. */
+  size_t action_capacity; /**< Allocated capacity of action components array. */
+  enum ui_floating_toolbar_orientation
+      orientation;                      /**< Orientation alignment. */
+  enum ui_floating_toolbar_state state; /**< Current expansion state. */
 };
 
 ui_error_t
 ui_floating_toolbar_base_create(struct ui_floating_toolbar_base **out_toolbar) {
   struct ui_floating_toolbar_base *tb = NULL;
   ui_error_t rc;
+  ui_error_t rc_cleanup;
 
   if (out_toolbar == NULL) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -54,134 +147,116 @@ ui_floating_toolbar_base_create(struct ui_floating_toolbar_base **out_toolbar) {
   /* Root toolbar container */
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &tb->root_node);
   if (rc != UI_ERROR_NONE) {
-    ui_component_destroy(tb->component);
-    C_MULTIPLATFORM_FREE(tb);
-    return rc;
+    goto cleanup;
   }
 
   rc = ui_dom_node_set_tag_name(tb->root_node, "div");
   if (rc != UI_ERROR_NONE) {
-    ui_dom_node_destroy(tb->root_node);
-    ui_component_destroy(tb->component);
-    C_MULTIPLATFORM_FREE(tb);
-    return rc;
+    goto cleanup;
   }
 
   rc = ui_dom_node_set_attribute(tb->root_node, "role", "toolbar");
   if (rc != UI_ERROR_NONE) {
-    ui_dom_node_destroy(tb->root_node);
-    ui_component_destroy(tb->component);
-    C_MULTIPLATFORM_FREE(tb);
-    return rc;
+    goto cleanup;
   }
 
   rc = ui_dom_node_set_attribute(tb->root_node, "class", "ui-floating-toolbar");
   if (rc != UI_ERROR_NONE) {
-    ui_dom_node_destroy(tb->root_node);
-    ui_component_destroy(tb->component);
-    C_MULTIPLATFORM_FREE(tb);
-    return rc;
+    goto cleanup;
   }
 
   rc = ui_dom_node_set_attribute(tb->root_node, "data-orientation",
                                  "horizontal");
   if (rc != UI_ERROR_NONE) {
-    ui_dom_node_destroy(tb->root_node);
-    ui_component_destroy(tb->component);
-    C_MULTIPLATFORM_FREE(tb);
-    return rc;
+    goto cleanup;
   }
 
   rc = ui_dom_node_set_attribute(tb->root_node, "data-state", "expanded");
   if (rc != UI_ERROR_NONE) {
-    ui_dom_node_destroy(tb->root_node);
-    ui_component_destroy(tb->component);
-    C_MULTIPLATFORM_FREE(tb);
-    return rc;
+    goto cleanup;
   }
 
   /* FAB Slot container */
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &tb->fab_slot_node);
   if (rc != UI_ERROR_NONE) {
-    ui_dom_node_destroy(tb->root_node);
-    ui_component_destroy(tb->component);
-    C_MULTIPLATFORM_FREE(tb);
-    return rc;
+    goto cleanup;
   }
 
   rc = ui_dom_node_set_tag_name(tb->fab_slot_node, "div");
   if (rc != UI_ERROR_NONE) {
-    ui_dom_node_destroy(tb->fab_slot_node);
-    ui_dom_node_destroy(tb->root_node);
-    ui_component_destroy(tb->component);
-    C_MULTIPLATFORM_FREE(tb);
-    return rc;
+    goto cleanup;
   }
 
   rc = ui_dom_node_set_attribute(tb->fab_slot_node, "class",
                                  "ui-floating-toolbar-fab-slot");
   if (rc != UI_ERROR_NONE) {
-    ui_dom_node_destroy(tb->fab_slot_node);
-    ui_dom_node_destroy(tb->root_node);
-    ui_component_destroy(tb->component);
-    C_MULTIPLATFORM_FREE(tb);
-    return rc;
+    goto cleanup;
   }
 
   rc = ui_dom_node_append_child(tb->root_node, tb->fab_slot_node);
   if (rc != UI_ERROR_NONE) {
-    ui_dom_node_destroy(tb->fab_slot_node);
-    ui_dom_node_destroy(tb->root_node);
-    ui_component_destroy(tb->component);
-    C_MULTIPLATFORM_FREE(tb);
-    return rc;
+    goto cleanup;
   }
 
   /* Actions container */
   rc =
       ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &tb->actions_container_node);
   if (rc != UI_ERROR_NONE) {
-    ui_dom_node_destroy(tb->root_node);
-    ui_component_destroy(tb->component);
-    C_MULTIPLATFORM_FREE(tb);
-    return rc;
+    goto cleanup;
   }
 
   rc = ui_dom_node_set_tag_name(tb->actions_container_node, "div");
   if (rc != UI_ERROR_NONE) {
-    ui_dom_node_destroy(tb->actions_container_node);
-    ui_dom_node_destroy(tb->root_node);
-    ui_component_destroy(tb->component);
-    C_MULTIPLATFORM_FREE(tb);
-    return rc;
+    goto cleanup;
   }
 
   rc = ui_dom_node_set_attribute(tb->actions_container_node, "class",
                                  "ui-floating-toolbar-actions");
   if (rc != UI_ERROR_NONE) {
-    ui_dom_node_destroy(tb->actions_container_node);
-    ui_dom_node_destroy(tb->root_node);
-    ui_component_destroy(tb->component);
-    C_MULTIPLATFORM_FREE(tb);
-    return rc;
+    goto cleanup;
   }
 
   rc = ui_dom_node_append_child(tb->root_node, tb->actions_container_node);
   if (rc != UI_ERROR_NONE) {
-    ui_dom_node_destroy(tb->actions_container_node);
-    ui_dom_node_destroy(tb->root_node);
-    ui_component_destroy(tb->component);
-    C_MULTIPLATFORM_FREE(tb);
-    return rc;
+    goto cleanup;
   }
 
   tb->component->shadow_root = tb->root_node;
   *out_toolbar = tb;
   return UI_ERROR_NONE;
+
+cleanup:
+  if (tb->actions_container_node != NULL) {
+    rc_cleanup = ui_dom_node_destroy(tb->actions_container_node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
+    }
+  }
+  if (tb->fab_slot_node != NULL && tb->fab_slot_node->parent == NULL) {
+    rc_cleanup = ui_dom_node_destroy(tb->fab_slot_node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
+    }
+  }
+  if (tb->root_node != NULL) {
+    rc_cleanup = ui_dom_node_destroy(tb->root_node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
+    }
+  }
+  rc_cleanup = ui_component_destroy(tb->component);
+  if (rc_cleanup != UI_ERROR_NONE) {
+    rc = rc_cleanup;
+  }
+  C_MULTIPLATFORM_FREE(tb);
+  return rc;
 }
 
 ui_error_t
 ui_floating_toolbar_base_destroy(struct ui_floating_toolbar_base *toolbar) {
+  ui_error_t rc = UI_ERROR_NONE;
+  ui_error_t rc_cleanup;
+
   if (toolbar == NULL) {
     return UI_ERROR_NONE;
   }
@@ -192,12 +267,15 @@ ui_floating_toolbar_base_destroy(struct ui_floating_toolbar_base *toolbar) {
   }
 
   if (toolbar->component != NULL) {
-    ui_component_destroy(toolbar->component);
+    rc_cleanup = ui_component_destroy(toolbar->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
+    }
     toolbar->component = NULL;
   }
 
   C_MULTIPLATFORM_FREE(toolbar);
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 ui_error_t

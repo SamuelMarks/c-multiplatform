@@ -15,6 +15,8 @@
 
 #ifdef UI_TEST_MOCK_ALLOC
 extern int g_malloc_fail_countdown;
+extern int g_scroll_field_mock_fail;
+extern int g_scroll_field_destroy_mock_fail;
 #endif
 
 SUITE(ui_scroll_field_base_suite);
@@ -50,6 +52,34 @@ TEST test_ui_scroll_field_create_destroy(void) {
   ASSERT_EQ(UI_ERROR_NONE, rc);
   ASSERT_STR_EQ("spinbutton", role_val);
 
+  /* Destroy with comp set to NULL branch */
+  {
+    struct ui_scroll_field_base *field_no_comp = NULL;
+    struct ui_component *saved_comp = NULL;
+    rc = ui_scroll_field_base_create(&field_no_comp);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+    rc = ui_scroll_field_base_get_component(field_no_comp, &saved_comp);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+    rc = ui_component_destroy(saved_comp);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+    *(struct ui_component **)field_no_comp = NULL;
+    rc = ui_scroll_field_base_destroy(field_no_comp);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+  }
+
+#ifdef UI_TEST_MOCK_ALLOC
+  /* Destroy mock failure */
+  {
+    struct ui_scroll_field_base *field_mock = NULL;
+    rc = ui_scroll_field_base_create(&field_mock);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+    g_scroll_field_destroy_mock_fail = 2;
+    rc = ui_scroll_field_base_destroy(field_mock);
+    ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+    g_scroll_field_destroy_mock_fail = 0;
+  }
+#endif
+
   rc = ui_scroll_field_base_destroy(field);
   ASSERT_EQ(UI_ERROR_NONE, rc);
 
@@ -67,7 +97,7 @@ TEST test_ui_scroll_field_range_and_value(void) {
   rc = ui_scroll_field_base_create(&field);
   ASSERT_EQ(UI_ERROR_NONE, rc);
 
-  /* Null checks */
+  /* Null and invalid checks */
   rc = ui_scroll_field_base_set_range(NULL, 0, 100, 1);
   ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
   rc = ui_scroll_field_base_set_range(field, 100, 50, 1); /* min >= max */
@@ -75,9 +105,14 @@ TEST test_ui_scroll_field_range_and_value(void) {
   rc = ui_scroll_field_base_set_range(field, 0, 50, 0); /* step <= 0 */
   ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
 
+  /* Get range null checks for each argument */
   rc = ui_scroll_field_base_get_range(NULL, &min_v, &max_v, &step_v);
   ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
   rc = ui_scroll_field_base_get_range(field, NULL, &max_v, &step_v);
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
+  rc = ui_scroll_field_base_get_range(field, &min_v, NULL, &step_v);
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
+  rc = ui_scroll_field_base_get_range(field, &min_v, &max_v, NULL);
   ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
 
   rc = ui_scroll_field_base_set_value(NULL, 10);
@@ -107,21 +142,43 @@ TEST test_ui_scroll_field_range_and_value(void) {
   ASSERT_EQ(UI_ERROR_NONE, rc);
   ASSERT_EQ(10, val);
 
+  /* Set value to 50 */
+  rc = ui_scroll_field_base_set_value(field, 50);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  /* Reconfigure range to 0..30 -> clamps current_value to max_val (30) */
+  rc = ui_scroll_field_base_set_range(field, 0, 30, 1);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_scroll_field_base_get_value(field, &val);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  ASSERT_EQ(30, val);
+
+  /* Reconfigure to 10..50 */
+  rc = ui_scroll_field_base_set_range(field, 10, 50, 5);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
   /* Step up */
   rc = ui_scroll_field_base_step_up(field);
   ASSERT_EQ(UI_ERROR_NONE, rc);
   rc = ui_scroll_field_base_get_value(field, &val);
   ASSERT_EQ(UI_ERROR_NONE, rc);
-  ASSERT_EQ(15, val);
+  ASSERT_EQ(35, val);
 
   /* Step down */
   rc = ui_scroll_field_base_step_down(field);
   ASSERT_EQ(UI_ERROR_NONE, rc);
   rc = ui_scroll_field_base_get_value(field, &val);
   ASSERT_EQ(UI_ERROR_NONE, rc);
+  ASSERT_EQ(30, val);
+
+  /* Set value below minimum without looping -> clamped to min */
+  rc = ui_scroll_field_base_set_value(field, -100);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_scroll_field_base_get_value(field, &val);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
   ASSERT_EQ(10, val);
 
-  /* Clamp at minimum without looping */
+  /* Clamp at minimum without looping when stepping down */
   rc = ui_scroll_field_base_step_down(field);
   ASSERT_EQ(UI_ERROR_NONE, rc);
   rc = ui_scroll_field_base_get_value(field, &val);
@@ -134,6 +191,29 @@ TEST test_ui_scroll_field_range_and_value(void) {
   rc = ui_scroll_field_base_get_value(field, &val);
   ASSERT_EQ(UI_ERROR_NONE, rc);
   ASSERT_EQ(50, val);
+
+#ifdef UI_TEST_MOCK_ALLOC
+  /* Test set_value failure via OOM during attribute updates */
+  g_malloc_fail_countdown = 0;
+  rc = ui_scroll_field_base_set_value(field, 20);
+  ASSERT(rc != UI_ERROR_NONE);
+  g_malloc_fail_countdown = -1;
+
+  g_malloc_fail_countdown = 1;
+  rc = ui_scroll_field_base_set_value(field, 20);
+  ASSERT(rc != UI_ERROR_NONE);
+  g_malloc_fail_countdown = -1;
+
+  g_malloc_fail_countdown = 2;
+  rc = ui_scroll_field_base_set_value(field, 20);
+  ASSERT(rc != UI_ERROR_NONE);
+  g_malloc_fail_countdown = -1;
+
+  g_malloc_fail_countdown = 3;
+  rc = ui_scroll_field_base_set_value(field, 20);
+  ASSERT(rc != UI_ERROR_NONE);
+  g_malloc_fail_countdown = -1;
+#endif
 
   rc = ui_scroll_field_base_destroy(field);
   ASSERT_EQ(UI_ERROR_NONE, rc);
@@ -169,6 +249,20 @@ TEST test_ui_scroll_field_looping(void) {
   ASSERT_EQ(UI_ERROR_NONE, rc);
   ASSERT_EQ(1, looping);
 
+  /* Set value with looping < min_val */
+  rc = ui_scroll_field_base_set_value(field, -65);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_scroll_field_base_get_value(field, &val);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  ASSERT(val >= 0 && val <= 59);
+
+  /* Set value with looping > max_val */
+  rc = ui_scroll_field_base_set_value(field, 150);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_scroll_field_base_get_value(field, &val);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  ASSERT(val >= 0 && val <= 59);
+
   /* Start at 0, step down wraps to 59 */
   rc = ui_scroll_field_base_set_value(field, 0);
   ASSERT_EQ(UI_ERROR_NONE, rc);
@@ -185,6 +279,13 @@ TEST test_ui_scroll_field_looping(void) {
   ASSERT_EQ(UI_ERROR_NONE, rc);
   ASSERT_EQ(0, val);
 
+  /* Disable looping */
+  rc = ui_scroll_field_base_set_looping(field, 0);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_scroll_field_base_is_looping(field, &looping);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  ASSERT_EQ(0, looping);
+
   rc = ui_scroll_field_base_destroy(field);
   ASSERT_EQ(UI_ERROR_NONE, rc);
 
@@ -193,14 +294,67 @@ TEST test_ui_scroll_field_looping(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
 TEST test_ui_scroll_field_oom(void) {
-  struct ui_scroll_field_base *field = NULL;
+  int i;
   ui_error_t rc;
 
-  g_malloc_fail_countdown = 0;
-  rc = ui_scroll_field_base_create(&field);
-  ASSERT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
-  ASSERT(field == NULL);
+  /* Test create under OOM countdown loops */
+  for (i = 0; i < 40; ++i) {
+    struct ui_scroll_field_base *field = NULL;
+    g_malloc_fail_countdown = i;
+    rc = ui_scroll_field_base_create(&field);
+    if (rc == UI_ERROR_NONE) {
+      ui_error_t rc_cleanup = ui_scroll_field_base_destroy(field);
+      ASSERT_EQ(UI_ERROR_NONE, rc_cleanup);
+      break;
+    } else {
+      ASSERT(rc != UI_ERROR_NONE);
+      ASSERT(field == NULL);
+    }
+  }
   g_malloc_fail_countdown = -1;
+
+  /* Mock append_child failure for text_node */
+  {
+    struct ui_scroll_field_base *field = NULL;
+    g_scroll_field_mock_fail = 1;
+    rc = ui_scroll_field_base_create(&field);
+    ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+    ASSERT(field == NULL);
+    g_scroll_field_mock_fail = 0;
+  }
+
+  /* Mock append_child failure for value_node */
+  {
+    struct ui_scroll_field_base *field = NULL;
+    g_scroll_field_mock_fail = 2;
+    rc = ui_scroll_field_base_create(&field);
+    ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+    ASSERT(field == NULL);
+    g_scroll_field_mock_fail = 0;
+  }
+
+  /* Mock destroy failures during cleanup */
+  {
+    struct ui_scroll_field_base *field = NULL;
+    g_scroll_field_mock_fail = 1;
+    g_scroll_field_destroy_mock_fail = 1;
+    rc = ui_scroll_field_base_create(&field);
+    ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+    ASSERT(field == NULL);
+    g_scroll_field_mock_fail = 0;
+    g_scroll_field_destroy_mock_fail = 0;
+  }
+
+  {
+    struct ui_scroll_field_base *field = NULL;
+    g_scroll_field_mock_fail = 1;
+    g_scroll_field_destroy_mock_fail = 2;
+    rc = ui_scroll_field_base_create(&field);
+    ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+    ASSERT(field == NULL);
+    g_scroll_field_mock_fail = 0;
+    g_scroll_field_destroy_mock_fail = 0;
+  }
 
   PASS();
 }

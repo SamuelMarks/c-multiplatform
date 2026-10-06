@@ -242,6 +242,7 @@ static void test_autocomplete_process_event_explicit(void) {
     assert(rc == UI_ERROR_NONE);
 
     /* 5. ac->on_selection succeeds */
+    ui_selection_model_select(model, (void *)0);
     ui_autocomplete_base_set_on_selection(ac, succeeding_on_selection, NULL);
     rc = g_ac_captured_on_change(model, ac);
     assert(rc == UI_ERROR_NONE);

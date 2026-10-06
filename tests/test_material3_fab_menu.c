@@ -14,6 +14,7 @@
 
 #ifdef UI_TEST_MOCK_ALLOC
 extern int g_malloc_fail_countdown;
+extern int g_md3_fab_menu_mock_fail;
 #endif
 
 SUITE(md3_fab_menu_suite);
@@ -35,6 +36,8 @@ TEST test_md3_fab_menu_lifecycle(void) {
   ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
   rc = md3_fab_menu_create(engine, MD3_FAB_MENU_DIRECTION_UP, NULL);
   ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
+  rc = md3_fab_menu_create(engine, MD3_FAB_MENU_DIRECTION_COUNT, &menu);
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
   rc = md3_fab_menu_destroy(NULL);
   ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
   rc = md3_fab_menu_get_base(NULL, &base);
@@ -44,6 +47,9 @@ TEST test_md3_fab_menu_lifecycle(void) {
   rc = md3_fab_menu_create(engine, MD3_FAB_MENU_DIRECTION_UP, &menu);
   ASSERT_EQ(UI_ERROR_NONE, rc);
   ASSERT(menu != NULL);
+
+  rc = md3_fab_menu_get_base(menu, NULL);
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
 
   rc = md3_fab_menu_get_base(menu, &base);
   ASSERT_EQ(UI_ERROR_NONE, rc);
@@ -97,6 +103,10 @@ TEST test_md3_fab_menu_actions(void) {
   rc = md3_fab_menu_add_action(menu, 1, action, "Edit");
   ASSERT_EQ(UI_ERROR_NONE, rc);
 
+  /* Add action with no label */
+  rc = md3_fab_menu_add_action(menu, 2, action, NULL);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
   rc = md3_fab_destroy(primary);
   ASSERT_EQ(UI_ERROR_NONE, rc);
 
@@ -112,7 +122,108 @@ TEST test_md3_fab_menu_actions(void) {
   PASS();
 }
 
+TEST test_md3_fab_menu_expansion(void) {
+  struct ui_engine *engine = NULL;
+  struct ui_engine_config engine_cfg;
+  struct md3_fab_menu *menu = NULL;
+  ui_error_t rc;
+
+  memset(&engine_cfg, 0, sizeof(engine_cfg));
+  engine_cfg.num_threads = 1;
+  rc = ui_engine_create(&engine_cfg, &engine);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  rc = md3_fab_menu_create(engine, MD3_FAB_MENU_DIRECTION_UP, &menu);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  rc = md3_fab_menu_set_expanded(NULL, 1);
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
+
+  rc = md3_fab_menu_set_expanded(menu, 1);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  rc = md3_fab_menu_toggle(NULL);
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
+
+  rc = md3_fab_menu_toggle(menu);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  rc = md3_fab_menu_destroy(menu);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  rc = ui_engine_destroy(engine);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  PASS();
+}
+
 #ifdef UI_TEST_MOCK_ALLOC
+TEST test_md3_fab_menu_mocking(void) {
+  struct ui_engine *engine = NULL;
+  struct ui_engine_config engine_cfg;
+  struct md3_fab_menu *menu = NULL;
+  struct md3_fab *action = NULL;
+  ui_error_t rc;
+
+  memset(&engine_cfg, 0, sizeof(engine_cfg));
+  engine_cfg.num_threads = 1;
+  rc = ui_engine_create(&engine_cfg, &engine);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  /* mock_component_create fail */
+  g_md3_fab_menu_mock_fail = 1;
+  rc = md3_fab_menu_create(engine, MD3_FAB_MENU_DIRECTION_UP, &menu);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+
+  /* mock_speed_dial_base_init fail */
+  g_md3_fab_menu_mock_fail = 2;
+  rc = md3_fab_menu_create(engine, MD3_FAB_MENU_DIRECTION_UP, &menu);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+
+  g_md3_fab_menu_mock_fail = 0;
+  rc = md3_fab_menu_create(engine, MD3_FAB_MENU_DIRECTION_UP, &menu);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  rc = md3_fab_create(engine, MD3_FAB_SIZE_SMALL, MD3_FAB_SURFACE, "edit", NULL,
+                      &action);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  /* mock_md3_fab_get_base fail */
+  g_md3_fab_menu_mock_fail = 5;
+  rc = md3_fab_menu_add_action(menu, 1, action, "Edit");
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+
+  /* mock_speed_dial_base_add_action fail */
+  g_md3_fab_menu_mock_fail = 6;
+  rc = md3_fab_menu_add_action(menu, 1, action, "Edit");
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+
+  g_md3_fab_menu_mock_fail = 0;
+
+  /* mock_speed_dial_base_cleanup fail */
+  g_md3_fab_menu_mock_fail = 3;
+  rc = md3_fab_menu_destroy(menu);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+
+  rc = md3_fab_menu_create(engine, MD3_FAB_MENU_DIRECTION_UP, &menu);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  /* mock_component_destroy fail */
+  g_md3_fab_menu_mock_fail = 4;
+  rc = md3_fab_menu_destroy(menu);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+
+  g_md3_fab_menu_mock_fail = 0;
+
+  rc = md3_fab_destroy(action);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  rc = ui_engine_destroy(engine);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  PASS();
+}
+
 TEST test_md3_fab_menu_oom(void) {
   struct ui_engine *engine = NULL;
   struct ui_engine_config engine_cfg;
@@ -147,6 +258,10 @@ TEST test_md3_fab_menu_oom(void) {
   rc = md3_fab_menu_add_action(menu, 1, action, "Edit");
   ASSERT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
 
+  g_malloc_fail_countdown = 2;
+  rc = md3_fab_menu_add_action(menu, 1, action, "Edit");
+  ASSERT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
+
   g_malloc_fail_countdown = -1;
 
   rc = md3_fab_destroy(action);
@@ -165,7 +280,9 @@ TEST test_md3_fab_menu_oom(void) {
 SUITE(md3_fab_menu_suite) {
   RUN_TEST(test_md3_fab_menu_lifecycle);
   RUN_TEST(test_md3_fab_menu_actions);
+  RUN_TEST(test_md3_fab_menu_expansion);
 #ifdef UI_TEST_MOCK_ALLOC
+  RUN_TEST(test_md3_fab_menu_mocking);
   RUN_TEST(test_md3_fab_menu_oom);
 #endif
 }

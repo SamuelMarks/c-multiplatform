@@ -15,6 +15,7 @@
 #include "ui_css_parser.h"
 #include "ui_layout.h"
 #include "ui_error.h"
+#include "ui_test_mock_mem.h"
 
 #if defined(__APPLE__) && defined(__MACH__)
 #include "ui_window_backend_macos.h"
@@ -26,7 +27,11 @@
 #elif defined(__linux__) || defined(__unix__)
 #include "ui_window_backend_linux.h"
 #endif
+
+#include "greatest.h"
 /* clang-format on */
+
+GREATEST_MAIN_DEFS();
 
 /**
  * @brief Default stylesheet for wide viewports (row flex layout).
@@ -290,137 +295,74 @@ static ui_error_t hook_test_verify_arrangement(struct hook_test_context *ctx,
  * @brief Runs through multi-step live drag resize workflow.
  * @return 0 on success, non-zero on failure.
  */
-static int test_live_drag_workflow(void) {
+TEST test_live_drag_workflow(void) {
   struct hook_test_context ctx;
   ui_error_t rc;
 
   memset(&ctx, 0, sizeof(ctx));
   rc = hook_test_build_dom(&ctx.root);
-  if (rc != UI_ERROR_NONE) {
-    return 1;
-  }
+  ASSERT_EQ(rc, UI_ERROR_NONE);
 
   /* Step 1: Initial 800x600 landscape window (ROW) */
   rc = hook_resize_callback(&ctx, 800, 600);
-  if (rc != UI_ERROR_NONE || ctx.call_count != 1) {
-    ui_dom_node_destroy(ctx.root);
-    return 2;
-  }
+  ASSERT_EQ(rc, UI_ERROR_NONE);
+  ASSERT_EQ(ctx.call_count, 1);
   rc = hook_test_verify_arrangement(&ctx, 0);
-  if (rc != UI_ERROR_NONE) {
-    ui_layout_tree_destroy(ctx.layout_tree);
-    ui_css_stylesheet_destroy(ctx.stylesheet);
-    ui_dom_node_destroy(ctx.root);
-    return 3;
-  }
+  ASSERT_EQ(rc, UI_ERROR_NONE);
 
   /* Step 2: Live dragging incrementally narrower to 700x600 (still ROW) */
   rc = hook_resize_callback(&ctx, 700, 600);
-  if (rc != UI_ERROR_NONE || ctx.call_count != 2) {
-    ui_layout_tree_destroy(ctx.layout_tree);
-    ui_css_stylesheet_destroy(ctx.stylesheet);
-    ui_dom_node_destroy(ctx.root);
-    return 4;
-  }
+  ASSERT_EQ(rc, UI_ERROR_NONE);
+  ASSERT_EQ(ctx.call_count, 2);
   rc = hook_test_verify_arrangement(&ctx, 0);
-  if (rc != UI_ERROR_NONE) {
-    ui_layout_tree_destroy(ctx.layout_tree);
-    ui_css_stylesheet_destroy(ctx.stylesheet);
-    ui_dom_node_destroy(ctx.root);
-    return 5;
-  }
+  ASSERT_EQ(rc, UI_ERROR_NONE);
 
   /* Step 3: Dragging across the 600px breakpoint to 550x600 (COLUMN) */
   rc = hook_resize_callback(&ctx, 550, 600);
-  if (rc != UI_ERROR_NONE || ctx.call_count != 3) {
-    ui_layout_tree_destroy(ctx.layout_tree);
-    ui_css_stylesheet_destroy(ctx.stylesheet);
-    ui_dom_node_destroy(ctx.root);
-    return 6;
-  }
+  ASSERT_EQ(rc, UI_ERROR_NONE);
+  ASSERT_EQ(ctx.call_count, 3);
   rc = hook_test_verify_arrangement(&ctx, 1);
-  if (rc != UI_ERROR_NONE) {
-    ui_layout_tree_destroy(ctx.layout_tree);
-    ui_css_stylesheet_destroy(ctx.stylesheet);
-    ui_dom_node_destroy(ctx.root);
-    return 7;
-  }
+  ASSERT_EQ(rc, UI_ERROR_NONE);
 
   /* Step 4: Dragging narrower to 400x600 (COLUMN) */
   rc = hook_resize_callback(&ctx, 400, 600);
-  if (rc != UI_ERROR_NONE || ctx.call_count != 4) {
-    ui_layout_tree_destroy(ctx.layout_tree);
-    ui_css_stylesheet_destroy(ctx.stylesheet);
-    ui_dom_node_destroy(ctx.root);
-    return 8;
-  }
+  ASSERT_EQ(rc, UI_ERROR_NONE);
+  ASSERT_EQ(ctx.call_count, 4);
   rc = hook_test_verify_arrangement(&ctx, 1);
-  if (rc != UI_ERROR_NONE) {
-    ui_layout_tree_destroy(ctx.layout_tree);
-    ui_css_stylesheet_destroy(ctx.stylesheet);
-    ui_dom_node_destroy(ctx.root);
-    return 9;
-  }
+  ASSERT_EQ(rc, UI_ERROR_NONE);
 
   /* Step 5: Dragging to narrow portrait 300x500 (COLUMN) */
   rc = hook_resize_callback(&ctx, 300, 500);
-  if (rc != UI_ERROR_NONE || ctx.call_count != 5) {
-    ui_layout_tree_destroy(ctx.layout_tree);
-    ui_css_stylesheet_destroy(ctx.stylesheet);
-    ui_dom_node_destroy(ctx.root);
-    return 10;
-  }
+  ASSERT_EQ(rc, UI_ERROR_NONE);
+  ASSERT_EQ(ctx.call_count, 5);
   rc = hook_test_verify_arrangement(&ctx, 1);
-  if (rc != UI_ERROR_NONE) {
-    ui_layout_tree_destroy(ctx.layout_tree);
-    ui_css_stylesheet_destroy(ctx.stylesheet);
-    ui_dom_node_destroy(ctx.root);
-    return 11;
-  }
+  ASSERT_EQ(rc, UI_ERROR_NONE);
 
   /* Step 6: Dragging back to wider landscape 650x600 (ROW) */
   rc = hook_resize_callback(&ctx, 650, 600);
-  if (rc != UI_ERROR_NONE || ctx.call_count != 6) {
-    ui_layout_tree_destroy(ctx.layout_tree);
-    ui_css_stylesheet_destroy(ctx.stylesheet);
-    ui_dom_node_destroy(ctx.root);
-    return 12;
-  }
+  ASSERT_EQ(rc, UI_ERROR_NONE);
+  ASSERT_EQ(ctx.call_count, 6);
   rc = hook_test_verify_arrangement(&ctx, 0);
-  if (rc != UI_ERROR_NONE) {
-    ui_layout_tree_destroy(ctx.layout_tree);
-    ui_css_stylesheet_destroy(ctx.stylesheet);
-    ui_dom_node_destroy(ctx.root);
-    return 13;
-  }
+  ASSERT_EQ(rc, UI_ERROR_NONE);
 
   /* Step 7: Dragging all the way back to 800x600 (ROW) */
   rc = hook_resize_callback(&ctx, 800, 600);
-  if (rc != UI_ERROR_NONE || ctx.call_count != 7) {
-    ui_layout_tree_destroy(ctx.layout_tree);
-    ui_css_stylesheet_destroy(ctx.stylesheet);
-    ui_dom_node_destroy(ctx.root);
-    return 14;
-  }
+  ASSERT_EQ(rc, UI_ERROR_NONE);
+  ASSERT_EQ(ctx.call_count, 7);
   rc = hook_test_verify_arrangement(&ctx, 0);
-  if (rc != UI_ERROR_NONE) {
-    ui_layout_tree_destroy(ctx.layout_tree);
-    ui_css_stylesheet_destroy(ctx.stylesheet);
-    ui_dom_node_destroy(ctx.root);
-    return 15;
-  }
+  ASSERT_EQ(rc, UI_ERROR_NONE);
 
   ui_layout_tree_destroy(ctx.layout_tree);
   ui_css_stylesheet_destroy(ctx.stylesheet);
   ui_dom_node_destroy(ctx.root);
-  return 0;
+  PASS();
 }
 
 /**
  * @brief Tests backend get_os_handle and set_on_resize_callback interaction.
  * @return 0 on success, non-zero on failure.
  */
-static int test_backend_handle_hook(void) {
+TEST test_backend_handle_hook(void) {
   struct ui_window_backend *backend = NULL;
   struct ui_window *window = NULL;
   void *os_handle = NULL;
@@ -437,7 +379,7 @@ static int test_backend_handle_hook(void) {
 #endif
 
   if (rc != UI_ERROR_NONE || !backend) {
-    return 0; /* Platform backend not available in headless environment */
+    PASS(); /* Platform backend not available in headless environment */
   }
 
   /* Test parameter validation on get_os_handle */
@@ -445,19 +387,32 @@ static int test_backend_handle_hook(void) {
     rc = backend->get_os_handle(NULL, window, &os_handle);
     if (rc != UI_ERROR_INVALID_ARGUMENT) {
       backend->destroy_window(backend, window);
-      return 1;
+      FAILm("Expected UI_ERROR_INVALID_ARGUMENT for NULL backend");
     }
     rc = backend->get_os_handle(backend, NULL, &os_handle);
     if (rc != UI_ERROR_INVALID_ARGUMENT) {
-      return 2;
+      FAILm("Expected UI_ERROR_INVALID_ARGUMENT for NULL window");
     }
     rc = backend->get_os_handle(backend, window, NULL);
     if (rc != UI_ERROR_INVALID_ARGUMENT) {
-      return 3;
+      FAILm("Expected UI_ERROR_INVALID_ARGUMENT for NULL os_handle");
     }
   }
 
   /* Create actual window and retrieve native OS handle */
+  if (getenv("WINELOADER") != NULL) {
+    printf("Skipping actual window creation under Wine CI.\n");
+    rc = backend->destroy_window(backend, window);
+#if defined(__APPLE__) && defined(__MACH__)
+    ui_window_backend_macos_destroy(backend);
+#elif defined(_WIN32) || defined(__CYGWIN__)
+    ui_window_backend_win32_destroy(backend);
+#elif defined(__linux__) || defined(__unix__)
+    ui_window_backend_linux_destroy(backend);
+#endif
+    PASS();
+  }
+
   rc = backend->create_window(backend, "Hook Test Window", 800, 600, &window);
   if (rc != UI_ERROR_NONE || !window) {
 #if defined(__APPLE__) && defined(__MACH__)
@@ -467,7 +422,7 @@ static int test_backend_handle_hook(void) {
 #elif defined(__linux__) || defined(__unix__)
     ui_window_backend_linux_destroy(backend);
 #endif
-    return 0;
+    PASS();
   }
 
   if (backend->get_os_handle) {
@@ -481,7 +436,7 @@ static int test_backend_handle_hook(void) {
 #elif defined(__linux__) || defined(__unix__)
       ui_window_backend_linux_destroy(backend);
 #endif
-      return 4;
+      FAILm("Failed to get OS handle");
     }
   }
 
@@ -498,7 +453,7 @@ static int test_backend_handle_hook(void) {
 #elif defined(__linux__) || defined(__unix__)
       ui_window_backend_linux_destroy(backend);
 #endif
-      return 5;
+      FAILm("Failed to set resize callback");
     }
   }
 
@@ -510,9 +465,7 @@ static int test_backend_handle_hook(void) {
   }
 
   rc = backend->destroy_window(backend, window);
-  if (rc != UI_ERROR_NONE) {
-    return 6;
-  }
+  ASSERT_EQ(rc, UI_ERROR_NONE);
 
 #if defined(__APPLE__) && defined(__MACH__)
   rc = ui_window_backend_macos_destroy(backend);
@@ -521,34 +474,22 @@ static int test_backend_handle_hook(void) {
 #elif defined(__linux__) || defined(__unix__)
   rc = ui_window_backend_linux_destroy(backend);
 #endif
-  if (rc != UI_ERROR_NONE) {
-    return 7;
-  }
+  ASSERT_EQ(rc, UI_ERROR_NONE);
 
-  return 0;
+  PASS();
+}
+
+SUITE(window_handle_hook_suite) {
+  RUN_TEST(test_live_drag_workflow);
+  RUN_TEST(test_backend_handle_hook);
 }
 
 /**
  * @brief Application entry point for window handle hook test suite.
  * @return 0 on success, non-zero on failure.
  */
-int main(void) {
-  int rc;
-
-  printf("Running test_live_drag_workflow...\n");
-  rc = test_live_drag_workflow();
-  if (rc != 0) {
-    printf("test_live_drag_workflow failed with code %d\n", rc);
-    return rc;
-  }
-
-  printf("Running test_backend_handle_hook...\n");
-  rc = test_backend_handle_hook();
-  if (rc != 0) {
-    printf("test_backend_handle_hook failed with code %d\n", rc);
-    return rc;
-  }
-
-  printf("All window handle hook tests passed!\n");
-  return 0;
+int main(int argc, char **argv) {
+  GREATEST_MAIN_BEGIN();
+  RUN_SUITE(window_handle_hook_suite);
+  GREATEST_MAIN_END();
 }

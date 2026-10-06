@@ -34,7 +34,6 @@ sampler_width_class_to_str(enum ui_adaptive_window_width_class wc) {
     return "compact";
   case UI_WINDOW_WIDTH_MEDIUM:
     return "medium";
-  case UI_WINDOW_WIDTH_EXPANDED:
   default:
     return "expanded";
   }
@@ -136,25 +135,20 @@ ui_error_t ui_adaptive_pane_scaffold_base_create(
   /* Root container */
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &scaffold->root_node);
   if (rc != UI_ERROR_NONE) {
-    ui_component_destroy(scaffold->component);
-    C_MULTIPLATFORM_FREE(scaffold);
+    ui_adaptive_pane_scaffold_base_destroy(scaffold);
     return rc;
   }
 
   rc = ui_dom_node_set_tag_name(scaffold->root_node, "div");
   if (rc != UI_ERROR_NONE) {
-    ui_dom_node_destroy(scaffold->root_node);
-    ui_component_destroy(scaffold->component);
-    C_MULTIPLATFORM_FREE(scaffold);
+    ui_adaptive_pane_scaffold_base_destroy(scaffold);
     return rc;
   }
 
   rc = ui_dom_node_set_attribute(scaffold->root_node, "class",
                                  "ui-adaptive-pane-scaffold");
   if (rc != UI_ERROR_NONE) {
-    ui_dom_node_destroy(scaffold->root_node);
-    ui_component_destroy(scaffold->component);
-    C_MULTIPLATFORM_FREE(scaffold);
+    ui_adaptive_pane_scaffold_base_destroy(scaffold);
     return rc;
   }
 
@@ -163,18 +157,14 @@ ui_error_t ui_adaptive_pane_scaffold_base_create(
                                      ? "list-detail"
                                      : "supporting-pane");
   if (rc != UI_ERROR_NONE) {
-    ui_dom_node_destroy(scaffold->root_node);
-    ui_component_destroy(scaffold->component);
-    C_MULTIPLATFORM_FREE(scaffold);
+    ui_adaptive_pane_scaffold_base_destroy(scaffold);
     return rc;
   }
 
   rc = ui_dom_node_set_attribute(scaffold->root_node, "data-width-class",
                                  "expanded");
   if (rc != UI_ERROR_NONE) {
-    ui_dom_node_destroy(scaffold->root_node);
-    ui_component_destroy(scaffold->component);
-    C_MULTIPLATFORM_FREE(scaffold);
+    ui_adaptive_pane_scaffold_base_destroy(scaffold);
     return rc;
   }
 
@@ -182,115 +172,65 @@ ui_error_t ui_adaptive_pane_scaffold_base_create(
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT,
                           &scaffold->primary_slot_node);
   if (rc != UI_ERROR_NONE) {
-    ui_dom_node_destroy(scaffold->root_node);
-    ui_component_destroy(scaffold->component);
-    C_MULTIPLATFORM_FREE(scaffold);
+    ui_adaptive_pane_scaffold_base_destroy(scaffold);
     return rc;
   }
   rc = ui_dom_node_set_tag_name(scaffold->primary_slot_node, "div");
   if (rc != UI_ERROR_NONE) {
-    ui_dom_node_destroy(scaffold->primary_slot_node);
-    ui_dom_node_destroy(scaffold->root_node);
-    ui_component_destroy(scaffold->component);
-    C_MULTIPLATFORM_FREE(scaffold);
+    ui_adaptive_pane_scaffold_base_destroy(scaffold);
     return rc;
   }
   rc = ui_dom_node_set_attribute(scaffold->primary_slot_node, "class",
                                  "ui-adaptive-pane-slot ui-pane-primary");
   if (rc != UI_ERROR_NONE) {
-    ui_dom_node_destroy(scaffold->primary_slot_node);
-    ui_dom_node_destroy(scaffold->root_node);
-    ui_component_destroy(scaffold->component);
-    C_MULTIPLATFORM_FREE(scaffold);
+    ui_adaptive_pane_scaffold_base_destroy(scaffold);
     return rc;
   }
-  rc = ui_dom_node_append_child(scaffold->root_node,
-                                scaffold->primary_slot_node);
-  if (rc != UI_ERROR_NONE) {
-    ui_dom_node_destroy(scaffold->primary_slot_node);
-    ui_dom_node_destroy(scaffold->root_node);
-    ui_component_destroy(scaffold->component);
-    C_MULTIPLATFORM_FREE(scaffold);
-    return rc;
-  }
+  ui_dom_node_append_child(scaffold->root_node, scaffold->primary_slot_node);
 
   /* Secondary slot */
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT,
                           &scaffold->secondary_slot_node);
   if (rc != UI_ERROR_NONE) {
-    ui_dom_node_destroy(scaffold->root_node);
-    ui_component_destroy(scaffold->component);
-    C_MULTIPLATFORM_FREE(scaffold);
+    ui_adaptive_pane_scaffold_base_destroy(scaffold);
     return rc;
   }
   rc = ui_dom_node_set_tag_name(scaffold->secondary_slot_node, "div");
   if (rc != UI_ERROR_NONE) {
-    ui_dom_node_destroy(scaffold->secondary_slot_node);
-    ui_dom_node_destroy(scaffold->root_node);
-    ui_component_destroy(scaffold->component);
-    C_MULTIPLATFORM_FREE(scaffold);
+    ui_adaptive_pane_scaffold_base_destroy(scaffold);
     return rc;
   }
   rc = ui_dom_node_set_attribute(scaffold->secondary_slot_node, "class",
                                  "ui-adaptive-pane-slot ui-pane-secondary");
   if (rc != UI_ERROR_NONE) {
-    ui_dom_node_destroy(scaffold->secondary_slot_node);
-    ui_dom_node_destroy(scaffold->root_node);
-    ui_component_destroy(scaffold->component);
-    C_MULTIPLATFORM_FREE(scaffold);
+    ui_adaptive_pane_scaffold_base_destroy(scaffold);
     return rc;
   }
-  rc = ui_dom_node_append_child(scaffold->root_node,
-                                scaffold->secondary_slot_node);
-  if (rc != UI_ERROR_NONE) {
-    ui_dom_node_destroy(scaffold->secondary_slot_node);
-    ui_dom_node_destroy(scaffold->root_node);
-    ui_component_destroy(scaffold->component);
-    C_MULTIPLATFORM_FREE(scaffold);
-    return rc;
-  }
+  ui_dom_node_append_child(scaffold->root_node, scaffold->secondary_slot_node);
 
   /* Supporting slot */
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT,
                           &scaffold->supporting_slot_node);
   if (rc != UI_ERROR_NONE) {
-    ui_dom_node_destroy(scaffold->root_node);
-    ui_component_destroy(scaffold->component);
-    C_MULTIPLATFORM_FREE(scaffold);
+    ui_adaptive_pane_scaffold_base_destroy(scaffold);
     return rc;
   }
   rc = ui_dom_node_set_tag_name(scaffold->supporting_slot_node, "div");
   if (rc != UI_ERROR_NONE) {
-    ui_dom_node_destroy(scaffold->supporting_slot_node);
-    ui_dom_node_destroy(scaffold->root_node);
-    ui_component_destroy(scaffold->component);
-    C_MULTIPLATFORM_FREE(scaffold);
+    ui_adaptive_pane_scaffold_base_destroy(scaffold);
     return rc;
   }
   rc = ui_dom_node_set_attribute(scaffold->supporting_slot_node, "class",
                                  "ui-adaptive-pane-slot ui-pane-supporting");
   if (rc != UI_ERROR_NONE) {
-    ui_dom_node_destroy(scaffold->supporting_slot_node);
-    ui_dom_node_destroy(scaffold->root_node);
-    ui_component_destroy(scaffold->component);
-    C_MULTIPLATFORM_FREE(scaffold);
+    ui_adaptive_pane_scaffold_base_destroy(scaffold);
     return rc;
   }
-  rc = ui_dom_node_append_child(scaffold->root_node,
-                                scaffold->supporting_slot_node);
-  if (rc != UI_ERROR_NONE) {
-    ui_dom_node_destroy(scaffold->supporting_slot_node);
-    ui_dom_node_destroy(scaffold->root_node);
-    ui_component_destroy(scaffold->component);
-    C_MULTIPLATFORM_FREE(scaffold);
-    return rc;
-  }
+  ui_dom_node_append_child(scaffold->root_node, scaffold->supporting_slot_node);
 
   rc = sampler_update_pane_visibility(scaffold);
   if (rc != UI_ERROR_NONE) {
-    ui_dom_node_destroy(scaffold->root_node);
-    ui_component_destroy(scaffold->component);
-    C_MULTIPLATFORM_FREE(scaffold);
+    ui_adaptive_pane_scaffold_base_destroy(scaffold);
     return rc;
   }
 
@@ -305,10 +245,8 @@ ui_error_t ui_adaptive_pane_scaffold_base_destroy(
     return UI_ERROR_NONE;
   }
 
-  if (scaffold->component != NULL) {
-    ui_component_destroy(scaffold->component);
-    scaffold->component = NULL;
-  }
+  ui_component_destroy(scaffold->component);
+  scaffold->component = NULL;
 
   C_MULTIPLATFORM_FREE(scaffold);
   return UI_ERROR_NONE;
@@ -359,7 +297,6 @@ ui_error_t ui_adaptive_pane_scaffold_base_set_pane(
     struct ui_adaptive_pane_scaffold_base *scaffold,
     enum ui_adaptive_pane_role role, struct ui_component *pane_component) {
   struct ui_dom_node *target_slot = NULL;
-  ui_error_t rc;
 
   if (scaffold == NULL) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -382,10 +319,7 @@ ui_error_t ui_adaptive_pane_scaffold_base_set_pane(
   }
 
   if (pane_component != NULL) {
-    rc = ui_component_mount(pane_component, target_slot);
-    if (rc != UI_ERROR_NONE) {
-      return rc;
-    }
+    ui_component_mount(pane_component, target_slot);
   }
 
   return UI_ERROR_NONE;

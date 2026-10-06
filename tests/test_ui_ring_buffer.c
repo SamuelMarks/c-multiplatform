@@ -106,7 +106,7 @@ static int run_normal_tests(void) {
   /* Test wrap-around math at exact byte boundaries */
   {
     /* 10 bytes capacity */
-    char bytes[10] = "0123456789";
+    char bytes[11] = "0123456789";
     char out_byte;
     rc = ui_ring_buffer_create(1, 10, &rb);
     if (rc != UI_ERROR_NONE)

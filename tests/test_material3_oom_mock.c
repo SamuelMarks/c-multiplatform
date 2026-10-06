@@ -239,11 +239,17 @@ TEST test_md3_oom_search(void) {
   ui_error_t rc;
 
 #ifdef UI_TEST_MOCK_ALLOC
+  extern int g_md3_search_mock_fail;
   g_malloc_fail_countdown = 0;
   rc = md3_search_bar_create(dummy_engine, "Search", &sb, NULL);
   ASSERT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
 
   g_malloc_fail_countdown = -1;
+  g_md3_search_mock_fail = 1;
+  rc = md3_search_bar_create(dummy_engine, "Search", &sb, NULL);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+  g_md3_search_mock_fail = 0;
+
   rc = md3_search_bar_create(dummy_engine, "Search", &sb, NULL);
   ASSERT_EQ(UI_ERROR_NONE, rc);
   g_malloc_fail_countdown = 0;

@@ -16,6 +16,12 @@
 
 #if defined(__APPLE__)
 
+struct ui_video_decoder {
+  VTDecompressionSessionRef session;
+  int width;
+  int height;
+};
+
 struct ui_vt_api {
   OSStatus (*VTDecompressionSessionCreate)(
       CFAllocatorRef allocator,
@@ -34,6 +40,7 @@ struct ui_vt_api {
 extern void ui_video_avfoundation_set_mock_api(const struct ui_vt_api *mock);
 
 static OSStatus mock_create_ret = noErr;
+static int mock_create_session_null = 0;
 static OSStatus mock_decode_ret = noErr;
 static VTDecompressionOutputCallback captured_output_callback = NULL;
 
@@ -50,6 +57,10 @@ static OSStatus my_VTDecompressionSessionCreate(
   (void)destinationImageBufferAttributes;
   if (outputCallback) {
     captured_output_callback = outputCallback->decompressionOutputCallback;
+  }
+  if (mock_create_session_null) {
+    *decompressionSessionOut = NULL;
+    return noErr;
   }
   if (mock_create_ret == noErr) {
     *decompressionSessionOut = (VTDecompressionSessionRef)0xcafebabe;
@@ -82,6 +93,7 @@ static struct ui_vt_api mock_api = {my_VTDecompressionSessionCreate,
 
 static void reset_mocks(void) {
   mock_create_ret = noErr;
+  mock_create_session_null = 0;
   mock_decode_ret = noErr;
   ui_video_avfoundation_set_mock_api(&mock_api);
 }
@@ -135,6 +147,7 @@ TEST test_avf_create_decoder_failures(void) {
   struct ui_video_decoder_backend backend;
   struct ui_video_decoder_config config = {1920, 1080, 0};
   struct ui_video_decoder *dec = NULL;
+  struct ui_video_decoder *null_dec = NULL;
 
   ui_video_decoder_avfoundation_get_backend(&backend);
 
@@ -142,6 +155,18 @@ TEST test_avf_create_decoder_failures(void) {
   mock_create_ret = -1;
   ASSERT_EQ(UI_ERROR_IO_FAILED,
             backend.create_decoder(&backend, &config, &dec));
+
+  reset_mocks();
+  mock_create_session_null = 1;
+  ASSERT_EQ(UI_ERROR_IO_FAILED,
+            backend.create_decoder(&backend, &config, &dec));
+  mock_create_session_null = 0;
+
+  /* Test destroy with NULL session */
+  null_dec = (struct ui_video_decoder *)malloc(sizeof(struct ui_video_decoder));
+  memset(null_dec, 0, sizeof(struct ui_video_decoder));
+  null_dec->session = NULL;
+  ASSERT_EQ(UI_ERROR_NONE, backend.destroy_decoder(&backend, null_dec));
 
   /* Test OOM */
   reset_mocks();

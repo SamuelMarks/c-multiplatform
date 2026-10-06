@@ -164,7 +164,17 @@ ui_error_t md2_theme_init_light(struct md2_theme *out_theme) {
 
   out_theme->is_dark = 0;
   out_theme->font_scale = 1.0f;
-  rc = md2_color_palette_init_light(&out_theme->colors);
+
+#ifdef UI_TEST_MOCK_ALLOC
+  extern int g_md2_theme_mock_color_init_fail;
+  if (g_md2_theme_mock_color_init_fail) {
+    rc = UI_ERROR_UNKNOWN;
+  } else {
+#endif
+    rc = md2_color_palette_init_light(&out_theme->colors);
+#ifdef UI_TEST_MOCK_ALLOC
+  }
+#endif
   if (rc != UI_ERROR_NONE) {
     return rc;
   }
@@ -181,7 +191,17 @@ ui_error_t md2_theme_init_dark(struct md2_theme *out_theme) {
 
   out_theme->is_dark = 1;
   out_theme->font_scale = 1.0f;
-  rc = md2_color_palette_init_dark(&out_theme->colors);
+
+#ifdef UI_TEST_MOCK_ALLOC
+  extern int g_md2_theme_mock_color_init_fail;
+  if (g_md2_theme_mock_color_init_fail) {
+    rc = UI_ERROR_UNKNOWN;
+  } else {
+#endif
+    rc = md2_color_palette_init_dark(&out_theme->colors);
+#ifdef UI_TEST_MOCK_ALLOC
+  }
+#endif
   if (rc != UI_ERROR_NONE) {
     return rc;
   }

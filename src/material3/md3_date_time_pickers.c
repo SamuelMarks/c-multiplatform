@@ -13,6 +13,157 @@
 #include <string.h>
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_md3_pickers_mock_fail = 0;
+
+static ui_error_t mock_datepicker_base_destroy(struct ui_datepicker_base *p) {
+  if (g_md3_pickers_mock_fail == 1) {
+    (ui_datepicker_base_destroy)(p);
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_datepicker_base_destroy)(p);
+}
+#undef ui_datepicker_base_destroy
+/** @cond */
+#define ui_datepicker_base_destroy mock_datepicker_base_destroy
+/** @endcond */
+
+static ui_error_t mock_calendar_base_destroy(struct ui_calendar_base *p) {
+  if (g_md3_pickers_mock_fail == 2) {
+    (ui_calendar_base_destroy)(p);
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_calendar_base_destroy)(p);
+}
+#undef ui_calendar_base_destroy
+/** @cond */
+#define ui_calendar_base_destroy mock_calendar_base_destroy
+/** @endcond */
+
+static ui_error_t mock_popover_base_destroy(struct ui_popover_base *p) {
+  if (g_md3_pickers_mock_fail == 3) {
+    (ui_popover_base_destroy)(p);
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_popover_base_destroy)(p);
+}
+#undef ui_popover_base_destroy
+/** @cond */
+#define ui_popover_base_destroy mock_popover_base_destroy
+/** @endcond */
+
+static ui_error_t mock_input_base_destroy(struct ui_input_base *p) {
+  if (g_md3_pickers_mock_fail == 4) {
+    (ui_input_base_destroy)(p);
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_input_base_destroy)(p);
+}
+#undef ui_input_base_destroy
+/** @cond */
+#define ui_input_base_destroy mock_input_base_destroy
+/** @endcond */
+
+static ui_error_t mock_component_destroy(struct ui_component *p) {
+  if (g_md3_pickers_mock_fail == 5) {
+    (ui_component_destroy)(p);
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_component_destroy)(p);
+}
+#undef ui_component_destroy
+/** @cond */
+#define ui_component_destroy mock_component_destroy
+/** @endcond */
+
+static ui_error_t
+mock_date_range_picker_base_destroy(struct ui_date_range_picker_base *p) {
+  if (g_md3_pickers_mock_fail == 6) {
+    (ui_date_range_picker_base_destroy)(p);
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_date_range_picker_base_destroy)(p);
+}
+#undef ui_date_range_picker_base_destroy
+/** @cond */
+#define ui_date_range_picker_base_destroy mock_date_range_picker_base_destroy
+/** @endcond */
+
+static ui_error_t mock_timepicker_base_destroy(struct ui_timepicker_base *p) {
+  if (g_md3_pickers_mock_fail == 7) {
+    (ui_timepicker_base_destroy)(p);
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_timepicker_base_destroy)(p);
+}
+#undef ui_timepicker_base_destroy
+/** @cond */
+#define ui_timepicker_base_destroy mock_timepicker_base_destroy
+/** @endcond */
+
+extern ui_error_t
+ui_date_range_picker_base_select_date(struct ui_date_range_picker_base *,
+                                      const struct ui_date *);
+static ui_error_t
+mock_date_range_picker_base_select_date(struct ui_date_range_picker_base *p,
+                                        const struct ui_date *d) {
+  if (g_md3_pickers_mock_fail == 8)
+    return UI_ERROR_UNKNOWN;
+  return (ui_date_range_picker_base_select_date)(p, d);
+}
+#undef ui_date_range_picker_base_select_date
+/** @cond */
+#define ui_date_range_picker_base_select_date                                  \
+  mock_date_range_picker_base_select_date
+/** @endcond */
+
+extern ui_error_t
+ui_date_range_picker_base_get_range(const struct ui_date_range_picker_base *,
+                                    struct ui_date_range *);
+static ui_error_t
+mock_date_range_picker_base_get_range(const struct ui_date_range_picker_base *p,
+                                      struct ui_date_range *r) {
+  if (g_md3_pickers_mock_fail == 9)
+    return UI_ERROR_UNKNOWN;
+  return (ui_date_range_picker_base_get_range)(p, r);
+}
+#undef ui_date_range_picker_base_get_range
+/** @cond */
+#define ui_date_range_picker_base_get_range                                    \
+  mock_date_range_picker_base_get_range
+/** @endcond */
+
+extern ui_error_t
+ui_date_range_picker_base_set_hover_date(struct ui_date_range_picker_base *,
+                                         const struct ui_date *);
+static ui_error_t
+mock_date_range_picker_base_set_hover_date(struct ui_date_range_picker_base *p,
+                                           const struct ui_date *d) {
+  if (g_md3_pickers_mock_fail == 10)
+    return UI_ERROR_UNKNOWN;
+  return (ui_date_range_picker_base_set_hover_date)(p, d);
+}
+#undef ui_date_range_picker_base_set_hover_date
+/** @cond */
+#define ui_date_range_picker_base_set_hover_date                               \
+  mock_date_range_picker_base_set_hover_date
+/** @endcond */
+
+extern ui_error_t
+ui_date_range_picker_base_clear(struct ui_date_range_picker_base *);
+static ui_error_t
+mock_date_range_picker_base_clear(struct ui_date_range_picker_base *p) {
+  if (g_md3_pickers_mock_fail == 11)
+    return UI_ERROR_UNKNOWN;
+  return (ui_date_range_picker_base_clear)(p);
+}
+#undef ui_date_range_picker_base_clear
+/** @cond */
+#define ui_date_range_picker_base_clear mock_date_range_picker_base_clear
+/** @endcond */
+
+#endif
+
 struct md3_date_picker {
   struct ui_component *component;
   struct ui_datepicker_base *base;
@@ -62,43 +213,33 @@ ui_error_t md3_date_picker_create(struct ui_engine *engine,
 
   rc = ui_component_create(&picker->component);
   if (rc != UI_ERROR_NONE) {
-    C_MULTIPLATFORM_FREE(picker);
+    md3_date_picker_destroy(picker);
     return rc;
   }
 
   /* Mock dependencies for datepicker_base */
   rc = ui_input_base_create(&picker->input);
   if (rc != UI_ERROR_NONE) {
-    ui_component_destroy(picker->component);
-    C_MULTIPLATFORM_FREE(picker);
+    md3_date_picker_destroy(picker);
     return rc;
   }
 
   rc = ui_popover_base_create(&picker->popover);
   if (rc != UI_ERROR_NONE) {
-    ui_input_base_destroy(picker->input);
-    ui_component_destroy(picker->component);
-    C_MULTIPLATFORM_FREE(picker);
+    md3_date_picker_destroy(picker);
     return rc;
   }
 
   rc = ui_calendar_base_create(&picker->calendar, &picker->calendar_cva);
   if (rc != UI_ERROR_NONE) {
-    ui_popover_base_destroy(picker->popover);
-    ui_input_base_destroy(picker->input);
-    ui_component_destroy(picker->component);
-    C_MULTIPLATFORM_FREE(picker);
+    md3_date_picker_destroy(picker);
     return rc;
   }
 
   rc = ui_datepicker_base_create(&picker->base, picker->input, picker->popover,
                                  picker->calendar, &picker->cva);
   if (rc != UI_ERROR_NONE) {
-    ui_calendar_base_destroy(picker->calendar);
-    ui_popover_base_destroy(picker->popover);
-    ui_input_base_destroy(picker->input);
-    ui_component_destroy(picker->component);
-    C_MULTIPLATFORM_FREE(picker);
+    md3_date_picker_destroy(picker);
     return rc;
   }
 
@@ -171,7 +312,7 @@ md3_date_range_picker_create(struct ui_engine *engine,
     rc = ui_date_range_picker_base_create(&picker->base);
   }
   if (rc != UI_ERROR_NONE) {
-    C_MULTIPLATFORM_FREE(picker);
+    md3_date_range_picker_destroy(picker);
     return rc;
   }
 
@@ -185,6 +326,12 @@ ui_error_t md3_date_range_picker_destroy(struct md3_date_range_picker *picker) {
 
   if (!picker) {
     return UI_ERROR_INVALID_ARGUMENT;
+  }
+
+  if (picker->base) {
+    temp_rc = ui_date_range_picker_base_destroy(picker->base);
+    if (temp_rc != UI_ERROR_NONE)
+      rc = temp_rc;
   }
 
   if (picker->component) {
@@ -225,14 +372,13 @@ ui_error_t md3_time_picker_create(struct ui_engine *engine,
 
   rc = ui_component_create(&picker->component);
   if (rc != UI_ERROR_NONE) {
-    C_MULTIPLATFORM_FREE(picker);
+    md3_time_picker_destroy(picker);
     return rc;
   }
 
   rc = ui_timepicker_base_create(&picker->base, &picker->cva);
   if (rc != UI_ERROR_NONE) {
-    ui_component_destroy(picker->component);
-    C_MULTIPLATFORM_FREE(picker);
+    md3_time_picker_destroy(picker);
     return rc;
   }
 

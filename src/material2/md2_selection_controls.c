@@ -6,6 +6,7 @@
 /* clang-format off */
 #include "material2/md2_selection_controls.h"
 #include <stdlib.h>
+#include "ui_internal_mem.h"
 /* clang-format on */
 
 struct md2_checkbox {
@@ -20,14 +21,15 @@ ui_error_t md2_checkbox_create(struct md2_checkbox **out_checkbox) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  checkbox = (struct md2_checkbox *)malloc(sizeof(struct md2_checkbox));
+  checkbox = (struct md2_checkbox *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct md2_checkbox));
   if (checkbox == NULL) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
 
   rc = ui_checkbox_base_create(&checkbox->base);
   if (rc != UI_ERROR_NONE) {
-    free(checkbox);
+    C_MULTIPLATFORM_FREE(checkbox);
     return rc;
   }
 
@@ -41,7 +43,7 @@ ui_error_t md2_checkbox_destroy(struct md2_checkbox *checkbox) {
   }
 
   ui_checkbox_base_destroy(checkbox->base);
-  free(checkbox);
+  C_MULTIPLATFORM_FREE(checkbox);
   return UI_ERROR_NONE;
 }
 
@@ -66,14 +68,15 @@ ui_error_t md2_radio_button_create(struct md2_radio_button **out_radio) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  radio = (struct md2_radio_button *)malloc(sizeof(struct md2_radio_button));
+  radio = (struct md2_radio_button *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct md2_radio_button));
   if (radio == NULL) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
 
   rc = ui_radio_group_base_create(&radio->base, NULL);
   if (rc != UI_ERROR_NONE) {
-    free(radio);
+    C_MULTIPLATFORM_FREE(radio);
     return rc;
   }
 
@@ -87,7 +90,7 @@ ui_error_t md2_radio_button_destroy(struct md2_radio_button *radio) {
   }
 
   ui_radio_group_base_destroy(radio->base);
-  free(radio);
+  C_MULTIPLATFORM_FREE(radio);
   return UI_ERROR_NONE;
 }
 
@@ -113,14 +116,14 @@ ui_error_t md2_switch_create(struct md2_switch **out_switch) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  sw = (struct md2_switch *)malloc(sizeof(struct md2_switch));
+  sw = (struct md2_switch *)C_MULTIPLATFORM_MALLOC(sizeof(struct md2_switch));
   if (sw == NULL) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
 
   rc = ui_slide_toggle_base_create(&sw->base, NULL);
   if (rc != UI_ERROR_NONE) {
-    free(sw);
+    C_MULTIPLATFORM_FREE(sw);
     return rc;
   }
 
@@ -134,7 +137,7 @@ ui_error_t md2_switch_destroy(struct md2_switch *sw) {
   }
 
   ui_slide_toggle_base_destroy(sw->base);
-  free(sw);
+  C_MULTIPLATFORM_FREE(sw);
   return UI_ERROR_NONE;
 }
 
@@ -160,14 +163,15 @@ ui_error_t md2_slider_create(struct md2_slider **out_slider) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  slider = (struct md2_slider *)malloc(sizeof(struct md2_slider));
+  slider =
+      (struct md2_slider *)C_MULTIPLATFORM_MALLOC(sizeof(struct md2_slider));
   if (slider == NULL) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
 
   rc = ui_slider_base_create(&slider->base, NULL);
   if (rc != UI_ERROR_NONE) {
-    free(slider);
+    C_MULTIPLATFORM_FREE(slider);
     return rc;
   }
 
@@ -181,7 +185,7 @@ ui_error_t md2_slider_destroy(struct md2_slider *slider) {
   }
 
   ui_slider_base_destroy(slider->base);
-  free(slider);
+  C_MULTIPLATFORM_FREE(slider);
   return UI_ERROR_NONE;
 }
 

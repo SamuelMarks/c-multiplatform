@@ -15,6 +15,12 @@
 
 #if defined(__APPLE__)
 
+struct ui_audio_sink {
+  AudioComponentInstance audio_unit;
+  int sample_rate;
+  int frame_size;
+};
+
 struct ui_coreaudio_api {
   AudioComponent (*AudioComponentFindNext)(
       AudioComponent inComponent, const AudioComponentDescription *inDesc);
@@ -36,6 +42,7 @@ ui_audio_coreaudio_set_mock_api(const struct ui_coreaudio_api *mock);
 
 static AudioComponent mock_comp_ret = (AudioComponent)-1;
 static OSStatus mock_new_ret = noErr;
+static int mock_new_instance_null = 0;
 static OSStatus mock_dispose_ret = noErr;
 static OSStatus mock_init_ret = noErr;
 static OSStatus mock_uninit_ret = noErr;
@@ -64,6 +71,10 @@ static OSStatus
 my_AudioComponentInstanceNew(AudioComponent inComponent,
                              AudioComponentInstance *outInstance) {
   (void)inComponent;
+  if (mock_new_instance_null) {
+    *outInstance = NULL;
+    return noErr;
+  }
   if (mock_new_ret == noErr) {
     *outInstance = (AudioComponentInstance)0xcafebabe;
   } else {
@@ -125,6 +136,7 @@ static struct ui_coreaudio_api mock_api = {
 static void reset_mocks(void) {
   mock_comp_ret = (AudioComponent)-1;
   mock_new_ret = noErr;
+  mock_new_instance_null = 0;
   mock_dispose_ret = noErr;
   mock_init_ret = noErr;
   mock_uninit_ret = noErr;
@@ -221,6 +233,11 @@ TEST test_coreaudio_create_sink_failures(void) {
   mock_init_ret = -1;
   ASSERT_EQ(UI_ERROR_IO_FAILED, backend.create_sink(&backend, &config, &sink));
 
+  reset_mocks();
+  mock_new_instance_null = 1;
+  ASSERT_EQ(UI_ERROR_IO_FAILED, backend.create_sink(&backend, &config, &sink));
+  mock_new_instance_null = 0;
+
   /* Test OOM */
   reset_mocks();
   g_malloc_fail_countdown = 0;
@@ -249,6 +266,14 @@ TEST test_coreaudio_create_sink_failures(void) {
     /* Verify it zeroed the buffer */
     ASSERT_EQ(0, ((char *)buf_list.mBuffers[0].mData)[0]);
     free(buf_list.mBuffers[0].mData);
+
+    /* Test ioData == NULL */
+    g_captured_render_callback(NULL, NULL, NULL, 0, 0, NULL);
+
+    /* Test ioData->mNumberBuffers == 0 */
+    buf_list.mNumberBuffers = 0;
+    buf_list.mBuffers[0].mData = NULL;
+    g_captured_render_callback(NULL, NULL, NULL, 0, 0, &buf_list);
   }
   backend.destroy_sink(&backend, sink);
 
@@ -257,10 +282,18 @@ TEST test_coreaudio_create_sink_failures(void) {
 
 TEST test_coreaudio_destroy_sink_invalid(void) {
   struct ui_audio_sink_backend backend;
+  struct ui_audio_sink *null_sink;
+
   ui_audio_sink_coreaudio_get_backend(&backend);
 
   ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, backend.destroy_sink(NULL, NULL));
   ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, backend.destroy_sink(&backend, NULL));
+
+  null_sink = (struct ui_audio_sink *)malloc(sizeof(struct ui_audio_sink));
+  memset(null_sink, 0, sizeof(struct ui_audio_sink));
+  null_sink->audio_unit = NULL;
+  ASSERT_EQ(UI_ERROR_NONE, backend.destroy_sink(&backend, null_sink));
+
   PASS();
 }
 

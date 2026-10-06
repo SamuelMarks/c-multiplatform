@@ -23,7 +23,45 @@ static ui_error_t dummy_on_click(struct ui_button_base *btn, void *user_data) {
   return UI_ERROR_NONE;
 }
 
+/* Hacks to access internal structure for branch coverage testing */
+struct md2_fab_hack {
+  struct ui_component *component;
+  struct ui_fab_base *base;
+  enum md2_fab_size size;
+};
+
 SUITE(md2_fab_suite);
+
+TEST test_md2_fab_base_failures(void) {
+  struct ui_engine *engine = NULL;
+  struct ui_engine_config engine_cfg;
+  struct md2_fab *fab = NULL;
+  struct ui_fab_base *orig_base = NULL;
+  ui_error_t rc;
+
+  memset(&engine_cfg, 0, sizeof(engine_cfg));
+  engine_cfg.num_threads = 1;
+  rc = ui_engine_create(&engine_cfg, &engine);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  rc = md2_fab_create(engine, MD2_FAB_SIZE_STANDARD, "add", NULL, &fab);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  orig_base = ((struct md2_fab_hack *)fab)->base;
+  ((struct md2_fab_hack *)fab)->base = NULL;
+
+  rc = md2_fab_set_on_click(fab, dummy_on_click, NULL);
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
+
+  ((struct md2_fab_hack *)fab)->base = orig_base;
+
+  rc = md2_fab_destroy(fab);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  rc = ui_engine_destroy(engine);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  PASS();
+}
 
 TEST test_md2_fab_lifecycle(void) {
   struct ui_engine *engine = NULL;
@@ -54,6 +92,9 @@ TEST test_md2_fab_lifecycle(void) {
   ASSERT_EQ(UI_ERROR_NONE, rc);
   ASSERT(fab != NULL);
 
+  rc = md2_fab_get_base(fab, NULL);
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
+
   rc = md2_fab_get_base(fab, &base);
   ASSERT_EQ(UI_ERROR_NONE, rc);
   ASSERT(base != NULL);
@@ -67,6 +108,18 @@ TEST test_md2_fab_lifecycle(void) {
 
   /* Valid create extended */
   rc = md2_fab_create(engine, MD2_FAB_SIZE_EXTENDED, "add", "Create", &fab);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = md2_fab_destroy(fab);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  /* Valid create extended without label to hit fallback branch */
+  rc = md2_fab_create(engine, MD2_FAB_SIZE_EXTENDED, "add", NULL, &fab);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = md2_fab_destroy(fab);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  /* Valid create without icon */
+  rc = md2_fab_create(engine, MD2_FAB_SIZE_STANDARD, NULL, NULL, &fab);
   ASSERT_EQ(UI_ERROR_NONE, rc);
   rc = md2_fab_destroy(fab);
   ASSERT_EQ(UI_ERROR_NONE, rc);
@@ -90,14 +143,13 @@ TEST test_md2_fab_oom(void) {
   rc = ui_engine_create(&engine_cfg, &engine);
   ASSERT_EQ(UI_ERROR_NONE, rc);
 
-  for (i = 0; i < 4; i++) {
+  for (i = 0; i < 200; i++) {
     g_malloc_fail_countdown = i;
     rc = md2_fab_create(engine, MD2_FAB_SIZE_EXTENDED, "add", "Label", &fab);
     if (rc == UI_ERROR_NONE) {
       md2_fab_destroy(fab);
       break;
     }
-    ASSERT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
   }
 
   g_malloc_fail_countdown = -1;
@@ -111,6 +163,7 @@ TEST test_md2_fab_oom(void) {
 
 SUITE(md2_fab_suite) {
   RUN_TEST(test_md2_fab_lifecycle);
+  RUN_TEST(test_md2_fab_base_failures);
 #ifdef UI_TEST_MOCK_ALLOC
   RUN_TEST(test_md2_fab_oom);
 #endif

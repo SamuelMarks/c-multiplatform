@@ -9,6 +9,32 @@
 #include <string.h>
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+/** @brief Global flag to simulate failures in mocked dependencies. */
+int g_md3_search_mock_fail = 0;
+
+/**
+ * @brief Mock for ui_search_bar_base_init.
+ * @param search_bar Parameter search_bar.
+ * @param component Parameter component.
+ * @param out_cva Parameter out_cva.
+ * @return Return value.
+ */
+static ui_error_t
+mock_search_bar_base_init(struct ui_search_bar_base *search_bar,
+                          struct ui_component *component,
+                          struct ui_control_value_accessor *out_cva) {
+  if (g_md3_search_mock_fail == 1) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return ui_search_bar_base_init(search_bar, component, out_cva);
+}
+#undef ui_search_bar_base_init
+/** @cond */
+#define ui_search_bar_base_init mock_search_bar_base_init
+/** @endcond */
+#endif
+
 ui_error_t md3_search_bar_create(struct ui_engine *engine,
                                  const char *placeholder,
                                  struct md3_search_bar **out_search_bar,

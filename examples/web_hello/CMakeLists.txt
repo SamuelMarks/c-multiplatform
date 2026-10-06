@@ -21,7 +21,7 @@ else()
 endif()
 
 add_executable(web_hello main.c)
-    target_link_libraries(web_hello PRIVATE ui_engine)
+    target_link_libraries(web_hello PRIVATE c-multiplatform-cdk c-multiplatform-material2 c-multiplatform-material3 c-multiplatform-cupertino)
 target_link_platform_libraries(web_hello PRIVATE)
 
     # We output .js. Our web/index.html will load it.

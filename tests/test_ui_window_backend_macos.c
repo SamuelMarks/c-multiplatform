@@ -4,6 +4,12 @@
 #include "../include/ui_event.h"
 #include <stdio.h>
 #include <stdlib.h>
+
+#ifdef UI_TEST_MOCK_ALLOC
+extern int g_malloc_fail_countdown;
+#endif
+extern int g_mock_macos_zero_scale;
+
 #include <string.h>
 #if defined(__APPLE__) && defined(__MACH__)
 #include <TargetConditionals.h>
@@ -211,11 +217,10 @@ int main(void) {
         ui_error_t rc_create;
 
 #ifdef UI_TEST_MOCK_ALLOC
-        extern int g_malloc_fail_countdown;
-        extern int g_mock_macos_no_nsopenglview;
         extern int g_mock_macos_event_type;
         extern int g_mock_macos_fail_delegate;
         extern int g_mock_macos_no_view;
+        extern int g_mock_macos_no_nsopenglview;
         extern int g_mock_macos_fail_allocate_class;
         extern void ui_test_macos_on_window_did_resize(id self, SEL _cmd,
                                                        id notif);
@@ -603,7 +608,6 @@ int main(void) {
             g_mock_macos_no_backing_scale = 0;
 
             /* Poll events when cur_scale <= 0.0 */
-            extern int g_mock_macos_zero_scale;
             g_mock_macos_zero_scale = 1;
             err = backend->poll_events(backend, real_win, &evt, &has_evt);
             failed |= (err != UI_ERROR_NONE);
@@ -615,7 +619,6 @@ int main(void) {
             struct ui_window *mock_win = NULL;
             extern int g_mock_macos_no_window;
             extern int g_mock_macos_no_backing_scale;
-            extern int g_mock_macos_zero_scale;
 
             g_mock_macos_no_window = 1;
             failed |= (backend->create_window(backend, "Mock", 100, 100,
@@ -781,7 +784,6 @@ int main(void) {
   }
 
 #ifdef UI_TEST_MOCK_ALLOC
-  extern int g_malloc_fail_countdown;
   g_malloc_fail_countdown = 0;
   failed |=
       (ui_window_backend_macos_create(&backend) != UI_ERROR_OUT_OF_MEMORY);

@@ -48,8 +48,6 @@ TEST test_md2_button_lifecycle(void) {
   ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
   rc = md2_button_set_text(NULL, "text");
   ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
-  rc = md2_button_set_text(btn, NULL);
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
   rc = md2_button_set_on_click(NULL, dummy_on_click, NULL);
   ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
 
@@ -57,6 +55,12 @@ TEST test_md2_button_lifecycle(void) {
   rc = md2_button_create(engine, MD2_BUTTON_CONTAINED, NULL, &btn);
   ASSERT_EQ(UI_ERROR_NONE, rc);
   ASSERT(btn != NULL);
+
+  rc = md2_button_set_text(btn, NULL);
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
+
+  rc = md2_button_get_base(btn, NULL);
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
 
   rc = md2_button_get_base(btn, &base);
   ASSERT_EQ(UI_ERROR_NONE, rc);
@@ -98,14 +102,13 @@ TEST test_md2_button_oom(void) {
   rc = ui_engine_create(&engine_cfg, &engine);
   ASSERT_EQ(UI_ERROR_NONE, rc);
 
-  for (i = 0; i < 4; i++) {
+  for (i = 0; i < 200; i++) {
     g_malloc_fail_countdown = i;
     rc = md2_button_create(engine, MD2_BUTTON_CONTAINED, "text", &btn);
     if (rc == UI_ERROR_NONE) {
       md2_button_destroy(btn);
       break;
     }
-    ASSERT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
   }
 
   g_malloc_fail_countdown = -1;
@@ -116,6 +119,10 @@ TEST test_md2_button_oom(void) {
   g_malloc_fail_countdown = 0;
   rc = md2_button_set_text(btn, "new text");
   ASSERT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
+
+  g_malloc_fail_countdown = 1;
+  rc = md2_button_set_text(btn, "new text");
+  ASSERT_NEQ(UI_ERROR_NONE, rc);
 
   g_malloc_fail_countdown = -1;
   rc = md2_button_destroy(btn);

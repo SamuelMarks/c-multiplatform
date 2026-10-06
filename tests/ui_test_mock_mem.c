@@ -63,3 +63,4 @@ int g_mock_append_child_fail = 0;
 int g_mock_strcpy_fail = 0;
 int g_mock_lock_contention = 0;
 int g_mock_cg_fail = 0;
+int g_md2_theme_mock_color_init_fail = 0;

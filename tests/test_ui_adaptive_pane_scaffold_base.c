@@ -100,6 +100,13 @@ TEST test_ui_adaptive_pane_scaffold_breakpoints(void) {
   ASSERT_EQ(UI_ERROR_NONE, rc);
   ASSERT_EQ(UI_WINDOW_WIDTH_MEDIUM, wc);
 
+  rc = ui_adaptive_pane_scaffold_base_set_window_width_class(
+      scaffold, UI_WINDOW_WIDTH_COMPACT);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_adaptive_pane_scaffold_base_set_active_pane(scaffold,
+                                                      UI_PANE_ROLE_SUPPORTING);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
   rc = ui_adaptive_pane_scaffold_base_destroy(scaffold);
   ASSERT_EQ(UI_ERROR_NONE, rc);
 
@@ -179,6 +186,16 @@ TEST test_ui_adaptive_pane_scaffold_panes(void) {
   ASSERT_EQ(UI_ERROR_NONE, rc);
   ASSERT_EQ(sup_comp, ret_comp);
 
+  rc = ui_adaptive_pane_scaffold_base_set_pane(scaffold, UI_PANE_ROLE_PRIMARY,
+                                               NULL);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_adaptive_pane_scaffold_base_set_pane(
+      scaffold, (enum ui_adaptive_pane_role)999, NULL);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_adaptive_pane_scaffold_base_get_pane(
+      scaffold, (enum ui_adaptive_pane_role)999, &ret_comp);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
   /* Active pane */
   rc = ui_adaptive_pane_scaffold_base_get_active_pane(scaffold, &active_role);
   ASSERT_EQ(UI_ERROR_NONE, rc);
@@ -202,6 +219,15 @@ TEST test_ui_adaptive_pane_scaffold_panes(void) {
   ASSERT_EQ(UI_ERROR_NONE, rc);
   ASSERT_EQ(1, levitated);
 
+  rc = ui_adaptive_pane_scaffold_base_set_window_width_class(
+      scaffold, UI_WINDOW_WIDTH_COMPACT);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_adaptive_pane_scaffold_base_set_dialog_levitation(scaffold, 1);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_adaptive_pane_scaffold_base_set_active_pane(scaffold,
+                                                      UI_PANE_ROLE_PRIMARY);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
   /* Cleanup */
   rc = ui_component_destroy(p_comp);
   ASSERT_EQ(UI_ERROR_NONE, rc);
@@ -221,12 +247,67 @@ TEST test_ui_adaptive_pane_scaffold_oom(void) {
   struct ui_adaptive_pane_scaffold_base *scaffold = NULL;
   ui_error_t rc;
 
-  g_malloc_fail_countdown = 0;
+  int i;
+  for (i = 0; i < 600; i++) {
+    g_malloc_fail_countdown = i;
+    rc = ui_adaptive_pane_scaffold_base_create(UI_ADAPTIVE_SCAFFOLD_LIST_DETAIL,
+                                               &scaffold);
+    g_malloc_fail_countdown = -1;
+    if (rc == UI_ERROR_NONE)
+      break;
+    ASSERT(scaffold == NULL);
+  }
+
   rc = ui_adaptive_pane_scaffold_base_create(UI_ADAPTIVE_SCAFFOLD_LIST_DETAIL,
                                              &scaffold);
-  ASSERT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
-  ASSERT(scaffold == NULL);
-  g_malloc_fail_countdown = -1;
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  for (i = 0; i < 200; i++) {
+    g_malloc_fail_countdown = i;
+    rc = ui_adaptive_pane_scaffold_base_set_window_width_class(
+        scaffold, UI_WINDOW_WIDTH_COMPACT);
+    g_malloc_fail_countdown = -1;
+    if (rc == UI_ERROR_NONE)
+      break;
+  }
+  for (i = 0; i < 200; i++) {
+    g_malloc_fail_countdown = i;
+    rc = ui_adaptive_pane_scaffold_base_set_window_width_class(
+        scaffold, UI_WINDOW_WIDTH_MEDIUM);
+    g_malloc_fail_countdown = -1;
+    if (rc == UI_ERROR_NONE)
+      break;
+  }
+  for (i = 0; i < 200; i++) {
+    g_malloc_fail_countdown = i;
+    rc = ui_adaptive_pane_scaffold_base_set_window_width_class(
+        scaffold, UI_WINDOW_WIDTH_EXPANDED);
+    g_malloc_fail_countdown = -1;
+    if (rc == UI_ERROR_NONE)
+      break;
+  }
+
+  struct ui_component *p_comp = NULL;
+  ui_component_create(&p_comp);
+  for (i = 0; i < 200; i++) {
+    g_malloc_fail_countdown = i;
+    rc = ui_adaptive_pane_scaffold_base_set_pane(scaffold, UI_PANE_ROLE_PRIMARY,
+                                                 p_comp);
+    g_malloc_fail_countdown = -1;
+    if (rc == UI_ERROR_NONE)
+      break;
+  }
+
+  for (i = 0; i < 200; i++) {
+    g_malloc_fail_countdown = i;
+    rc = ui_adaptive_pane_scaffold_base_set_dialog_levitation(scaffold, 1);
+    g_malloc_fail_countdown = -1;
+    if (rc == UI_ERROR_NONE)
+      break;
+  }
+
+  ui_component_destroy(p_comp);
+  ui_adaptive_pane_scaffold_base_destroy(scaffold);
 
   PASS();
 }

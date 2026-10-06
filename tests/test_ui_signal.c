@@ -567,6 +567,11 @@ static int test_other_types(void) {
 
 int main(void) {
   int failed = 0;
+  {
+    struct ui_signal valid_sig;
+    memset(&valid_sig, 0, sizeof(valid_sig));
+    assert(ui_signal_get(&valid_sig, NULL) == UI_ERROR_INVALID_ARGUMENT);
+  }
   failed |= test_other_types();
   failed |= test_signal();
   if (failed) {

@@ -92,8 +92,45 @@ extern C_MULTIPLATFORM_EXPORT ui_error_t md3_date_range_picker_create(
 extern C_MULTIPLATFORM_EXPORT ui_error_t
 md3_date_range_picker_destroy(struct md3_date_range_picker *picker);
 
+/**
+ * @brief Selects a date in the date range picker.
+ * @param picker The picker.
+ * @param date The date to select.
+ * @return UI_ERROR_NONE on success.
+ */
+extern C_MULTIPLATFORM_EXPORT ui_error_t md3_date_range_picker_select_date(
+    struct md3_date_range_picker *picker, const struct ui_date *date);
+
+/**
+ * @brief Sets the hover date in the date range picker.
+ * @param picker The picker.
+ * @param date The date to hover.
+ * @return UI_ERROR_NONE on success.
+ */
+extern C_MULTIPLATFORM_EXPORT ui_error_t md3_date_range_picker_set_hover_date(
+    struct md3_date_range_picker *picker, const struct ui_date *date);
+
+/**
+ * @brief Gets the selected range from the date range picker.
+ * @param picker The picker.
+ * @param out_range Pointer to store the range.
+ * @return UI_ERROR_NONE on success.
+ */
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+md3_date_range_picker_get_range(const struct md3_date_range_picker *picker,
+                                struct ui_date_range *out_range);
+
+/**
+ * @brief Clears the selected range from the date range picker.
+ * @param picker The picker.
+ * @return UI_ERROR_NONE on success.
+ */
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+md3_date_range_picker_clear(struct md3_date_range_picker *picker);
+
 /* -------------------------------------------------------------------------
  * MD3 Time Picker
+
  * ------------------------------------------------------------------------- */
 
 /**
