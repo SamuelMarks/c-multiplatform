@@ -9,8 +9,8 @@
 #include "ui_test_visual.h"
 #include "../../src/ui_internal_mem.h"
 
-#define STBTT_STATIC
-#define STB_TRUETYPE_IMPLEMENTATION
+
+
 #define STBTT_malloc(x,u)  ((u) ? C_MULTIPLATFORM_MALLOC(x) : C_MULTIPLATFORM_MALLOC(x))
 #define STBTT_free(x,u)    do { if (u) {} C_MULTIPLATFORM_FREE(x); } while (0)
 #include "stb/stb_truetype.h"

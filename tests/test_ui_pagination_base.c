@@ -219,6 +219,7 @@ static int test_pagination_oom(void) {
 }
 
 static int test_pagination_config_shrink(void) {
+  size_t current;
   struct ui_pagination_base *p = NULL;
   if (ui_pagination_base_create(&p) != UI_ERROR_NONE)
     return 1;
@@ -231,7 +232,6 @@ static int test_pagination_config_shrink(void) {
   ui_pagination_base_set_config(p, 20, 10);
 
   /* current_page should be clamped to 1 (total_pages - 1) */
-  size_t current;
   ui_pagination_base_get_current_page(p, &current);
   if (current != 1)
     return 1;

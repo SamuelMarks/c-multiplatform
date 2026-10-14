@@ -11,7 +11,6 @@
 
 extern int g_malloc_fail_countdown;
 
-static int change_count = 0;
 static int is_multi_select_cva = 0;
 
 static const char *items[] = {"Apple", "Banana",     "Cherry",
@@ -68,7 +67,7 @@ static int run_normal_tests(void) {
   struct ui_selection_model *model = NULL;
   struct ui_control_value_accessor cva;
   ui_error_t rc;
-  struct ui_event ev;
+  struct ui_event ev = {0};
   int is_selected;
   int on_change_called = 0;
   int on_touched_called = 0;
@@ -758,7 +757,7 @@ static int test_ui_listbox_base_mock_failures(void) {
   struct ui_listbox_base *listbox = NULL;
   struct ui_control_value_accessor cva;
   struct ui_selection_model *model = NULL;
-  struct ui_event ev;
+  struct ui_event ev = {0};
   union ui_signal_payload val;
   ui_error_t rc;
 

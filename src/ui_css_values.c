@@ -316,21 +316,39 @@ static ui_error_t create_value_ext_env(const char *name,
  * @param math Parameter math.
  * @return Return value.
  */
-static void destroy_math_node(struct ui_css_math_expr *math) {
+static ui_error_t destroy_math_node(struct ui_css_math_expr *math) {
+  ui_error_t rc;
   if (!math)
-    return;
+    return UI_ERROR_INVALID_ARGUMENT;
 
-  { ui_css_value_ext_destroy(math->left); }
-  { ui_css_value_ext_destroy(math->right); }
-  { ui_css_value_ext_destroy(math->ext); }
+  {
+    rc = ui_css_value_ext_destroy(math->left);
+    if (rc != UI_ERROR_NONE && rc != UI_ERROR_INVALID_ARGUMENT)
+      return rc;
+  }
+  {
+    rc = ui_css_value_ext_destroy(math->right);
+    if (rc != UI_ERROR_NONE && rc != UI_ERROR_INVALID_ARGUMENT)
+      return rc;
+  }
+  {
+    rc = ui_css_value_ext_destroy(math->ext);
+    if (rc != UI_ERROR_NONE && rc != UI_ERROR_INVALID_ARGUMENT)
+      return rc;
+  }
 
   while (math->next) {
     struct ui_css_math_expr *next = math->next;
     math->next = next->next;
-    { ui_css_value_ext_destroy(next->left); }
+    {
+      rc = ui_css_value_ext_destroy(next->left);
+      if (rc != UI_ERROR_NONE && rc != UI_ERROR_INVALID_ARGUMENT)
+        return rc;
+    }
     C_MULTIPLATFORM_FREE(next);
   }
   C_MULTIPLATFORM_FREE(math);
+  return UI_ERROR_NONE;
 }
 
 /**
@@ -338,20 +356,26 @@ static void destroy_math_node(struct ui_css_math_expr *math) {
  * @param val Parameter val.
  * @return Return value.
  */
-void ui_css_value_ext_destroy(struct ui_css_value_ext *val) {
+ui_error_t ui_css_value_ext_destroy(struct ui_css_value_ext *val) {
+  ui_error_t rc;
   if (!val)
-    return;
+    return UI_ERROR_INVALID_ARGUMENT;
   if (val->type == UI_CSS_VALUE_TYPE_MATH) {
     {
-      destroy_math_node(val->value.math);
+      rc = destroy_math_node(val->value.math);
+      if (rc != UI_ERROR_NONE)
+        return rc;
     }
   } else {
     if (val->type == UI_CSS_VALUE_TYPE_ENV && val->value.env) {
-      ui_css_value_ext_destroy(val->value.env->fallback);
+      rc = ui_css_value_ext_destroy(val->value.env->fallback);
+      if (rc != UI_ERROR_NONE)
+        return rc;
       C_MULTIPLATFORM_FREE(val->value.env);
     }
   }
   C_MULTIPLATFORM_FREE(val);
+  return UI_ERROR_NONE;
 }
 
 /* We need to properly handle min(), max(), clamp() */

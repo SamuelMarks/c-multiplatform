@@ -24,6 +24,7 @@ struct md2_navigation_drawer {
 static ui_error_t on_base_close(struct ui_sidenav_base *sidenav,
                                 void *user_data) {
   struct md2_navigation_drawer *drawer;
+  (void)sidenav;
 
   drawer = (struct md2_navigation_drawer *)user_data;
   if (drawer->on_close != NULL) {

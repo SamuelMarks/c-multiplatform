@@ -68,13 +68,16 @@ struct ui_signal {
  * @param sig Parameter sig.
  * @return Return value.
  */
-static void ui_signal_lock(ui_signal_t *sig) {
+static ui_error_t ui_signal_lock(ui_signal_t *sig) {
   if (sig->mode == UI_SIGNAL_MODE_MULTI_THREADED) {
     int is_swapped = 0;
     while (is_swapped == 0) {
-      ui_atomic_cas(&sig->lock, 0, 1, &is_swapped);
+      ui_error_t rc = ui_atomic_cas(&sig->lock, 0, 1, &is_swapped);
+      if (rc != UI_ERROR_NONE)
+        return rc;
     }
   }
+  return UI_ERROR_NONE;
 }
 
 /**
@@ -87,10 +90,13 @@ static void ui_signal_lock(ui_signal_t *sig) {
  * @param sig Parameter sig.
  * @return Return value.
  */
-static void ui_signal_unlock(ui_signal_t *sig) {
+static ui_error_t ui_signal_unlock(ui_signal_t *sig) {
   if (sig->mode == UI_SIGNAL_MODE_MULTI_THREADED) {
-    ui_atomic_store(&sig->lock, 0);
+    ui_error_t rc = ui_atomic_store(&sig->lock, 0);
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
+  return UI_ERROR_NONE;
 }
 
 /**
@@ -204,12 +210,18 @@ ui_error_t ui_signal_get(ui_signal_t *signal,
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  ui_signal_lock(signal);
+  rc = ui_signal_lock(signal);
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
   /* Dependency tracking for reactive graph */
   rc = ui_reactive_graph_get_current_node(&current_node);
   if (rc != UI_ERROR_NONE) {
-    ui_signal_unlock(signal);
+    {
+      ui_error_t _unlock_rc = ui_signal_unlock(signal);
+      if (rc == UI_ERROR_NONE)
+        rc = _unlock_rc;
+    }
     return rc;
   }
 
@@ -217,14 +229,22 @@ ui_error_t ui_signal_get(ui_signal_t *signal,
     ui_error_t add_rc = ui_signal_add_subscriber(signal, current_node);
     /* In case of OOM on array growth, we pass rc up */
     if (add_rc != UI_ERROR_NONE) {
-      ui_signal_unlock(signal);
+      {
+        ui_error_t _unlock_rc = ui_signal_unlock(signal);
+        if (rc == UI_ERROR_NONE)
+          rc = _unlock_rc;
+      }
       return add_rc;
     }
   }
 
   *out_value = signal->value;
 
-  ui_signal_unlock(signal);
+  {
+    ui_error_t _unlock_rc = ui_signal_unlock(signal);
+    if (rc == UI_ERROR_NONE)
+      rc = _unlock_rc;
+  }
   return rc;
 }
 
@@ -246,12 +266,18 @@ ui_error_t ui_signal_set(ui_signal_t *signal,
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  ui_signal_lock(signal);
+  rc = ui_signal_lock(signal);
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
   if (signal->equality_fn) {
     ui_error_t eq_rc = signal->equality_fn(signal->value, new_value, &equal);
     if (eq_rc != UI_ERROR_NONE) {
-      ui_signal_unlock(signal);
+      {
+        ui_error_t _unlock_rc = ui_signal_unlock(signal);
+        if (rc == UI_ERROR_NONE)
+          rc = _unlock_rc;
+      }
       return eq_rc;
     }
   } else {
@@ -278,7 +304,11 @@ ui_error_t ui_signal_set(ui_signal_t *signal,
     if (signal->destructor_fn) {
       ui_error_t dest_rc = signal->destructor_fn(signal->value);
       if (dest_rc != UI_ERROR_NONE) {
-        ui_signal_unlock(signal);
+        {
+          ui_error_t _unlock_rc = ui_signal_unlock(signal);
+          if (rc == UI_ERROR_NONE)
+            rc = _unlock_rc;
+        }
         return dest_rc;
       }
     }
@@ -300,7 +330,11 @@ ui_error_t ui_signal_set(ui_signal_t *signal,
     }
   }
 
-  ui_signal_unlock(signal);
+  {
+    ui_error_t _unlock_rc = ui_signal_unlock(signal);
+    if (rc == UI_ERROR_NONE)
+      rc = _unlock_rc;
+  }
 
   if (subs_copy) {
     for (i = 0; i < subs_count; i++) {
@@ -338,18 +372,28 @@ ui_error_t ui_signal_update(ui_signal_t *signal, ui_update_fn update_fn) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  ui_signal_lock(signal);
+  rc = ui_signal_lock(signal);
+  if (rc != UI_ERROR_NONE)
+    return rc;
   new_val.ptr_val = NULL;
   update_rc = update_fn(signal->value, &new_val);
   if (update_rc != UI_ERROR_NONE) {
-    ui_signal_unlock(signal);
+    {
+      ui_error_t _unlock_rc = ui_signal_unlock(signal);
+      if (rc == UI_ERROR_NONE)
+        rc = _unlock_rc;
+    }
     return update_rc;
   }
 
   if (signal->equality_fn) {
     ui_error_t eq_rc = signal->equality_fn(signal->value, new_val, &equal);
     if (eq_rc != UI_ERROR_NONE) {
-      ui_signal_unlock(signal);
+      {
+        ui_error_t _unlock_rc = ui_signal_unlock(signal);
+        if (rc == UI_ERROR_NONE)
+          rc = _unlock_rc;
+      }
       return eq_rc;
     }
   } else {
@@ -376,7 +420,11 @@ ui_error_t ui_signal_update(ui_signal_t *signal, ui_update_fn update_fn) {
     if (signal->destructor_fn) {
       ui_error_t dest_rc = signal->destructor_fn(signal->value);
       if (dest_rc != UI_ERROR_NONE) {
-        ui_signal_unlock(signal);
+        {
+          ui_error_t _unlock_rc = ui_signal_unlock(signal);
+          if (rc == UI_ERROR_NONE)
+            rc = _unlock_rc;
+        }
         return dest_rc;
       }
     }
@@ -385,7 +433,11 @@ ui_error_t ui_signal_update(ui_signal_t *signal, ui_update_fn update_fn) {
       subs_copy = (struct ui_reactive_node **)C_MULTIPLATFORM_MALLOC(
           signal->subscribers_count * sizeof(struct ui_reactive_node *));
       if (!subs_copy) {
-        ui_signal_unlock(signal);
+        {
+          ui_error_t _unlock_rc = ui_signal_unlock(signal);
+          if (rc == UI_ERROR_NONE)
+            rc = _unlock_rc;
+        }
         return UI_ERROR_OUT_OF_MEMORY;
       }
       for (i = 0; i < signal->subscribers_count; i++) {
@@ -394,7 +446,11 @@ ui_error_t ui_signal_update(ui_signal_t *signal, ui_update_fn update_fn) {
       subs_count = signal->subscribers_count;
     }
   }
-  ui_signal_unlock(signal);
+  {
+    ui_error_t _unlock_rc = ui_signal_unlock(signal);
+    if (rc == UI_ERROR_NONE)
+      rc = _unlock_rc;
+  }
 
   if (subs_copy) {
     for (i = 0; i < subs_count; i++) {

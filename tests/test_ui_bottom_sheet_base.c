@@ -51,10 +51,18 @@ static ui_error_t on_close_handler(struct ui_bottom_sheet_base *sheet,
 }
 
 static ui_error_t run_normal_tests(void) {
-  struct ui_bottom_sheet_base *sheet = NULL;
-  struct ui_overlay_director *director = NULL;
+  struct ui_component *content_comp = NULL;
+  union ui_signal_payload init_payload;
+  struct ui_signal *signal = NULL;
+  struct ui_arena *arena = NULL;
+  struct ui_event ev = {0};
+  struct ui_spring_config spring = {1.0f, 1.0f, 1.0f};
   struct ui_dom_node *root = NULL;
-  struct ui_event ev;
+  struct ui_component *tmp_comp = NULL;
+  struct ui_computed *anim_sig = NULL;
+  struct ui_overlay_director *director = NULL;
+  int is_open = 0;
+  struct ui_bottom_sheet_base *sheet = NULL;
   ui_error_t rc;
 
   printf("Testing invalid arguments...\n");
@@ -74,7 +82,6 @@ static ui_error_t run_normal_tests(void) {
   if (rc != UI_ERROR_INVALID_ARGUMENT)
     return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
-  int is_open = 0;
   rc = ui_bottom_sheet_base_is_open(NULL, &is_open);
   if (rc != UI_ERROR_INVALID_ARGUMENT)
     return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
@@ -96,12 +103,10 @@ static ui_error_t run_normal_tests(void) {
   if (rc != UI_ERROR_INVALID_ARGUMENT)
     return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
-  struct ui_component *tmp_comp = NULL;
   rc = ui_bottom_sheet_base_get_component(NULL, &tmp_comp);
   if (rc != UI_ERROR_INVALID_ARGUMENT)
     return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
-  struct ui_spring_config spring = {1.0f, 1.0f, 1.0f};
   rc = ui_bottom_sheet_base_set_spring_config(NULL, &spring);
   if (rc != UI_ERROR_INVALID_ARGUMENT)
     return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
@@ -111,7 +116,6 @@ static ui_error_t run_normal_tests(void) {
   if (rc != UI_ERROR_INVALID_ARGUMENT)
     return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
-  struct ui_computed *anim_sig = NULL;
   rc = ui_bottom_sheet_base_get_animating_signal(NULL, &anim_sig);
   if (rc != UI_ERROR_INVALID_ARGUMENT)
     return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
@@ -145,12 +149,9 @@ static ui_error_t run_normal_tests(void) {
   if (rc != UI_ERROR_NONE)
     return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
-  struct ui_arena *arena = NULL;
   rc = ui_arena_create(1024, &arena);
   if (rc != UI_ERROR_NONE)
     return rc;
-  struct ui_signal *signal = NULL;
-  union ui_signal_payload init_payload;
   memset(&init_payload, 0, sizeof(init_payload));
   rc = ui_signal_create(arena, init_payload, UI_SIGNAL_TYPE_BOOL, NULL, NULL,
                         UI_SIGNAL_MODE_SINGLE_THREADED, &signal);
@@ -355,7 +356,6 @@ static ui_error_t run_normal_tests(void) {
   assert(is_open == 0);
 
   /* Test setting actual content */
-  struct ui_component *content_comp = NULL;
   rc = ui_component_create(&content_comp);
   if (rc != UI_ERROR_NONE)
     return rc;
@@ -591,6 +591,8 @@ static ui_error_t run_oom_tests(void) {
 }
 
 static ui_error_t test_branch_coverage_destroy(void) {
+  struct ui_dom_node *root = NULL;
+  struct ui_overlay_director *director = NULL;
   ui_error_t rc;
   struct ui_bottom_sheet_base *sheet = NULL;
 
@@ -614,8 +616,6 @@ static ui_error_t test_branch_coverage_destroy(void) {
     return rc;
 
   /* Test set_open edge cases */
-  struct ui_overlay_director *director = NULL;
-  struct ui_dom_node *root = NULL;
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
   if (rc != UI_ERROR_NONE)
     return rc;
@@ -697,6 +697,9 @@ static ui_error_t test_branch_coverage_destroy(void) {
 }
 
 static ui_error_t run_mock_fail_tests(void) {
+  struct ui_event ev = {0};
+  struct ui_dom_node *root = NULL;
+  struct ui_overlay_director *director = NULL;
 #ifdef UI_TEST_MOCK_ALLOC
   int i;
   extern int g_bottom_sheet_mock_fail;
@@ -712,10 +715,6 @@ static ui_error_t run_mock_fail_tests(void) {
     }
   }
 
-  struct ui_overlay_director *director = NULL;
-  struct ui_dom_node *root = NULL;
-
-  struct ui_event ev;
   memset(&ev, 0, sizeof(ev));
   ev.type = UI_EVENT_MOUSE_DOWN;
 

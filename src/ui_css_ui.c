@@ -257,7 +257,11 @@ ui_error_t ui_css_parse_cursor(const char *str,
               sizeof(struct ui_css_cursor_image));
       if (!img) {
         out_cursor->images = head;
-        ui_css_cursor_destroy(out_cursor);
+        {
+          ui_error_t rc_dest = ui_css_cursor_destroy(out_cursor);
+          if (rc_dest != UI_ERROR_NONE)
+            return rc_dest;
+        }
         return UI_ERROR_OUT_OF_MEMORY;
       }
       img->has_hotspot = 0;
@@ -383,7 +387,11 @@ ui_error_t ui_css_parse_cursor(const char *str,
         out_cursor->keyword = UI_CSS_CURSOR_ZOOM_OUT;
       else {
         out_cursor->images = head;
-        ui_css_cursor_destroy(out_cursor);
+        {
+          ui_error_t rc_dest = ui_css_cursor_destroy(out_cursor);
+          if (rc_dest != UI_ERROR_NONE)
+            return rc_dest;
+        }
         return UI_ERROR_PARSE_FAILED;
       }
     }

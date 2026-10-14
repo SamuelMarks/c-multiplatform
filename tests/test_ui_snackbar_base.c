@@ -564,7 +564,6 @@ TEST test_snackbar_oom(void) {
   struct ui_snackbar_config sconfig;
   ui_error_t rc;
   int i;
-  int j;
 
   tconfig.time_source = mock_time_source;
   tconfig.user_data = NULL;

@@ -8,8 +8,8 @@
 /* clang-format on */
 
 static int test_hsv_rgb_conversions(void) {
-  struct ui_color_rgb rgb;
-  struct ui_color_hsv hsv;
+  struct ui_color_rgb rgb = {0};
+  struct ui_color_hsv hsv = {0};
   ui_error_t rc;
 
   /* NULL checks */
@@ -143,7 +143,7 @@ static int test_hsv_rgb_conversions(void) {
 }
 
 static int test_hex_conversions(void) {
-  struct ui_color_rgb rgb;
+  struct ui_color_rgb rgb = {0};
   char hex[8];
   ui_error_t rc;
 
@@ -189,7 +189,7 @@ static int test_hex_conversions(void) {
 }
 
 static int test_2d_mapping(void) {
-  struct ui_color_hsv hsv;
+  struct ui_color_hsv hsv = {0};
   ui_error_t rc;
 
   if (ui_color_picker_calc_hsv_from_2d(0, 0, 0, 0, 100, &hsv) !=
@@ -257,8 +257,8 @@ extern int g_malloc_fail_countdown;
 static int test_manager_state(void) {
   struct ui_color_picker_base *picker;
   struct ui_control_value_accessor cva;
-  struct ui_color_rgb rgb;
-  struct ui_color_hsv hsv;
+  struct ui_color_rgb rgb = {0};
+  struct ui_color_hsv hsv = {0};
   union ui_signal_payload val;
   struct ui_color_picker_base *p2;
 

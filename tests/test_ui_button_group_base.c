@@ -11,7 +11,6 @@ extern int g_button_group_mock_fail;
 static ui_error_t test_button_group_base(void) {
   struct ui_button_group_base *group;
   struct ui_component *dummy_btn;
-  ui_error_t err;
   ui_error_t rc = UI_ERROR_NONE;
   const char *attr_val;
   int dummy_signal = 0;

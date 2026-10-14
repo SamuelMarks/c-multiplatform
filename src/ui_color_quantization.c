@@ -126,8 +126,10 @@ ui_color_quantize_kmeans(const unsigned char *pixels, size_t width,
       for (c = 0; c < num_clusters; ++c) {
         /* If squared distance is < 100, we consider it the same color cluster
          */
-        calc_color_distance(r, g, b, clusters[c].r, clusters[c].g,
-                            clusters[c].b, &dist);
+        ui_error_t rc_dist = calc_color_distance(
+            r, g, b, clusters[c].r, clusters[c].g, clusters[c].b, &dist);
+        if (rc_dist != UI_ERROR_NONE)
+          return rc_dist;
         if (dist < 100) {
           is_distinct = 0;
           break;
@@ -195,8 +197,10 @@ ui_color_quantize_kmeans(const unsigned char *pixels, size_t width,
         }
 
         for (c = 0; c < num_clusters; ++c) {
-          calc_color_distance(r, g, b, clusters[c].r, clusters[c].g,
-                              clusters[c].b, &dist);
+          ui_error_t rc_dist = calc_color_distance(
+              r, g, b, clusters[c].r, clusters[c].g, clusters[c].b, &dist);
+          if (rc_dist != UI_ERROR_NONE)
+            return rc_dist;
           if (dist < min_dist) {
             min_dist = dist;
             best_cluster = c;

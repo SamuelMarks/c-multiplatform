@@ -47,7 +47,7 @@ static ui_error_t on_refresh(struct ui_pull_to_refresh_base *ptr,
 static void test_ptr_basic(void) {
   struct ui_pull_to_refresh_base *ptr = NULL;
   struct ui_component *spinner = NULL;
-  struct ui_event ev;
+  struct ui_event ev = {0};
   enum ui_pull_to_refresh_state current_state;
   float progress = 0.0f;
   ui_error_t rc;
@@ -180,7 +180,7 @@ static void test_ptr_spring_back(void) {
   struct ui_pull_to_refresh_base *ptr = NULL;
   enum ui_pull_to_refresh_state current_state;
   ui_error_t rc;
-  struct ui_event ev;
+  struct ui_event ev = {0};
   int i;
   memset(&ev, 0, sizeof(ev));
 
@@ -235,7 +235,7 @@ static void test_ptr_spring_back(void) {
 
 static void test_ptr_push_up(void) {
   struct ui_pull_to_refresh_base *ptr = NULL;
-  struct ui_event ev;
+  struct ui_event ev = {0};
   ui_error_t rc;
   memset(&ev, 0, sizeof(ev));
 
@@ -286,7 +286,7 @@ static void test_ptr_cancel(void) {
   struct ui_pull_to_refresh_base *ptr = NULL;
   enum ui_pull_to_refresh_state current_state;
   ui_error_t rc;
-  struct ui_event ev;
+  struct ui_event ev = {0};
   memset(&ev, 0, sizeof(ev));
 
   rc = ui_pull_to_refresh_base_create(&ptr);
@@ -475,7 +475,7 @@ static void test_ptr_nulls(void) {
   struct ui_computed *comp_sig = NULL;
   enum ui_pull_to_refresh_state dummy_state;
   float progress;
-  struct ui_event ev;
+  struct ui_event ev = {0};
 
   assert(ui_pull_to_refresh_base_create(&ptr) == UI_ERROR_NONE);
 
@@ -550,7 +550,7 @@ static void test_ptr_oom(void) {
 #ifdef UI_TEST_MOCK_ALLOC
 static void test_ptr_mock_failures(void) {
   struct ui_pull_to_refresh_base *ptr = NULL;
-  struct ui_event ev;
+  struct ui_event ev = {0};
   ui_error_t rc;
 
   /* 1. create: dom_node_create fails, component_destroy succeeds */

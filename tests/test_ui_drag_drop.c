@@ -8,6 +8,13 @@
 
 extern int g_malloc_fail_countdown;
 static void test_missing_coverage(void) {
+  struct ui_event ev = {0};
+  struct ui_drag_item d_item = {0};
+  struct ui_drag_list d_list_v = {0};
+  struct ui_drag_item dummy_item = {0};
+  struct ui_drag_list d_list_v_empty = {0};
+  struct ui_drag_list d_list_invalid = {0};
+  struct ui_drag_drop_context *d_ctx;
   struct ui_drag_drop_context *d_ctx_empty;
   {
     ui_error_t rc_cleanup = ui_drag_drop_create(&d_ctx_empty);
@@ -15,13 +22,11 @@ static void test_missing_coverage(void) {
   }
   assert(ui_drag_drop_destroy(d_ctx_empty) == UI_ERROR_NONE);
 
-  struct ui_drag_drop_context *d_ctx;
   {
     ui_error_t rc_cleanup = ui_drag_drop_create(&d_ctx);
     assert(rc_cleanup == UI_ERROR_NONE);
   }
 
-  struct ui_drag_list d_list_v_empty = {0};
   d_list_v_empty.list_id = 2;
   d_list_v_empty.x = 200;
   d_list_v_empty.y = 200;
@@ -33,8 +38,6 @@ static void test_missing_coverage(void) {
     assert(rc_cleanup == UI_ERROR_NONE);
   }
 
-  struct ui_drag_list d_list_invalid = d_list_v_empty;
-  struct ui_drag_item dummy_item = {0};
   d_list_invalid.item_count = 1;
   d_list_invalid.items = NULL;
   {
@@ -54,14 +57,12 @@ static void test_missing_coverage(void) {
     assert(rc_cleanup == UI_ERROR_NONE);
   }
 
-  struct ui_drag_list d_list_v = {0};
   d_list_v.list_id = 1;
   d_list_v.x = 0;
   d_list_v.y = 0;
   d_list_v.width = 100;
   d_list_v.height = 100;
   d_list_v.orientation = UI_DRAG_LIST_ORIENTATION_VERTICAL;
-  struct ui_drag_item d_item = {0};
   d_item.item_id = 100;
   d_item.x = 0;
   d_item.y = 0;
@@ -74,7 +75,6 @@ static void test_missing_coverage(void) {
     assert(rc_cleanup == UI_ERROR_NONE);
   }
 
-  struct ui_event ev = {0};
   ev.type = UI_EVENT_MOUSE_MOVE;
   ev.event_data.mouse.x = 250;
   ev.event_data.mouse.y = 250;
@@ -210,12 +210,17 @@ static void test_missing_coverage(void) {
 }
 
 static int run_normal_tests(void) {
+  int i;
+  struct ui_drag_item hitems[2];
+  struct ui_drag_list hlist;
+  const char *draggable_attr = "true";
+  int is_draggable = 0;
   struct ui_drag_drop_context *ctx = NULL;
   ui_error_t rc;
   enum ui_drag_state state;
-  struct ui_drag_list list;
+  struct ui_drag_list list = {0};
   struct ui_drag_item items[2];
-  struct ui_event ev;
+  struct ui_event ev = {0};
   int item_id, source_list_id, current_x, current_y;
   struct ui_drag_placeholder placeholder;
   int dropped, drop_item_id, drop_from_list, drop_to_list, drop_to_index;
@@ -391,8 +396,6 @@ static int run_normal_tests(void) {
   /* Test HTML5 drag attributes parsing proxy */
   /* Since we don't have the full dom_node parser linked here natively easily,
      we emulate what the layout module extracts. */
-  int is_draggable = 0;
-  const char *draggable_attr = "true";
   if (strcmp(draggable_attr, "true") == 0)
     is_draggable = 1;
   if (!is_draggable) {
@@ -401,11 +404,13 @@ static int run_normal_tests(void) {
   }
 
   /* Visual Proxy */
-  int proxy_x = current_x + 10;
-  int proxy_y = current_y + 10;
-  if (proxy_x != 10 || proxy_y != 85) {
-    printf("Drag proxy visual coordinates failed %d %d\n", proxy_x, proxy_y);
-    return 1;
+  {
+    int proxy_x = current_x + 10;
+    int proxy_y = current_y + 10;
+    if (proxy_x != 10 || proxy_y != 85) {
+      printf("Drag proxy visual coordinates failed %d %d\n", proxy_x, proxy_y);
+      return 1;
+    }
   }
 
   if (ui_drag_drop_get_drop_event(NULL, &dropped, &drop_item_id,
@@ -540,7 +545,6 @@ static int run_normal_tests(void) {
   }
 
   /* Test Horizontal List */
-  struct ui_drag_list hlist;
   hlist.list_id = 2;
   hlist.x = 200;
   hlist.y = 200;
@@ -548,7 +552,6 @@ static int run_normal_tests(void) {
   hlist.height = 100;
   hlist.orientation = UI_DRAG_LIST_ORIENTATION_HORIZONTAL;
 
-  struct ui_drag_item hitems[2];
   hitems[0].item_id = 301;
   hitems[0].x = 200;
   hitems[0].y = 200;
@@ -668,7 +671,6 @@ static int run_normal_tests(void) {
   }
 
   /* Re-alloc limits tests */
-  int i;
   for (i = 0; i < 10; i++) {
     {
       ui_error_t rc_cleanup = ui_drag_drop_add_list(ctx, &list);
@@ -759,19 +761,22 @@ static int run_error_paths(void) {
 }
 
 static void test_dragged_item_idle(void) {
+  struct ui_drag_list d_list_h_empty = {0};
+  struct ui_drag_item dummy_item = {0};
+  struct ui_drag_list d_list_v_empty = {0};
+  struct ui_drag_list d_list_invalid = {0};
+  int i, s, x, y;
   struct ui_drag_drop_context *d_ctx;
   {
     ui_error_t rc_cleanup = ui_drag_drop_create(&d_ctx);
     assert(rc_cleanup == UI_ERROR_NONE);
   }
-  int i, s, x, y;
   {
     ui_error_t rc_cleanup =
         ui_drag_drop_get_dragged_item(d_ctx, &i, &s, &x, &y);
     assert(rc_cleanup == UI_ERROR_INVALID_ARGUMENT);
   }
 
-  struct ui_drag_list d_list_v_empty = {0};
   d_list_v_empty.list_id = 2;
   d_list_v_empty.x = 200;
   d_list_v_empty.y = 200;
@@ -783,8 +788,6 @@ static void test_dragged_item_idle(void) {
     assert(rc_cleanup == UI_ERROR_NONE);
   }
 
-  struct ui_drag_list d_list_invalid = d_list_v_empty;
-  struct ui_drag_item dummy_item = {0};
   d_list_invalid.item_count = 1;
   d_list_invalid.items = NULL;
   {
@@ -804,7 +807,6 @@ static void test_dragged_item_idle(void) {
     assert(rc_cleanup == UI_ERROR_NONE);
   }
 
-  struct ui_drag_list d_list_h_empty = {0};
   d_list_h_empty.list_id = 3;
   d_list_h_empty.x = 400;
   d_list_h_empty.y = 400;
@@ -820,13 +822,19 @@ static void test_dragged_item_idle(void) {
 }
 
 static void test_drag_drop_coverage(void) {
+  struct ui_event m_ev = {0};
+  struct ui_drag_item d_item = {0};
+  struct ui_drag_list d_list_v = {0};
+  struct ui_drag_list d_list_h_empty = {0};
+  struct ui_drag_item dummy_item = {0};
+  struct ui_drag_list d_list_v_empty = {0};
+  struct ui_drag_list d_list_invalid = {0};
   struct ui_drag_drop_context *d_ctx;
   {
     ui_error_t rc_cleanup = ui_drag_drop_create(&d_ctx);
     assert(rc_cleanup == UI_ERROR_NONE);
   }
 
-  struct ui_drag_list d_list_v_empty = {0};
   d_list_v_empty.list_id = 2;
   d_list_v_empty.x = 200;
   d_list_v_empty.y = 200;
@@ -838,8 +846,6 @@ static void test_drag_drop_coverage(void) {
     assert(rc_cleanup == UI_ERROR_NONE);
   }
 
-  struct ui_drag_list d_list_invalid = d_list_v_empty;
-  struct ui_drag_item dummy_item = {0};
   d_list_invalid.item_count = 1;
   d_list_invalid.items = NULL;
   {
@@ -859,7 +865,6 @@ static void test_drag_drop_coverage(void) {
     assert(rc_cleanup == UI_ERROR_NONE);
   }
 
-  struct ui_drag_list d_list_h_empty = {0};
   d_list_h_empty.list_id = 3;
   d_list_h_empty.x = 400;
   d_list_h_empty.y = 400;
@@ -871,14 +876,12 @@ static void test_drag_drop_coverage(void) {
     assert(rc_cleanup == UI_ERROR_NONE);
   }
 
-  struct ui_drag_list d_list_v = {0};
   d_list_v.list_id = 1;
   d_list_v.x = 0;
   d_list_v.y = 0;
   d_list_v.width = 100;
   d_list_v.height = 100;
   d_list_v.orientation = UI_DRAG_LIST_ORIENTATION_VERTICAL;
-  struct ui_drag_item d_item = {0};
   d_item.item_id = 100;
   d_item.x = 0;
   d_item.y = 0;
@@ -891,7 +894,6 @@ static void test_drag_drop_coverage(void) {
     assert(rc_cleanup == UI_ERROR_NONE);
   }
 
-  struct ui_event m_ev = {0};
   m_ev.type = UI_EVENT_MOUSE_DOWN;
   m_ev.event_data.mouse.x = 5;
   m_ev.event_data.mouse.y = 5;
@@ -1072,7 +1074,6 @@ static void test_bounds_exhaustive(void) {
   struct ui_drag_list list;
   struct ui_drag_item item;
   struct ui_event ev;
-  int state;
 
   {
     ui_error_t rc_cleanup = ui_drag_drop_create(&ctx);

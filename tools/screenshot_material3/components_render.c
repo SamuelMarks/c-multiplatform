@@ -362,11 +362,12 @@ ui_error_t render_all_pickers(const struct md3_color_scheme *s,
   char path[512];
   struct canvas *c = NULL;
   ui_error_t rc = UI_ERROR_NONE;
-  if (!s || !opts || !opts->output_dir)
-    return UI_ERROR_INVALID_ARGUMENT;
   int row, col;
   int day = 1;
   const char *weekdays[] = {"S", "M", "T", "W", "T", "F", "S"};
+
+  if (!s || !opts || !opts->output_dir)
+    return UI_ERROR_INVALID_ARGUMENT;
 
   /* 1. datepicker.png */
   CHECK_RC(canvas_create(360, 480, &c));
@@ -591,9 +592,10 @@ ui_error_t render_all_selection_controls(const struct md3_color_scheme *s,
   char path[512];
   struct canvas *c = NULL;
   ui_error_t rc = UI_ERROR_NONE;
+  int i;
+  (void)i;
   if (!s || !opts || !opts->output_dir)
     return UI_ERROR_INVALID_ARGUMENT;
-  int i;
 
   /* 1. checkbox.png */
   CHECK_RC(canvas_create(280, 150, &c));
@@ -832,9 +834,10 @@ ui_error_t render_all_containment_and_cards(const struct md3_color_scheme *s,
   char path[512];
   struct canvas *c = NULL;
   ui_error_t rc = UI_ERROR_NONE;
+  int i;
+  (void)i;
   if (!s || !opts || !opts->output_dir)
     return UI_ERROR_INVALID_ARGUMENT;
-  int i;
 
   /* 1. card_elevated.png */
   CHECK_RC(canvas_create(320, 240, &c));
@@ -1130,9 +1133,10 @@ ui_error_t render_all_navigation(const struct md3_color_scheme *s,
   char path[512];
   struct canvas *c = NULL;
   ui_error_t rc = UI_ERROR_NONE;
+  int i;
+  (void)i;
   if (!s || !opts || !opts->output_dir)
     return UI_ERROR_INVALID_ARGUMENT;
-  int i;
 
   /* 1. navigation_bar.png (Bottom navigation) */
   CHECK_RC(canvas_create(360, 110, &c));
@@ -1868,9 +1872,10 @@ ui_error_t render_all_progress_and_shapes(const struct md3_color_scheme *s,
   char path[512];
   struct canvas *c = NULL;
   ui_error_t rc = UI_ERROR_NONE;
+  int i;
+  (void)i;
   if (!s || !opts || !opts->output_dir)
     return UI_ERROR_INVALID_ARGUMENT;
-  int i;
 
   /* 1. progress_linear.png */
   CHECK_RC(canvas_create(320, 80, &c));

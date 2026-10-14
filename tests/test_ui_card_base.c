@@ -243,10 +243,6 @@ static ui_error_t run_oom_tests(void) {
 static ui_error_t test_card_coverage(void) {
   ui_error_t rc;
   {
-    struct ui_card_base *c = NULL;
-    rc = ui_card_base_create(&c);
-    if (rc != UI_ERROR_NONE)
-      return rc;
     struct ui_card_base_internal {
       struct ui_component *component;
       struct ui_dom_node *root_node;
@@ -256,10 +252,15 @@ static ui_error_t test_card_coverage(void) {
       struct ui_component *header_component;
       struct ui_component *content_component;
       struct ui_component *footer_component;
-      int variant; /* Assuming variant is int enum */
-    } *ci = (struct ui_card_base_internal *)c;
-
-    struct ui_component *saved = ci->component;
+      int variant;
+    } *ci;
+    struct ui_component *saved;
+    struct ui_card_base *c = NULL;
+    rc = ui_card_base_create(&c);
+    if (rc != UI_ERROR_NONE)
+      return rc;
+    ci = (struct ui_card_base_internal *)c;
+    saved = ci->component;
     ci->component = NULL;
     rc = ui_card_base_destroy(c);
     if (rc != UI_ERROR_NONE)

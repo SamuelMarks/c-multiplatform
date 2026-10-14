@@ -131,25 +131,27 @@ static void test_action_sheet_edge_cases(void) {
   ui_action_sheet_base_set_cancel_action(sheet, cancel);
 
   /* Replace cancel action */
-  struct ui_component *cancel2;
-  ui_component_create(&cancel2);
-  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &cancel2->shadow_root);
-  ui_action_sheet_base_set_cancel_action(sheet, cancel2);
+  {
+    struct ui_component *cancel2;
+    ui_component_create(&cancel2);
+    ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &cancel2->shadow_root);
+    ui_action_sheet_base_set_cancel_action(sheet, cancel2);
 
-  {
-    ui_error_t rc_cleanup = ui_action_sheet_base_destroy(sheet);
-    assert(rc_cleanup == UI_ERROR_NONE);
-  }
-  /* cancel was removed from the tree, so its shadow_root is still valid and
-   * needs to be freed */
-  {
-    ui_error_t rc_cleanup = ui_component_destroy(cancel);
-    assert(rc_cleanup == UI_ERROR_NONE);
-  }
-  cancel2->shadow_root = NULL;
-  {
-    ui_error_t rc_cleanup = ui_component_destroy(cancel2);
-    assert(rc_cleanup == UI_ERROR_NONE);
+    {
+      ui_error_t rc_cleanup = ui_action_sheet_base_destroy(sheet);
+      assert(rc_cleanup == UI_ERROR_NONE);
+    }
+    /* cancel was removed from the tree, so its shadow_root is still valid and
+     * needs to be freed */
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(cancel);
+      assert(rc_cleanup == UI_ERROR_NONE);
+    }
+    cancel2->shadow_root = NULL;
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(cancel2);
+      assert(rc_cleanup == UI_ERROR_NONE);
+    }
   }
 }
 
@@ -445,45 +447,49 @@ int main(void) {
   }
 
   /* Send ENTER event (unhandled by action sheet) */
-  struct ui_event ev_enter;
-  memset(&ev_enter, 0, sizeof(ev_enter));
-  ev_enter.type = UI_EVENT_KEY_DOWN;
-  ev_enter.event_data.keyboard.key_code = UI_KEY_ENTER;
-  rc = ui_action_sheet_base_process_event(sheet, &ev_enter, 100.0);
-  assert(rc == UI_ERROR_NONE);
+  {
+    struct ui_event ev_enter = {0};
+    memset(&ev_enter, 0, sizeof(ev_enter));
+    ev_enter.type = UI_EVENT_KEY_DOWN;
+    ev_enter.event_data.keyboard.key_code = UI_KEY_ENTER;
+    rc = ui_action_sheet_base_process_event(sheet, &ev_enter, 100.0);
+    assert(rc == UI_ERROR_NONE);
 
-  /* Send random event to test non-keydown */
-  ev_enter.type = UI_EVENT_MOUSE_UP;
-  rc = ui_action_sheet_base_process_event(sheet, &ev_enter, 100.0);
-  assert(rc == UI_ERROR_NONE);
+    /* Send random event to test non-keydown */
+    ev_enter.type = UI_EVENT_MOUSE_UP;
+    rc = ui_action_sheet_base_process_event(sheet, &ev_enter, 100.0);
+    assert(rc == UI_ERROR_NONE);
+  }
 
   /* Send ESC event */
-  struct ui_event ev;
-  memset(&ev, 0, sizeof(ev));
-  ev.type = UI_EVENT_KEY_DOWN;
-  ev.event_data.keyboard.key_code = UI_KEY_ESCAPE;
-
-  rc = ui_action_sheet_base_process_event(sheet, &ev, 100.0);
-  assert(rc == UI_ERROR_NONE);
-
   {
-    int is_open = 0;
-    ui_action_sheet_base_is_open(sheet, &is_open);
-    assert(is_open == 0);
+    struct ui_event ev = {0};
+    memset(&ev, 0, sizeof(ev));
+    ev.type = UI_EVENT_KEY_DOWN;
+    ev.event_data.keyboard.key_code = UI_KEY_ESCAPE;
+
+    rc = ui_action_sheet_base_process_event(sheet, &ev, 100.0);
+    assert(rc == UI_ERROR_NONE);
+
+    {
+      int is_open = 0;
+      ui_action_sheet_base_is_open(sheet, &is_open);
+      assert(is_open == 0);
+    }
+    assert(close_count == 1);
+
+    /* Send ESC event while closed */
+    rc = ui_action_sheet_base_process_event(sheet, &ev, 100.0);
+    assert(rc == UI_ERROR_NONE);
+
+    /* Set on_close to NULL and close it */
+    ui_action_sheet_base_set_open(sheet, 1);
+    ui_action_sheet_base_set_on_close(sheet, NULL, NULL);
+    ev.type = UI_EVENT_KEY_DOWN;
+    ev.event_data.keyboard.key_code = UI_KEY_ESCAPE;
+    rc = ui_action_sheet_base_process_event(sheet, &ev, 100.0);
+    assert(rc == UI_ERROR_NONE);
   }
-  assert(close_count == 1);
-
-  /* Send ESC event while closed */
-  rc = ui_action_sheet_base_process_event(sheet, &ev, 100.0);
-  assert(rc == UI_ERROR_NONE);
-
-  /* Set on_close to NULL and close it */
-  ui_action_sheet_base_set_open(sheet, 1);
-  ui_action_sheet_base_set_on_close(sheet, NULL, NULL);
-  ev.type = UI_EVENT_KEY_DOWN;
-  ev.event_data.keyboard.key_code = UI_KEY_ESCAPE;
-  rc = ui_action_sheet_base_process_event(sheet, &ev, 100.0);
-  assert(rc == UI_ERROR_NONE);
 
   {
     ui_error_t rc_cleanup = ui_action_sheet_base_destroy(sheet);

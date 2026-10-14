@@ -59,6 +59,13 @@ struct ui_segmented_button_base {
 void test_ui_segmented_coverage_branches(void);
 
 int main(void) {
+  struct ui_segmented_button_base *btn_nocva;
+  struct ui_segmented_control_base *control_no_cva;
+  struct ui_segmented_button_base *btn_orphan;
+  union ui_signal_payload pl;
+  struct ui_segmented_button_base *btn4, *btn5;
+  int selected;
+  enum ui_segmented_control_mode mode;
   struct ui_segmented_control_base *control = NULL;
   struct ui_segmented_button_base *btn1 = NULL, *btn2 = NULL, *btn3 = NULL;
   struct ui_control_value_accessor cva;
@@ -76,7 +83,6 @@ int main(void) {
   err = ui_segmented_control_base_get_component((void *)1, NULL);
   /* if (err != UI_ERROR_INVALID_ARGUMENT) abort(); */
 
-  enum ui_segmented_control_mode mode;
   {
     ui_error_t rc_cleanup = ui_segmented_control_base_set_mode(
         NULL, UI_SEGMENTED_CONTROL_MODE_MULTI);
@@ -140,7 +146,6 @@ int main(void) {
   err = ui_segmented_button_base_set_selected(NULL, 1);
   /* if (err != UI_ERROR_INVALID_ARGUMENT) abort(); */
 
-  int selected;
   err = ui_segmented_button_base_get_selected(NULL, &selected);
   /* if (err != UI_ERROR_INVALID_ARGUMENT) abort(); */
   err = ui_segmented_button_base_get_selected((void *)1, NULL);
@@ -170,7 +175,6 @@ int main(void) {
     abort();
 
   /* Append more to test reallocation */
-  struct ui_segmented_button_base *btn4, *btn5;
   {
     ui_error_t rc_cleanup = ui_segmented_button_base_create(&btn4);
     assert(rc_cleanup == UI_ERROR_NONE);
@@ -197,7 +201,6 @@ int main(void) {
   /* if (err != UI_ERROR_INVALID_ARGUMENT) abort(); */
   err = cva.set_disabled_state(NULL, 1);
   /* if (err != UI_ERROR_INVALID_ARGUMENT) abort(); */
-  union ui_signal_payload pl;
   pl.int_val = 1;
   err = cva.write_value(NULL, pl);
   /* if (err != UI_ERROR_INVALID_ARGUMENT) abort(); */
@@ -297,7 +300,6 @@ int main(void) {
     abort();
 
   /* Trigger paths with missing callbacks or missing parent */
-  struct ui_segmented_button_base *btn_orphan;
   {
     ui_error_t rc_cleanup = ui_segmented_button_base_create(&btn_orphan);
     assert(rc_cleanup == UI_ERROR_NONE);
@@ -309,8 +311,6 @@ int main(void) {
   } /* no parent */
 
   /* Missing callbacks on control */
-  struct ui_segmented_control_base *control_no_cva;
-  struct ui_segmented_button_base *btn_nocva;
   {
     ui_error_t rc_cleanup =
         ui_segmented_control_base_create(&control_no_cva, NULL);

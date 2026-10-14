@@ -44,7 +44,9 @@ static ui_error_t ui_computed_lock(ui_computed_t *comp) {
   if (comp->mode == UI_SIGNAL_MODE_MULTI_THREADED) {
     ui_int32 is_swapped = 0;
     while (!is_swapped) {
-      ui_atomic_cas(&comp->lock, 0, 1, &is_swapped);
+      ui_error_t rc = ui_atomic_cas(&comp->lock, 0, 1, &is_swapped);
+      if (rc != UI_ERROR_NONE)
+        return rc;
     }
   }
   return UI_ERROR_NONE;
@@ -108,10 +110,18 @@ static ui_error_t ui_computed_on_notify(void *user_data) {
   size_t subs_count = 0;
   ui_error_t rc;
 
-  ui_computed_lock(comp);
+  {
+    ui_error_t _rc_c = ui_computed_lock(comp);
+    if (_rc_c != UI_ERROR_NONE)
+      return _rc_c;
+  }
 
   if (comp->is_dirty) {
-    ui_computed_unlock(comp);
+    {
+      ui_error_t _rc_c = ui_computed_unlock(comp);
+      if (_rc_c != UI_ERROR_NONE)
+        return _rc_c;
+    }
     return UI_ERROR_NONE; /* Already dirty, no need to re-notify */
   }
 
@@ -129,7 +139,11 @@ static ui_error_t ui_computed_on_notify(void *user_data) {
     }
   }
 
-  ui_computed_unlock(comp);
+  {
+    ui_error_t _rc_c = ui_computed_unlock(comp);
+    if (_rc_c != UI_ERROR_NONE)
+      return _rc_c;
+  }
 
   if (subs_copy) {
     for (i = 0; i < subs_count; i++) {
@@ -215,37 +229,70 @@ ui_error_t ui_computed_get(ui_computed_t *computed,
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  ui_computed_lock(computed);
+  {
+    ui_error_t _rc_c = ui_computed_lock(computed);
+    if (_rc_c != UI_ERROR_NONE)
+      return _rc_c;
+  }
 
   /* Dependency tracking */
-  ui_reactive_graph_get_current_node(&current_node);
+  {
+    ui_error_t _rc_g = ui_reactive_graph_get_current_node(&current_node);
+    if (_rc_g != UI_ERROR_NONE)
+      return _rc_g;
+  }
 
   if (current_node && current_node != &computed->self_node) {
     rc = ui_computed_add_subscriber(computed, current_node);
     if (rc != UI_ERROR_NONE) {
-      ui_computed_unlock(computed);
+      {
+        ui_error_t _rc_c = ui_computed_unlock(computed);
+        if (_rc_c != UI_ERROR_NONE)
+          return _rc_c;
+      }
       return rc;
     }
   }
 
   if (computed->is_dirty) {
     /* Push self to graph to track inner dependencies */
-    ui_reactive_graph_set_current_node(&computed->self_node, &prev_node);
+    {
+      ui_error_t _rc_g =
+          ui_reactive_graph_set_current_node(&computed->self_node, &prev_node);
+      if (_rc_g != UI_ERROR_NONE)
+        return _rc_g;
+    }
 
     rc = computed->compute_fn(computed->user_data, &computed->cached_value);
     if (rc != UI_ERROR_NONE) {
-      ui_reactive_graph_set_current_node(prev_node, NULL);
-      ui_computed_unlock(computed);
+      {
+        ui_error_t _rc_g = ui_reactive_graph_set_current_node(prev_node, NULL);
+        if (_rc_g != UI_ERROR_NONE)
+          return _rc_g;
+      }
+      {
+        ui_error_t _rc_c = ui_computed_unlock(computed);
+        if (_rc_c != UI_ERROR_NONE)
+          return _rc_c;
+      }
       return rc;
     }
 
-    ui_reactive_graph_set_current_node(prev_node, NULL);
+    {
+      ui_error_t _rc_g = ui_reactive_graph_set_current_node(prev_node, NULL);
+      if (_rc_g != UI_ERROR_NONE)
+        return _rc_g;
+    }
     computed->is_dirty = UI_FALSE;
   }
 
   *out_value = computed->cached_value;
 
-  ui_computed_unlock(computed);
+  {
+    ui_error_t _rc_c = ui_computed_unlock(computed);
+    if (_rc_c != UI_ERROR_NONE)
+      return _rc_c;
+  }
   return UI_ERROR_NONE;
 }
 

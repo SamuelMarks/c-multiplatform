@@ -90,7 +90,6 @@ ui_error_t md2_fab_set_on_click(struct md2_fab *fab,
                                 ui_button_on_click_t on_click,
                                 void *user_data) {
   struct ui_button_base *main_button;
-  ui_error_t rc;
 
   if (!fab || !fab->base) {
     return UI_ERROR_INVALID_ARGUMENT;

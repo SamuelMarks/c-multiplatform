@@ -16,8 +16,12 @@
 #endif
 #endif
 
+#include "ui_export.h"
+
 /** @brief internal */
 #define STB_TRUETYPE_IMPLEMENTATION
+/** @brief internal */
+#define STBTT_DEF C_MULTIPLATFORM_EXPORT
 /** @brief internal */
 #define STBTT_malloc(x,u)  ((u) ? C_MULTIPLATFORM_MALLOC(x) : C_MULTIPLATFORM_MALLOC(x))
 /** @brief internal */
@@ -26,6 +30,8 @@
 
 /** @brief internal */
 #define STB_IMAGE_WRITE_IMPLEMENTATION
+/** @brief internal */
+#define STBIWDEF C_MULTIPLATFORM_EXPORT
 /** @brief internal */
 #define STBIW_MALLOC(x)    C_MULTIPLATFORM_MALLOC(x)
 /** @brief internal */
@@ -36,6 +42,8 @@
 
 /** @brief internal */
 #define STB_IMAGE_IMPLEMENTATION
+/** @brief internal */
+#define STBIDEF C_MULTIPLATFORM_EXPORT
 /** @brief internal */
 #define STBI_MALLOC(x)    C_MULTIPLATFORM_MALLOC(x)
 /** @brief internal */

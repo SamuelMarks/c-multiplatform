@@ -10,6 +10,7 @@ extern int g_malloc_fail_countdown;
 static ui_error_t mock_on_change(struct ui_selection_model *model,
                                  void *user_data) {
   int *count = (int *)user_data;
+  (void)model;
   (*count)++;
   return UI_ERROR_NONE;
 }
@@ -246,7 +247,6 @@ static int test_null_args(void) {
 
 static int test_oom(void) {
   struct ui_selection_model *m = NULL;
-  int i;
   void *all_ids[] = {(void *)(size_t)1, (void *)(size_t)2, (void *)(size_t)3,
                      (void *)(size_t)4, (void *)(size_t)5};
 
@@ -320,7 +320,10 @@ static int test_fallback_and_select_all(void) {
 static int test_coverage_branches(void) {
   struct ui_selection_model *model;
   int id1 = 10, id2 = 20, id3 = 30;
-  int arr[3] = {id1, id2, id3};
+  int arr[3];
+  arr[0] = id1;
+  arr[1] = id2;
+  arr[2] = id3;
 
   if (ui_selection_model_create(&model) != UI_ERROR_NONE)
     return 1;

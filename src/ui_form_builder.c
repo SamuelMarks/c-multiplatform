@@ -84,7 +84,10 @@ ui_error_t ui_form_builder_group_start(ui_form_builder_t *builder,
 
   if (builder->depth == 0) {
     if (builder->root_group) {
-      ui_form_group_destroy(group);
+      ui_error_t destroy_rc = ui_form_group_destroy(group);
+      if (destroy_rc != UI_ERROR_NONE) {
+        return destroy_rc;
+      }
       return UI_ERROR_INVALID_ARGUMENT;
     }
     builder->root_group = group;
@@ -259,7 +262,10 @@ ui_error_t ui_form_builder_control(ui_form_builder_t *builder, const char *name,
   if (validator) {
     rc = ui_form_control_add_validator(ctrl, validator, user_data);
     if (rc != UI_ERROR_NONE) {
-      ui_form_control_destroy(ctrl);
+      ui_error_t destroy_rc = ui_form_control_destroy(ctrl);
+      if (destroy_rc != UI_ERROR_NONE) {
+        return destroy_rc;
+      }
       return rc;
     }
   }

@@ -186,10 +186,12 @@ static int test_ui_design_token_set_string(void) {
   if (rc != UI_ERROR_NONE)
     return 1;
 
-  float number;
-  rc = ui_design_token_get_number(&dict, "font-family", &number);
-  if (rc != UI_ERROR_UNSUPPORTED)
-    return 1;
+  {
+    float number;
+    rc = ui_design_token_get_number(&dict, "font-family", &number);
+    if (rc != UI_ERROR_UNSUPPORTED)
+      return 1;
+  }
 
   rc = ui_design_token_set_string(NULL, "str", "val");
   if (rc != UI_ERROR_INVALID_ARGUMENT)

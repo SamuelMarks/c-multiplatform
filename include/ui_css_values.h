@@ -181,7 +181,7 @@ ui_css_parse_value_ext(const char *str, struct ui_css_value_ext **out_value);
  *
  * @param val Pointer to the value to destroy.
  */
-extern C_MULTIPLATFORM_EXPORT void
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_css_value_ext_destroy(struct ui_css_value_ext *val);
 
 /**

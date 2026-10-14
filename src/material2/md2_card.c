@@ -25,6 +25,7 @@ ui_error_t md2_card_create(struct ui_engine *engine,
                            struct md2_card **out_card) {
   struct md2_card *card = NULL;
   struct ui_component *comp = NULL;
+  const char *cls = NULL;
   ui_error_t rc;
 
   if (engine == NULL || out_card == NULL) {
@@ -47,9 +48,8 @@ ui_error_t md2_card_create(struct ui_engine *engine,
 
   ui_card_base_get_component(card->base, &comp);
 
-  const char *cls = (variant == MD2_CARD_OUTLINED)
-                        ? "md2-card md2-card-outlined"
-                        : "md2-card md2-card-elevated";
+  cls = (variant == MD2_CARD_OUTLINED) ? "md2-card md2-card-outlined"
+                                       : "md2-card md2-card-elevated";
   rc = ui_dom_node_set_attribute(comp->shadow_root, "class", cls);
   if (rc != UI_ERROR_NONE) {
     ui_card_base_destroy(card->base);

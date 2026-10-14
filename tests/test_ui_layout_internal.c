@@ -22,6 +22,9 @@ ui_error_t mock_ui_css_resolve_style(const struct ui_css_stylesheet *sheet,
 ui_error_t
 mock_ui_css_computed_style_destroy(struct ui_css_computed_style *style);
 
+#include "ui_export.h"
+#undef C_MULTIPLATFORM_EXPORT
+#define C_MULTIPLATFORM_EXPORT
 #include "../src/ui_layout.c"
 /* clang-format on */
 #undef ui_css_computed_style_get_property

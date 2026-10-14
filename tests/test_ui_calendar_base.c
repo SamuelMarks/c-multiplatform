@@ -12,9 +12,9 @@
 extern int g_malloc_fail_countdown;
 
 static ui_error_t mock_cva_on_touched(void *user_data) {
+  int *called = (int *)user_data;
   if (user_data == (void *)1)
     return UI_ERROR_UNKNOWN;
-  int *called = (int *)user_data;
   if (called)
     (*called)++;
   return UI_ERROR_NONE;
@@ -23,6 +23,8 @@ static ui_error_t mock_cva_on_touched(void *user_data) {
 static ui_error_t mock_on_select(struct ui_calendar_base *calendar,
                                  const struct ui_date *date, void *user_data) {
   int *called = (int *)user_data;
+  (void)calendar;
+  (void)date;
   if (called)
     (*called)++;
   return UI_ERROR_NONE;
@@ -31,6 +33,9 @@ static ui_error_t mock_on_select(struct ui_calendar_base *calendar,
 static ui_error_t mock_on_select_fail(struct ui_calendar_base *calendar,
                                       const struct ui_date *date,
                                       void *user_data) {
+  (void)calendar;
+  (void)date;
+  (void)user_data;
   return UI_ERROR_OUT_OF_MEMORY;
 }
 
@@ -199,9 +204,10 @@ static int test_calendar_math(void) {
 
 static ui_error_t mock_cva_on_change(union ui_signal_payload value,
                                      void *user_data) {
+  int *called = (int *)user_data;
+  (void)value;
   if (user_data == (void *)1)
     return UI_ERROR_UNKNOWN;
-  int *called = (int *)user_data;
   if (called)
     (*called)++;
   return UI_ERROR_NONE;
@@ -500,14 +506,16 @@ static int test_calendar_coverage(void) {
       printf("Failed at %d\n", __LINE__);
       return 1;
     }
-    struct ui_date invalid_month = {2024, 0, 10};
-    if (ui_calendar_base_select_date(cal, &invalid_month) !=
-        UI_ERROR_OUT_OF_BOUNDS)
-      return 1;
-    invalid_month.month = 13;
-    if (ui_calendar_base_select_date(cal, &invalid_month) !=
-        UI_ERROR_OUT_OF_BOUNDS)
-      return 1;
+    {
+      struct ui_date invalid_month = {2024, 0, 10};
+      if (ui_calendar_base_select_date(cal, &invalid_month) !=
+          UI_ERROR_OUT_OF_BOUNDS)
+        return 1;
+      invalid_month.month = 13;
+      if (ui_calendar_base_select_date(cal, &invalid_month) !=
+          UI_ERROR_OUT_OF_BOUNDS)
+        return 1;
+    }
   }
 
   /* Grid boundaries logic for prev_m/next_m */
@@ -745,6 +753,7 @@ static struct ui_control_value_accessor g_mock_cva_for_reentrancy;
 
 static ui_error_t mock_dp_cva_change(union ui_signal_payload val, void *data) {
   int *c = (int *)data;
+  (void)val;
   if (c)
     (*c)++;
 
@@ -992,6 +1001,7 @@ static int test_calendar_missing_branches(void) {
   struct ui_date min_dt = {2024, 1, 1};
   struct ui_date max_dt = {2024, 12, 1};
   int g_calendar_mock_fail = 0;
+  (void)g_calendar_mock_fail;
 
   /* 228: cva_on_touched fails */
   {

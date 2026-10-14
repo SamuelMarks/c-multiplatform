@@ -551,10 +551,12 @@ typedef char stbtt__check_size16[sizeof(stbtt_int16) == 2 ? 1 : -1];
 #ifndef __STB_INCLUDE_STB_TRUETYPE_H__
 #define __STB_INCLUDE_STB_TRUETYPE_H__
 
+#ifndef STBTT_DEF
 #ifdef STBTT_STATIC
 #define STBTT_DEF static
 #else
 #define STBTT_DEF extern
+#endif
 #endif
 
 #ifdef __cplusplus

@@ -580,7 +580,6 @@ static int run_normal_tests(void) {
 
 static int test_select_empty_keyboard(void) {
   struct ui_select_base *select = NULL;
-  struct ui_component *comp;
   struct ui_event ev;
   ui_error_t rc;
 
@@ -672,11 +671,13 @@ static int test_select_empty_keyboard(void) {
 
   /* Test setting index with no on_change */
   ui_select_base_set_on_change(select, NULL, NULL);
-  ui_error_t rc2 = ui_select_base_set_selected_index(select, 0);
-  printf("set_selected_index returned %d\n", rc2);
-  ui_select_base_set_highlighted_index(select, 0);
-  ui_select_base_set_selected_index(select, 10);    /* clamp branch */
-  ui_select_base_set_highlighted_index(select, 10); /* clamp branch */
+  {
+    ui_error_t rc2 = ui_select_base_set_selected_index(select, 0);
+    printf("set_selected_index returned %d\n", rc2);
+    ui_select_base_set_highlighted_index(select, 0);
+    ui_select_base_set_selected_index(select, 10);    /* clamp branch */
+    ui_select_base_set_highlighted_index(select, 10); /* clamp branch */
+  }
 
   {
     ui_error_t rc_cleanup = ui_select_base_destroy(select);
@@ -739,11 +740,17 @@ static int run_oom_tests(void) {
 }
 static ui_error_t on_select_change_fail(struct ui_select_base *select,
                                         int index, void *user_data) {
+  (void)select;
+  (void)index;
+  (void)user_data;
   return UI_ERROR_UNKNOWN;
 }
 
 static ui_error_t on_select_open_change_fail(struct ui_select_base *select,
                                              int is_open, void *user_data) {
+  (void)select;
+  (void)is_open;
+  (void)user_data;
   return UI_ERROR_UNKNOWN;
 }
 
@@ -1025,9 +1032,9 @@ static int test_cva_and_edge_cases(void) {
       struct ui_gesture_recognizer *gesture_recognizer;
     };
     struct ui_select_base *dummy_select = NULL;
+    struct ui_select_internal *internal;
     ui_select_base_create(&dummy_select);
-    struct ui_select_internal *internal =
-        (struct ui_select_internal *)dummy_select;
+    internal = (struct ui_select_internal *)dummy_select;
 
     {
       ui_error_t rc_cleanup = ui_component_destroy(internal->component);

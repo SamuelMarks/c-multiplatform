@@ -1,4 +1,7 @@
 /* clang-format off */
+#include "ui_export.h"
+#undef C_MULTIPLATFORM_EXPORT
+#define C_MULTIPLATFORM_EXPORT
 #include "../src/ui_cssom.c"
 #include "../src/ui_internal_mem.h"
 #include <stdio.h>

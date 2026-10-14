@@ -75,7 +75,16 @@ static ui_error_t strdup_arena(struct ui_arena *arena, const char *str,
   char *copy;
   ui_error_t rc = ui_arena_alloc(arena, len + 1, 1, (void **)&copy);
   if (rc == UI_ERROR_NONE) {
-    memcpy(copy, str, len + 1);
+#if defined(_MSC_VER)
+    errno_t err = memcpy_s(copy, len + 1, str, len + 1);
+    if (err != 0) {
+      return UI_ERROR_OUT_OF_BOUNDS;
+    }
+#else
+    void *dummy = memcpy(copy, str, len + 1);
+    if (!dummy)
+      return UI_ERROR_OUT_OF_BOUNDS;
+#endif
     *out_str = copy;
   }
   return rc;
@@ -108,8 +117,21 @@ ui_error_t ui_form_group_add_node(ui_form_group_t *group, const char *name,
     }
 
     if (group->count > 0) {
-      memcpy(new_entries, group->entries,
-             (size_t)group->count * sizeof(struct ui_form_group_entry));
+#if defined(_MSC_VER)
+      errno_t err = memcpy_s(
+          new_entries, (size_t)new_cap * sizeof(struct ui_form_group_entry),
+          group->entries,
+          (size_t)group->count * sizeof(struct ui_form_group_entry));
+      if (err != 0) {
+        return UI_ERROR_OUT_OF_BOUNDS;
+      }
+#else
+      void *dummy =
+          memcpy(new_entries, group->entries,
+                 (size_t)group->count * sizeof(struct ui_form_group_entry));
+      if (!dummy)
+        return UI_ERROR_OUT_OF_BOUNDS;
+#endif
     }
     group->entries = new_entries;
     group->capacity = new_cap;

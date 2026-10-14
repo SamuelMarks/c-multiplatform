@@ -13,7 +13,6 @@ static struct ui_mutation_record g_last_record;
 static ui_error_t mutation_cb(struct ui_mutation_observer *observer,
                               const struct ui_mutation_record *records,
                               int record_count, void *user_data) {
-  int i;
   if (observer) {
   }
   if (user_data) {

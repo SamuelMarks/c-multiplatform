@@ -32,8 +32,8 @@ static ui_error_t mock_on_close_err(struct ui_dialog_base *dialog,
 }
 
 static int test_create_destroy(void) {
-  struct ui_dialog_base *dialog = NULL;
   ui_error_t rc;
+  struct ui_dialog_base *dialog = NULL;
 
   rc = ui_dialog_base_create(&dialog);
   if (rc != UI_ERROR_NONE || !dialog)
@@ -49,11 +49,12 @@ static int test_create_destroy(void) {
 }
 
 static int test_errors(void) {
+  int i;
   struct ui_dialog_base *dialog = NULL;
   struct ui_component *comp = (struct ui_component *)1;
   struct ui_overlay_director *director = (struct ui_overlay_director *)2;
   struct ui_focus_manager *focus_manager = (struct ui_focus_manager *)3;
-  struct ui_event event;
+  struct ui_event event = {0};
   int is_open;
   struct ui_signal *signal = (struct ui_signal *)4;
   struct ui_computed *computed;
@@ -103,7 +104,6 @@ static int test_errors(void) {
       UI_ERROR_INVALID_ARGUMENT)
     return 1;
 
-  int i;
   for (i = 0; i < 15; i++) {
     g_malloc_fail_countdown = i;
     if (ui_dialog_base_create(&dialog) == UI_ERROR_NONE) {
@@ -122,6 +122,9 @@ static int test_errors(void) {
 }
 
 static int test_getters_and_setters(void) {
+  ui_error_t rc;
+  int called = 0;
+  int i;
   struct ui_dialog_base *dialog = NULL;
   struct ui_component *comp = NULL;
   struct ui_component *content = NULL;
@@ -131,7 +134,6 @@ static int test_getters_and_setters(void) {
   struct ui_signal *signal = (struct ui_signal *)4;
   struct ui_computed *computed = NULL;
   int is_open = -1;
-  ui_error_t rc;
   struct ui_event event = {0};
 
   ui_dialog_base_create(&dialog);
@@ -188,7 +190,6 @@ static int test_getters_and_setters(void) {
     return 1;
 
   /* Calling process_event when open */
-  int called = 0;
 
   rc = ui_dialog_base_set_on_close(dialog, mock_on_close, &called);
   if (rc != UI_ERROR_NONE)
@@ -262,8 +263,6 @@ static int test_getters_and_setters(void) {
   /* Mock OOM for push trap */
   /* overlay mount takes about 4 allocs typically, let's just use a loop to hit
    * the trap error */
-  int hit_rollback = 0;
-  int i;
   for (i = 1; i <= 20; i++) {
     g_malloc_fail_countdown = i;
     rc = ui_dialog_base_set_open(dialog, 1);
@@ -313,6 +312,7 @@ static int test_getters_and_setters(void) {
 }
 
 static int test_open_without_director_and_focus(void) {
+  int j;
   struct ui_dialog_base *dialog = NULL;
   struct ui_focus_manager *focus_manager = NULL;
   struct ui_overlay_director *director = NULL;
@@ -345,7 +345,6 @@ static int test_open_without_director_and_focus(void) {
   ui_dialog_base_create(&dialog);
   ui_focus_manager_create(&focus_manager);
   ui_dialog_base_set_focus_manager(dialog, focus_manager);
-  int j;
   for (j = 1; j <= 20; j++) {
     g_malloc_fail_countdown = j;
     if (ui_dialog_base_set_open(dialog, 1) == UI_ERROR_NONE) {
@@ -389,12 +388,13 @@ static int test_open_without_director_and_focus(void) {
 }
 
 static int test_oom_open(void) {
+  ui_error_t rc;
+  int i;
   struct ui_dialog_base *dialog = NULL;
   struct ui_overlay_director *director = NULL;
   struct ui_focus_manager *focus_manager = NULL;
   struct ui_dom_node *root_node = NULL;
-  ui_error_t rc;
-  int i;
+  (void)rc;
 
   for (i = 0; i < 20; i++) {
     ui_dialog_base_create(&dialog);

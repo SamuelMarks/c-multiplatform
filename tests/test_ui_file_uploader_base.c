@@ -11,6 +11,7 @@ extern int g_malloc_fail_countdown;
 static ui_error_t dummy_on_change(union ui_signal_payload value,
                                   void *user_data) {
   int *called = (int *)user_data;
+  (void)value;
   *called = 1;
   return UI_ERROR_NONE;
 }
@@ -22,6 +23,11 @@ static ui_error_t dummy_on_touched(void *user_data) {
 }
 
 static int run_coverage_tests(void) {
+  FILE *fp_empty = fopen("empty_test.txt", "wb");
+  FILE *fptest = fopen("test_coverage.txt", "wb");
+  FILE *fp2 = fopen("test.txt", "wb");
+  extern void C_MULTIPLATFORM_FREE(void *);
+  extern int g_mock_io_fail;
   struct ui_file_uploader_base uploader;
   struct ui_control_value_accessor cva;
   union ui_signal_payload payload;
@@ -53,7 +59,6 @@ static int run_coverage_tests(void) {
 
   ui_file_uploader_on_drag_enter(&uploader);
   touched_called = 0;
-  FILE *fp2 = fopen("test.txt", "wb");
   if (fp2) {
     fwrite("1", 1, 1, fp2);
     fclose(fp2);
@@ -61,7 +66,6 @@ static int run_coverage_tests(void) {
   ui_file_uploader_drop_file(&uploader, "test.txt");
 
   /* Create a file so it can be read and deleted */
-  FILE *fptest = fopen("test_coverage.txt", "wb");
   if (fptest) {
     fwrite("123", 1, 3, fptest);
     fclose(fptest);
@@ -80,8 +84,6 @@ static int run_coverage_tests(void) {
   ui_file_uploader_read_files(&uploader);
 
 #ifdef UI_TEST_MOCK_ALLOC
-  extern int g_mock_io_fail;
-  extern void C_MULTIPLATFORM_FREE(void *);
   if (uploader.files[0].data)
     C_MULTIPLATFORM_FREE(uploader.files[0].data);
   uploader.files[0].data = NULL; /* reset to read again */
@@ -159,7 +161,6 @@ static int run_coverage_tests(void) {
   remove("test.txt");
 
   /* Test 0 file size */
-  FILE *fp_empty = fopen("empty_test.txt", "wb");
   if (fp_empty) {
     fclose(fp_empty);
   }
@@ -291,13 +292,17 @@ static int run_oom_tests(void) {
 }
 
 static ui_error_t mock_touch_fail(void *ud) {
+  (void)ud;
   return UI_ERROR_INVALID_ARGUMENT;
 }
 static ui_error_t mock_change_fail(union ui_signal_payload v, void *ud) {
+  (void)v;
+  (void)ud;
   return UI_ERROR_INVALID_ARGUMENT;
 }
 
 static void test_failing_callbacks(void) {
+  FILE *fp = fopen("fail_test.txt", "w");
   struct ui_file_uploader_base uploader;
 
   ui_file_uploader_init(&uploader, 2, 0, 0, 100, 100, NULL);
@@ -315,7 +320,6 @@ static void test_failing_callbacks(void) {
   ui_file_uploader_drop_file(&uploader, "test.txt");
   ui_file_uploader_destroy(&uploader);
 
-  FILE *fp = fopen("fail_test.txt", "w");
   if (fp) {
     fprintf(fp, "123");
     fclose(fp);
@@ -331,6 +335,7 @@ static void test_failing_callbacks(void) {
 }
 
 int main(void) {
+  int cov_ret = run_coverage_tests();
   if (run_normal_tests() != 0) {
     printf("run_normal_tests failed\n");
     return 1;
@@ -340,7 +345,6 @@ int main(void) {
     return 1;
   }
   test_failing_callbacks();
-  int cov_ret = run_coverage_tests();
   if (cov_ret != 0) {
     printf("run_coverage_tests failed: %d\n", cov_ret);
     return 1;

@@ -97,7 +97,7 @@ static int run_normal_tests(void) {
   struct ui_component *comp = NULL;
   union ui_signal_payload payload;
   double val;
-  struct ui_event ev;
+  struct ui_event ev = {0};
 
   /* Null checks */
   ASSERT_EQ(ui_spin_button_base_create(NULL, NULL), UI_ERROR_INVALID_ARGUMENT);
@@ -750,27 +750,31 @@ static int run_edge_cases(void) {
     } while (0);
   }
 
-  struct ui_component *comp;
-  ui_spin_button_base_get_component(sb, &comp);
+  {
+    struct ui_component *comp;
+    ui_spin_button_base_get_component(sb, &comp);
 
-  if (comp && comp->shadow_root) {
-    struct ui_dom_node *orig_root = comp->shadow_root;
-    comp->shadow_root = NULL;
-    ui_spin_button_base_set_value(
-        sb, 5.0); /* triggers !shadow_root branch in update_aria */
-    comp->shadow_root = orig_root;
+    if (comp && comp->shadow_root) {
+      struct ui_dom_node *orig_root = comp->shadow_root;
+      comp->shadow_root = NULL;
+      ui_spin_button_base_set_value(
+          sb, 5.0); /* triggers !shadow_root branch in update_aria */
+      comp->shadow_root = orig_root;
 
-    struct ui_component *orig_comp = sb->component;
-    sb->component = NULL;
-    ui_spin_button_base_set_value(
-        sb, 6.0); /* triggers !component branch in update_aria */
-    sb->component = orig_comp;
+      {
+        struct ui_component *orig_comp = sb->component;
+        sb->component = NULL;
+        ui_spin_button_base_set_value(
+            sb, 6.0); /* triggers !component branch in update_aria */
+        sb->component = orig_comp;
+      }
 
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(orig_root);
-      assert(rc_cleanup == UI_ERROR_NONE);
+      {
+        ui_error_t rc_cleanup = ui_dom_node_destroy(orig_root);
+        assert(rc_cleanup == UI_ERROR_NONE);
+      }
+      comp->shadow_root = NULL;
     }
-    comp->shadow_root = NULL;
   }
 
   ui_spin_button_base_set_min(sb, 10.0);

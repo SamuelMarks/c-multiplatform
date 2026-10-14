@@ -158,6 +158,8 @@ static int test_accordion_lifecycle(void) {
 }
 
 static int test_accordion_edge_cases(void) {
+  extern int g_malloc_fail_countdown;
+  extern int g_malloc_fail_countdown;
   struct ui_accordion_base *accordion = NULL;
   struct ui_disclosure_base *d1 = NULL;
   struct ui_disclosure_base *d2 = NULL;
@@ -200,7 +202,6 @@ static int test_accordion_edge_cases(void) {
     return 1;
 
   /* 2. OOM in create */
-  extern int g_malloc_fail_countdown;
   g_malloc_fail_countdown = 0;
   if (ui_accordion_base_create(&accordion) != UI_ERROR_OUT_OF_MEMORY) {
     g_malloc_fail_countdown = -1;

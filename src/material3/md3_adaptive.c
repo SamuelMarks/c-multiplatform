@@ -8,6 +8,10 @@
 #include "ui_dom_node.h"
 #include "ui_internal_mem.h"
 #include <stdlib.h>
+
+#ifdef UI_TEST_MOCK_ALLOC
+extern int g_md3_adaptive_mock_comp_null;
+#endif
 #include <string.h>
 /* clang-format on */
 
@@ -56,7 +60,6 @@ ui_error_t md3_list_detail_pane_scaffold_create(
 
   rc = ui_adaptive_pane_scaffold_base_get_component(s->base, &comp);
 #ifdef UI_TEST_MOCK_ALLOC
-  extern int g_md3_adaptive_mock_comp_null;
   if (g_md3_adaptive_mock_comp_null == 1)
     rc = UI_ERROR_UNKNOWN;
   if (g_md3_adaptive_mock_comp_null == 2)
@@ -169,7 +172,6 @@ ui_error_t md3_supporting_pane_scaffold_create(
 
   rc = ui_adaptive_pane_scaffold_base_get_component(s->base, &comp);
 #ifdef UI_TEST_MOCK_ALLOC
-  extern int g_md3_adaptive_mock_comp_null;
   if (g_md3_adaptive_mock_comp_null == 1)
     rc = UI_ERROR_UNKNOWN;
   if (g_md3_adaptive_mock_comp_null == 2)

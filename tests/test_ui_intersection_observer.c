@@ -137,6 +137,7 @@ static int test_capacity_and_unobserve(void) {
   struct ui_dom_node *nodes[8];
   int i;
   ui_error_t rc;
+  (void)rc;
 
   ui_intersection_observer_create(NULL, 0, NULL, 0, &obs);
   for (i = 0; i < 8; i++)
@@ -188,6 +189,7 @@ static int test_capacity_and_unobserve(void) {
 static int run_oom_tests(void) {
   struct ui_intersection_observer *obs = NULL;
   ui_error_t rc;
+  (void)rc;
 
   g_malloc_fail_countdown = 0;
   rc = ui_intersection_observer_create(NULL, 0, NULL, 0, &obs);

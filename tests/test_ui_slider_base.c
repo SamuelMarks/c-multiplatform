@@ -490,7 +490,7 @@ static ui_error_t mock_on_change_fail(struct ui_slider_base *slider, float val,
   return UI_ERROR_OUT_OF_MEMORY;
 }
 
-static void test_on_change_error() {
+static void test_on_change_error(void) {
   struct ui_slider_base *slider;
   ui_slider_base_create(&slider, NULL);
   ui_slider_base_set_on_change(slider, mock_on_change_fail, NULL);
@@ -509,11 +509,9 @@ static void test_on_change_error() {
   ui_slider_base_destroy(slider);
 }
 
-static void test_invalid_args_more() {
+static void test_invalid_args_more(void) {
   struct ui_slider_base *slider = NULL;
   struct ui_control_value_accessor cva;
-  float val;
-  struct ui_component *comp;
   struct ui_event ev;
 
   {

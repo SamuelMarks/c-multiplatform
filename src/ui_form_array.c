@@ -77,8 +77,19 @@ ui_error_t ui_form_array_push(ui_form_array_t *array, ui_form_node_t node) {
     }
 
     if (array->count > 0) {
-      memcpy(new_nodes, array->nodes,
-             (size_t)array->count * sizeof(ui_form_node_t));
+#if defined(_MSC_VER)
+      errno_t err =
+          memcpy_s(new_nodes, (size_t)new_cap * sizeof(ui_form_node_t),
+                   array->nodes, (size_t)array->count * sizeof(ui_form_node_t));
+      if (err != 0) {
+        return UI_ERROR_OUT_OF_BOUNDS;
+      }
+#else
+      void *dummy = memcpy(new_nodes, array->nodes,
+                           (size_t)array->count * sizeof(ui_form_node_t));
+      if (!dummy)
+        return UI_ERROR_OUT_OF_BOUNDS;
+#endif
     }
     array->nodes = new_nodes;
     array->capacity = new_cap;
@@ -117,8 +128,19 @@ ui_error_t ui_form_array_insert_at(ui_form_array_t *array, size_t index,
     }
 
     if (array->count > 0) {
-      memcpy(new_nodes, array->nodes,
-             (size_t)array->count * sizeof(ui_form_node_t));
+#if defined(_MSC_VER)
+      errno_t err =
+          memcpy_s(new_nodes, (size_t)new_cap * sizeof(ui_form_node_t),
+                   array->nodes, (size_t)array->count * sizeof(ui_form_node_t));
+      if (err != 0) {
+        return UI_ERROR_OUT_OF_BOUNDS;
+      }
+#else
+      void *dummy = memcpy(new_nodes, array->nodes,
+                           (size_t)array->count * sizeof(ui_form_node_t));
+      if (!dummy)
+        return UI_ERROR_OUT_OF_BOUNDS;
+#endif
     }
     array->nodes = new_nodes;
     array->capacity = new_cap;

@@ -114,7 +114,11 @@ ui_error_t ui_css_stylesheet_destroy(struct ui_css_stylesheet *stylesheet) {
   rule = stylesheet->rules;
   while (rule) {
     next_rule = rule->next;
-    ui_css_rule_destroy(rule);
+    {
+      ui_error_t _rc_d = ui_css_rule_destroy(rule);
+      if (_rc_d != UI_ERROR_NONE)
+        return _rc_d;
+    }
     rule = next_rule;
   }
 
@@ -281,7 +285,11 @@ ui_error_t ui_css_selector_destroy(struct ui_css_selector *sel) {
       C_MULTIPLATFORM_FREE(sel->attr_value);
     }
     if (sel->nested_selector) {
-      ui_css_selector_destroy(sel->nested_selector);
+      {
+        ui_error_t _rc_d = ui_css_selector_destroy(sel->nested_selector);
+        if (_rc_d != UI_ERROR_NONE)
+          return _rc_d;
+      }
     }
     C_MULTIPLATFORM_FREE(sel);
     sel = next_sel;
@@ -305,7 +313,11 @@ ui_error_t ui_css_rule_destroy(struct ui_css_rule *rule) {
   }
 
   if (rule->type == UI_CSS_RULE_TYPE_STYLE) {
-    ui_css_selector_destroy(rule->selectors);
+    {
+      ui_error_t _rc_d = ui_css_selector_destroy(rule->selectors);
+      if (_rc_d != UI_ERROR_NONE)
+        return _rc_d;
+    }
 
     decl = rule->declarations;
     while (decl) {
@@ -318,7 +330,11 @@ ui_error_t ui_css_rule_destroy(struct ui_css_rule *rule) {
     nested = rule->nested_rules;
     while (nested) {
       next_nested = nested->next;
-      ui_css_rule_destroy(nested);
+      {
+        ui_error_t _rc_d = ui_css_rule_destroy(nested);
+        if (_rc_d != UI_ERROR_NONE)
+          return _rc_d;
+      }
       nested = next_nested;
     }
   } else if (rule->type == UI_CSS_RULE_TYPE_MEDIA) {
@@ -326,7 +342,11 @@ ui_error_t ui_css_rule_destroy(struct ui_css_rule *rule) {
     nested = rule->nested_rules;
     while (nested) {
       next_nested = nested->next;
-      ui_css_rule_destroy(nested);
+      {
+        ui_error_t _rc_d = ui_css_rule_destroy(nested);
+        if (_rc_d != UI_ERROR_NONE)
+          return _rc_d;
+      }
       nested = next_nested;
     }
   } else if (rule->type == UI_CSS_RULE_TYPE_LAYER) {
@@ -334,20 +354,36 @@ ui_error_t ui_css_rule_destroy(struct ui_css_rule *rule) {
     nested = rule->nested_rules;
     while (nested) {
       next_nested = nested->next;
-      ui_css_rule_destroy(nested);
+      {
+        ui_error_t _rc_d = ui_css_rule_destroy(nested);
+        if (_rc_d != UI_ERROR_NONE)
+          return _rc_d;
+      }
       nested = next_nested;
     }
   } else if (rule->type == UI_CSS_RULE_TYPE_SCOPE) {
     if (rule->scope_start) {
-      ui_css_selector_destroy(rule->scope_start);
+      {
+        ui_error_t _rc_d = ui_css_selector_destroy(rule->scope_start);
+        if (_rc_d != UI_ERROR_NONE)
+          return _rc_d;
+      }
     }
     if (rule->scope_end) {
-      ui_css_selector_destroy(rule->scope_end);
+      {
+        ui_error_t _rc_d = ui_css_selector_destroy(rule->scope_end);
+        if (_rc_d != UI_ERROR_NONE)
+          return _rc_d;
+      }
     }
     nested = rule->nested_rules;
     while (nested) {
       next_nested = nested->next;
-      ui_css_rule_destroy(nested);
+      {
+        ui_error_t _rc_d = ui_css_rule_destroy(nested);
+        if (_rc_d != UI_ERROR_NONE)
+          return _rc_d;
+      }
       nested = next_nested;
     }
   } else if (rule->type == UI_CSS_RULE_TYPE_SUPPORTS) {
@@ -355,7 +391,11 @@ ui_error_t ui_css_rule_destroy(struct ui_css_rule *rule) {
     nested = rule->nested_rules;
     while (nested) {
       next_nested = nested->next;
-      ui_css_rule_destroy(nested);
+      {
+        ui_error_t _rc_d = ui_css_rule_destroy(nested);
+        if (_rc_d != UI_ERROR_NONE)
+          return _rc_d;
+      }
       nested = next_nested;
     }
   } else if (rule->type == UI_CSS_RULE_TYPE_CONTAINER) {
@@ -363,7 +403,11 @@ ui_error_t ui_css_rule_destroy(struct ui_css_rule *rule) {
     nested = rule->nested_rules;
     while (nested) {
       next_nested = nested->next;
-      ui_css_rule_destroy(nested);
+      {
+        ui_error_t _rc_d = ui_css_rule_destroy(nested);
+        if (_rc_d != UI_ERROR_NONE)
+          return _rc_d;
+      }
       nested = next_nested;
     }
   } else if (rule->type == UI_CSS_RULE_TYPE_PROPERTY) {
@@ -713,7 +757,11 @@ any_selector_matches(const struct ui_css_selector *selectors_list,
   const struct ui_css_selector *curr = selectors_list;
   while (curr) {
     int m = 0;
-    selector_matches(curr, node, &m);
+    {
+      ui_error_t _rc_p = selector_matches(curr, node, &m);
+      if (_rc_p != UI_ERROR_NONE)
+        return _rc_p;
+    }
     if (m) {
       *out_matched = 1;
       return UI_ERROR_NONE;
@@ -738,12 +786,20 @@ has_matching_descendant(const struct ui_css_selector *selectors_list,
   while (child) {
     if (child->type == UI_DOM_NODE_TYPE_ELEMENT) {
       int m = 0;
-      any_selector_matches(selectors_list, child, &m);
+      {
+        ui_error_t _rc_p = any_selector_matches(selectors_list, child, &m);
+        if (_rc_p != UI_ERROR_NONE)
+          return _rc_p;
+      }
       if (m) {
         *out_matched = 1;
         return UI_ERROR_NONE;
       }
-      has_matching_descendant(selectors_list, child, &m);
+      {
+        ui_error_t _rc_p = has_matching_descendant(selectors_list, child, &m);
+        if (_rc_p != UI_ERROR_NONE)
+          return _rc_p;
+      }
       if (m) {
         *out_matched = 1;
         return UI_ERROR_NONE;
@@ -790,14 +846,22 @@ static ui_error_t is_in_scope(const struct ui_css_selector *scope_start,
     if (1) {
       if (scope_end) {
         int m = 0;
-        any_selector_matches(scope_end, curr, &m);
+        {
+          ui_error_t _rc_p = any_selector_matches(scope_end, curr, &m);
+          if (_rc_p != UI_ERROR_NONE)
+            return _rc_p;
+        }
         if (m) {
           end_matched = 1;
         }
       }
       if (scope_start) {
         int m = 0;
-        any_selector_matches(scope_start, curr, &m);
+        {
+          ui_error_t _rc_p = any_selector_matches(scope_start, curr, &m);
+          if (_rc_p != UI_ERROR_NONE)
+            return _rc_p;
+        }
         if (m) {
           start_matched = 1;
           break; /* Found the scope root */
@@ -834,7 +898,11 @@ has_matching_ancestor(const struct ui_css_selector *selectors_list,
   while (parent) {
     if (1) {
       int m = 0;
-      any_selector_matches(selectors_list, parent, &m);
+      {
+        ui_error_t _rc_p = any_selector_matches(selectors_list, parent, &m);
+        if (_rc_p != UI_ERROR_NONE)
+          return _rc_p;
+      }
       if (m) {
         *out_matched = 1;
         return UI_ERROR_NONE;
@@ -883,7 +951,12 @@ static ui_error_t pseudo_class_matches(const struct ui_css_selector *selector,
         *out_matched = 1;
         return UI_ERROR_NONE;
       }
-      any_selector_matches(selector->nested_selector, node, &m);
+      {
+        ui_error_t _rc_p =
+            any_selector_matches(selector->nested_selector, node, &m);
+        if (_rc_p != UI_ERROR_NONE)
+          return _rc_p;
+      }
       *out_matched = !m;
       return UI_ERROR_NONE;
     }
@@ -1199,7 +1272,11 @@ static ui_error_t selector_matches(const struct ui_css_selector *selector,
     ui_error_t attr_rc = ui_dom_node_get_attribute(node, "class", &attr_val);
     if (attr_rc == UI_ERROR_NONE) {
       int m = 0;
-      class_list_contains(attr_val, selector->value, &m);
+      {
+        ui_error_t _rc_p = class_list_contains(attr_val, selector->value, &m);
+        if (_rc_p != UI_ERROR_NONE)
+          return _rc_p;
+      }
       if (m) {
         *out_matched = 1;
         return UI_ERROR_NONE;
@@ -1380,7 +1457,12 @@ static ui_error_t get_selector_specificity(const struct ui_css_selector *sel,
       struct ui_css_selector *nested = sel->nested_selector;
       int max_a = 0, max_b = 0, max_c = 0;
       if (nested) {
-        get_selector_specificity(nested, &max_a, &max_b, &max_c);
+        {
+          ui_error_t _rc_p =
+              get_selector_specificity(nested, &max_a, &max_b, &max_c);
+          if (_rc_p != UI_ERROR_NONE)
+            return _rc_p;
+        }
       }
       *a = max_a;
       *b = max_b;
@@ -1441,13 +1523,25 @@ static ui_error_t eval_cond_or(const char **p, int *out_matched);
 static ui_error_t eval_cond_term(const char **p, int *out_matched) {
   int res = 0;
   int m1 = 0, m2 = 0, m3 = 0;
-  cond_skip_ws(p);
+  {
+    ui_error_t _rc_p = cond_skip_ws(p);
+    if (_rc_p != UI_ERROR_NONE)
+      return _rc_p;
+  }
   if (**p == '\0')
     return UI_ERROR_PARSE_FAILED;
-  cond_is_word(*p, "not", &m1);
+  {
+    ui_error_t _rc_p = cond_is_word(*p, "not", &m1);
+    if (_rc_p != UI_ERROR_NONE)
+      return _rc_p;
+  }
   if (m1) {
     *p += 3;
-    cond_skip_ws(p);
+    {
+      ui_error_t _rc_p = cond_skip_ws(p);
+      if (_rc_p != UI_ERROR_NONE)
+        return _rc_p;
+    }
     {
       ui_error_t rc = eval_cond_term(p, &res);
       if (rc != UI_ERROR_NONE)
@@ -1458,13 +1552,27 @@ static ui_error_t eval_cond_term(const char **p, int *out_matched) {
   }
   if (**p == '(') {
     (*p)++;
-    cond_skip_ws(p);
-    cond_is_word(*p, "not", &m2);
+    {
+      ui_error_t _rc_p = cond_skip_ws(p);
+      if (_rc_p != UI_ERROR_NONE)
+        return _rc_p;
+    }
+    {
+      ui_error_t _rc_p = cond_is_word(*p, "not", &m2);
+      if (_rc_p != UI_ERROR_NONE)
+        return _rc_p;
+    }
     if (m2 || **p == '(') {
       ui_error_t rc = eval_cond_or(p, &res);
       if (rc != UI_ERROR_NONE)
         return rc;
-      { cond_skip_ws(p); }
+      {
+        {
+          ui_error_t _rc_p = cond_skip_ws(p);
+          if (_rc_p != UI_ERROR_NONE)
+            return _rc_p;
+        }
+      }
       if (**p == ')')
         (*p)++;
       *out_matched = res;
@@ -1496,10 +1604,18 @@ static ui_error_t eval_cond_term(const char **p, int *out_matched) {
       return UI_ERROR_NONE;
     }
   }
-  cond_is_word(*p, "selector", &m3);
+  {
+    ui_error_t _rc_p = cond_is_word(*p, "selector", &m3);
+    if (_rc_p != UI_ERROR_NONE)
+      return _rc_p;
+  }
   if (m3) {
     *p += 8;
-    cond_skip_ws(p);
+    {
+      ui_error_t _rc_p = cond_skip_ws(p);
+      if (_rc_p != UI_ERROR_NONE)
+        return _rc_p;
+    }
     if (**p == '(') {
       const char *start;
       int paren_count = 1;
@@ -1544,8 +1660,16 @@ static ui_error_t eval_cond_and(const char **p, int *out_matched) {
     return rc;
   for (;;) {
     int m = 0;
-    cond_skip_ws(p);
-    cond_is_word(*p, "and", &m);
+    {
+      ui_error_t _rc_p = cond_skip_ws(p);
+      if (_rc_p != UI_ERROR_NONE)
+        return _rc_p;
+    }
+    {
+      ui_error_t _rc_p = cond_is_word(*p, "and", &m);
+      if (_rc_p != UI_ERROR_NONE)
+        return _rc_p;
+    }
 
     if (m) {
       int next_res = 0;
@@ -1576,8 +1700,16 @@ static ui_error_t eval_cond_or(const char **p, int *out_matched) {
     return rc;
   for (;;) {
     int m = 0;
-    cond_skip_ws(p);
-    cond_is_word(*p, "or", &m);
+    {
+      ui_error_t _rc_p = cond_skip_ws(p);
+      if (_rc_p != UI_ERROR_NONE)
+        return _rc_p;
+    }
+    {
+      ui_error_t _rc_p = cond_is_word(*p, "or", &m);
+      if (_rc_p != UI_ERROR_NONE)
+        return _rc_p;
+    }
 
     if (m) {
       int next_res = 0;
@@ -1691,7 +1823,12 @@ static ui_error_t resolve_rules_recursive(
       }
     } else if (rule->type == UI_CSS_RULE_TYPE_SCOPE) {
       int _m = 0;
-      is_in_scope(rule->scope_start, rule->scope_end, node, &_m);
+      {
+        ui_error_t _rc_p =
+            is_in_scope(rule->scope_start, rule->scope_end, node, &_m);
+        if (_rc_p != UI_ERROR_NONE)
+          return _rc_p;
+      }
       if (_m) {
         err =
             resolve_rules_recursive(stylesheet, rule->nested_rules, node, style,
@@ -1708,10 +1845,18 @@ static ui_error_t resolve_rules_recursive(
       sel = rule->selectors;
       while (sel) {
         int _sm = 0;
-        selector_matches(sel, node, &_sm);
+        {
+          ui_error_t _rc_p = selector_matches(sel, node, &_sm);
+          if (_rc_p != UI_ERROR_NONE)
+            return _rc_p;
+        }
         if (_sm) {
           int a, b, c;
-          get_selector_specificity(sel, &a, &b, &c);
+          {
+            ui_error_t _rc_p = get_selector_specificity(sel, &a, &b, &c);
+            if (_rc_p != UI_ERROR_NONE)
+              return _rc_p;
+          }
           if (!matched || a > best_a || (a == best_a && b > best_b) ||
               (a == best_a && b == best_b && c > best_c)) {
             best_a = a;
@@ -1723,7 +1868,12 @@ static ui_error_t resolve_rules_recursive(
         {
           int _hm = 0;
           if (!ancestor_matched) {
-            has_matching_ancestor(rule->selectors, node, &_hm);
+            {
+              ui_error_t _rc_p =
+                  has_matching_ancestor(rule->selectors, node, &_hm);
+              if (_rc_p != UI_ERROR_NONE)
+                return _rc_p;
+            }
           }
           if (!ancestor_matched && _hm) {
             ancestor_matched = 1;
@@ -1791,7 +1941,11 @@ ui_error_t ui_css_resolve_style(const struct ui_css_stylesheet *stylesheet,
   err = resolve_rules_recursive(stylesheet, stylesheet->rules, node, style,
                                 &source_order, 0x7FFFFFFF /* unlayered */);
   if (err != UI_ERROR_NONE) {
-    ui_css_computed_style_destroy(style);
+    {
+      ui_error_t _rc_p = ui_css_computed_style_destroy(style);
+      if (_rc_p != UI_ERROR_NONE)
+        return _rc_p;
+    }
     return err;
   }
 

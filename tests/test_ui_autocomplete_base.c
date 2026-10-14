@@ -47,11 +47,16 @@ static ui_error_t succeeding_on_selection(struct ui_autocomplete_base *a,
 }
 
 static void test_autocomplete_process_event_explicit(void) {
-  fprintf(stderr, "RUNNING explicit\n");
-  struct ui_autocomplete_base *ac = NULL;
-  struct ui_layout_node dummy_layout;
-  struct ui_event ev;
+  extern ui_error_t (*g_ac_captured_on_change)(struct ui_selection_model *,
+                                               void *);
+  struct ui_event ev = {0};
   ui_error_t rc;
+  extern int g_popover_is_open_calls;
+  extern int g_ac_mock_is_open;
+  struct ui_layout_node dummy_layout;
+  struct ui_selection_model *model = NULL;
+  struct ui_autocomplete_base *ac = NULL;
+  fprintf(stderr, "RUNNING explicit\n");
 
   memset(&dummy_layout, 0, sizeof(dummy_layout));
 
@@ -104,7 +109,6 @@ static void test_autocomplete_process_event_explicit(void) {
   g_ac_mock_fail = 0;
 
   /* Open failure: set_attribute fails */
-  extern int g_ac_mock_is_open;
   g_ac_mock_is_open = 0;
   g_ac_mock_fail = 8;
   rc = ui_autocomplete_base_open(ac, &dummy_layout, 100.0f, 100.0f);
@@ -158,7 +162,6 @@ static void test_autocomplete_process_event_explicit(void) {
   g_ac_mock_fail = 0;
 
   /* process_event: second popover_is_open fails */
-  extern int g_popover_is_open_calls;
   g_popover_is_open_calls = 0;
   g_ac_mock_fail = 19;
   rc = ui_autocomplete_base_process_event(ac, &ev, 100.0);
@@ -203,12 +206,9 @@ static void test_autocomplete_process_event_explicit(void) {
   assert(rc == UI_ERROR_NONE);
 
   /* Trigger the error branches in on_listbox_selection_change directly */
-  extern ui_error_t (*g_ac_captured_on_change)(struct ui_selection_model *,
-                                               void *);
   if (g_ac_captured_on_change) {
     struct ui_listbox_base *lb = NULL;
     ui_autocomplete_base_get_listbox(ac, &lb);
-    struct ui_selection_model *model = NULL;
     ui_listbox_base_get_selection_model(lb, &model);
 
     /* 1. !ac */
@@ -366,13 +366,18 @@ static ui_error_t dummy_cva_on_touched(void *user_data) {
 }
 
 TEST test_autocomplete_edge_cases(void) {
+  struct ui_selection_model *model = NULL;
+  struct ui_event ev = {0};
+  ui_error_t rc;
+  struct ui_dom_node *dummy_root = NULL;
+  struct ui_focus_manager *focus = NULL;
+  struct ui_overlay_director *director = NULL;
+  struct ui_layout_node layout;
+  union ui_signal_payload val;
   struct ui_autocomplete_base *autocomplete = NULL;
   struct ui_control_value_accessor cva;
-  struct ui_component *tmp_comp = NULL;
-  struct ui_input_base *tmp_input = NULL;
   struct ui_listbox_base *tmp_listbox = NULL;
   union ui_signal_payload dummy_payload;
-  ui_error_t rc;
   int i;
   int cva_change_cnt = 0;
   int cva_touched_cnt = 0;
@@ -405,7 +410,6 @@ TEST test_autocomplete_edge_cases(void) {
                                     &cva_touched_cnt));
 
   /* Write value */
-  union ui_signal_payload val;
   val.ptr_val = (void *)"Hello";
   ASSERT_EQ(UI_ERROR_NONE, cva.write_value(autocomplete, val));
   val.ptr_val = NULL;
@@ -416,12 +420,8 @@ TEST test_autocomplete_edge_cases(void) {
   ASSERT_EQ(UI_ERROR_NONE, cva.set_disabled_state(autocomplete, 0));
 
   /* Event handling when open */
-  struct ui_layout_node layout;
   memset(&layout, 0, sizeof(layout));
 
-  struct ui_overlay_director *director = NULL;
-  struct ui_focus_manager *focus = NULL;
-  struct ui_dom_node *dummy_root = NULL;
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &dummy_root);
   ASSERT_EQ(UI_ERROR_NONE, ui_overlay_director_create(dummy_root, &director));
   ASSERT_EQ(UI_ERROR_NONE, ui_focus_manager_create(&focus));
@@ -437,7 +437,6 @@ TEST test_autocomplete_edge_cases(void) {
   ASSERT_EQ(UI_ERROR_NONE, rc); /* Already open */
 
   /* Send keys to test open behavior */
-  struct ui_event ev;
   memset(&ev, 0, sizeof(ev));
   ev.type = UI_EVENT_KEY_DOWN;
 
@@ -465,7 +464,6 @@ TEST test_autocomplete_edge_cases(void) {
 
   /* Selection with ENTER */
   ui_autocomplete_base_get_listbox(autocomplete, &tmp_listbox);
-  struct ui_selection_model *model = NULL;
   ui_listbox_base_get_selection_model(tmp_listbox, &model);
   ui_listbox_base_set_item_count(tmp_listbox, 1);
   ui_listbox_base_set_active_index(tmp_listbox, 0);
@@ -543,10 +541,10 @@ TEST test_autocomplete_edge_cases(void) {
 }
 
 TEST test_autocomplete_main(void) {
-  struct ui_autocomplete_base *autocomplete = NULL;
+  struct ui_event ev = {0};
   ui_error_t rc;
+  struct ui_autocomplete_base *autocomplete = NULL;
   int my_data = 0;
-  struct ui_event ev;
 
   ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, ui_autocomplete_base_create(NULL, NULL));
 
@@ -639,10 +637,10 @@ SUITE(ui_autocomplete_suite) {
 GREATEST_MAIN_DEFS();
 
 int main(int argc, char **argv) {
+  extern ui_error_t run_ac_coverage(void);
   GREATEST_MAIN_BEGIN();
 
 #ifdef UI_TEST_MOCK_ALLOC
-  extern ui_error_t run_ac_coverage(void);
   assert(run_ac_coverage() == UI_ERROR_NONE);
 #endif
 

@@ -183,7 +183,6 @@ static int run_normal_tests(void) {
 static int run_error_paths(void) {
   struct ui_layout_observer *observer = NULL;
   int bp_id;
-  int i;
   ui_error_t rc;
 
   /* Creation OOM */
@@ -292,11 +291,13 @@ static void test_failing_callback_coverage(void) {
   ui_layout_observer_add_breakpoint(obs, -1, 500, -1, -1, &bp_id);
   ui_layout_observer_subscribe(obs, failing_callback, NULL);
   /* Trigger the breakpoint to fire the callback, which returns an error */
-  ui_error_t err = ui_layout_observer_notify_resize(obs, 400, 400);
-  if (err != UI_ERROR_INVALID_ARGUMENT) {
-    printf("Failed to percolate error!\n");
+  {
+    ui_error_t err = ui_layout_observer_notify_resize(obs, 400, 400);
+    if (err != UI_ERROR_INVALID_ARGUMENT) {
+      printf("Failed to percolate error!\n");
+    }
+    ui_layout_observer_destroy(obs);
   }
-  ui_layout_observer_destroy(obs);
 }
 int main(void) {
   if (run_normal_tests() != 0)

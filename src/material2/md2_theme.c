@@ -7,6 +7,10 @@
 /* clang-format off */
 #include "material2/md2_theme.h"
 #include <string.h>
+
+#ifdef UI_TEST_MOCK_ALLOC
+extern int g_md2_theme_mock_color_init_fail;
+#endif
 /* clang-format on */
 
 ui_error_t md2_color_palette_init_light(struct md2_color_palette *out_palette) {
@@ -166,7 +170,6 @@ ui_error_t md2_theme_init_light(struct md2_theme *out_theme) {
   out_theme->font_scale = 1.0f;
 
 #ifdef UI_TEST_MOCK_ALLOC
-  extern int g_md2_theme_mock_color_init_fail;
   if (g_md2_theme_mock_color_init_fail) {
     rc = UI_ERROR_UNKNOWN;
   } else {
@@ -193,7 +196,6 @@ ui_error_t md2_theme_init_dark(struct md2_theme *out_theme) {
   out_theme->font_scale = 1.0f;
 
 #ifdef UI_TEST_MOCK_ALLOC
-  extern int g_md2_theme_mock_color_init_fail;
   if (g_md2_theme_mock_color_init_fail) {
     rc = UI_ERROR_UNKNOWN;
   } else {

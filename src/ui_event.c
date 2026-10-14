@@ -80,8 +80,12 @@ ui_error_t ui_event_dispatch(const struct ui_layout_node *layout_root,
       event->type == UI_EVENT_MOUSE_WHEEL) {
 
     const struct ui_layout_node *hit = NULL;
-    hit_test(layout_root, (float)event->event_data.mouse.x,
-             (float)event->event_data.mouse.y, &hit);
+    {
+      ui_error_t ht_rc = hit_test(layout_root, (float)event->event_data.mouse.x,
+                                  (float)event->event_data.mouse.y, &hit);
+      if (ht_rc != UI_ERROR_NONE)
+        return ht_rc;
+    }
 
     if (event->type == UI_EVENT_MOUSE_MOVE) {
       if (hit != state->hovered_node) {
@@ -186,7 +190,9 @@ ui_error_t ui_event_dispatch(const struct ui_layout_node *layout_root,
              event->type == UI_EVENT_KEY_PRESS) {
     struct ui_dom_node *focused = NULL;
     if (focus_mgr) {
-      ui_focus_manager_get_focused_node(focus_mgr, &focused);
+      ui_error_t fm_rc = ui_focus_manager_get_focused_node(focus_mgr, &focused);
+      if (fm_rc != UI_ERROR_NONE)
+        return fm_rc;
     }
     if (focused) {
       {
