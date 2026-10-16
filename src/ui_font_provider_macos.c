@@ -138,6 +138,7 @@ ui_error_t ui_font_provider_load_system_font(struct ui_font_manager *manager,
 #else
 
 /* Non-Apple dummy */
+/** @brief ui_font_provider_macos_dummy function. */
 ui_error_t ui_font_provider_macos_dummy(void) { return UI_ERROR_NONE; }
 
 #endif

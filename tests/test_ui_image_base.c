@@ -7,6 +7,8 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_mock_strcpy_fail;
+
 extern int g_malloc_fail_countdown;
 
 static ui_error_t run_normal_tests(void) {
@@ -68,7 +70,6 @@ static ui_error_t run_normal_tests(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_mock_strcpy_fail;
     g_mock_strcpy_fail = 1;
     rc = ui_image_base_set_src(&image, "http://example.com/mock.png", 0);
     g_mock_strcpy_fail = 0;

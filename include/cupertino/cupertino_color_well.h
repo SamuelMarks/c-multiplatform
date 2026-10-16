@@ -17,12 +17,15 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
+/** @brief CUPERTINO_COLOR_WELL_DEFAULT_WIDTH constant. */
 #define CUPERTINO_COLOR_WELL_DEFAULT_WIDTH 44.0f
+/** @brief CUPERTINO_COLOR_WELL_DEFAULT_HEIGHT constant. */
 #define CUPERTINO_COLOR_WELL_DEFAULT_HEIGHT 24.0f
+/** @brief CUPERTINO_COLOR_WELL_CORNER_RADIUS constant. */
 #define CUPERTINO_COLOR_WELL_CORNER_RADIUS 5.0f
 
 /**
@@ -40,13 +43,13 @@ struct cupertino_color_well_descriptor {
  * @brief Cupertino Color Well instance.
  */
 struct cupertino_color_well {
-  ui_color_t current_color;
-  int is_panel_open;
-  int is_dragging;
-  float width;
-  float height;
-  struct ui_color_picker_base *base;
-  struct ui_control_value_accessor cva;
+  ui_color_t current_color;             /**< current_color field. */
+  int is_panel_open;                    /**< is_panel_open field. */
+  int is_dragging;                      /**< is_dragging field. */
+  float width;                          /**< width field. */
+  float height;                         /**< height field. */
+  struct ui_color_picker_base *base;    /**< base field. */
+  struct ui_control_value_accessor cva; /**< cva field. */
 };
 
 /**

@@ -21,7 +21,6 @@ static ui_error_t on_slider_change(struct ui_slider_base *slider, float value,
   g_change_count++;
   g_last_value = value;
   return UI_ERROR_NONE;
-  return UI_ERROR_NONE;
 }
 
 static ui_error_t dummy_on_change(union ui_signal_payload new_value,

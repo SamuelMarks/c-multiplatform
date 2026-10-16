@@ -19,14 +19,17 @@ static ui_error_t make_path(char *dest, size_t dest_sz, const char *dir,
   if (!dest || dest_sz == 0 || !dir || !filename) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
+  if (strlen(dir) + 1 + strlen(filename) >= dest_sz) {
+    return UI_ERROR_IO_FAILED;
+  }
 #if defined(_MSC_VER)
   written = sprintf_s(dest, dest_sz, "%s/%s", dir, filename);
   if (written < 0) {
     return UI_ERROR_IO_FAILED;
   }
 #else
-  written = snprintf(dest, dest_sz, "%s/%s", dir, filename);
-  if (written < 0 || (size_t)written >= dest_sz) {
+  written = sprintf(dest, "%s/%s", dir, filename);
+  if (written < 0) {
     return UI_ERROR_IO_FAILED;
   }
 #endif
@@ -399,7 +402,7 @@ ui_error_t render_all_pickers(const struct md3_color_scheme *s,
   /* Calendar days grid (Sep 2026 starts on Tuesday = col 2) */
   for (row = 0; row < 5; ++row) {
     for (col = 0; col < 7; ++col) {
-      char day_str[8];
+      char day_str[16];
       float cx = 45.0f + (float)col * 40.0f;
       float cy = 200.0f + (float)row * 40.0f;
 
@@ -411,7 +414,7 @@ ui_error_t render_all_pickers(const struct md3_color_scheme *s,
 #if defined(_MSC_VER)
       sprintf_s(day_str, sizeof(day_str), "%d", day);
 #else
-      snprintf(day_str, sizeof(day_str), "%d", day);
+      sprintf(day_str, "%d", day);
 #endif
 
       if (day == 30) {
@@ -466,7 +469,7 @@ ui_error_t render_all_pickers(const struct md3_color_scheme *s,
   day = 1;
   for (row = 0; row < 5; ++row) {
     for (col = 0; col < 7; ++col) {
-      char day_str[8];
+      char day_str[16];
       float cx = 45.0f + (float)col * 40.0f;
       float cy = 200.0f + (float)row * 40.0f;
 
@@ -478,7 +481,7 @@ ui_error_t render_all_pickers(const struct md3_color_scheme *s,
 #if defined(_MSC_VER)
       sprintf_s(day_str, sizeof(day_str), "%d", day);
 #else
-      snprintf(day_str, sizeof(day_str), "%d", day);
+      sprintf(day_str, "%d", day);
 #endif
 
       if (day == 15 || day == 19) {
@@ -548,21 +551,21 @@ ui_error_t render_all_pickers(const struct md3_color_scheme *s,
     /* Clock hand to 10 */
     {
       float angle = (-1.5707963f + 10.0f * (3.14159265f / 6.0f));
-      float hx = dial_cx + cosf(angle) * (dial_r - 25.0f);
-      float hy = dial_cy + sinf(angle) * (dial_r - 25.0f);
+      float hx = dial_cx + (float)cos((double)angle) * (dial_r - 25.0f);
+      float hy = dial_cy + (float)sin((double)angle) * (dial_r - 25.0f);
       CHECK_RC(draw_line(c, dial_cx, dial_cy, hx, hy, 2.0f, s->primary));
       CHECK_RC(draw_circle(c, hx, hy, 16.0f, s->primary));
     }
 
     for (h_idx = 1; h_idx <= 12; ++h_idx) {
-      char num_str[4];
+      char num_str[16];
       float angle = (-1.5707963f + (float)h_idx * (3.14159265f / 6.0f));
-      float nx = dial_cx + cosf(angle) * (dial_r - 25.0f);
-      float ny = dial_cy + sinf(angle) * (dial_r - 25.0f);
+      float nx = dial_cx + (float)cos((double)angle) * (dial_r - 25.0f);
+      float ny = dial_cy + (float)sin((double)angle) * (dial_r - 25.0f);
 #if defined(_MSC_VER)
       sprintf_s(num_str, sizeof(num_str), "%d", h_idx);
 #else
-      snprintf(num_str, sizeof(num_str), "%d", h_idx);
+      sprintf(num_str, "%d", h_idx);
 #endif
       CHECK_RC(
           draw_text_centered(c, nx, ny - 8.0f, num_str, 0.9f,
@@ -1897,8 +1900,8 @@ ui_error_t render_all_progress_and_shapes(const struct md3_color_scheme *s,
   /* Arc segment */
   for (i = 0; i < 20; ++i) {
     float angle = -1.5707963f + (float)i * 0.22f;
-    float px = 70.0f + cosf(angle) * 40.0f;
-    float py = 70.0f + sinf(angle) * 40.0f;
+    float px = 70.0f + (float)cos((double)angle) * 40.0f;
+    float py = 70.0f + (float)sin((double)angle) * 40.0f;
     CHECK_RC(draw_circle(c, px, py, 3.0f, s->primary));
   }
   CHECK_RC(
@@ -1933,8 +1936,8 @@ ui_error_t render_all_progress_and_shapes(const struct md3_color_scheme *s,
   /* Shape 3: 8-point Star / Flower */
   for (i = 0; i < 8; ++i) {
     float angle = (float)i * (3.14159265f / 4.0f);
-    float px = 280.0f + cosf(angle) * 20.0f;
-    float py = 70.0f + sinf(angle) * 20.0f;
+    float px = 280.0f + (float)cos((double)angle) * 20.0f;
+    float py = 70.0f + (float)sin((double)angle) * 20.0f;
     CHECK_RC(draw_circle(c, px, py, 24.0f, s->tertiary_container));
   }
   CHECK_RC(draw_circle(c, 280.0f, 70.0f, 22.0f, s->tertiary));
@@ -2013,13 +2016,13 @@ ui_error_t render_catalog_overview(const struct md3_color_scheme *s,
     int r_idx, c_idx, d = 1;
     for (r_idx = 0; r_idx < 3; ++r_idx) {
       for (c_idx = 0; c_idx < 7; ++c_idx) {
-        char buf[4];
+        char buf[16];
         float cx = 60.0f + (float)c_idx * 30.0f;
         float cy = 325.0f + (float)r_idx * 28.0f;
 #if defined(_MSC_VER)
         sprintf_s(buf, sizeof(buf), "%d", d);
 #else
-        snprintf(buf, sizeof(buf), "%d", d);
+        sprintf(buf, "%d", d);
 #endif
         if (d == 15) {
           CHECK_RC(draw_circle(c, cx, cy, 12.0f, s->primary));

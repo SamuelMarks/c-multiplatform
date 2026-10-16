@@ -92,6 +92,7 @@ static ui_error_t mock_badge_base_destroy(struct ui_badge_base *badge) {
 /** @endcond */
 #endif
 
+/** @brief cupertino_badge_calculate_layout function. */
 static void cupertino_badge_calculate_layout(struct cupertino_badge *badge) {
   size_t len;
 
@@ -117,6 +118,7 @@ static void cupertino_badge_calculate_layout(struct cupertino_badge *badge) {
   }
 }
 
+/** @brief cupertino_badge_create function. */
 ui_error_t cupertino_badge_create(struct ui_engine *engine,
                                   const struct cupertino_badge_descriptor *desc,
                                   struct cupertino_badge **out_badge) {
@@ -218,6 +220,7 @@ ui_error_t cupertino_badge_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_badge_destroy function. */
 ui_error_t cupertino_badge_destroy(struct cupertino_badge *badge) {
   ui_error_t rc = UI_ERROR_NONE;
 
@@ -234,6 +237,7 @@ ui_error_t cupertino_badge_destroy(struct cupertino_badge *badge) {
   return rc;
 }
 
+/** @brief cupertino_badge_set_count function. */
 ui_error_t cupertino_badge_set_count(struct cupertino_badge *badge, int count) {
   ui_error_t rc;
 
@@ -269,6 +273,7 @@ ui_error_t cupertino_badge_set_count(struct cupertino_badge *badge, int count) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_badge_get_count function. */
 ui_error_t cupertino_badge_get_count(const struct cupertino_badge *badge,
                                      int *out_count) {
   if (!badge || !out_count) {
@@ -279,6 +284,7 @@ ui_error_t cupertino_badge_get_count(const struct cupertino_badge *badge,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_badge_set_text function. */
 ui_error_t cupertino_badge_set_text(struct cupertino_badge *badge,
                                     const char *text) {
   ui_error_t rc;
@@ -309,6 +315,7 @@ ui_error_t cupertino_badge_set_text(struct cupertino_badge *badge,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_badge_get_text function. */
 ui_error_t cupertino_badge_get_text(const struct cupertino_badge *badge,
                                     const char **out_text) {
   if (!badge || !out_text) {
@@ -319,6 +326,7 @@ ui_error_t cupertino_badge_get_text(const struct cupertino_badge *badge,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_badge_set_hidden function. */
 ui_error_t cupertino_badge_set_hidden(struct cupertino_badge *badge,
                                       int is_hidden) {
   ui_error_t rc;
@@ -338,6 +346,7 @@ ui_error_t cupertino_badge_set_hidden(struct cupertino_badge *badge,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_badge_is_hidden function. */
 ui_error_t cupertino_badge_is_hidden(const struct cupertino_badge *badge,
                                      int *out_hidden) {
   if (!badge || !out_hidden) {
@@ -348,6 +357,7 @@ ui_error_t cupertino_badge_is_hidden(const struct cupertino_badge *badge,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_badge_get_dimensions function. */
 ui_error_t cupertino_badge_get_dimensions(const struct cupertino_badge *badge,
                                           float *out_width, float *out_height) {
   if (!badge || !out_width || !out_height) {
@@ -359,6 +369,7 @@ ui_error_t cupertino_badge_get_dimensions(const struct cupertino_badge *badge,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_badge_get_colors function. */
 ui_error_t cupertino_badge_get_colors(const struct cupertino_badge *badge,
                                       ui_color_t *out_bg, ui_color_t *out_fg) {
   if (!badge || !out_bg || !out_fg) {
@@ -370,6 +381,7 @@ ui_error_t cupertino_badge_get_colors(const struct cupertino_badge *badge,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_badge_get_base function. */
 ui_error_t cupertino_badge_get_base(struct cupertino_badge *badge,
                                     struct ui_badge_base **out_base) {
   if (!badge || !out_base) {

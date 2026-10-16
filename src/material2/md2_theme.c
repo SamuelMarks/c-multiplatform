@@ -13,6 +13,7 @@ extern int g_md2_theme_mock_color_init_fail;
 #endif
 /* clang-format on */
 
+/** @brief md2_color_palette_init_light function. */
 ui_error_t md2_color_palette_init_light(struct md2_color_palette *out_palette) {
   if (out_palette == NULL) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -34,6 +35,7 @@ ui_error_t md2_color_palette_init_light(struct md2_color_palette *out_palette) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md2_color_palette_init_dark function. */
 ui_error_t md2_color_palette_init_dark(struct md2_color_palette *out_palette) {
   if (out_palette == NULL) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -55,6 +57,7 @@ ui_error_t md2_color_palette_init_dark(struct md2_color_palette *out_palette) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md2_typography_get_style function. */
 ui_error_t md2_typography_get_style(enum md2_typography_style style,
                                     struct md2_text_style *out_style) {
   if (out_style == NULL) {
@@ -159,6 +162,7 @@ ui_error_t md2_typography_get_style(enum md2_typography_style style,
   return UI_ERROR_NONE;
 }
 
+/** @brief md2_theme_init_light function. */
 ui_error_t md2_theme_init_light(struct md2_theme *out_theme) {
   ui_error_t rc;
 
@@ -185,6 +189,7 @@ ui_error_t md2_theme_init_light(struct md2_theme *out_theme) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md2_theme_init_dark function. */
 ui_error_t md2_theme_init_dark(struct md2_theme *out_theme) {
   ui_error_t rc;
 

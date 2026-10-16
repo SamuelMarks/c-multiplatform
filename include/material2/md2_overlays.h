@@ -19,7 +19,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 /**
  * @struct md2_dialog
@@ -165,6 +165,6 @@ md2_tabs_get_base(struct md2_tabs *tabs, struct ui_tabs_base **out_base);
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* MATERIAL2_MD2_OVERLAYS_H */

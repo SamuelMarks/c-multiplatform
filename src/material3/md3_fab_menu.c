@@ -63,22 +63,25 @@ static ui_error_t mock_speed_dial_base_add_action(struct ui_speed_dial_base *b,
 #define ui_speed_dial_base_add_action mock_speed_dial_base_add_action
 #endif
 
+/** @brief md3_fab_menu_action structure. */
 struct md3_fab_menu_action {
-  int id;
-  struct md3_fab *fab;
-  char *label;
-  struct md3_fab_menu_action *next;
+  int id;                           /**< id field. */
+  struct md3_fab *fab;              /**< fab field. */
+  char *label;                      /**< label field. */
+  struct md3_fab_menu_action *next; /**< next field. */
 };
 
+/** @brief md3_fab_menu structure. */
 struct md3_fab_menu {
-  struct ui_speed_dial_base base;
-  struct ui_component *component;
-  enum md3_fab_menu_direction direction;
-  struct md3_fab *primary_fab;
-  int is_expanded;
-  struct md3_fab_menu_action *actions;
+  struct ui_speed_dial_base base;        /**< base field. */
+  struct ui_component *component;        /**< component field. */
+  enum md3_fab_menu_direction direction; /**< direction field. */
+  struct md3_fab *primary_fab;           /**< primary_fab field. */
+  int is_expanded;                       /**< is_expanded field. */
+  struct md3_fab_menu_action *actions;   /**< actions field. */
 };
 
+/** @brief md3_fab_menu_create function. */
 ui_error_t md3_fab_menu_create(struct ui_engine *engine,
                                enum md3_fab_menu_direction direction,
                                struct md3_fab_menu **out_menu) {
@@ -113,6 +116,7 @@ ui_error_t md3_fab_menu_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_fab_menu_destroy function. */
 ui_error_t md3_fab_menu_destroy(struct md3_fab_menu *menu) {
   ui_error_t rc;
   ui_error_t final_rc = UI_ERROR_NONE;
@@ -149,6 +153,7 @@ ui_error_t md3_fab_menu_destroy(struct md3_fab_menu *menu) {
   return final_rc;
 }
 
+/** @brief md3_fab_menu_set_primary_fab function. */
 ui_error_t md3_fab_menu_set_primary_fab(struct md3_fab_menu *menu,
                                         struct md3_fab *fab) {
   if (!menu) {
@@ -158,6 +163,7 @@ ui_error_t md3_fab_menu_set_primary_fab(struct md3_fab_menu *menu,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_fab_menu_add_action function. */
 ui_error_t md3_fab_menu_add_action(struct md3_fab_menu *menu, int id,
                                    struct md3_fab *fab, const char *label) {
   struct md3_fab_menu_action *action;
@@ -209,6 +215,7 @@ ui_error_t md3_fab_menu_add_action(struct md3_fab_menu *menu, int id,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_fab_menu_get_base function. */
 ui_error_t md3_fab_menu_get_base(struct md3_fab_menu *menu,
                                  struct ui_speed_dial_base **out_base) {
   if (!menu || !out_base) {

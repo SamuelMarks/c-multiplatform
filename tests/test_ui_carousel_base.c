@@ -10,6 +10,8 @@
 #include <string.h>
 /* clang-format on */
 
+extern ui_error_t run_carousel_coverage(void);
+
 #if defined(_MSC_VER)
 /* MSVC Safe CRT */
 #endif
@@ -24,7 +26,6 @@ static ui_error_t create_mock_node(size_t index, struct ui_dom_node **out_node,
   if (user_data) {
   }
   return ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, out_node);
-  return UI_ERROR_NONE;
 }
 
 static ui_error_t update_mock_node(size_t index, struct ui_dom_node *node,
@@ -38,7 +39,6 @@ static ui_error_t update_mock_node(size_t index, struct ui_dom_node *node,
   sprintf(buf, "Item %lu", (unsigned long)index);
 #endif
   return ui_dom_node_set_attribute(node, "data-index", buf);
-  return UI_ERROR_NONE;
 }
 
 static ui_error_t run_mock_failures(void) {
@@ -483,7 +483,6 @@ static ui_error_t run_normal_tests(void) {
   }
 
   return UI_ERROR_NONE;
-  return UI_ERROR_NONE;
 }
 
 static ui_error_t
@@ -572,7 +571,6 @@ int main(void) {
   ui_error_t rc;
 
 #ifdef UI_TEST_MOCK_ALLOC
-  extern ui_error_t run_carousel_coverage(void);
   rc = run_carousel_coverage();
   if (rc != UI_ERROR_NONE)
     return rc;

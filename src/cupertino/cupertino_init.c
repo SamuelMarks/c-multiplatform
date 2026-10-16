@@ -52,7 +52,9 @@ mock_cupertino_get_system_color(enum cupertino_system_color color, int is_dark,
 /** @endcond */
 #endif
 
+/** @brief g_cupertino_initialized variable. */
 static int g_cupertino_initialized = 0;
+/** @brief g_current_theme variable. */
 static enum cupertino_theme_mode g_current_theme = CUPERTINO_THEME_IOS_LIGHT;
 
 /**
@@ -175,6 +177,7 @@ cupertino_vtable_resolve_token(const char *token_name,
   return UI_ERROR_NOT_FOUND;
 }
 
+/** @brief g_cupertino_vtable variable. */
 static const struct ui_design_system_vtable g_cupertino_vtable = {
     cupertino_vtable_init, cupertino_vtable_shutdown,
     cupertino_vtable_apply_theme, cupertino_vtable_resolve_token};

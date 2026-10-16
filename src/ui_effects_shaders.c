@@ -175,6 +175,7 @@ static const char blur_v_fragment_source[] = {
 
 /* \brief ui_error
  */
+/** @brief ui_effects_shaders_get_blur_h_program function. */
 ui_error_t
 ui_effects_shaders_get_blur_h_program(struct ui_shader_manager *manager,
                                       unsigned int *out_program) {
@@ -188,6 +189,7 @@ ui_effects_shaders_get_blur_h_program(struct ui_shader_manager *manager,
 
 /* \brief ui_error
  */
+/** @brief ui_effects_shaders_get_blur_v_program function. */
 ui_error_t
 ui_effects_shaders_get_blur_v_program(struct ui_shader_manager *manager,
                                       unsigned int *out_program) {
@@ -507,6 +509,7 @@ static const char *blend_fragment_source_normal =
 
 /* \brief ui_error
  */
+/** @brief ui_effects_shaders_get_blend_program function. */
 ui_error_t
 ui_effects_shaders_get_blend_program(struct ui_shader_manager *manager,
                                      enum ui_css_blend_mode mode,
@@ -614,6 +617,7 @@ static const char *filter_fragment_source_sepia =
 
 /* \brief ui_error
  */
+/** @brief ui_effects_shaders_get_color_filter_program function. */
 ui_error_t
 ui_effects_shaders_get_color_filter_program(struct ui_shader_manager *manager,
                                             enum ui_css_filter_type type,
@@ -654,6 +658,7 @@ static const char *drop_shadow_fragment_source =
 
 /* \brief ui_error
  */
+/** @brief ui_effects_shaders_get_drop_shadow_program function. */
 ui_error_t
 ui_effects_shaders_get_drop_shadow_program(struct ui_shader_manager *manager,
                                            unsigned int *out_program) {

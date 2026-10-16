@@ -9,7 +9,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 /* clang-format off */
 #include "material3/md3_color.h"
@@ -254,6 +254,6 @@ ui_error_t save_canvas_png(const struct canvas *c, const char *filepath);
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* MD3_RASTERIZER_H */

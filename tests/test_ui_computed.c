@@ -10,6 +10,11 @@
 /* clang-format on */
 
 extern int g_malloc_fail_countdown;
+#ifdef UI_TEST_MOCK_ALLOC
+extern int g_computed_mock_cas_fail;
+extern int g_computed_mock_graph_get_fail;
+extern int g_computed_mock_graph_set_fail;
+#endif
 
 static ui_error_t dummy_compute(void *user_data,
                                 union ui_signal_payload *out_val) {
@@ -118,18 +123,20 @@ static int test_subscribers(void) {
     ui_computed_t *comp2;
     ui_computed_create(NULL, dummy_compute, &my_data, UI_SIGNAL_TYPE_INT32,
                        UI_SIGNAL_MODE_SINGLE_THREADED, &comp2);
-    struct mock_ui_computed *mock2 = (struct mock_ui_computed *)comp2;
-    mock2->is_dirty = 0;
-    mock2->self_node.notify_fn(comp2);
-
-    /* Self dependency test */
-    ui_reactive_graph_set_current_node(&mock2->self_node, NULL);
-    ui_computed_get(comp2, &out_val);
-    ui_reactive_graph_set_current_node(NULL, NULL);
-
     {
-      ui_error_t rc_cleanup = ui_computed_destroy(comp2);
-      assert(rc_cleanup == UI_ERROR_NONE);
+      struct mock_ui_computed *mock2 = (struct mock_ui_computed *)comp2;
+      mock2->is_dirty = 0;
+      mock2->self_node.notify_fn(comp2);
+
+      /* Self dependency test */
+      ui_reactive_graph_set_current_node(&mock2->self_node, NULL);
+      ui_computed_get(comp2, &out_val);
+      ui_reactive_graph_set_current_node(NULL, NULL);
+
+      {
+        ui_error_t rc_cleanup = ui_computed_destroy(comp2);
+        assert(rc_cleanup == UI_ERROR_NONE);
+      }
     }
   }
 
@@ -144,6 +151,39 @@ static int test_subscribers(void) {
     ui_error_t rc_cleanup = ui_computed_destroy(comp);
     assert(rc_cleanup == UI_ERROR_NONE);
   }
+
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    ui_computed_t *mt_comp = NULL;
+    struct mock_ui_computed *mt_mock;
+    ui_computed_create(NULL, dummy_compute, &my_data, UI_SIGNAL_TYPE_INT32,
+                       UI_SIGNAL_MODE_MULTI_THREADED, &mt_comp);
+    mt_mock = (struct mock_ui_computed *)mt_comp;
+
+    g_computed_mock_cas_fail = 1;
+    assert(ui_computed_get(mt_comp, &out_val) == UI_ERROR_UNKNOWN);
+    assert(mt_mock->self_node.notify_fn(mt_comp) == UI_ERROR_UNKNOWN);
+    g_computed_mock_cas_fail = 0;
+
+    g_computed_mock_graph_get_fail = 1;
+    assert(ui_computed_get(mt_comp, &out_val) == UI_ERROR_UNKNOWN);
+    g_computed_mock_graph_get_fail = 0;
+
+    g_computed_mock_graph_set_fail = 1;
+    assert(ui_computed_get(mt_comp, &out_val) == UI_ERROR_UNKNOWN);
+
+    g_computed_mock_graph_set_fail = 2;
+    assert(ui_computed_get(mt_comp, &out_val) == UI_ERROR_UNKNOWN);
+    mt_mock->compute_fn = dummy_compute_fail;
+    assert(ui_computed_get(mt_comp, &out_val) == UI_ERROR_UNKNOWN);
+    g_computed_mock_graph_set_fail = 0;
+
+    {
+      ui_error_t rc_cleanup = ui_computed_destroy(mt_comp);
+      assert(rc_cleanup == UI_ERROR_NONE);
+    }
+  }
+#endif
 
   return 0;
 }

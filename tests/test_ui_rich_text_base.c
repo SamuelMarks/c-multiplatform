@@ -174,16 +174,18 @@ static int test_rich_text(void) {
     ui_rich_text_base_redo(editor);
     ui_rich_text_base_redo(editor); /* hits next == NULL */
 
-    struct ui_rich_text_base_mock *meditor =
-        (struct ui_rich_text_base_mock *)editor;
-    struct ui_rich_text_history_entry_mock *saved_hist =
-        meditor->history_current;
+    {
+      struct ui_rich_text_base_mock *meditor =
+          (struct ui_rich_text_base_mock *)editor;
+      struct ui_rich_text_history_entry_mock *saved_hist =
+          meditor->history_current;
 
-    meditor->history_current = NULL;
-    EXPECT(ui_rich_text_base_undo(editor) == UI_ERROR_NONE);
-    EXPECT(ui_rich_text_base_redo(editor) == UI_ERROR_NONE);
+      meditor->history_current = NULL;
+      EXPECT(ui_rich_text_base_undo(editor) == UI_ERROR_NONE);
+      EXPECT(ui_rich_text_base_redo(editor) == UI_ERROR_NONE);
 
-    meditor->history_current = saved_hist;
+      meditor->history_current = saved_hist;
+    }
   }
 
   /* Test OOM on history entry creation (line 294) */

@@ -10,9 +10,11 @@
 #include <string.h>
 /* clang-format on */
 
+/** @brief s_months[12] variable. */
 static const char *s_months[12] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
                                    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
 
+/** @brief update_formatted_text function. */
 static void update_formatted_text(struct cupertino_date_picker *picker) {
   int m_idx;
   int h12;
@@ -80,6 +82,7 @@ static void update_formatted_text(struct cupertino_date_picker *picker) {
   }
 }
 
+/** @brief update_dimensions function. */
 static void update_dimensions(struct cupertino_date_picker *picker) {
   if (picker->style == CUPERTINO_DATE_PICKER_STYLE_COMPACT) {
     picker->width = CUPERTINO_DATE_PICKER_COMPACT_WIDTH;
@@ -93,6 +96,7 @@ static void update_dimensions(struct cupertino_date_picker *picker) {
   }
 }
 
+/** @brief date_picker_cva_write_value function. */
 static ui_error_t date_picker_cva_write_value(void *component,
                                               union ui_signal_payload value) {
   struct cupertino_date_picker *picker =
@@ -116,6 +120,7 @@ static ui_error_t date_picker_cva_write_value(void *component,
   return UI_ERROR_NONE;
 }
 
+/** @brief date_picker_cva_set_disabled function. */
 static ui_error_t date_picker_cva_set_disabled(void *component,
                                                ui_bool_t is_disabled) {
   if (!component) {
@@ -127,6 +132,7 @@ static ui_error_t date_picker_cva_set_disabled(void *component,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_date_picker_create function. */
 ui_error_t cupertino_date_picker_create(
     struct ui_engine *engine,
     const struct cupertino_date_picker_descriptor *desc,
@@ -189,6 +195,7 @@ ui_error_t cupertino_date_picker_create(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_date_picker_destroy function. */
 ui_error_t cupertino_date_picker_destroy(struct cupertino_date_picker *picker) {
   if (!picker) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -198,6 +205,7 @@ ui_error_t cupertino_date_picker_destroy(struct cupertino_date_picker *picker) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_date_picker_set_date function. */
 ui_error_t cupertino_date_picker_set_date(struct cupertino_date_picker *picker,
                                           int year, int month, int day,
                                           int hour, int minute) {
@@ -217,6 +225,7 @@ ui_error_t cupertino_date_picker_set_date(struct cupertino_date_picker *picker,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_date_picker_get_date function. */
 ui_error_t
 cupertino_date_picker_get_date(const struct cupertino_date_picker *picker,
                                int *out_year, int *out_month, int *out_day,
@@ -234,6 +243,7 @@ cupertino_date_picker_get_date(const struct cupertino_date_picker *picker,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_date_picker_set_mode function. */
 ui_error_t
 cupertino_date_picker_set_mode(struct cupertino_date_picker *picker,
                                enum cupertino_date_picker_mode mode) {
@@ -246,6 +256,7 @@ cupertino_date_picker_set_mode(struct cupertino_date_picker *picker,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_date_picker_get_mode function. */
 ui_error_t
 cupertino_date_picker_get_mode(const struct cupertino_date_picker *picker,
                                enum cupertino_date_picker_mode *out_mode) {
@@ -257,6 +268,7 @@ cupertino_date_picker_get_mode(const struct cupertino_date_picker *picker,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_date_picker_set_style function. */
 ui_error_t
 cupertino_date_picker_set_style(struct cupertino_date_picker *picker,
                                 enum cupertino_date_picker_style style) {
@@ -269,6 +281,7 @@ cupertino_date_picker_set_style(struct cupertino_date_picker *picker,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_date_picker_get_style function. */
 ui_error_t
 cupertino_date_picker_get_style(const struct cupertino_date_picker *picker,
                                 enum cupertino_date_picker_style *out_style) {
@@ -280,6 +293,7 @@ cupertino_date_picker_get_style(const struct cupertino_date_picker *picker,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_date_picker_get_formatted_text function. */
 ui_error_t cupertino_date_picker_get_formatted_text(
     const struct cupertino_date_picker *picker, const char **out_text) {
   if (!picker || !out_text) {
@@ -290,6 +304,7 @@ ui_error_t cupertino_date_picker_get_formatted_text(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_date_picker_set_popover_open function. */
 ui_error_t
 cupertino_date_picker_set_popover_open(struct cupertino_date_picker *picker,
                                        int is_open) {
@@ -301,6 +316,7 @@ cupertino_date_picker_set_popover_open(struct cupertino_date_picker *picker,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_date_picker_get_dimensions function. */
 ui_error_t
 cupertino_date_picker_get_dimensions(const struct cupertino_date_picker *picker,
                                      float *out_width, float *out_height) {
@@ -313,6 +329,7 @@ cupertino_date_picker_get_dimensions(const struct cupertino_date_picker *picker,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_date_picker_get_cva function. */
 ui_error_t
 cupertino_date_picker_get_cva(struct cupertino_date_picker *picker,
                               struct ui_control_value_accessor **out_cva) {

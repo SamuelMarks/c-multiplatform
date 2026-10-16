@@ -260,7 +260,6 @@ static int test_web_animation_coverage(void) {
   struct ui_web_animation_timing timing;
   int failed = 0;
   enum ui_web_animation_play_state state;
-  double dval;
 
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &node);
 
@@ -419,6 +418,7 @@ static int test_web_animation_more_coverage(void) {
   timing.direction = UI_WEB_ANIMATION_DIRECTION_NORMAL;
 
   /* Add dummy properties to hit the free loop */
+{
   struct ui_web_animation_keyframe *kf =
       C_MULTIPLATFORM_MALLOC(sizeof(struct ui_web_animation_keyframe));
   {
@@ -504,7 +504,7 @@ static int test_web_animation_more_coverage(void) {
   }
 
   return failed;
-}
+} }
 
 int main(void) {
   int failed = 0;

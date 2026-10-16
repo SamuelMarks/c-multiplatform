@@ -55,6 +55,7 @@ mock_grid_list_base_add_item(struct ui_grid_list_base *grid_list, int rowspan,
 /** @endcond */
 #endif
 
+/** @brief calculate_active_columns function. */
 static int calculate_active_columns(float viewport_width, int compact,
                                     int regular, int wide) {
   if (viewport_width < 600.0f) {
@@ -66,6 +67,7 @@ static int calculate_active_columns(float viewport_width, int compact,
   }
 }
 
+/** @brief cupertino_collection_view_create function. */
 ui_error_t cupertino_collection_view_create(
     struct ui_engine *engine,
     const struct cupertino_collection_view_descriptor *desc,
@@ -109,6 +111,7 @@ ui_error_t cupertino_collection_view_create(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_collection_view_destroy function. */
 ui_error_t
 cupertino_collection_view_destroy(struct cupertino_collection_view *view) {
   ui_error_t rc;
@@ -128,6 +131,7 @@ cupertino_collection_view_destroy(struct cupertino_collection_view *view) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_collection_view_set_breakpoints function. */
 ui_error_t cupertino_collection_view_set_breakpoints(
     struct cupertino_collection_view *view, int compact, int regular,
     int wide) {
@@ -157,6 +161,7 @@ ui_error_t cupertino_collection_view_set_breakpoints(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_collection_view_update_viewport function. */
 ui_error_t cupertino_collection_view_update_viewport(
     struct cupertino_collection_view *view, float width, float height) {
   int new_cols;
@@ -186,6 +191,7 @@ ui_error_t cupertino_collection_view_update_viewport(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_collection_view_add_section function. */
 ui_error_t cupertino_collection_view_add_section(
     struct cupertino_collection_view *view,
     const struct cupertino_collection_section *section,
@@ -211,6 +217,7 @@ ui_error_t cupertino_collection_view_add_section(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_collection_view_add_group function. */
 ui_error_t cupertino_collection_view_add_group(
     struct cupertino_collection_view *view, size_t section_index,
     const struct cupertino_collection_group *group) {
@@ -249,6 +256,7 @@ ui_error_t cupertino_collection_view_add_group(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_collection_view_scroll_orthogonal function. */
 ui_error_t cupertino_collection_view_scroll_orthogonal(
     struct cupertino_collection_view *view, size_t section_index,
     float delta_x) {
@@ -275,6 +283,7 @@ ui_error_t cupertino_collection_view_scroll_orthogonal(
   return UI_ERROR_NONE;
 }
 
+/** @brief resolve_dimension function. */
 static float resolve_dimension(const struct cupertino_collection_dimension *dim,
                                float parent_size) {
   switch (dim->type) {
@@ -288,6 +297,7 @@ static float resolve_dimension(const struct cupertino_collection_dimension *dim,
   }
 }
 
+/** @brief cupertino_collection_view_get_item_layout function. */
 ui_error_t cupertino_collection_view_get_item_layout(
     const struct cupertino_collection_view *view, size_t section_index,
     size_t group_index, size_t item_index, float *out_x, float *out_y,

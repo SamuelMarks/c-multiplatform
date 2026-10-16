@@ -13,8 +13,10 @@
 int g_cupertino_spell_check_mock_recompute_fail = 0;
 #endif
 
+/** @brief CUPERTINO_SPELL_CHECK_ARROW_HEIGHT macro definition. */
 #define CUPERTINO_SPELL_CHECK_ARROW_HEIGHT 8.0f
 
+/** @brief cupertino_spell_check_recompute_bounds function. */
 ui_error_t cupertino_spell_check_recompute_bounds(
     struct cupertino_spell_check_toolbar *toolbar) {
   size_t i;
@@ -64,6 +66,7 @@ ui_error_t cupertino_spell_check_recompute_bounds(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_spell_check_toolbar_create function. */
 ui_error_t cupertino_spell_check_toolbar_create(
     struct ui_engine *engine,
     const struct cupertino_spell_check_toolbar_descriptor *desc,
@@ -88,6 +91,7 @@ ui_error_t cupertino_spell_check_toolbar_create(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_spell_check_toolbar_destroy function. */
 ui_error_t cupertino_spell_check_toolbar_destroy(
     struct cupertino_spell_check_toolbar *toolbar) {
   if (!toolbar) {
@@ -98,6 +102,7 @@ ui_error_t cupertino_spell_check_toolbar_destroy(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_spell_check_toolbar_show function. */
 ui_error_t cupertino_spell_check_toolbar_show(
     struct cupertino_spell_check_toolbar *toolbar, float target_x,
     float target_y, float target_w, float target_h, const char *misspelled_word,
@@ -153,6 +158,7 @@ ui_error_t cupertino_spell_check_toolbar_show(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_spell_check_toolbar_hide function. */
 ui_error_t cupertino_spell_check_toolbar_hide(
     struct cupertino_spell_check_toolbar *toolbar) {
   if (!toolbar) {
@@ -163,6 +169,7 @@ ui_error_t cupertino_spell_check_toolbar_hide(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_spell_check_toolbar_is_visible function. */
 ui_error_t cupertino_spell_check_toolbar_is_visible(
     const struct cupertino_spell_check_toolbar *toolbar, int *out_visible) {
   if (!toolbar || !out_visible) {
@@ -173,6 +180,7 @@ ui_error_t cupertino_spell_check_toolbar_is_visible(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_spell_check_toolbar_get_suggestion_count function. */
 ui_error_t cupertino_spell_check_toolbar_get_suggestion_count(
     const struct cupertino_spell_check_toolbar *toolbar, size_t *out_count) {
   if (!toolbar || !out_count) {
@@ -183,6 +191,7 @@ ui_error_t cupertino_spell_check_toolbar_get_suggestion_count(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_spell_check_toolbar_select_suggestion function. */
 ui_error_t cupertino_spell_check_toolbar_select_suggestion(
     struct cupertino_spell_check_toolbar *toolbar, size_t index,
     const char **out_replacement) {
@@ -196,6 +205,7 @@ ui_error_t cupertino_spell_check_toolbar_select_suggestion(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_spell_check_toolbar_add_to_dictionary function. */
 ui_error_t cupertino_spell_check_toolbar_add_to_dictionary(
     struct cupertino_spell_check_toolbar *toolbar, int *out_added) {
   if (!toolbar || !out_added) {
@@ -212,6 +222,7 @@ ui_error_t cupertino_spell_check_toolbar_add_to_dictionary(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_spell_check_toolbar_get_misspelled_word function. */
 ui_error_t cupertino_spell_check_toolbar_get_misspelled_word(
     const struct cupertino_spell_check_toolbar *toolbar,
     const char **out_word) {
@@ -223,6 +234,7 @@ ui_error_t cupertino_spell_check_toolbar_get_misspelled_word(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_spell_check_toolbar_get_bounds function. */
 ui_error_t cupertino_spell_check_toolbar_get_bounds(
     const struct cupertino_spell_check_toolbar *toolbar, float *out_x,
     float *out_y, float *out_w, float *out_h) {

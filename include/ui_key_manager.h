@@ -8,7 +8,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 /* clang-format off */
 #include "ui_error.h"
@@ -23,7 +23,7 @@ struct ui_hotkey {
   int id;                 /**< Unique identifier for the hotkey */
   int key_code;           /**< Key code (e.g., from ui_key_code or ASCII) */
   unsigned int modifiers; /**< Bitmask of ui_modifier_flags */
-  void (*callback)(
+  ui_error_t (*callback)(
       void *user_data); /**< Callback triggered when hotkey is matched */
   void *user_data;      /**< User data passed to the callback */
 };

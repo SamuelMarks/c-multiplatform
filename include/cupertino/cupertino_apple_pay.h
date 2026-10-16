@@ -15,12 +15,15 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
+/** @brief CUPERTINO_APPLE_PAY_MIN_WIDTH constant. */
 #define CUPERTINO_APPLE_PAY_MIN_WIDTH 140.0f
+/** @brief CUPERTINO_APPLE_PAY_MIN_HEIGHT constant. */
 #define CUPERTINO_APPLE_PAY_MIN_HEIGHT 44.0f
+/** @brief CUPERTINO_APPLE_PAY_DEFAULT_CORNER_RADIUS constant. */
 #define CUPERTINO_APPLE_PAY_DEFAULT_CORNER_RADIUS 4.0f
 
 /**

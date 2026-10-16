@@ -64,6 +64,7 @@ static ui_error_t mock_progress_base_set_determinate(struct ui_progress_base *b,
 /** @endcond */
 #endif
 
+/** @brief cupertino_indicator_update_spokes function. */
 static void
 cupertino_indicator_update_spokes(struct cupertino_indicator *indicator) {
   int i;
@@ -78,6 +79,7 @@ cupertino_indicator_update_spokes(struct cupertino_indicator *indicator) {
   }
 }
 
+/** @brief cupertino_indicator_create function. */
 ui_error_t
 cupertino_indicator_create(struct ui_engine *engine,
                            const struct cupertino_indicator_descriptor *desc,
@@ -139,6 +141,7 @@ cupertino_indicator_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_indicator_destroy function. */
 ui_error_t cupertino_indicator_destroy(struct cupertino_indicator *indicator) {
   ui_error_t rc;
 
@@ -158,6 +161,7 @@ ui_error_t cupertino_indicator_destroy(struct cupertino_indicator *indicator) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_indicator_start function. */
 ui_error_t cupertino_indicator_start(struct cupertino_indicator *indicator) {
   if (!indicator) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -167,6 +171,7 @@ ui_error_t cupertino_indicator_start(struct cupertino_indicator *indicator) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_indicator_stop function. */
 ui_error_t cupertino_indicator_stop(struct cupertino_indicator *indicator) {
   if (!indicator) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -176,6 +181,7 @@ ui_error_t cupertino_indicator_stop(struct cupertino_indicator *indicator) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_indicator_is_animating function. */
 ui_error_t
 cupertino_indicator_is_animating(const struct cupertino_indicator *indicator,
                                  int *out_animating) {
@@ -187,6 +193,7 @@ cupertino_indicator_is_animating(const struct cupertino_indicator *indicator,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_indicator_tick function. */
 ui_error_t cupertino_indicator_tick(struct cupertino_indicator *indicator,
                                     float delta_ms) {
   if (!indicator || delta_ms < 0.0f) {
@@ -208,6 +215,7 @@ ui_error_t cupertino_indicator_tick(struct cupertino_indicator *indicator,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_indicator_get_spoke_opacity function. */
 ui_error_t cupertino_indicator_get_spoke_opacity(
     const struct cupertino_indicator *indicator, size_t spoke_index,
     float *out_opacity) {
@@ -220,6 +228,7 @@ ui_error_t cupertino_indicator_get_spoke_opacity(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_indicator_set_value function. */
 ui_error_t cupertino_indicator_set_value(struct cupertino_indicator *indicator,
                                          float value) {
   ui_error_t rc;
@@ -246,6 +255,7 @@ ui_error_t cupertino_indicator_set_value(struct cupertino_indicator *indicator,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_indicator_get_value function. */
 ui_error_t
 cupertino_indicator_get_value(const struct cupertino_indicator *indicator,
                               float *out_value) {
@@ -257,6 +267,7 @@ cupertino_indicator_get_value(const struct cupertino_indicator *indicator,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_indicator_get_dimensions function. */
 ui_error_t
 cupertino_indicator_get_dimensions(const struct cupertino_indicator *indicator,
                                    float *out_width, float *out_height) {
@@ -280,6 +291,7 @@ cupertino_indicator_get_dimensions(const struct cupertino_indicator *indicator,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_indicator_get_base function. */
 ui_error_t cupertino_indicator_get_base(struct cupertino_indicator *indicator,
                                         struct ui_progress_base **out_base) {
   if (!indicator || !out_base) {

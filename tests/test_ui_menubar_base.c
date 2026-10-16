@@ -6,6 +6,8 @@
 #include <assert.h>
 /* clang-format on */
 
+extern int g_menubar_mock_fail;
+
 extern int g_malloc_fail_countdown;
 
 static ui_error_t test_menubar_base(void) {
@@ -18,7 +20,6 @@ static ui_error_t test_menubar_base(void) {
   if (err != UI_ERROR_NONE) {
     fprintf(stderr, "ui_menubar_base_create failed\n");
     exit(1);
-    return UI_ERROR_NONE;
   }
 
   err = ui_dom_node_get_attribute(menubar->base.shadow_root, "role", &attr_val);
@@ -92,7 +93,6 @@ static int test_edge_cases(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_menubar_mock_fail;
     g_menubar_mock_fail = 1;
     g_malloc_fail_countdown = 1;
     err = ui_menubar_base_create(&menubar);

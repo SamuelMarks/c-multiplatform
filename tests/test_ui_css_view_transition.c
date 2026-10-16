@@ -57,7 +57,6 @@ static ui_error_t test_parse_view_transition_class(void) {
   if (!vt_class.names) {
     fprintf(stderr, "Expected class names list\n");
     exit(1);
-    return UI_ERROR_NONE;
   }
 
   EXPECT_STR_EQ("card", vt_class.names->name);

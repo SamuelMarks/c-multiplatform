@@ -17,6 +17,7 @@
 #include <string.h>
 /* clang-format on */
 
+/** @brief g_md3_high_contrast_enabled variable. */
 static int g_md3_high_contrast_enabled = 0;
 
 /**
@@ -39,6 +40,7 @@ struct md3_announcer {
   struct ui_live_announcer *base;
 };
 
+/** @brief md3_a11y_enforce_touch_target function. */
 ui_error_t md3_a11y_enforce_touch_target(float width, float height,
                                          float *out_pad_x, float *out_pad_y) {
   if (!out_pad_x || !out_pad_y || width < 0.0f || height < 0.0f) {
@@ -60,6 +62,7 @@ ui_error_t md3_a11y_enforce_touch_target(float width, float height,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_a11y_validate_touch_target function. */
 ui_error_t md3_a11y_validate_touch_target(float width, float height,
                                           int *out_is_valid) {
   if (!out_is_valid || width < 0.0f || height < 0.0f) {
@@ -75,6 +78,7 @@ ui_error_t md3_a11y_validate_touch_target(float width, float height,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_a11y_is_high_contrast_enabled function. */
 ui_error_t md3_a11y_is_high_contrast_enabled(struct ui_engine *engine,
                                              int *out_enabled) {
   if (!engine || !out_enabled) {
@@ -85,6 +89,7 @@ ui_error_t md3_a11y_is_high_contrast_enabled(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_a11y_set_high_contrast_enabled function. */
 ui_error_t md3_a11y_set_high_contrast_enabled(struct ui_engine *engine,
                                               int enabled) {
   if (!engine) {
@@ -95,6 +100,7 @@ ui_error_t md3_a11y_set_high_contrast_enabled(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_a11y_get_forced_colors_border function. */
 ui_error_t md3_a11y_get_forced_colors_border(int is_high_contrast,
                                              float *out_border_width,
                                              ui_color_t *out_border_color) {
@@ -113,6 +119,7 @@ ui_error_t md3_a11y_get_forced_colors_border(int is_high_contrast,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_a11y_get_focus_ring function. */
 ui_error_t md3_a11y_get_focus_ring(ui_color_t bg_color,
                                    struct ui_focus_ring *out_ring) {
   float r, g, b, lum;
@@ -143,6 +150,7 @@ ui_error_t md3_a11y_get_focus_ring(ui_color_t bg_color,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_roving_tabindex_create function. */
 ui_error_t md3_roving_tabindex_create(size_t item_count,
                                       struct md3_roving_tabindex **out_roving) {
   struct md3_roving_tabindex *roving;
@@ -164,6 +172,7 @@ ui_error_t md3_roving_tabindex_create(size_t item_count,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_roving_tabindex_destroy function. */
 ui_error_t md3_roving_tabindex_destroy(struct md3_roving_tabindex *roving) {
   if (!roving) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -173,6 +182,7 @@ ui_error_t md3_roving_tabindex_destroy(struct md3_roving_tabindex *roving) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_roving_tabindex_handle_key function. */
 ui_error_t md3_roving_tabindex_handle_key(struct md3_roving_tabindex *roving,
                                           enum ui_key_code key,
                                           size_t *out_focused_index) {
@@ -211,6 +221,7 @@ ui_error_t md3_roving_tabindex_handle_key(struct md3_roving_tabindex *roving,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_roving_tabindex_get_focused function. */
 ui_error_t
 md3_roving_tabindex_get_focused(const struct md3_roving_tabindex *roving,
                                 size_t *out_focused_index) {
@@ -222,6 +233,7 @@ md3_roving_tabindex_get_focused(const struct md3_roving_tabindex *roving,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_roving_tabindex_set_focused function. */
 ui_error_t md3_roving_tabindex_set_focused(struct md3_roving_tabindex *roving,
                                            size_t index) {
   if (!roving || index >= roving->item_count) {
@@ -232,6 +244,7 @@ ui_error_t md3_roving_tabindex_set_focused(struct md3_roving_tabindex *roving,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_announcer_create function. */
 ui_error_t md3_announcer_create(struct md3_announcer **out_announcer) {
   struct md3_announcer *announcer;
   ui_error_t rc;
@@ -256,6 +269,7 @@ ui_error_t md3_announcer_create(struct md3_announcer **out_announcer) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_announcer_destroy function. */
 ui_error_t md3_announcer_destroy(struct md3_announcer *announcer) {
   ui_error_t rc;
 
@@ -268,6 +282,7 @@ ui_error_t md3_announcer_destroy(struct md3_announcer *announcer) {
   return rc;
 }
 
+/** @brief md3_announcer_announce function. */
 ui_error_t md3_announcer_announce(struct md3_announcer *announcer,
                                   const char *message,
                                   enum ui_live_politeness politeness) {
@@ -278,6 +293,7 @@ ui_error_t md3_announcer_announce(struct md3_announcer *announcer,
   return ui_live_announce(announcer->base, message, politeness);
 }
 
+/** @brief md3_announcer_clear function. */
 ui_error_t md3_announcer_clear(struct md3_announcer *announcer) {
   if (!announcer) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -286,6 +302,7 @@ ui_error_t md3_announcer_clear(struct md3_announcer *announcer) {
   return ui_live_announcer_clear(announcer->base);
 }
 
+/** @brief md3_a11y_sync_aria function. */
 ui_error_t md3_a11y_sync_aria(struct ui_component *comp, const char *role,
                               int is_checked, int is_expanded, int is_selected,
                               int is_disabled, double value_now,
@@ -348,7 +365,7 @@ ui_error_t md3_a11y_sync_aria(struct ui_component *comp, const char *role,
 #if defined(_MSC_VER)
     sprintf_s(num_buf, sizeof(num_buf), "%.2f", value_now);
 #else
-    snprintf(num_buf, sizeof(num_buf), "%.2f", value_now);
+    sprintf(num_buf, "%.2f", value_now);
 #endif
     rc = ui_component_set_property(comp, "aria-valuenow", num_buf);
     if (rc != UI_ERROR_NONE) {
@@ -360,7 +377,7 @@ ui_error_t md3_a11y_sync_aria(struct ui_component *comp, const char *role,
 #if defined(_MSC_VER)
     sprintf_s(num_buf, sizeof(num_buf), "%.2f", value_min);
 #else
-    snprintf(num_buf, sizeof(num_buf), "%.2f", value_min);
+    sprintf(num_buf, "%.2f", value_min);
 #endif
     rc = ui_component_set_property(comp, "aria-valuemin", num_buf);
     if (rc != UI_ERROR_NONE) {
@@ -372,7 +389,7 @@ ui_error_t md3_a11y_sync_aria(struct ui_component *comp, const char *role,
 #if defined(_MSC_VER)
     sprintf_s(num_buf, sizeof(num_buf), "%.2f", value_max);
 #else
-    snprintf(num_buf, sizeof(num_buf), "%.2f", value_max);
+    sprintf(num_buf, "%.2f", value_max);
 #endif
     rc = ui_component_set_property(comp, "aria-valuemax", num_buf);
     if (rc != UI_ERROR_NONE) {
@@ -390,6 +407,7 @@ ui_error_t md3_a11y_sync_aria(struct ui_component *comp, const char *role,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_a11y_trap_focus function. */
 ui_error_t md3_a11y_trap_focus(struct ui_focus_trap **out_trap,
                                struct ui_focus_manager *manager,
                                struct ui_dom_node *root) {
@@ -410,6 +428,7 @@ ui_error_t md3_a11y_trap_focus(struct ui_focus_trap **out_trap,
   return rc;
 }
 
+/** @brief md3_a11y_release_focus function. */
 ui_error_t md3_a11y_release_focus(struct ui_focus_trap *trap,
                                   struct ui_focus_manager *manager) {
   ui_error_t rc;

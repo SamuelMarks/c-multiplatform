@@ -480,6 +480,8 @@ static int test_empty_scroll_variable(void) {
 static ui_error_t create_mock_node_fail(size_t index,
                                         struct ui_dom_node **out_node,
                                         void *user_data) {
+  if (sizeof(out_node) == 0) {
+  }
   if (index) {
   }
   if (user_data) {

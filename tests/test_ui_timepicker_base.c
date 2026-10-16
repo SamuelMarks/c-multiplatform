@@ -7,6 +7,8 @@
 #include <stdlib.h>
 /* clang-format on */
 
+extern int g_timepicker_mock_fail;
+
 extern int g_malloc_fail_countdown;
 
 #define ACCUM_ERR(failed, expr) failed |= ((expr) != UI_ERROR_NONE)
@@ -117,7 +119,6 @@ static int test_normal(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_timepicker_mock_fail;
     char *mock_str = NULL;
     g_timepicker_mock_fail = 1;
     failed |=

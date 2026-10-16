@@ -25,6 +25,7 @@ struct ui_virtual_keyboard {
    and compute: vk_height = current_bottom_inset - base_bottom_inset.
    For this CDK base, we provide the manual setter and the structural layout. */
 
+/** @brief ui_virtual_keyboard_create function. */
 ui_error_t ui_virtual_keyboard_create(struct ui_virtual_keyboard **out_vk) {
   struct ui_virtual_keyboard *vk;
 
@@ -47,6 +48,7 @@ ui_error_t ui_virtual_keyboard_create(struct ui_virtual_keyboard **out_vk) {
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_virtual_keyboard_destroy function. */
 ui_error_t ui_virtual_keyboard_destroy(struct ui_virtual_keyboard *vk) {
   if (!vk)
     return UI_ERROR_NONE;
@@ -55,6 +57,7 @@ ui_error_t ui_virtual_keyboard_destroy(struct ui_virtual_keyboard *vk) {
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_virtual_keyboard_bind_safe_area function. */
 ui_error_t ui_virtual_keyboard_bind_safe_area(
     struct ui_virtual_keyboard *vk,
     struct ui_safe_area_manager *safe_area_manager) {
@@ -66,6 +69,7 @@ ui_error_t ui_virtual_keyboard_bind_safe_area(
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_virtual_keyboard_set_height function. */
 ui_error_t ui_virtual_keyboard_set_height(struct ui_virtual_keyboard *vk,
                                           float height_px) {
   if (!vk) {
@@ -83,6 +87,7 @@ ui_error_t ui_virtual_keyboard_set_height(struct ui_virtual_keyboard *vk,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_virtual_keyboard_get_height function. */
 ui_error_t ui_virtual_keyboard_get_height(const struct ui_virtual_keyboard *vk,
                                           float *out_height) {
   if (!vk || !out_height) {
@@ -92,6 +97,7 @@ ui_error_t ui_virtual_keyboard_get_height(const struct ui_virtual_keyboard *vk,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_virtual_keyboard_bind_height_signal function. */
 ui_error_t
 ui_virtual_keyboard_bind_height_signal(struct ui_virtual_keyboard *vk,
                                        struct ui_signal *height_signal) {

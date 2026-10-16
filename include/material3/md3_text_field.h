@@ -17,7 +17,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
@@ -37,13 +37,13 @@ enum md3_text_field_variant {
  * styling.
  */
 struct md3_text_field {
-  struct ui_input_base *input;
-  struct ui_form_field_base *field;
-  struct ui_control_value_accessor cva;
-  enum md3_text_field_variant variant;
-  char prefix_text[32];
-  char suffix_text[32];
-  size_t max_length;
+  struct ui_input_base *input;          /**< input field. */
+  struct ui_form_field_base *field;     /**< field field. */
+  struct ui_control_value_accessor cva; /**< cva field. */
+  enum md3_text_field_variant variant;  /**< variant field. */
+  char prefix_text[32];                 /**< prefix_text[32] field. */
+  char suffix_text[32];                 /**< suffix_text[32] field. */
+  size_t max_length;                    /**< max_length field. */
 };
 
 /**

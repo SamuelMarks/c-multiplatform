@@ -5,6 +5,8 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_page_control_mock_fail;
+
 extern int g_malloc_fail_countdown;
 
 static void test_page_control_base(void) {
@@ -107,7 +109,6 @@ static void test_page_control_base_errors(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_page_control_mock_fail;
     g_page_control_mock_fail = 2;
     if (ui_page_control_base_destroy(control) != UI_ERROR_UNKNOWN)
       exit(1);
@@ -152,7 +153,6 @@ static void test_page_control_base_oom(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_page_control_mock_fail;
     g_page_control_mock_fail = 1;
     g_malloc_fail_countdown = 1;
     if (ui_page_control_base_create(&control) == UI_ERROR_NONE) {

@@ -94,6 +94,7 @@ ui_css_logical_to_physical_edge(enum ui_css_logical_edge logical_edge,
 
 /* \brief ui_css_logical_to_physical_size
  */
+/** @brief ui_css_logical_to_physical_size function. */
 ui_error_t ui_css_logical_to_physical_size(
     int is_inline, enum ui_css_writing_mode writing_mode, int *out_is_width) {
   if (!out_is_width)

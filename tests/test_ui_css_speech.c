@@ -6,6 +6,8 @@
 #include <string.h>
 /* clang-format on */
 
+extern ui_error_t run_speech_coverage(void);
+
 extern int g_malloc_fail_countdown;
 
 #define TEST_ASSERT(cond)                                                      \
@@ -471,10 +473,7 @@ int main(void) {
   }
 
 #ifdef UI_TEST_MOCK_ALLOC
-  {
-    extern ui_error_t run_speech_coverage(void);
-    run_speech_coverage();
-  }
+  { run_speech_coverage(); }
 #endif
 
   printf("test_ui_css_speech passed.\n");

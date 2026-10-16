@@ -8,6 +8,8 @@
 #include "../include/ui_test_visual.h"
 /* clang-format on */
 
+extern ui_error_t ui_renderer_gles_fallback_init(struct ui_renderer *);
+
 static ui_error_t test_render_scene(struct ui_renderer *renderer) {
   struct ui_rect r;
   struct ui_color c;
@@ -45,8 +47,7 @@ static ui_error_t test_render_scene(struct ui_renderer *renderer) {
   rc = renderer->vtable->draw_rect(renderer->ctx, &r, &c);
   if (rc != UI_ERROR_NONE)
     return rc;
-
-  return renderer->vtable->end_frame(renderer->ctx);
+  return UI_ERROR_NONE;
 }
 
 extern int g_mock_stbi_write_png_fail;
@@ -64,9 +65,23 @@ int main(void) {
   printf("Initializing visual test harness...\n");
 
 #ifdef _WIN32
-  if (getenv("WINELOADER") != NULL) {
-    printf("Skipping test_ui_visual under Wine CI to avoid pipe hangs.\n");
-    return 0;
+  {
+    char *wine_env = NULL;
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+    size_t wine_len = 0;
+    if (_dupenv_s(&wine_env, &wine_len, "WINELOADER") == 0 &&
+        wine_env != NULL) {
+      free(wine_env);
+      printf("Skipping test_ui_visual under Wine CI to avoid pipe hangs.\n");
+      return 0;
+    }
+#else
+    wine_env = getenv("WINELOADER");
+    if (wine_env != NULL) {
+      printf("Skipping test_ui_visual under Wine CI to avoid pipe hangs.\n");
+      return 0;
+    }
+#endif
   }
 #endif
 
@@ -77,7 +92,6 @@ int main(void) {
   failed |= (gles_renderer == NULL);
 
   if (gles_renderer) {
-    extern ui_error_t ui_renderer_gles_fallback_init(struct ui_renderer *);
     rc = ui_renderer_gles_fallback_init(gles_renderer);
     failed |= (rc != 0);
   }

@@ -10,6 +10,7 @@
 #include <string.h>
 /* clang-format on */
 
+/** @brief cupertino_spatial_ornament_create function. */
 ui_error_t cupertino_spatial_ornament_create(
     struct ui_engine *engine,
     const struct cupertino_spatial_ornament_descriptor *desc,
@@ -45,6 +46,7 @@ ui_error_t cupertino_spatial_ornament_create(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_spatial_ornament_destroy function. */
 ui_error_t cupertino_spatial_ornament_destroy(
     struct cupertino_spatial_ornament *ornament) {
   if (!ornament) {
@@ -55,6 +57,7 @@ ui_error_t cupertino_spatial_ornament_destroy(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_spatial_ornament_set_placement function. */
 ui_error_t cupertino_spatial_ornament_set_placement(
     struct cupertino_spatial_ornament *ornament,
     enum cupertino_ornament_placement placement) {
@@ -66,6 +69,7 @@ ui_error_t cupertino_spatial_ornament_set_placement(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_spatial_ornament_get_placement function. */
 ui_error_t cupertino_spatial_ornament_get_placement(
     const struct cupertino_spatial_ornament *ornament,
     enum cupertino_ornament_placement *out_placement) {
@@ -77,6 +81,7 @@ ui_error_t cupertino_spatial_ornament_get_placement(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_spatial_ornament_set_depth function. */
 ui_error_t cupertino_spatial_ornament_set_depth(
     struct cupertino_spatial_ornament *ornament, float depth_offset_pt,
     float ambient_occlusion) {
@@ -90,6 +95,7 @@ ui_error_t cupertino_spatial_ornament_set_depth(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_spatial_ornament_get_depth function. */
 ui_error_t cupertino_spatial_ornament_get_depth(
     const struct cupertino_spatial_ornament *ornament, float *out_depth,
     float *out_occlusion) {
@@ -102,6 +108,7 @@ ui_error_t cupertino_spatial_ornament_get_depth(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_spatial_ornament_set_size function. */
 ui_error_t
 cupertino_spatial_ornament_set_size(struct cupertino_spatial_ornament *ornament,
                                     float width, float height) {
@@ -114,6 +121,7 @@ cupertino_spatial_ornament_set_size(struct cupertino_spatial_ornament *ornament,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_spatial_ornament_get_size function. */
 ui_error_t cupertino_spatial_ornament_get_size(
     const struct cupertino_spatial_ornament *ornament, float *out_width,
     float *out_height) {
@@ -126,6 +134,7 @@ ui_error_t cupertino_spatial_ornament_get_size(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_spatial_ornament_set_visible function. */
 ui_error_t cupertino_spatial_ornament_set_visible(
     struct cupertino_spatial_ornament *ornament, int is_visible) {
   if (!ornament) {
@@ -136,6 +145,7 @@ ui_error_t cupertino_spatial_ornament_set_visible(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_spatial_ornament_is_visible function. */
 ui_error_t cupertino_spatial_ornament_is_visible(
     const struct cupertino_spatial_ornament *ornament, int *out_visible) {
   if (!ornament || !out_visible) {
@@ -146,6 +156,7 @@ ui_error_t cupertino_spatial_ornament_is_visible(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_spatial_ornament_compute_bounds function. */
 ui_error_t cupertino_spatial_ornament_compute_bounds(
     const struct cupertino_spatial_ornament *ornament, float window_x,
     float window_y, float window_w, float window_h, float *out_x, float *out_y,
@@ -180,6 +191,7 @@ ui_error_t cupertino_spatial_ornament_compute_bounds(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_spatial_ornament_compute_shadow function. */
 ui_error_t cupertino_spatial_ornament_compute_shadow(
     const struct cupertino_spatial_ornament *ornament,
     float *out_shadow_offset_y, float *out_shadow_radius,

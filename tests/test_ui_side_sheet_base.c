@@ -39,7 +39,7 @@ void test_ui_side_sheet_errs(void);
 int main(void) {
   struct ui_side_sheet_base *sheet = NULL;
   struct ui_component *comp = NULL;
-  struct ui_event ev;
+  struct ui_event ev = {0};
   int is_open;
   int close_called = 0;
   ui_signal_t *signal = NULL;

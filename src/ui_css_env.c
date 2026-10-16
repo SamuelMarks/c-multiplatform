@@ -29,6 +29,7 @@ struct ui_css_env_manager {
 
 /* \brief ui_error
  */
+/** @brief ui_css_env_manager_create function. */
 ui_error_t ui_css_env_manager_create(struct ui_css_env_manager **out_manager) {
   struct ui_css_env_manager *manager;
 
@@ -121,6 +122,7 @@ ui_error_t ui_css_env_manager_set(struct ui_css_env_manager *manager,
 
 /* \brief ui_error
  */
+/** @brief ui_css_env_manager_get function. */
 ui_error_t ui_css_env_manager_get(const struct ui_css_env_manager *manager,
                                   const char *name,
                                   const struct ui_css_value_ext **out_value) {

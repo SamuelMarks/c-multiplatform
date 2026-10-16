@@ -18,7 +18,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
@@ -45,8 +45,8 @@ struct cupertino_radio {
   float scale;              /**< Spring scale (1.0 to 1.15 on select). */
   float outer_diameter;     /**< 18.0pt outer dimension. */
   float inner_dot_diameter; /**< 8.0pt inner white concentric dot. */
-  ui_color_t active_color;  /**< SystemBlue (#007AFF) fill when ON. */
-  ui_color_t border_color;  /**< SystemGray4 (#D1D1D6) outline when OFF. */
+  ui_color_t active_color;  /**< SystemBlue (\#007AFF) fill when ON. */
+  ui_color_t border_color;  /**< SystemGray4 (\#D1D1D6) outline when OFF. */
 };
 
 /**

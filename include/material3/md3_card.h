@@ -15,7 +15,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
@@ -35,10 +35,10 @@ enum md3_card_variant {
  * @brief Material 3 Card skin wrapping ui_card_base.
  */
 struct md3_card {
-  struct ui_card_base *base;
-  enum md3_card_variant variant;
-  char title[64];
-  char subtitle[64];
+  struct ui_card_base *base;     /**< base field. */
+  enum md3_card_variant variant; /**< variant field. */
+  char title[64];                /**< title[64] field. */
+  char subtitle[64];             /**< subtitle[64] field. */
 };
 
 /**
@@ -124,6 +124,6 @@ md3_card_get_base(struct md3_card *card, struct ui_card_base **out_base);
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* MATERIAL3_MD3_CARD_H */

@@ -11,6 +11,29 @@
 #include <stddef.h>
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_mock_focus_fail = 0;
+
+/**
+ * @brief mock_event_focus_get_focused_node.
+ * @param mgr Focus manager.
+ * @param out_node Output node.
+ * @return Return value.
+ */
+static ui_error_t
+mock_event_focus_get_focused_node(const struct ui_focus_manager *mgr,
+                                  struct ui_dom_node **out_node) {
+  if (g_mock_focus_fail) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_focus_manager_get_focused_node)(mgr, out_node);
+}
+#undef ui_focus_manager_get_focused_node
+/** @cond */
+#define ui_focus_manager_get_focused_node mock_event_focus_get_focused_node
+/** @endcond */
+#endif
+
 /**
  * @brief trigger_event.
  * @param node Parameter node.
@@ -44,16 +67,14 @@ static ui_error_t trigger_event(const struct ui_dom_node *node,
  * @param x Parameter x.
  * @param y Parameter y.
  * @param out_node Parameter out_node.
- * @return Return value.
  */
-static ui_error_t hit_test(const struct ui_layout_node *node, float x, float y,
-                           const struct ui_layout_node **out_node) {
+static void hit_test(const struct ui_layout_node *node, float x, float y,
+                     const struct ui_layout_node **out_node) {
   *out_node = NULL;
   if (x >= node->x && x <= node->x + node->width && y >= node->y &&
       y <= node->y + node->height) {
     *out_node = node;
   }
-  return UI_ERROR_NONE;
 }
 
 ui_error_t ui_event_dispatch(const struct ui_layout_node *layout_root,
@@ -80,12 +101,8 @@ ui_error_t ui_event_dispatch(const struct ui_layout_node *layout_root,
       event->type == UI_EVENT_MOUSE_WHEEL) {
 
     const struct ui_layout_node *hit = NULL;
-    {
-      ui_error_t ht_rc = hit_test(layout_root, (float)event->event_data.mouse.x,
-                                  (float)event->event_data.mouse.y, &hit);
-      if (ht_rc != UI_ERROR_NONE)
-        return ht_rc;
-    }
+    hit_test(layout_root, (float)event->event_data.mouse.x,
+             (float)event->event_data.mouse.y, &hit);
 
     if (event->type == UI_EVENT_MOUSE_MOVE) {
       if (hit != state->hovered_node) {

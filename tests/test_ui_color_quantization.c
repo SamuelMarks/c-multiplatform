@@ -4,6 +4,8 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_malloc_fail_countdown;
+
 int main(void) {
   ui_error_t rc;
   struct ui_color_quantization_options options = {0};
@@ -179,7 +181,6 @@ int main(void) {
     /* Check out of memory mock */
 #ifdef UI_TEST_MOCK_ALLOC
     {
-      extern int g_malloc_fail_countdown;
       unsigned char pixels2[4 * 4 * 3] = {0};
       g_malloc_fail_countdown = 0;
       rc = ui_color_quantize_kmeans(pixels2, 4, 4, 3, &options, colors, &count);

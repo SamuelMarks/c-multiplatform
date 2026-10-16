@@ -7,6 +7,13 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_mock_svg_skip_ws_fail;
+extern int g_mock_svg_reflect_fail;
+extern int g_mock_svg_triangle_area_fail;
+extern int g_mock_svg_point_in_triangle_fail;
+extern ui_error_t ui_test_svg_skip_ws(const char **ptr);
+extern ui_error_t ui_test_svg_parse_float(const char **ptr, float *out_val);
+
 extern int g_malloc_fail_countdown;
 
 #define ACCUM_ERR(failed, expr) failed |= ((expr) != UI_ERROR_NONE)
@@ -264,13 +271,15 @@ static int run_stroke_test(void) {
   ui_svg_tessellate_stroke(&geom, &f, 2.0f);
 
   /* Trigger degenerate stroke */
-  struct ui_svg_point dpts[2] = {{0, 0}, {0, 0}};
-  sp.points = dpts;
-  ui_svg_tessellate_stroke(&geom, &f, 2.0f);
+  {
+    struct ui_svg_point dpts[2] = {{0, 0}, {0, 0}};
+    sp.points = dpts;
+    ui_svg_tessellate_stroke(&geom, &f, 2.0f);
 
-  f.subpaths = NULL;
-  ui_svg_geometry_destroy(&geom);
-  return 0;
+    f.subpaths = NULL;
+    ui_svg_geometry_destroy(&geom);
+    return 0;
+  }
 }
 
 static int run_cw_tests(void) {
@@ -297,33 +306,37 @@ static int run_cw_tests(void) {
   ui_svg_geometry_destroy(&geom);
 
   /* Another star with inside points to hit is_ear = 0 */
-  struct ui_svg_point star2[6] = {{0, 20},  {20, 20}, {10, 0},
-                                  {10, 10}, {5, 5},   {15, 5}};
-  sp.points = star2;
-  sp.count = 6;
-  sp.capacity = 6;
-  ui_svg_geometry_init(&geom);
-  f.subpaths = &sp;
-  ui_svg_tessellate_fill(&geom, &f);
-  f.subpaths = NULL;
-  ui_svg_geometry_destroy(&geom);
+  {
+    struct ui_svg_point star2[6] = {{0, 20},  {20, 20}, {10, 0},
+                                    {10, 10}, {5, 5},   {15, 5}};
+    sp.points = star2;
+    sp.count = 6;
+    sp.capacity = 6;
+    ui_svg_geometry_init(&geom);
+    f.subpaths = &sp;
+    ui_svg_tessellate_fill(&geom, &f);
+    f.subpaths = NULL;
+    ui_svg_geometry_destroy(&geom);
 
-  /* Run a larger star to test is_ear logic */
-  struct ui_svg_point star_pts[10] = {{50, 0},  {61, 35}, {98, 35}, {68, 57},
-                                      {79, 91}, {50, 70}, {21, 91}, {32, 57},
-                                      {2, 35},  {39, 35}};
-  sp.points = star_pts;
-  sp.count = 10;
-  sp.capacity = 10;
+    /* Run a larger star to test is_ear logic */
+    {
+      struct ui_svg_point star_pts[10] = {
+          {50, 0},  {61, 35}, {98, 35}, {68, 57}, {79, 91},
+          {50, 70}, {21, 91}, {32, 57}, {2, 35},  {39, 35}};
+      sp.points = star_pts;
+      sp.count = 10;
+      sp.capacity = 10;
 
-  ui_svg_geometry_init(&geom);
-  f.subpaths = &sp;
-  ui_svg_tessellate_fill(&geom, &f);
+      ui_svg_geometry_init(&geom);
+      f.subpaths = &sp;
+      ui_svg_tessellate_fill(&geom, &f);
 
-  f.subpaths = NULL;
-  ui_svg_geometry_destroy(&geom);
+      f.subpaths = NULL;
+      ui_svg_geometry_destroy(&geom);
 
-  return 0;
+      return 0;
+    }
+  }
 }
 
 static int run_tessellate_oom_branches(void) {
@@ -348,27 +361,30 @@ static int run_tessellate_oom_branches(void) {
     ui_svg_geometry_destroy(&geom);
     ui_svg_geometry_init(&geom);
 
-    int oom_idx = i % 10;
-    int force_realloc_at = (i / 10) % 15;
+    {
+      int oom_idx = i % 10;
+      int force_realloc_at = (i / 10) % 15;
 
-    g_malloc_fail_countdown = -1;
-    geom.vertex_capacity = 64;
-    geom.vertex_count = 64;
-    geom.vertices = (struct ui_svg_point *)C_MULTIPLATFORM_MALLOC(
-        64 * sizeof(struct ui_svg_point));
+      g_malloc_fail_countdown = -1;
+      geom.vertex_capacity = 64;
+      geom.vertex_count = 64;
+      geom.vertices = (struct ui_svg_point *)C_MULTIPLATFORM_MALLOC(
+          64 * sizeof(struct ui_svg_point));
 
-    geom.index_capacity = 128;
-    geom.index_count = 128;
-    geom.indices = (ui_uint32 *)C_MULTIPLATFORM_MALLOC(128 * sizeof(ui_uint32));
+      geom.index_capacity = 128;
+      geom.index_count = 128;
+      geom.indices =
+          (ui_uint32 *)C_MULTIPLATFORM_MALLOC(128 * sizeof(ui_uint32));
 
-    if (force_realloc_at < 6) {
-      geom.vertex_count = geom.vertex_capacity - force_realloc_at;
-    } else {
-      geom.index_count = geom.index_capacity - (force_realloc_at - 6);
+      if (force_realloc_at < 6) {
+        geom.vertex_count = geom.vertex_capacity - force_realloc_at;
+      } else {
+        geom.index_count = geom.index_capacity - (force_realloc_at - 6);
+      }
+
+      g_malloc_fail_countdown = oom_idx;
+      ui_svg_tessellate_fill(&geom, &f);
     }
-
-    g_malloc_fail_countdown = oom_idx;
-    ui_svg_tessellate_fill(&geom, &f);
   }
   g_malloc_fail_countdown = -1;
 
@@ -400,28 +416,31 @@ static int run_tessellate_stroke_oom_branches(void) {
     ui_svg_geometry_destroy(&geom);
     ui_svg_geometry_init(&geom);
 
-    int oom_idx = i % 10;
-    int force_realloc_at = (i / 10) % 10; /* 0 to 9 */
+    {
+      int oom_idx = i % 10;
+      int force_realloc_at = (i / 10) % 10; /* 0 to 9 */
 
-    g_malloc_fail_countdown = -1;
-    geom.vertex_capacity = 64;
-    geom.vertex_count = 64;
-    geom.vertices = (struct ui_svg_point *)C_MULTIPLATFORM_MALLOC(
-        64 * sizeof(struct ui_svg_point));
+      g_malloc_fail_countdown = -1;
+      geom.vertex_capacity = 64;
+      geom.vertex_count = 64;
+      geom.vertices = (struct ui_svg_point *)C_MULTIPLATFORM_MALLOC(
+          64 * sizeof(struct ui_svg_point));
 
-    geom.index_capacity = 128;
-    geom.index_count = 128;
-    geom.indices = (ui_uint32 *)C_MULTIPLATFORM_MALLOC(128 * sizeof(ui_uint32));
+      geom.index_capacity = 128;
+      geom.index_count = 128;
+      geom.indices =
+          (ui_uint32 *)C_MULTIPLATFORM_MALLOC(128 * sizeof(ui_uint32));
 
-    /* Adjust counts so the Nth append triggers reallocation */
-    if (force_realloc_at < 4) {
-      geom.vertex_count = geom.vertex_capacity - force_realloc_at;
-    } else {
-      geom.index_count = geom.index_capacity - (force_realloc_at - 4);
+      /* Adjust counts so the Nth append triggers reallocation */
+      if (force_realloc_at < 4) {
+        geom.vertex_count = geom.vertex_capacity - force_realloc_at;
+      } else {
+        geom.index_count = geom.index_capacity - (force_realloc_at - 4);
+      }
+
+      g_malloc_fail_countdown = oom_idx;
+      ui_svg_tessellate_stroke(&geom, &f, 2.0f);
     }
-
-    g_malloc_fail_countdown = oom_idx;
-    ui_svg_tessellate_stroke(&geom, &f, 2.0f);
   }
   g_malloc_fail_countdown = -1;
 
@@ -539,7 +558,6 @@ static int run_oom_tests(void) {
   struct ui_svg_flattened_path flat;
   struct ui_svg_geometry geom;
   int failed = 0;
-  int temp_failed;
 
   ui_svg_path_init(&path);
   ui_svg_flattened_path_init(&flat);
@@ -559,72 +577,73 @@ static int run_oom_tests(void) {
                     "Z");
 
   /* Flatten OOM exhaustive */
-  int i;
-  for (i = 0; i < 300; i++) {
+  {
+    int i;
+    for (i = 0; i < 300; i++) {
+      ui_svg_flattened_path_destroy(&flat);
+      ui_svg_flattened_path_init(&flat);
+      g_malloc_fail_countdown = i;
+      ui_svg_path_flatten(&flat, &path, 0.1f);
+    }
+    g_malloc_fail_countdown = -1;
+
     ui_svg_flattened_path_destroy(&flat);
     ui_svg_flattened_path_init(&flat);
-    g_malloc_fail_countdown = i;
-    ui_svg_path_flatten(&flat, &path, 0.1f);
-  }
-  g_malloc_fail_countdown = -1;
+    ui_svg_path_flatten(&flat, &path, 1.0f);
 
-  ui_svg_flattened_path_destroy(&flat);
-  ui_svg_flattened_path_init(&flat);
-  ui_svg_path_flatten(&flat, &path, 1.0f);
+    /* Need a shape with ears to test vertex append OOM */
+    ui_svg_path_destroy(&path);
+    ui_svg_flattened_path_destroy(&flat);
+    ui_svg_path_init(&path);
+    ui_svg_flattened_path_init(&flat);
+    ui_svg_path_parse(&path, "M 0 0 L 10 0 L 10 10 Z");
+    ui_svg_path_flatten(&flat, &path, 1.0f);
 
-  /* Need a shape with ears to test vertex append OOM */
-  ui_svg_path_destroy(&path);
-  ui_svg_flattened_path_destroy(&flat);
-  ui_svg_path_init(&path);
-  ui_svg_flattened_path_init(&flat);
-  ui_svg_path_parse(&path, "M 0 0 L 10 0 L 10 10 Z");
-  ui_svg_path_flatten(&flat, &path, 1.0f);
+    /* Tessellate Fill OOM (linked array) */
+    ui_svg_geometry_destroy(&geom);
+    ui_svg_geometry_init(&geom);
+    g_malloc_fail_countdown = 0;
+    failed |= (ui_svg_tessellate_fill(&geom, &flat) != UI_ERROR_OUT_OF_MEMORY);
+    g_malloc_fail_countdown = -1;
 
-  /* Tessellate Fill OOM (linked array) */
-  ui_svg_geometry_destroy(&geom);
-  ui_svg_geometry_init(&geom);
-  g_malloc_fail_countdown = 0;
-  failed |= (ui_svg_tessellate_fill(&geom, &flat) != UI_ERROR_OUT_OF_MEMORY);
-  g_malloc_fail_countdown = -1;
+    ui_svg_geometry_destroy(&geom);
+    ui_svg_geometry_init(&geom);
+    g_malloc_fail_countdown = 1;
+    failed |= (ui_svg_tessellate_fill(&geom, &flat) != UI_ERROR_OUT_OF_MEMORY);
+    g_malloc_fail_countdown = -1;
 
-  ui_svg_geometry_destroy(&geom);
-  ui_svg_geometry_init(&geom);
-  g_malloc_fail_countdown = 1;
-  failed |= (ui_svg_tessellate_fill(&geom, &flat) != UI_ERROR_OUT_OF_MEMORY);
-  g_malloc_fail_countdown = -1;
+    ui_svg_geometry_destroy(&geom);
+    ui_svg_geometry_init(&geom);
+    g_malloc_fail_countdown = 2; /* index append */
+    failed |= (ui_svg_tessellate_fill(&geom, &flat) != UI_ERROR_OUT_OF_MEMORY);
+    g_malloc_fail_countdown = -1;
+    /* Tessellate stroke OOM */
+    ui_svg_geometry_destroy(&geom);
+    ui_svg_geometry_init(&geom);
+    g_malloc_fail_countdown = 0;
+    failed |= (ui_svg_tessellate_stroke(&geom, &flat, 2.0f) !=
+               UI_ERROR_OUT_OF_MEMORY);
+    g_malloc_fail_countdown = -1;
 
-  ui_svg_geometry_destroy(&geom);
-  ui_svg_geometry_init(&geom);
-  g_malloc_fail_countdown = 2; /* index append */
-  failed |= (ui_svg_tessellate_fill(&geom, &flat) != UI_ERROR_OUT_OF_MEMORY);
-  g_malloc_fail_countdown = -1;
-  /* Tessellate stroke OOM */
-  ui_svg_geometry_destroy(&geom);
-  ui_svg_geometry_init(&geom);
-  g_malloc_fail_countdown = 0;
-  failed |=
-      (ui_svg_tessellate_stroke(&geom, &flat, 2.0f) != UI_ERROR_OUT_OF_MEMORY);
-  g_malloc_fail_countdown = -1;
-
-  ui_svg_geometry_destroy(&geom);
-  ui_svg_geometry_init(&geom);
-  g_malloc_fail_countdown = 1;
-  failed |=
-      (ui_svg_tessellate_stroke(&geom, &flat, 2.0f) != UI_ERROR_OUT_OF_MEMORY);
-  g_malloc_fail_countdown = -1;
-  ui_svg_geometry_destroy(&geom);
-  ui_svg_flattened_path_destroy(&flat);
-  ui_svg_path_destroy(&path);
-  return failed;
+    ui_svg_geometry_destroy(&geom);
+    ui_svg_geometry_init(&geom);
+    g_malloc_fail_countdown = 1;
+    failed |= (ui_svg_tessellate_stroke(&geom, &flat, 2.0f) !=
+               UI_ERROR_OUT_OF_MEMORY);
+    g_malloc_fail_countdown = -1;
+    ui_svg_geometry_destroy(&geom);
+    ui_svg_flattened_path_destroy(&flat);
+    ui_svg_path_destroy(&path);
+    return failed;
 #else
   return 0;
 #endif
+  }
 }
 
 static int run_edge_cases(void) {
   struct ui_svg_geometry geom;
   struct ui_svg_flattened_path f;
-  struct ui_svg_subpath sp;
   int failed = 0;
 
   /* NULL Checks */
@@ -632,133 +651,136 @@ static int run_edge_cases(void) {
   ui_svg_path_destroy(NULL);
   failed |= (ui_svg_path_parse(NULL, "M 0 0") != UI_ERROR_INVALID_ARGUMENT);
 
-  struct ui_svg_path p;
-  ui_svg_path_init(&p);
-  failed |= (ui_svg_path_parse(&p, NULL) != UI_ERROR_INVALID_ARGUMENT);
+  {
+    struct ui_svg_path p;
+    ui_svg_path_init(&p);
+    failed |= (ui_svg_path_parse(&p, NULL) != UI_ERROR_INVALID_ARGUMENT);
 
-  failed |= (ui_svg_flattened_path_init(NULL) != UI_ERROR_INVALID_ARGUMENT);
-  ui_svg_flattened_path_destroy(NULL);
-  failed |= (ui_svg_path_flatten(NULL, &p, 1.0f) != UI_ERROR_INVALID_ARGUMENT);
-  ui_svg_flattened_path_init(&f);
-  failed |= (ui_svg_path_flatten(&f, NULL, 1.0f) != UI_ERROR_INVALID_ARGUMENT);
+    failed |= (ui_svg_flattened_path_init(NULL) != UI_ERROR_INVALID_ARGUMENT);
+    ui_svg_flattened_path_destroy(NULL);
+    failed |=
+        (ui_svg_path_flatten(NULL, &p, 1.0f) != UI_ERROR_INVALID_ARGUMENT);
+    ui_svg_flattened_path_init(&f);
+    failed |=
+        (ui_svg_path_flatten(&f, NULL, 1.0f) != UI_ERROR_INVALID_ARGUMENT);
 
-  failed |= (ui_svg_geometry_init(NULL) != UI_ERROR_INVALID_ARGUMENT);
-  ui_svg_geometry_destroy(NULL);
-  ui_svg_geometry_init(&geom);
+    failed |= (ui_svg_geometry_init(NULL) != UI_ERROR_INVALID_ARGUMENT);
+    ui_svg_geometry_destroy(NULL);
+    ui_svg_geometry_init(&geom);
 
-  failed |= (ui_svg_tessellate_fill(NULL, &f) != UI_ERROR_INVALID_ARGUMENT);
-  failed |= (ui_svg_tessellate_fill(&geom, NULL) != UI_ERROR_INVALID_ARGUMENT);
-  failed |=
-      (ui_svg_tessellate_stroke(NULL, &f, 1.0f) != UI_ERROR_INVALID_ARGUMENT);
-  failed |= (ui_svg_tessellate_stroke(&geom, NULL, 1.0f) !=
-             UI_ERROR_INVALID_ARGUMENT);
+    failed |= (ui_svg_tessellate_fill(NULL, &f) != UI_ERROR_INVALID_ARGUMENT);
+    failed |=
+        (ui_svg_tessellate_fill(&geom, NULL) != UI_ERROR_INVALID_ARGUMENT);
+    failed |=
+        (ui_svg_tessellate_stroke(NULL, &f, 1.0f) != UI_ERROR_INVALID_ARGUMENT);
+    failed |= (ui_svg_tessellate_stroke(&geom, NULL, 1.0f) !=
+               UI_ERROR_INVALID_ARGUMENT);
 
-  /* Edge Case: Degen Arc rx=ry=0 */
-  ui_svg_path_parse(&p, "M 0 0 A 0 0 0 0 0 10 10 Z");
-  ui_svg_path_flatten(&f, &p, 1.0f);
-  ui_svg_tessellate_fill(&geom, &f);
-  ui_svg_tessellate_stroke(&geom, &f, 2.0f);
+    /* Edge Case: Degen Arc rx=ry=0 */
+    ui_svg_path_parse(&p, "M 0 0 A 0 0 0 0 0 10 10 Z");
+    ui_svg_path_flatten(&f, &p, 1.0f);
+    ui_svg_tessellate_fill(&geom, &f);
+    ui_svg_tessellate_stroke(&geom, &f, 2.0f);
 
-  /* Edge Case: Collinear */
-  ui_svg_path_destroy(&p);
-  ui_svg_flattened_path_destroy(&f);
-  ui_svg_geometry_destroy(&geom);
-  ui_svg_path_init(&p);
-  ui_svg_flattened_path_init(&f);
-  ui_svg_geometry_init(&geom);
-  ui_svg_path_parse(&p, "M 0 0 L 0 0 L 0 0 Z");
-  ui_svg_path_flatten(&f, &p, 1.0f);
-  ui_svg_tessellate_fill(&geom, &f);
-  ui_svg_tessellate_stroke(&geom, &f, 2.0f);
+    /* Edge Case: Collinear */
+    ui_svg_path_destroy(&p);
+    ui_svg_flattened_path_destroy(&f);
+    ui_svg_geometry_destroy(&geom);
+    ui_svg_path_init(&p);
+    ui_svg_flattened_path_init(&f);
+    ui_svg_geometry_init(&geom);
+    ui_svg_path_parse(&p, "M 0 0 L 0 0 L 0 0 Z");
+    ui_svg_path_flatten(&f, &p, 1.0f);
+    ui_svg_tessellate_fill(&geom, &f);
+    ui_svg_tessellate_stroke(&geom, &f, 2.0f);
 
-  /* Edge Case: Rad Check Arc */
-  ui_svg_path_destroy(&p);
-  ui_svg_flattened_path_destroy(&f);
-  ui_svg_path_init(&p);
-  ui_svg_flattened_path_init(&f);
-  ui_svg_path_parse(&p, "M 0 0 A 10 10 0 0 0 10 10 A 10 10 0 0 1 15 15 A 10 "
-                        "10 0 1 0 10 20 A 10 10 0 1 1 0 20 A 10 10 0 1 1 10 10 "
-                        "A 10 10 0 0 0 100 100");
-  ui_svg_path_flatten(&f, &p, 1.0f);
+    /* Edge Case: Rad Check Arc */
+    ui_svg_path_destroy(&p);
+    ui_svg_flattened_path_destroy(&f);
+    ui_svg_path_init(&p);
+    ui_svg_flattened_path_init(&f);
+    ui_svg_path_parse(&p,
+                      "M 0 0 A 10 10 0 0 0 10 10 A 10 10 0 0 1 15 15 A 10 "
+                      "10 0 1 0 10 20 A 10 10 0 1 1 0 20 A 10 10 0 1 1 10 10 "
+                      "A 10 10 0 0 0 100 100");
+    ui_svg_path_flatten(&f, &p, 1.0f);
 
-  /* Path starting without M */
-  ui_svg_path_destroy(&p);
-  ui_svg_flattened_path_destroy(&f);
-  ui_svg_path_init(&p);
-  ui_svg_flattened_path_init(&f);
-  ui_svg_path_parse(&p, "L 10 10 Z");
-  ui_svg_path_flatten(&f, &p, 1.0f);
+    /* Path starting without M */
+    ui_svg_path_destroy(&p);
+    ui_svg_flattened_path_destroy(&f);
+    ui_svg_path_init(&p);
+    ui_svg_flattened_path_init(&f);
+    ui_svg_path_parse(&p, "L 10 10 Z");
+    ui_svg_path_flatten(&f, &p, 1.0f);
 
-  ui_svg_path_destroy(&p);
-  ui_svg_flattened_path_destroy(&f);
-  ui_svg_geometry_destroy(&geom);
+    ui_svg_path_destroy(&p);
+    ui_svg_flattened_path_destroy(&f);
+    ui_svg_geometry_destroy(&geom);
 
-  /* Add a path that does NOT close exactly and has more points to trigger the
-   * false branches of the UI_SVG_ABS checks */
-  ui_svg_path_init(&p);
-  ui_svg_flattened_path_init(&f);
-  ui_svg_geometry_init(&geom);
-  ui_svg_path_parse(&p, "M 0 0 L 100 0 L 100 100 L 0 50");
-  ui_svg_path_flatten(&f, &p, 1.0f);
-  ui_svg_tessellate_fill(&geom, &f);
-  ui_svg_path_destroy(&p);
-  ui_svg_flattened_path_destroy(&f);
-  ui_svg_geometry_destroy(&geom);
+    /* Add a path that does NOT close exactly and has more points to trigger the
+     * false branches of the UI_SVG_ABS checks */
+    ui_svg_path_init(&p);
+    ui_svg_flattened_path_init(&f);
+    ui_svg_geometry_init(&geom);
+    ui_svg_path_parse(&p, "M 0 0 L 100 0 L 100 100 L 0 50");
+    ui_svg_path_flatten(&f, &p, 1.0f);
+    ui_svg_tessellate_fill(&geom, &f);
+    ui_svg_path_destroy(&p);
+    ui_svg_flattened_path_destroy(&f);
+    ui_svg_geometry_destroy(&geom);
 
-  ui_svg_path_init(&p);
-  ui_svg_flattened_path_init(&f);
-  /* Trigger arc small radius (rad_chk > 1.0f) and negative sqrt (sq < 0.0f)
-   * branches */
-  ui_svg_path_parse(&p, "M 0 0 A 1 1 0 0 0 100 100");
-  ui_svg_path_flatten(&f, &p, 1.0f);
-  ui_svg_path_destroy(&p);
-  ui_svg_flattened_path_destroy(&f);
+    ui_svg_path_init(&p);
+    ui_svg_flattened_path_init(&f);
+    /* Trigger arc small radius (rad_chk > 1.0f) and negative sqrt (sq < 0.0f)
+     * branches */
+    ui_svg_path_parse(&p, "M 0 0 A 1 1 0 0 0 100 100");
+    ui_svg_path_flatten(&f, &p, 1.0f);
+    ui_svg_path_destroy(&p);
+    ui_svg_flattened_path_destroy(&f);
 
-  ui_svg_path_init(&p);
-  ui_svg_flattened_path_init(&f);
-  /* Force a mathematically negative sq inside the parameter calculation */
-  ui_svg_path_parse(&p, "M 0 0 A 10 10 0 0 0 100 0");
-  ui_svg_path_flatten(&f, &p, 1.0f);
-  ui_svg_path_destroy(&p);
-  ui_svg_flattened_path_destroy(&f);
+    ui_svg_path_init(&p);
+    ui_svg_flattened_path_init(&f);
+    /* Force a mathematically negative sq inside the parameter calculation */
+    ui_svg_path_parse(&p, "M 0 0 A 10 10 0 0 0 100 0");
+    ui_svg_path_flatten(&f, &p, 1.0f);
+    ui_svg_path_destroy(&p);
+    ui_svg_flattened_path_destroy(&f);
 
-  ui_svg_path_init(&p);
-  ui_svg_flattened_path_init(&f);
-  /* Force negative radii */
-  ui_svg_path_parse(&p, "M 0 0 A -10 -10 0 0 0 100 0");
-  ui_svg_path_flatten(&f, &p, 1.0f);
-  ui_svg_path_destroy(&p);
-  ui_svg_flattened_path_destroy(&f);
+    ui_svg_path_init(&p);
+    ui_svg_flattened_path_init(&f);
+    /* Force negative radii */
+    ui_svg_path_parse(&p, "M 0 0 A -10 -10 0 0 0 100 0");
+    ui_svg_path_flatten(&f, &p, 1.0f);
+    ui_svg_path_destroy(&p);
+    ui_svg_flattened_path_destroy(&f);
 
-  ui_svg_path_init(&p);
-  ui_svg_flattened_path_init(&f);
-  /* Force ry to be too small */
-  ui_svg_path_parse(&p, "M 0 0 A 10 0.000001 0 0 0 100 0");
-  ui_svg_path_flatten(&f, &p, 1.0f);
-  ui_svg_path_destroy(&p);
-  ui_svg_flattened_path_destroy(&f);
+    ui_svg_path_init(&p);
+    ui_svg_flattened_path_init(&f);
+    /* Force ry to be too small */
+    ui_svg_path_parse(&p, "M 0 0 A 10 0.000001 0 0 0 100 0");
+    ui_svg_path_flatten(&f, &p, 1.0f);
+    ui_svg_path_destroy(&p);
+    ui_svg_flattened_path_destroy(&f);
 
-  return 0;
+    return failed;
+  }
 }
 
 #ifdef UI_TEST_MOCK_ALLOC
-static int test_mock_coverage_branches(void) {
-  extern int g_mock_svg_skip_ws_fail;
-  extern int g_mock_svg_reflect_fail;
-  extern int g_mock_svg_triangle_area_fail;
-  extern int g_mock_svg_point_in_triangle_fail;
+extern ui_error_t ui_test_svg_reflect_point(struct ui_svg_point *out_p,
+                                            const struct ui_svg_point *p,
+                                            const struct ui_svg_point *ref);
+extern ui_error_t ui_test_svg_triangle_area(struct ui_svg_point a,
+                                            struct ui_svg_point b,
+                                            struct ui_svg_point c,
+                                            float *out_area);
+extern ui_error_t ui_test_svg_is_point_in_triangle(struct ui_svg_point p,
+                                                   struct ui_svg_point a,
+                                                   struct ui_svg_point b,
+                                                   struct ui_svg_point c,
+                                                   int *out_match);
 
-  extern ui_error_t ui_test_svg_skip_ws(const char **ptr);
-  extern ui_error_t ui_test_svg_parse_float(const char **ptr, float *out_val);
-  extern ui_error_t ui_test_svg_reflect_point(struct ui_svg_point * out_p,
-                                              const struct ui_svg_point *p,
-                                              const struct ui_svg_point *ref);
-  extern ui_error_t ui_test_svg_triangle_area(
-      struct ui_svg_point a, struct ui_svg_point b, struct ui_svg_point c,
-      float *out_area);
-  extern ui_error_t ui_test_svg_is_point_in_triangle(
-      struct ui_svg_point p, struct ui_svg_point a, struct ui_svg_point b,
-      struct ui_svg_point c, int *out_match);
+static int test_mock_coverage_branches(void) {
   struct ui_svg_point p1, p2, p3, p_test, p_out;
   struct ui_svg_path path;
   struct ui_svg_flattened_path flat;

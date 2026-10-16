@@ -6,6 +6,9 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_malloc_fail_countdown;
+extern int g_empty_state_mock_fail;
+
 static void test_empty_state_base(void) {
   struct ui_empty_state_base *state = NULL;
   ui_error_t err;
@@ -102,7 +105,6 @@ static void test_empty_state_base(void) {
 }
 
 static void test_oom(void) {
-  extern int g_malloc_fail_countdown;
   struct ui_empty_state_base *state;
   int i;
   ui_error_t err;
@@ -120,7 +122,6 @@ static void test_oom(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_empty_state_mock_fail;
     g_empty_state_mock_fail = 1;
     g_malloc_fail_countdown = 1;
     err = ui_empty_state_base_create(&state);

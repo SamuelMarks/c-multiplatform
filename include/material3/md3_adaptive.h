@@ -16,7 +16,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
@@ -220,6 +220,6 @@ md3_navigation_suite_scaffold_get_component(
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* MATERIAL3_MD3_ADAPTIVE_H */

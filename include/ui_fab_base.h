@@ -17,7 +17,7 @@ struct ui_signal;
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 /**
  * @brief States of a Floating Action Button (FAB) speed dial.

@@ -14,6 +14,7 @@
 int g_cupertino_dynamic_island_mock_set_state_fail = 0;
 #endif
 
+/** @brief internal_set_state function. */
 static ui_error_t internal_set_state(struct cupertino_dynamic_island *island,
                                      enum cupertino_island_state state,
                                      int animated) {
@@ -25,6 +26,7 @@ static ui_error_t internal_set_state(struct cupertino_dynamic_island *island,
   return cupertino_dynamic_island_set_state(island, state, animated);
 }
 
+/** @brief get_state_metrics function. */
 static void get_state_metrics(enum cupertino_island_state state,
                               float screen_width, float *out_w, float *out_h,
                               float *out_r) {
@@ -44,6 +46,7 @@ static void get_state_metrics(enum cupertino_island_state state,
   }
 }
 
+/** @brief cupertino_dynamic_island_create function. */
 ui_error_t cupertino_dynamic_island_create(
     struct ui_engine *engine,
     const struct cupertino_dynamic_island_descriptor *desc,
@@ -88,6 +91,7 @@ ui_error_t cupertino_dynamic_island_create(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_dynamic_island_destroy function. */
 ui_error_t
 cupertino_dynamic_island_destroy(struct cupertino_dynamic_island *island) {
   if (!island) {
@@ -98,6 +102,7 @@ cupertino_dynamic_island_destroy(struct cupertino_dynamic_island *island) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_dynamic_island_set_state function. */
 ui_error_t
 cupertino_dynamic_island_set_state(struct cupertino_dynamic_island *island,
                                    enum cupertino_island_state state,
@@ -128,6 +133,7 @@ cupertino_dynamic_island_set_state(struct cupertino_dynamic_island *island,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_dynamic_island_get_state function. */
 ui_error_t cupertino_dynamic_island_get_state(
     const struct cupertino_dynamic_island *island,
     enum cupertino_island_state *out_state) {
@@ -139,6 +145,7 @@ ui_error_t cupertino_dynamic_island_get_state(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_dynamic_island_set_template function. */
 ui_error_t cupertino_dynamic_island_set_template(
     struct cupertino_dynamic_island *island,
     enum cupertino_island_template template_type) {
@@ -150,6 +157,7 @@ ui_error_t cupertino_dynamic_island_set_template(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_dynamic_island_get_template function. */
 ui_error_t cupertino_dynamic_island_get_template(
     const struct cupertino_dynamic_island *island,
     enum cupertino_island_template *out_template) {
@@ -161,6 +169,7 @@ ui_error_t cupertino_dynamic_island_get_template(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_dynamic_island_tick function. */
 ui_error_t
 cupertino_dynamic_island_tick(struct cupertino_dynamic_island *island,
                               float delta_ms) {
@@ -201,6 +210,7 @@ cupertino_dynamic_island_tick(struct cupertino_dynamic_island *island,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_dynamic_island_get_bounds function. */
 ui_error_t cupertino_dynamic_island_get_bounds(
     const struct cupertino_dynamic_island *island, float *out_x, float *out_y,
     float *out_w, float *out_h, float *out_radius) {
@@ -216,6 +226,7 @@ ui_error_t cupertino_dynamic_island_get_bounds(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_dynamic_island_handle_touch function. */
 ui_error_t
 cupertino_dynamic_island_handle_touch(struct cupertino_dynamic_island *island,
                                       int is_long_press,

@@ -12,8 +12,6 @@ extern int g_malloc_fail_countdown;
 
 int main(void) {
   struct ui_e2e_headful_ctx *ctx = NULL;
-  struct ui_window_backend *backend = NULL;
-  struct ui_window *window = NULL;
   struct ui_window_backend dummy_backend;
   ui_error_t rc;
 

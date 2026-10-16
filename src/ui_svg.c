@@ -977,6 +977,7 @@ static ui_error_t is_point_in_triangle(struct ui_svg_point p,
 
 /* \brief ui_error
  */
+/** @brief ui_svg_tessellate_fill function. */
 ui_error_t
 ui_svg_tessellate_fill(struct ui_svg_geometry *geom,
                        const struct ui_svg_flattened_path *flattened) {
@@ -1129,6 +1130,7 @@ cleanup:
 
 /* \brief ui_error
  */
+/** @brief ui_svg_tessellate_stroke function. */
 ui_error_t
 ui_svg_tessellate_stroke(struct ui_svg_geometry *geom,
                          const struct ui_svg_flattened_path *flattened,

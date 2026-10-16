@@ -9,10 +9,12 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
+/* clang-format off */
 #include "material3/md3_color.h"
 #include "ui_error.h"
+/* clang-format on */
 
 /**
  * @struct render_options
@@ -124,6 +126,6 @@ ui_error_t render_catalog_overview(const struct md3_color_scheme *scheme,
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* MD3_COMPONENTS_RENDER_H */

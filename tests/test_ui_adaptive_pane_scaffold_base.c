@@ -287,29 +287,31 @@ TEST test_ui_adaptive_pane_scaffold_oom(void) {
       break;
   }
 
-  struct ui_component *p_comp = NULL;
-  ui_component_create(&p_comp);
-  for (i = 0; i < 200; i++) {
-    g_malloc_fail_countdown = i;
-    rc = ui_adaptive_pane_scaffold_base_set_pane(scaffold, UI_PANE_ROLE_PRIMARY,
-                                                 p_comp);
-    g_malloc_fail_countdown = -1;
-    if (rc == UI_ERROR_NONE)
-      break;
+  {
+    struct ui_component *p_comp = NULL;
+    ui_component_create(&p_comp);
+    for (i = 0; i < 200; i++) {
+      g_malloc_fail_countdown = i;
+      rc = ui_adaptive_pane_scaffold_base_set_pane(
+          scaffold, UI_PANE_ROLE_PRIMARY, p_comp);
+      g_malloc_fail_countdown = -1;
+      if (rc == UI_ERROR_NONE)
+        break;
+    }
+
+    for (i = 0; i < 200; i++) {
+      g_malloc_fail_countdown = i;
+      rc = ui_adaptive_pane_scaffold_base_set_dialog_levitation(scaffold, 1);
+      g_malloc_fail_countdown = -1;
+      if (rc == UI_ERROR_NONE)
+        break;
+    }
+
+    ui_component_destroy(p_comp);
+    ui_adaptive_pane_scaffold_base_destroy(scaffold);
+
+    PASS();
   }
-
-  for (i = 0; i < 200; i++) {
-    g_malloc_fail_countdown = i;
-    rc = ui_adaptive_pane_scaffold_base_set_dialog_levitation(scaffold, 1);
-    g_malloc_fail_countdown = -1;
-    if (rc == UI_ERROR_NONE)
-      break;
-  }
-
-  ui_component_destroy(p_comp);
-  ui_adaptive_pane_scaffold_base_destroy(scaffold);
-
-  PASS();
 }
 #endif
 

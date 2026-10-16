@@ -13,7 +13,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 /**
  * @enum md3_motion_curve
@@ -34,10 +34,10 @@ enum md3_motion_curve {
  * @brief Control points for a cubic Bezier curve (x1, y1, x2, y2).
  */
 struct md3_cubic_bezier {
-  float x1;
-  float y1;
-  float x2;
-  float y2;
+  float x1; /**< x1 field. */
+  float y1; /**< y1 field. */
+  float x2; /**< x2 field. */
+  float y2; /**< y2 field. */
 };
 
 /**
@@ -65,6 +65,6 @@ extern C_MULTIPLATFORM_EXPORT ui_error_t md3_motion_cubic_bezier_evaluate(
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* MATERIAL3_MD3_MOTION_H */

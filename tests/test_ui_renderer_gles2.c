@@ -7,6 +7,21 @@
 #include "../include/ui_window_backend.h"
 /* clang-format on */
 
+extern int g_mock_gles2_glyph_box;
+extern int g_mock_gles2_glyph_metrics_fail;
+extern int g_mock_gles2_flush_fail;
+extern int g_malloc_fail_countdown;
+extern int g_mock_gles2_destroy_fail;
+extern int g_mock_gles2_create_shader_fail;
+extern int g_mock_gles2_compile_status_fail;
+extern int g_mock_gles2_create_program_fail;
+extern int g_mock_cgl_context_null;
+#ifdef UI_TEST_MOCK_ALLOC
+extern ui_error_t ui_test_gles2_compile_shader(unsigned int type,
+                                               const char *source,
+                                               unsigned int *out_shader);
+#endif
+
 static const unsigned char test_ttf_bytes[] = {
     0x00, 0x01, 0x00, 0x00, 0x00, 0x07, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x63, 0x6d, 0x61, 0x70, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x7c,
@@ -200,9 +215,6 @@ int main(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
     {
-      extern int g_mock_gles2_glyph_box;
-      extern int g_mock_gles2_glyph_metrics_fail;
-      extern int g_mock_gles2_flush_fail;
 
       /* Flush failure at start */
       g_mock_gles2_flush_fail = 1;
@@ -365,7 +377,7 @@ int main(void) {
       UI_ERROR_INVALID_ARGUMENT)
     return 1;
   {
-    struct ui_vertex dummy_v;
+    struct ui_vertex dummy_v = {0};
     if (backend->draw_triangles(backend, &dummy_v, 0, NULL, 0) !=
         UI_ERROR_INVALID_ARGUMENT)
       return 1;
@@ -375,13 +387,13 @@ int main(void) {
     void *tmp = backend->user_data;
     backend->user_data = NULL;
     {
-      ui_error_t rc = backend->flush(backend);
+      rc = backend->flush(backend);
       printf("Flush with user_data=NULL returned %d\n", rc);
       if (rc != UI_ERROR_INVALID_ARGUMENT)
         return 1;
     }
     {
-      ui_error_t rc = backend->draw_triangles(backend, NULL, 0, NULL, 0);
+      rc = backend->draw_triangles(backend, NULL, 0, NULL, 0);
       if (rc != UI_ERROR_INVALID_ARGUMENT) {
         printf("draw_triangles returned %d\n", rc);
         return 1;
@@ -416,8 +428,6 @@ int main(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_malloc_fail_countdown;
-    extern int g_mock_gles2_flush_fail;
     struct ui_renderer_backend *backend2;
     g_malloc_fail_countdown = 0;
     if (ui_renderer_gles2_create(&backend2) != UI_ERROR_OUT_OF_MEMORY)
@@ -603,10 +613,6 @@ int main(void) {
 
 void dummy_test_destroy_fail(void) {
 #ifdef UI_TEST_MOCK_ALLOC
-  extern int g_mock_gles2_destroy_fail;
-  extern int g_mock_gles2_create_shader_fail;
-  extern int g_mock_gles2_compile_status_fail;
-  extern int g_mock_gles2_create_program_fail;
   struct ui_renderer_backend *backend = NULL;
   if (ui_renderer_gles2_create(&backend) == 0) {
     if (backend->init(backend, NULL, NULL) == UI_ERROR_NONE) {
@@ -674,10 +680,7 @@ void dummy_test_destroy_fail(void) {
   }
 
   if (ui_renderer_gles2_create(&backend) == 0) {
-    extern int g_mock_cgl_context_null;
     unsigned int shdr = 0;
-    extern ui_error_t ui_test_gles2_compile_shader(
-        unsigned int type, const char *source, unsigned int *out_shader);
     g_mock_cgl_context_null = 1;
     if (backend->init(backend, NULL, NULL) == UI_ERROR_NONE) {
       /* handled */

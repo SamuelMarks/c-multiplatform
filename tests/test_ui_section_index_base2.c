@@ -1,6 +1,6 @@
+extern int g_malloc_fail_countdown;
 
 void test_ui_section_index_errs(void) {
-  extern int g_malloc_fail_countdown;
   struct ui_section_index_base *index = NULL;
   const char *sections[] = {"A", "B", "C"};
   ui_error_t rc;

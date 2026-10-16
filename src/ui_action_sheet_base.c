@@ -197,11 +197,12 @@ static ui_error_t on_bottom_sheet_close(struct ui_bottom_sheet_base *bs,
 }
 
 /**
- * @brief ui_action_sheet_base_create.
- * @param out_sheet Parameter out_sheet.
+ * @brief destroy_partially_created_action_sheet.
+ * @param sheet Parameter sheet.
+ * @param actions_attached Parameter actions_attached.
+ * @param cancel_attached Parameter cancel_attached.
  * @return Return value.
  */
-
 static ui_error_t
 destroy_partially_created_action_sheet(struct ui_action_sheet_base *sheet,
                                        int actions_attached,

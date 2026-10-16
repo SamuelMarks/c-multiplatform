@@ -84,6 +84,7 @@ mock_ui_list_base_append_item(struct ui_list_base *list,
 /** @endcond */
 #endif
 
+/** @brief cupertino_list_section_create function. */
 ui_error_t cupertino_list_section_create(
     struct ui_engine *engine,
     const struct cupertino_list_section_descriptor *desc,
@@ -146,6 +147,7 @@ ui_error_t cupertino_list_section_create(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_list_section_destroy function. */
 ui_error_t
 cupertino_list_section_destroy(struct cupertino_list_section *section) {
   ui_error_t rc;
@@ -166,6 +168,7 @@ cupertino_list_section_destroy(struct cupertino_list_section *section) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_list_section_set_header function. */
 ui_error_t
 cupertino_list_section_set_header(struct cupertino_list_section *section,
                                   const char *header) {
@@ -188,6 +191,7 @@ cupertino_list_section_set_header(struct cupertino_list_section *section,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_list_section_get_header function. */
 ui_error_t
 cupertino_list_section_get_header(const struct cupertino_list_section *section,
                                   const char **out_header) {
@@ -199,6 +203,7 @@ cupertino_list_section_get_header(const struct cupertino_list_section *section,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_list_section_set_footer function. */
 ui_error_t
 cupertino_list_section_set_footer(struct cupertino_list_section *section,
                                   const char *footer) {
@@ -221,6 +226,7 @@ cupertino_list_section_set_footer(struct cupertino_list_section *section,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_list_section_get_footer function. */
 ui_error_t
 cupertino_list_section_get_footer(const struct cupertino_list_section *section,
                                   const char **out_footer) {
@@ -232,6 +238,7 @@ cupertino_list_section_get_footer(const struct cupertino_list_section *section,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_list_section_add_tile function. */
 ui_error_t
 cupertino_list_section_add_tile(struct cupertino_list_section *section,
                                 struct cupertino_list_tile *tile,
@@ -269,6 +276,7 @@ cupertino_list_section_add_tile(struct cupertino_list_section *section,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_list_section_get_tile_count function. */
 ui_error_t cupertino_list_section_get_tile_count(
     const struct cupertino_list_section *section, size_t *out_count) {
   if (!section || !out_count) {
@@ -279,6 +287,7 @@ ui_error_t cupertino_list_section_get_tile_count(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_list_section_get_tile function. */
 ui_error_t
 cupertino_list_section_get_tile(const struct cupertino_list_section *section,
                                 size_t index,
@@ -291,6 +300,7 @@ cupertino_list_section_get_tile(const struct cupertino_list_section *section,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_list_section_is_separator_visible function. */
 ui_error_t cupertino_list_section_is_separator_visible(
     const struct cupertino_list_section *section, size_t index,
     int *out_visible) {
@@ -309,6 +319,7 @@ ui_error_t cupertino_list_section_is_separator_visible(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_list_section_get_separator_inset function. */
 ui_error_t cupertino_list_section_get_separator_inset(
     const struct cupertino_list_section *section, size_t index,
     float *out_inset_leading) {
@@ -325,6 +336,7 @@ ui_error_t cupertino_list_section_get_separator_inset(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_list_section_get_base function. */
 ui_error_t
 cupertino_list_section_get_base(struct cupertino_list_section *section,
                                 struct ui_list_base **out_base) {

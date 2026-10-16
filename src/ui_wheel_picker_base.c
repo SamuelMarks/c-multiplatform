@@ -338,6 +338,7 @@ static ui_error_t wheel_picker_cva_set_disabled_state(void *component,
                                    is_disabled ? "true" : "false");
 }
 
+/** @brief ui_wheel_picker_base_create function. */
 ui_error_t
 ui_wheel_picker_base_create(struct ui_wheel_picker_base **out_picker,
                             struct ui_control_value_accessor *out_cva) {
@@ -428,6 +429,7 @@ cleanup:
   return rc;
 }
 
+/** @brief ui_wheel_picker_base_destroy function. */
 ui_error_t ui_wheel_picker_base_destroy(struct ui_wheel_picker_base *picker) {
   int i;
   ui_error_t rc = UI_ERROR_NONE;
@@ -467,6 +469,7 @@ ui_error_t ui_wheel_picker_base_destroy(struct ui_wheel_picker_base *picker) {
   return rc;
 }
 
+/** @brief ui_wheel_picker_base_set_items function. */
 ui_error_t ui_wheel_picker_base_set_items(struct ui_wheel_picker_base *picker,
                                           const char *const *items, int count) {
   int i;
@@ -514,6 +517,7 @@ ui_error_t ui_wheel_picker_base_set_items(struct ui_wheel_picker_base *picker,
   return update_dom_state(picker);
 }
 
+/** @brief ui_wheel_picker_base_set_looping function. */
 ui_error_t ui_wheel_picker_base_set_looping(struct ui_wheel_picker_base *picker,
                                             int is_looping) {
   if (!picker) {
@@ -523,6 +527,7 @@ ui_error_t ui_wheel_picker_base_set_looping(struct ui_wheel_picker_base *picker,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_wheel_picker_base_set_selected_index function. */
 ui_error_t
 ui_wheel_picker_base_set_selected_index(struct ui_wheel_picker_base *picker,
                                         int index) {
@@ -562,6 +567,7 @@ ui_wheel_picker_base_set_selected_index(struct ui_wheel_picker_base *picker,
 
 /* \brief ui_wheel_picker_base_get_selected_index
  */
+/** @brief ui_wheel_picker_base_get_selected_index function. */
 ui_error_t ui_wheel_picker_base_get_selected_index(
     const struct ui_wheel_picker_base *picker, int *out_index) {
   if (!picker || !out_index) {
@@ -571,6 +577,7 @@ ui_error_t ui_wheel_picker_base_get_selected_index(
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_wheel_picker_base_set_on_change function. */
 ui_error_t
 ui_wheel_picker_base_set_on_change(struct ui_wheel_picker_base *picker,
                                    ui_wheel_picker_on_change_t on_change,
@@ -583,6 +590,7 @@ ui_wheel_picker_base_set_on_change(struct ui_wheel_picker_base *picker,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_wheel_picker_base_process_event function. */
 ui_error_t
 ui_wheel_picker_base_process_event(struct ui_wheel_picker_base *picker,
                                    const struct ui_event *event,
@@ -637,6 +645,7 @@ ui_wheel_picker_base_process_event(struct ui_wheel_picker_base *picker,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_wheel_picker_base_on_tick function. */
 ui_error_t ui_wheel_picker_base_on_tick(struct ui_wheel_picker_base *picker,
                                         double delta_ms) {
   float target_offset;
@@ -726,6 +735,7 @@ ui_error_t ui_wheel_picker_base_on_tick(struct ui_wheel_picker_base *picker,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_wheel_picker_base_get_component function. */
 ui_error_t
 ui_wheel_picker_base_get_component(struct ui_wheel_picker_base *picker,
                                    struct ui_component **out_component) {

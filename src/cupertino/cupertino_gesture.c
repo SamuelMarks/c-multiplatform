@@ -10,6 +10,7 @@
 #include <string.h>
 /* clang-format on */
 
+/** @brief cupertino_pop_gesture_init function. */
 ui_error_t cupertino_pop_gesture_init(struct cupertino_pop_gesture *gesture,
                                       float screen_width,
                                       enum ui_bidi_direction direction) {
@@ -29,6 +30,7 @@ ui_error_t cupertino_pop_gesture_init(struct cupertino_pop_gesture *gesture,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_pop_gesture_touch_down function. */
 ui_error_t
 cupertino_pop_gesture_touch_down(struct cupertino_pop_gesture *gesture,
                                  float touch_x, int *out_began) {
@@ -66,6 +68,7 @@ cupertino_pop_gesture_touch_down(struct cupertino_pop_gesture *gesture,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_pop_gesture_touch_move function. */
 ui_error_t
 cupertino_pop_gesture_touch_move(struct cupertino_pop_gesture *gesture,
                                  float current_x, float *out_progress) {
@@ -106,6 +109,7 @@ cupertino_pop_gesture_touch_move(struct cupertino_pop_gesture *gesture,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_pop_gesture_touch_up function. */
 ui_error_t cupertino_pop_gesture_touch_up(struct cupertino_pop_gesture *gesture,
                                           float velocity_x,
                                           int *out_should_pop) {
@@ -148,6 +152,7 @@ ui_error_t cupertino_pop_gesture_touch_up(struct cupertino_pop_gesture *gesture,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_pop_gesture_get_underlying_offset function. */
 ui_error_t cupertino_pop_gesture_get_underlying_offset(
     const struct cupertino_pop_gesture *gesture,
     float *out_underlying_offset_x) {
@@ -173,6 +178,7 @@ ui_error_t cupertino_pop_gesture_get_underlying_offset(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_scrub_gesture_init function. */
 ui_error_t cupertino_scrub_gesture_init(struct cupertino_scrub_gesture *scrub) {
   if (!scrub) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -183,6 +189,7 @@ ui_error_t cupertino_scrub_gesture_init(struct cupertino_scrub_gesture *scrub) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_scrub_gesture_touch_down function. */
 ui_error_t
 cupertino_scrub_gesture_touch_down(struct cupertino_scrub_gesture *scrub,
                                    int pointer_count, float x, float y) {
@@ -205,6 +212,7 @@ cupertino_scrub_gesture_touch_down(struct cupertino_scrub_gesture *scrub,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_scrub_gesture_touch_move function. */
 ui_error_t
 cupertino_scrub_gesture_touch_move(struct cupertino_scrub_gesture *scrub,
                                    float x, float y, int *out_recognized) {
@@ -251,6 +259,7 @@ cupertino_scrub_gesture_touch_move(struct cupertino_scrub_gesture *scrub,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_scrub_gesture_reset function. */
 ui_error_t
 cupertino_scrub_gesture_reset(struct cupertino_scrub_gesture *scrub) {
   if (!scrub) {
@@ -356,6 +365,7 @@ mock_cupertino_scrub_gesture_reset(struct cupertino_scrub_gesture *scrub) {
 
 #endif /* UI_TEST_MOCK_ALLOC */
 
+/** @brief cupertino_gesture_forward_event function. */
 ui_error_t
 cupertino_gesture_forward_event(struct cupertino_pop_gesture *pop_gesture,
                                 struct cupertino_scrub_gesture *scrub_gesture,

@@ -226,6 +226,7 @@ ui_error_t ui_search_bar_base_cleanup(struct ui_search_bar_base *search_bar) {
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_search_bar_base_get_component function. */
 ui_error_t
 ui_search_bar_base_get_component(struct ui_search_bar_base *search_bar,
                                  struct ui_component **out_component) {

@@ -10,6 +10,7 @@
 #include <string.h>
 /* clang-format on */
 
+/** @brief cupertino_text_selection_toolbar_create function. */
 ui_error_t cupertino_text_selection_toolbar_create(
     struct ui_engine *engine,
     const struct cupertino_text_selection_toolbar_descriptor *desc,
@@ -50,6 +51,7 @@ ui_error_t cupertino_text_selection_toolbar_create(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_text_selection_toolbar_destroy function. */
 ui_error_t cupertino_text_selection_toolbar_destroy(
     struct cupertino_text_selection_toolbar *toolbar) {
   if (!toolbar) {
@@ -60,6 +62,7 @@ ui_error_t cupertino_text_selection_toolbar_destroy(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_text_selection_toolbar_show function. */
 ui_error_t cupertino_text_selection_toolbar_show(
     struct cupertino_text_selection_toolbar *toolbar, float anchor_x,
     float anchor_y, float selection_w, float selection_h) {
@@ -103,6 +106,7 @@ ui_error_t cupertino_text_selection_toolbar_show(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_text_selection_toolbar_hide function. */
 ui_error_t cupertino_text_selection_toolbar_hide(
     struct cupertino_text_selection_toolbar *toolbar) {
   if (!toolbar) {
@@ -113,6 +117,7 @@ ui_error_t cupertino_text_selection_toolbar_hide(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_text_selection_toolbar_is_visible function. */
 ui_error_t cupertino_text_selection_toolbar_is_visible(
     const struct cupertino_text_selection_toolbar *toolbar, int *out_visible) {
   if (!toolbar || !out_visible) {
@@ -123,6 +128,7 @@ ui_error_t cupertino_text_selection_toolbar_is_visible(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_text_selection_toolbar_get_page function. */
 ui_error_t cupertino_text_selection_toolbar_get_page(
     const struct cupertino_text_selection_toolbar *toolbar, int *out_page,
     int *out_total_pages) {
@@ -135,6 +141,7 @@ ui_error_t cupertino_text_selection_toolbar_get_page(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_text_selection_toolbar_paginate function. */
 ui_error_t cupertino_text_selection_toolbar_paginate(
     struct cupertino_text_selection_toolbar *toolbar, int forward) {
   if (!toolbar) {
@@ -154,6 +161,7 @@ ui_error_t cupertino_text_selection_toolbar_paginate(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_text_selection_toolbar_trigger_action function. */
 ui_error_t cupertino_text_selection_toolbar_trigger_action(
     struct cupertino_text_selection_toolbar *toolbar,
     enum cupertino_text_action action, int *out_handled) {
@@ -175,6 +183,7 @@ ui_error_t cupertino_text_selection_toolbar_trigger_action(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_text_selection_toolbar_get_bounds function. */
 ui_error_t cupertino_text_selection_toolbar_get_bounds(
     const struct cupertino_text_selection_toolbar *toolbar, float *out_x,
     float *out_y, float *out_w, float *out_h) {
@@ -189,6 +198,7 @@ ui_error_t cupertino_text_selection_toolbar_get_bounds(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_text_selection_toolbar_get_handle_bounds function. */
 ui_error_t cupertino_text_selection_toolbar_get_handle_bounds(
     const struct cupertino_text_selection_toolbar *toolbar, int is_start_handle,
     float *out_x, float *out_y, float *out_w, float *out_h) {

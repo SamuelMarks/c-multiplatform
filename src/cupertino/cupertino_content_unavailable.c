@@ -68,6 +68,7 @@ static ui_error_t mock_ui_component_destroy(struct ui_component *comp) {
 /** @endcond */
 #endif
 
+/** @brief cupertino_content_unavailable_create function. */
 ui_error_t cupertino_content_unavailable_create(
     struct ui_engine *engine,
     const struct cupertino_content_unavailable_descriptor *desc,
@@ -212,6 +213,7 @@ ui_error_t cupertino_content_unavailable_create(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_content_unavailable_destroy function. */
 ui_error_t cupertino_content_unavailable_destroy(
     struct cupertino_content_unavailable_view *view) {
   ui_error_t rc;
@@ -232,6 +234,7 @@ ui_error_t cupertino_content_unavailable_destroy(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_content_unavailable_set_title function. */
 ui_error_t cupertino_content_unavailable_set_title(
     struct cupertino_content_unavailable_view *view, const char *title) {
   ui_error_t rc;
@@ -257,6 +260,7 @@ ui_error_t cupertino_content_unavailable_set_title(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_content_unavailable_get_title function. */
 ui_error_t cupertino_content_unavailable_get_title(
     const struct cupertino_content_unavailable_view *view,
     const char **out_title) {
@@ -268,6 +272,7 @@ ui_error_t cupertino_content_unavailable_get_title(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_content_unavailable_set_description function. */
 ui_error_t cupertino_content_unavailable_set_description(
     struct cupertino_content_unavailable_view *view,
     const char *description_text) {
@@ -297,6 +302,7 @@ ui_error_t cupertino_content_unavailable_set_description(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_content_unavailable_get_description function. */
 ui_error_t cupertino_content_unavailable_get_description(
     const struct cupertino_content_unavailable_view *view,
     const char **out_description) {
@@ -308,6 +314,7 @@ ui_error_t cupertino_content_unavailable_get_description(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_content_unavailable_set_search_query function. */
 ui_error_t cupertino_content_unavailable_set_search_query(
     struct cupertino_content_unavailable_view *view, const char *search_query) {
   if (!view) {
@@ -341,6 +348,7 @@ ui_error_t cupertino_content_unavailable_set_search_query(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_content_unavailable_trigger_action function. */
 ui_error_t cupertino_content_unavailable_trigger_action(
     struct cupertino_content_unavailable_view *view) {
   if (!view) {
@@ -351,6 +359,7 @@ ui_error_t cupertino_content_unavailable_trigger_action(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_content_unavailable_get_dimensions function. */
 ui_error_t cupertino_content_unavailable_get_dimensions(
     const struct cupertino_content_unavailable_view *view, float *out_width,
     float *out_height) {
@@ -363,6 +372,7 @@ ui_error_t cupertino_content_unavailable_get_dimensions(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_content_unavailable_get_base function. */
 ui_error_t cupertino_content_unavailable_get_base(
     struct cupertino_content_unavailable_view *view,
     struct ui_empty_state_base **out_base) {

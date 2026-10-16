@@ -5,6 +5,8 @@
 #include <assert.h>
 /* clang-format on */
 
+extern int g_aspect_ratio_mock_fail;
+
 extern int g_malloc_fail_countdown;
 
 static ui_error_t test_aspect_ratio_creation(void) {
@@ -102,7 +104,6 @@ static void test_aspect_ratio_edge_cases(void) {
 static ui_error_t run_aspect_ratio_coverage(void) {
   struct ui_aspect_ratio_base *ar = NULL;
   ui_error_t rc;
-  extern int g_aspect_ratio_mock_fail;
 
   g_aspect_ratio_mock_fail = 1;
   rc = ui_aspect_ratio_base_create(&ar);

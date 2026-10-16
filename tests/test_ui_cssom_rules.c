@@ -52,8 +52,7 @@ int test_cssom_part2_rules(void) {
   }
 
   {
-    struct ui_css_rule *rule;
-    struct ui_css_selector *sel = NULL;
+    struct ui_css_rule *rule_sub1;
     struct ui_css_stylesheet *tmp_sheet = NULL;
     struct ui_css_computed_style *tmp_style = NULL;
     {
@@ -62,13 +61,14 @@ int test_cssom_part2_rules(void) {
     }
     {
       ui_error_t rc_cleanup =
-          ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+          ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule_sub1);
       TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
     }
-    rule->supports_condition =
+    rule_sub1->supports_condition =
         ui_mock_strdup("((display: flex) or"); /* missing end term */
     {
-      ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(tmp_sheet, rule);
+      ui_error_t rc_cleanup =
+          ui_css_stylesheet_append_rule(tmp_sheet, rule_sub1);
       TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
     }
 
@@ -90,17 +90,16 @@ int test_cssom_part2_rules(void) {
 
   {
     /* Test evaluating condition parenthesis errors */
-    struct ui_css_rule *rule;
-    struct ui_css_selector *sel = NULL;
+    struct ui_css_rule *rule_sub2;
     {
       ui_error_t rc_cleanup =
-          ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+          ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule_sub2);
       TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
     }
-    rule->supports_condition =
+    rule_sub2->supports_condition =
         ui_mock_strdup("((display: flex"); /* missing ) */
     {
-      ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule);
+      ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule_sub2);
       TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
     }
 
@@ -114,17 +113,16 @@ int test_cssom_part2_rules(void) {
 
   {
     /* Test evaluating condition parenthesis errors */
-    struct ui_css_rule *rule;
-    struct ui_css_selector *sel = NULL;
+    struct ui_css_rule *rule_sub3;
     {
       ui_error_t rc_cleanup =
-          ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+          ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule_sub3);
       TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
     }
-    rule->supports_condition =
+    rule_sub3->supports_condition =
         ui_mock_strdup("((display: flex"); /* missing ) */
     {
-      ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule);
+      ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule_sub3);
       TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
     }
 
@@ -203,919 +201,1008 @@ int test_cssom_part2_rules(void) {
   TEST_ASSERT(ui_css_rule_append_selector_attr(rule, "a", UI_CSS_ATTR_OP_EQUALS,
                                                "b") == UI_ERROR_OUT_OF_MEMORY);
   g_malloc_fail_countdown = 2;
-  ui_error_t rc_debug =
-      ui_css_rule_append_selector_attr(rule, "a", UI_CSS_ATTR_OP_EQUALS, "b");
-  printf("DEBUG: rc_debug=%d\n", rc_debug);
-  TEST_ASSERT(rc_debug == UI_ERROR_OUT_OF_MEMORY);
-  g_malloc_fail_countdown = 0;
-  TEST_ASSERT(ui_css_rule_append_selector_attr(rule, "a", UI_CSS_ATTR_OP_NONE,
-                                               NULL) == UI_ERROR_OUT_OF_MEMORY);
-  g_malloc_fail_countdown = 1;
-  TEST_ASSERT(ui_css_rule_append_selector_attr(rule, "a", UI_CSS_ATTR_OP_NONE,
-                                               NULL) == UI_ERROR_OUT_OF_MEMORY);
-  g_malloc_fail_countdown = -1;
-
-  g_malloc_fail_countdown = 0;
-  TEST_ASSERT(ui_css_rule_append_declaration(rule, "a", "b", 0) ==
-              UI_ERROR_OUT_OF_MEMORY);
-  g_malloc_fail_countdown = 1;
-  TEST_ASSERT(ui_css_rule_append_declaration(rule, "a", "b", 0) ==
-              UI_ERROR_OUT_OF_MEMORY);
-  g_malloc_fail_countdown = 2;
-  TEST_ASSERT(ui_css_rule_append_declaration(rule, "a", "b", 0) ==
-              UI_ERROR_OUT_OF_MEMORY);
-  g_malloc_fail_countdown = -1;
-
   {
-    ui_error_t rc_cleanup =
-        ui_css_rule_append_declaration(rule, "prop1", "val1", 0);
-    TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-  }
-  {
-    ui_error_t rc_cleanup =
-        ui_css_rule_append_declaration(rule, "prop2", "val2", 0);
-    TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-  }
+    ui_error_t rc_debug =
+        ui_css_rule_append_selector_attr(rule, "a", UI_CSS_ATTR_OP_EQUALS, "b");
+    printf("DEBUG: rc_debug=%d\n", rc_debug);
+    TEST_ASSERT(rc_debug == UI_ERROR_OUT_OF_MEMORY);
+    g_malloc_fail_countdown = 0;
+    TEST_ASSERT(ui_css_rule_append_selector_attr(rule, "a", UI_CSS_ATTR_OP_NONE,
+                                                 NULL) ==
+                UI_ERROR_OUT_OF_MEMORY);
+    g_malloc_fail_countdown = 1;
+    TEST_ASSERT(ui_css_rule_append_selector_attr(rule, "a", UI_CSS_ATTR_OP_NONE,
+                                                 NULL) ==
+                UI_ERROR_OUT_OF_MEMORY);
+    g_malloc_fail_countdown = -1;
 
-  {
-    ui_error_t rc_cleanup = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &node);
-    TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-  }
-  {
-    ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule);
-    TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-  }
-  {
-    ui_error_t rc_cleanup = ui_css_rule_append_declaration(rule, "a", "b", 0);
-    TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-  }
-
-  {
-    int oom_cnt = 0;
-    while (1) {
-      g_malloc_fail_countdown = oom_cnt;
-      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_OUT_OF_MEMORY) {
-        oom_cnt++;
-      } else {
-        break;
-      }
-    }
-  }
-  {
-    ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
-    TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-  }
-  g_malloc_fail_countdown = -1;
-
-  {
-    /* Test evaluating condition parenthesis errors */
-    struct ui_css_rule *rule;
-    struct ui_css_selector *sel = NULL;
-    {
-      ui_error_t rc_cleanup =
-          ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
-      TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-    }
-    rule->supports_condition =
-        ui_mock_strdup("((display: flex"); /* missing ) */
-    {
-      ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule);
-      TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-    }
-
-    if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
-      {
-        ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
-        TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-      }
-    }
-  }
-
-  {
-    /* Test evaluating condition parenthesis errors */
-    struct ui_css_rule *rule;
-    struct ui_css_selector *sel = NULL;
-    {
-      ui_error_t rc_cleanup =
-          ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
-      TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-    }
-    rule->supports_condition =
-        ui_mock_strdup("((display: flex"); /* missing ) */
-    {
-      ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule);
-      TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-    }
-
-    if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
-      {
-        ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
-        TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-      }
-    }
-  }
-
-  {
-    struct ui_css_rule *rule;
-    struct ui_css_selector *sel = NULL;
-    {
-      ui_error_t rc_cleanup =
-          ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
-      TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-    }
-    rule->supports_condition =
-        ui_mock_strdup("((display: flex) and"); /* missing end term */
-    {
-      ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule);
-      TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-    }
-
-    if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
-      {
-        ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
-        TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-      }
-    }
-  }
-
-  {
-    struct ui_css_rule *rule;
-    struct ui_css_selector *sel = NULL;
-    {
-      ui_error_t rc_cleanup =
-          ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
-      TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-    }
-    rule->supports_condition =
-        ui_mock_strdup("((display: flex) or"); /* missing end term */
-    {
-      ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule);
-      TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-    }
-
-    if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
-      {
-        ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
-        TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-      }
-    }
-  }
-  {
-    struct ui_css_rule *rule;
-    struct ui_css_selector *sel = NULL;
-    {
-      ui_error_t rc_cleanup =
-          ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
-      TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-    }
-    rule->supports_condition =
-        ui_mock_strdup("(not (display: flex)"); /* missing inner end */
-    {
-      ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule);
-      TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-    }
-
-    if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
-      {
-        ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
-        TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-      }
-    }
-  }
-  {
-    struct ui_css_rule *rule;
-    struct ui_css_selector *sel = NULL;
-    {
-      ui_error_t rc_cleanup =
-          ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
-      TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-    }
-    rule->supports_condition =
-        ui_mock_strdup("((display: flex) or )"); /* trailing paren */
-    {
-      ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule);
-      TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-    }
-
-    if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
-      {
-        ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
-        TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-      }
-    }
-  }
-
-  {
-    /* Test evaluating condition parenthesis errors */
-    struct ui_css_rule *rule;
-    struct ui_css_selector *sel = NULL;
-
-    struct ui_css_stylesheet *tmp_sheet = NULL;
-    struct ui_css_computed_style *tmp_style = NULL;
-    {
-      ui_error_t rc_cleanup = ui_css_stylesheet_create(&tmp_sheet);
-      TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-    }
+    g_malloc_fail_countdown = 0;
+    TEST_ASSERT(ui_css_rule_append_declaration(rule, "a", "b", 0) ==
+                UI_ERROR_OUT_OF_MEMORY);
+    g_malloc_fail_countdown = 1;
+    TEST_ASSERT(ui_css_rule_append_declaration(rule, "a", "b", 0) ==
+                UI_ERROR_OUT_OF_MEMORY);
+    g_malloc_fail_countdown = 2;
+    TEST_ASSERT(ui_css_rule_append_declaration(rule, "a", "b", 0) ==
+                UI_ERROR_OUT_OF_MEMORY);
+    g_malloc_fail_countdown = -1;
 
     {
       ui_error_t rc_cleanup =
-          ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
-      TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-    }
-    rule->supports_condition =
-        ui_mock_strdup("((display: flex"); /* missing ) */
-    {
-      ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(tmp_sheet, rule);
-      TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-    }
-
-    {
-      ui_error_t rc_cleanup = ui_css_resolve_style(tmp_sheet, node, &tmp_style);
-      TEST_ASSERT(rc_cleanup == UI_ERROR_NONE ||
-                  rc_cleanup == UI_ERROR_PARSE_FAILED);
-    }
-    if (tmp_style) {
-      ui_error_t rc_cleanup = ui_css_computed_style_destroy(tmp_style);
-      TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-      tmp_style = NULL;
-    }
-
-    {
-      ui_error_t rc_cleanup = ui_css_stylesheet_destroy(tmp_sheet);
-      TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-    }
-  }
-  {
-    struct ui_css_rule *rule;
-    struct ui_css_selector *sel = NULL;
-    struct ui_css_stylesheet *tmp_sheet = NULL;
-    struct ui_css_computed_style *tmp_style = NULL;
-    {
-      ui_error_t rc_cleanup = ui_css_stylesheet_create(&tmp_sheet);
+          ui_css_rule_append_declaration(rule, "prop1", "val1", 0);
       TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
     }
     {
       ui_error_t rc_cleanup =
-          ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
-      TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-    }
-    rule->supports_condition =
-        ui_mock_strdup("((display: flex) and"); /* missing end term */
-    {
-      ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(tmp_sheet, rule);
+          ui_css_rule_append_declaration(rule, "prop2", "val2", 0);
       TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
     }
 
-    {
-      ui_error_t rc_cleanup = ui_css_resolve_style(tmp_sheet, node, &tmp_style);
-      TEST_ASSERT(rc_cleanup == UI_ERROR_NONE ||
-                  rc_cleanup == UI_ERROR_PARSE_FAILED);
-    }
-    if (tmp_style) {
-      ui_error_t rc_cleanup = ui_css_computed_style_destroy(tmp_style);
-      TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-      tmp_style = NULL;
-    }
-    {
-      ui_error_t rc_cleanup = ui_css_stylesheet_destroy(tmp_sheet);
-      TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-    }
-  }
-  {
-    struct ui_css_rule *rule;
-    struct ui_css_selector *sel = NULL;
-    struct ui_css_stylesheet *tmp_sheet = NULL;
-    struct ui_css_computed_style *tmp_style = NULL;
-    {
-      ui_error_t rc_cleanup = ui_css_stylesheet_create(&tmp_sheet);
-      TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-    }
-    {
-      ui_error_t rc_cleanup =
-          ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
-      TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-    }
-    rule->supports_condition =
-        ui_mock_strdup("((display: flex) or"); /* missing end term */
-    {
-      ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(tmp_sheet, rule);
-      TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-    }
-
-    {
-      ui_error_t rc_cleanup = ui_css_resolve_style(tmp_sheet, node, &tmp_style);
-      TEST_ASSERT(rc_cleanup == UI_ERROR_NONE ||
-                  rc_cleanup == UI_ERROR_PARSE_FAILED);
-    }
-    if (tmp_style) {
-      ui_error_t rc_cleanup = ui_css_computed_style_destroy(tmp_style);
-      TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-      tmp_style = NULL;
-    }
-    {
-      ui_error_t rc_cleanup = ui_css_stylesheet_destroy(tmp_sheet);
-      TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-    }
-  }
-
-  {
-    /* Test evaluating condition parenthesis errors */
-    struct ui_css_rule *rule;
-    struct ui_css_selector *sel = NULL;
-    {
-      ui_error_t rc_cleanup =
-          ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
-      TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-    }
-    rule->supports_condition =
-        ui_mock_strdup("((display: flex"); /* missing ) */
-    {
-      ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule);
-      TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-    }
-
-    if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
-      {
-        ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
-        TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-      }
-    }
-  }
-
-  {
-    /* Test evaluating condition parenthesis errors */
-    struct ui_css_rule *rule;
-    struct ui_css_selector *sel = NULL;
-    {
-      ui_error_t rc_cleanup =
-          ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
-      TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-    }
-    rule->supports_condition =
-        ui_mock_strdup("((display: flex"); /* missing ) */
-    {
-      ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule);
-      TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-    }
-
-    if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
-      {
-        ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
-        TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-      }
-    }
-  }
-
-  {
-    ui_error_t rc_cleanup = ui_css_stylesheet_destroy(sheet);
-    TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-  }
-  {
-    ui_error_t rc_cleanup = ui_dom_node_destroy(node);
-    TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-  }
-
-  /* Eval condition paths */
-  /* These are static functions but reached via supports/media rules */
-  rc = ui_css_stylesheet_create(&sheet);
-  struct ui_css_rule *r;
-  {
-    ui_error_t rc_cleanup = ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &r);
-    TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-  }
-  struct ui_css_rule *nested_r;
-  {
-    ui_error_t rc_cleanup =
-        ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &nested_r);
-    TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-  }
-  {
-    ui_error_t rc_cleanup =
-        ui_css_rule_append_selector(nested_r, UI_CSS_SELECTOR_TYPE_TAG, "div");
-    TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-  }
-  {
-    ui_error_t rc_cleanup =
-        ui_css_rule_append_declaration(nested_r, "display", "flex", 0);
-    TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-  }
-  r->nested_rules = nested_r;
-  {
-    ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, r);
-    TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-  }
-
-  struct ui_css_rule *media_r;
-  {
-    ui_error_t rc_cleanup =
-        ui_css_rule_create(UI_CSS_RULE_TYPE_MEDIA, &media_r);
-    TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-  }
-  media_r->media_condition = my_strdup("screen");
-  struct ui_css_rule *nested_mr;
-  {
-    ui_error_t rc_cleanup =
-        ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &nested_mr);
-    TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-  }
-  {
-    ui_error_t rc_cleanup =
-        ui_css_rule_append_selector(nested_mr, UI_CSS_SELECTOR_TYPE_TAG, "div");
-    TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-  }
-  {
-    ui_error_t rc_cleanup =
-        ui_css_rule_append_declaration(nested_mr, "color", "red", 0);
-    TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-  }
-  media_r->nested_rules = nested_mr;
-  {
-    ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, media_r);
-    TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-  }
-
-  struct ui_css_rule *cont_r;
-  {
-    ui_error_t rc_cleanup =
-        ui_css_rule_create(UI_CSS_RULE_TYPE_CONTAINER, &cont_r);
-    TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-  }
-  cont_r->container_condition = my_strdup("(min-width: 100px)");
-  struct ui_css_rule *nested_cr;
-  {
-    ui_error_t rc_cleanup =
-        ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &nested_cr);
-    TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-  }
-  {
-    ui_error_t rc_cleanup =
-        ui_css_rule_append_selector(nested_cr, UI_CSS_SELECTOR_TYPE_TAG, "div");
-    TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-  }
-  {
-    ui_error_t rc_cleanup =
-        ui_css_rule_append_declaration(nested_cr, "color", "blue", 0);
-    TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-  }
-  cont_r->nested_rules = nested_cr;
-  {
-    ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, cont_r);
-    TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-  }
-
-  struct ui_css_rule *scope_r;
-  {
-    ui_error_t rc_cleanup =
-        ui_css_rule_create(UI_CSS_RULE_TYPE_SCOPE, &scope_r);
-    TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-  }
-  scope_r->scope_start =
-      create_mock_selector(UI_CSS_SELECTOR_TYPE_CLASS, ".card");
-  struct ui_css_rule *nested_scope_r;
-  {
-    ui_error_t rc_cleanup =
-        ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &nested_scope_r);
-    TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-  }
-  {
-    ui_error_t rc_cleanup = ui_css_rule_append_selector(
-        nested_scope_r, UI_CSS_SELECTOR_TYPE_TAG, "div");
-    TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-  }
-  {
-    ui_error_t rc_cleanup = ui_css_rule_append_declaration(
-        nested_scope_r, "background", "yellow", 0);
-    TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-  }
-  scope_r->nested_rules = nested_scope_r;
-  {
-    ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, scope_r);
-    TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-  }
-
-  struct ui_css_rule *style_r;
-  {
-    ui_error_t rc_cleanup =
-        ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &style_r);
-    TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-  }
-  {
-    ui_error_t rc_cleanup =
-        ui_css_rule_append_selector(style_r, UI_CSS_SELECTOR_TYPE_TAG, "div");
-    TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-  }
-  struct ui_css_rule *nested_sr;
-  {
-    ui_error_t rc_cleanup =
-        ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &nested_sr);
-    TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-  }
-  {
-    ui_error_t rc_cleanup = ui_css_rule_append_selector(
-        nested_sr, UI_CSS_SELECTOR_TYPE_CLASS, "nested");
-    TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-  }
-  {
-    ui_error_t rc_cleanup =
-        ui_css_rule_append_declaration(nested_sr, "margin", "0", 0);
-    TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-  }
-  style_r->nested_rules = nested_sr;
-  {
-    ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, style_r);
-    TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-  }
-
-  /* Condition variations */
-  const char *conds[] = {"not (display: flex)",
-                         "(display: grid) or (display: flex)",
-                         "(display: flex) and (display: none)",
-                         "selector(:has(.a))",
-                         "selector(:invalid)",
-                         "(((a)))",
-                         "not not",
-                         "(not (display: flex))",
-                         "(not display: flex)",
-                         "(display: flex) and (not (display: grid))",
-                         "(display: flex) or (not (display: grid))",
-                         "and and or or not not",
-                         "and (display: flex)",
-                         "or (display: flex)",
-                         "not display: flex",
-                         "(((",
-                         "selector",
-                         "selector(",
-                         "selector(:has",
-                         "selector(:has()",
-                         "not",
-                         "not (",
-                         "not )",
-                         "(a) and",
-                         "(a) or"};
-  size_t i;
-  for (i = 0; i < sizeof(conds) / sizeof(conds[0]); i++) {
-    if (r->supports_condition) {
-      C_MULTIPLATFORM_FREE(r->supports_condition);
-    }
-    r->supports_condition = my_strdup(conds[i]);
     {
       ui_error_t rc_cleanup =
           ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &node);
       TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
     }
     {
-      ui_error_t rc_cleanup = ui_css_resolve_style(sheet, node, &style);
-      TEST_ASSERT(rc_cleanup == UI_ERROR_NONE ||
-                  rc_cleanup == UI_ERROR_PARSE_FAILED);
+      ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule);
+      TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
     }
-    if (style) {
+    {
+      ui_error_t rc_cleanup = ui_css_rule_append_declaration(rule, "a", "b", 0);
+      TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+    }
+
+    {
+      int oom_cnt = 0;
+      while (1) {
+        g_malloc_fail_countdown = oom_cnt;
+        if (ui_css_resolve_style(sheet, node, &style) ==
+            UI_ERROR_OUT_OF_MEMORY) {
+          oom_cnt++;
+        } else {
+          break;
+        }
+      }
+    }
+    {
       ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
       TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-      style = NULL;
+    }
+    g_malloc_fail_countdown = -1;
+
+    {
+      /* Test evaluating condition parenthesis errors */
+      struct ui_css_rule *rule_sub4;
+      {
+        ui_error_t rc_cleanup =
+            ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule_sub4);
+        TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+      }
+      rule_sub4->supports_condition =
+          ui_mock_strdup("((display: flex"); /* missing ) */
+      {
+        ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule_sub4);
+        TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+      }
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        {
+          ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+          TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+        }
+      }
+    }
+
+    {
+      /* Test evaluating condition parenthesis errors */
+      struct ui_css_rule *rule_sub5;
+      {
+        ui_error_t rc_cleanup =
+            ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule_sub5);
+        TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+      }
+      rule_sub5->supports_condition =
+          ui_mock_strdup("((display: flex"); /* missing ) */
+      {
+        ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule_sub5);
+        TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+      }
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        {
+          ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+          TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+        }
+      }
+    }
+
+    {
+      struct ui_css_rule *rule_sub6;
+      {
+        ui_error_t rc_cleanup =
+            ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule_sub6);
+        TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+      }
+      rule_sub6->supports_condition =
+          ui_mock_strdup("((display: flex) and"); /* missing end term */
+      {
+        ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule_sub6);
+        TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+      }
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        {
+          ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+          TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+        }
+      }
+    }
+
+    {
+      struct ui_css_rule *rule_sub7;
+      {
+        ui_error_t rc_cleanup =
+            ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule_sub7);
+        TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+      }
+      rule_sub7->supports_condition =
+          ui_mock_strdup("((display: flex) or"); /* missing end term */
+      {
+        ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule_sub7);
+        TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+      }
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        {
+          ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+          TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+        }
+      }
+    }
+    {
+      struct ui_css_rule *rule_sub8;
+      {
+        ui_error_t rc_cleanup =
+            ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule_sub8);
+        TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+      }
+      rule_sub8->supports_condition =
+          ui_mock_strdup("(not (display: flex)"); /* missing inner end */
+      {
+        ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule_sub8);
+        TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+      }
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        {
+          ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+          TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+        }
+      }
+    }
+    {
+      struct ui_css_rule *rule_sub9;
+      {
+        ui_error_t rc_cleanup =
+            ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule_sub9);
+        TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+      }
+      rule_sub9->supports_condition =
+          ui_mock_strdup("((display: flex) or )"); /* trailing paren */
+      {
+        ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule_sub9);
+        TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+      }
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        {
+          ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+          TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+        }
+      }
+    }
+
+    {
+      /* Test evaluating condition parenthesis errors */
+      struct ui_css_rule *rule_sub10;
+
+      struct ui_css_stylesheet *tmp_sheet = NULL;
+      struct ui_css_computed_style *tmp_style = NULL;
+      {
+        ui_error_t rc_cleanup = ui_css_stylesheet_create(&tmp_sheet);
+        TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+      }
+
+      {
+        ui_error_t rc_cleanup =
+            ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule_sub10);
+        TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+      }
+      rule_sub10->supports_condition =
+          ui_mock_strdup("((display: flex"); /* missing ) */
+      {
+        ui_error_t rc_cleanup =
+            ui_css_stylesheet_append_rule(tmp_sheet, rule_sub10);
+        TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+      }
+
+      {
+        ui_error_t rc_cleanup =
+            ui_css_resolve_style(tmp_sheet, node, &tmp_style);
+        TEST_ASSERT(rc_cleanup == UI_ERROR_NONE ||
+                    rc_cleanup == UI_ERROR_PARSE_FAILED);
+      }
+      if (tmp_style) {
+        ui_error_t rc_cleanup = ui_css_computed_style_destroy(tmp_style);
+        TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+        tmp_style = NULL;
+      }
+
+      {
+        ui_error_t rc_cleanup = ui_css_stylesheet_destroy(tmp_sheet);
+        TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+      }
+    }
+    {
+      struct ui_css_rule *rule_sub11;
+      struct ui_css_stylesheet *tmp_sheet = NULL;
+      struct ui_css_computed_style *tmp_style = NULL;
+      {
+        ui_error_t rc_cleanup = ui_css_stylesheet_create(&tmp_sheet);
+        TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+      }
+      {
+        ui_error_t rc_cleanup =
+            ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule_sub11);
+        TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+      }
+      rule_sub11->supports_condition =
+          ui_mock_strdup("((display: flex) and"); /* missing end term */
+      {
+        ui_error_t rc_cleanup =
+            ui_css_stylesheet_append_rule(tmp_sheet, rule_sub11);
+        TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+      }
+
+      {
+        ui_error_t rc_cleanup =
+            ui_css_resolve_style(tmp_sheet, node, &tmp_style);
+        TEST_ASSERT(rc_cleanup == UI_ERROR_NONE ||
+                    rc_cleanup == UI_ERROR_PARSE_FAILED);
+      }
+      if (tmp_style) {
+        ui_error_t rc_cleanup = ui_css_computed_style_destroy(tmp_style);
+        TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+        tmp_style = NULL;
+      }
+      {
+        ui_error_t rc_cleanup = ui_css_stylesheet_destroy(tmp_sheet);
+        TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+      }
+    }
+    {
+      struct ui_css_rule *rule_sub12;
+      struct ui_css_stylesheet *tmp_sheet = NULL;
+      struct ui_css_computed_style *tmp_style = NULL;
+      {
+        ui_error_t rc_cleanup = ui_css_stylesheet_create(&tmp_sheet);
+        TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+      }
+      {
+        ui_error_t rc_cleanup =
+            ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule_sub12);
+        TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+      }
+      rule_sub12->supports_condition =
+          ui_mock_strdup("((display: flex) or"); /* missing end term */
+      {
+        ui_error_t rc_cleanup =
+            ui_css_stylesheet_append_rule(tmp_sheet, rule_sub12);
+        TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+      }
+
+      {
+        ui_error_t rc_cleanup =
+            ui_css_resolve_style(tmp_sheet, node, &tmp_style);
+        TEST_ASSERT(rc_cleanup == UI_ERROR_NONE ||
+                    rc_cleanup == UI_ERROR_PARSE_FAILED);
+      }
+      if (tmp_style) {
+        ui_error_t rc_cleanup = ui_css_computed_style_destroy(tmp_style);
+        TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+        tmp_style = NULL;
+      }
+      {
+        ui_error_t rc_cleanup = ui_css_stylesheet_destroy(tmp_sheet);
+        TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+      }
+    }
+
+    {
+      /* Test evaluating condition parenthesis errors */
+      struct ui_css_rule *rule_sub13;
+      {
+        ui_error_t rc_cleanup =
+            ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule_sub13);
+        TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+      }
+      rule_sub13->supports_condition =
+          ui_mock_strdup("((display: flex"); /* missing ) */
+      {
+        ui_error_t rc_cleanup =
+            ui_css_stylesheet_append_rule(sheet, rule_sub13);
+        TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+      }
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        {
+          ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+          TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+        }
+      }
+    }
+
+    {
+      /* Test evaluating condition parenthesis errors */
+      struct ui_css_rule *rule_sub14;
+      {
+        ui_error_t rc_cleanup =
+            ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule_sub14);
+        TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+      }
+      rule_sub14->supports_condition =
+          ui_mock_strdup("((display: flex"); /* missing ) */
+      {
+        ui_error_t rc_cleanup =
+            ui_css_stylesheet_append_rule(sheet, rule_sub14);
+        TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+      }
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        {
+          ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+          TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+        }
+      }
+    }
+
+    {
+      ui_error_t rc_cleanup = ui_css_stylesheet_destroy(sheet);
+      TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
     }
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(node);
       TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
     }
-  }
 
-  {
-    ui_error_t rc_cleanup = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &node);
-    TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-  }
-  {
-    ui_error_t rc_cleanup = ui_dom_node_set_tag_name(node, "div");
-    TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-  }
-  {
-    ui_error_t rc_cleanup = ui_dom_node_set_attribute(node, "class", "nested");
-    TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-  }
-  {
-    int oom_cnt = 0;
-    while (1) {
-      g_malloc_fail_countdown = oom_cnt;
-      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_OUT_OF_MEMORY) {
-        oom_cnt++;
-      } else {
-        break;
-      }
-    }
-  }
-  {
-    ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
-    TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-  }
-  g_malloc_fail_countdown = -1;
-  {
-    ui_error_t rc_cleanup = ui_dom_node_destroy(node);
-    TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-  }
-
-  /* Check supports evaluation failure */
-  if (r->supports_condition) {
-    C_MULTIPLATFORM_FREE(r->supports_condition);
-  }
-  r->supports_condition = my_strdup("(a) and"); /* parse error */
-  {
-    ui_error_t rc_cleanup = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &node);
-    TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-  }
-  rc = ui_css_resolve_style(sheet, node, &style);
-  if (rc != UI_ERROR_PARSE_FAILED) {
-    printf("Expected PARSE_FAILED, got %d\n", rc);
-    TEST_ASSERT(rc == UI_ERROR_PARSE_FAILED);
-  }
-  {
-    ui_error_t rc_cleanup = ui_dom_node_destroy(node);
-    TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-  }
-
-  {
-    /* Test evaluating condition parenthesis errors */
-    struct ui_css_rule *rule;
-    struct ui_css_selector *sel = NULL;
+    /* Eval condition paths */
+    /* These are static functions but reached via supports/media rules */
+    rc = ui_css_stylesheet_create(&sheet);
     {
-      ui_error_t rc_cleanup =
-          ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
-      TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-    }
-    rule->supports_condition =
-        ui_mock_strdup("((display: flex"); /* missing ) */
-    {
-      ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule);
-      TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-    }
-
-    if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+      struct ui_css_rule *r;
       {
-        ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+        ui_error_t rc_cleanup =
+            ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &r);
         TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
       }
-    }
-  }
-
-  {
-    /* Test evaluating condition parenthesis errors */
-    struct ui_css_rule *rule;
-    struct ui_css_selector *sel = NULL;
-    {
-      ui_error_t rc_cleanup =
-          ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
-      TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-    }
-    rule->supports_condition =
-        ui_mock_strdup("((display: flex"); /* missing ) */
-    {
-      ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule);
-      TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-    }
-
-    if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
       {
-        ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
-        TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-      }
-    }
-  }
+        struct ui_css_rule *nested_r;
+        {
+          ui_error_t rc_cleanup =
+              ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &nested_r);
+          TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+        }
+        {
+          ui_error_t rc_cleanup = ui_css_rule_append_selector(
+              nested_r, UI_CSS_SELECTOR_TYPE_TAG, "div");
+          TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+        }
+        {
+          ui_error_t rc_cleanup =
+              ui_css_rule_append_declaration(nested_r, "display", "flex", 0);
+          TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+        }
+        r->nested_rules = nested_r;
+        {
+          ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, r);
+          TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+        }
 
-  {
-    struct ui_css_rule *rule;
-    struct ui_css_selector *sel = NULL;
-    {
-      ui_error_t rc_cleanup =
-          ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
-      TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-    }
-    rule->supports_condition =
-        ui_mock_strdup("((display: flex) and"); /* missing end term */
-    {
-      ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule);
-      TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-    }
+        {
+          struct ui_css_rule *media_r;
+          {
+            ui_error_t rc_cleanup =
+                ui_css_rule_create(UI_CSS_RULE_TYPE_MEDIA, &media_r);
+            TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+          }
+          media_r->media_condition = my_strdup("screen");
+          {
+            struct ui_css_rule *nested_mr;
+            {
+              ui_error_t rc_cleanup =
+                  ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &nested_mr);
+              TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+            }
+            {
+              ui_error_t rc_cleanup = ui_css_rule_append_selector(
+                  nested_mr, UI_CSS_SELECTOR_TYPE_TAG, "div");
+              TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+            }
+            {
+              ui_error_t rc_cleanup =
+                  ui_css_rule_append_declaration(nested_mr, "color", "red", 0);
+              TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+            }
+            media_r->nested_rules = nested_mr;
+            {
+              ui_error_t rc_cleanup =
+                  ui_css_stylesheet_append_rule(sheet, media_r);
+              TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+            }
 
-    if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
-      {
-        ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
-        TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-      }
-    }
-  }
+            {
+              struct ui_css_rule *cont_r;
+              {
+                ui_error_t rc_cleanup =
+                    ui_css_rule_create(UI_CSS_RULE_TYPE_CONTAINER, &cont_r);
+                TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+              }
+              cont_r->container_condition = my_strdup("(min-width: 100px)");
+              {
+                struct ui_css_rule *nested_cr;
+                {
+                  ui_error_t rc_cleanup =
+                      ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &nested_cr);
+                  TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+                }
+                {
+                  ui_error_t rc_cleanup = ui_css_rule_append_selector(
+                      nested_cr, UI_CSS_SELECTOR_TYPE_TAG, "div");
+                  TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+                }
+                {
+                  ui_error_t rc_cleanup = ui_css_rule_append_declaration(
+                      nested_cr, "color", "blue", 0);
+                  TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+                }
+                cont_r->nested_rules = nested_cr;
+                {
+                  ui_error_t rc_cleanup =
+                      ui_css_stylesheet_append_rule(sheet, cont_r);
+                  TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+                }
 
-  {
-    struct ui_css_rule *rule;
-    struct ui_css_selector *sel = NULL;
-    {
-      ui_error_t rc_cleanup =
-          ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
-      TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-    }
-    rule->supports_condition =
-        ui_mock_strdup("((display: flex) or"); /* missing end term */
-    {
-      ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule);
-      TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-    }
+                {
+                  struct ui_css_rule *scope_r;
+                  {
+                    ui_error_t rc_cleanup =
+                        ui_css_rule_create(UI_CSS_RULE_TYPE_SCOPE, &scope_r);
+                    TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+                  }
+                  scope_r->scope_start =
+                      create_mock_selector(UI_CSS_SELECTOR_TYPE_CLASS, ".card");
+                  {
+                    struct ui_css_rule *nested_scope_r;
+                    {
+                      ui_error_t rc_cleanup = ui_css_rule_create(
+                          UI_CSS_RULE_TYPE_STYLE, &nested_scope_r);
+                      TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+                    }
+                    {
+                      ui_error_t rc_cleanup = ui_css_rule_append_selector(
+                          nested_scope_r, UI_CSS_SELECTOR_TYPE_TAG, "div");
+                      TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+                    }
+                    {
+                      ui_error_t rc_cleanup = ui_css_rule_append_declaration(
+                          nested_scope_r, "background", "yellow", 0);
+                      TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+                    }
+                    scope_r->nested_rules = nested_scope_r;
+                    {
+                      ui_error_t rc_cleanup =
+                          ui_css_stylesheet_append_rule(sheet, scope_r);
+                      TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+                    }
 
-    if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
-      {
-        ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
-        TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-      }
-    }
-  }
-  {
-    struct ui_css_rule *rule;
-    struct ui_css_selector *sel = NULL;
-    {
-      ui_error_t rc_cleanup =
-          ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
-      TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-    }
-    rule->supports_condition =
-        ui_mock_strdup("(not (display: flex)"); /* missing inner end */
-    {
-      ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule);
-      TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-    }
+                    {
+                      struct ui_css_rule *style_r;
+                      {
+                        ui_error_t rc_cleanup = ui_css_rule_create(
+                            UI_CSS_RULE_TYPE_STYLE, &style_r);
+                        TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+                      }
+                      {
+                        ui_error_t rc_cleanup = ui_css_rule_append_selector(
+                            style_r, UI_CSS_SELECTOR_TYPE_TAG, "div");
+                        TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+                      }
+                      {
+                        struct ui_css_rule *nested_sr;
+                        {
+                          ui_error_t rc_cleanup = ui_css_rule_create(
+                              UI_CSS_RULE_TYPE_STYLE, &nested_sr);
+                          TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+                        }
+                        {
+                          ui_error_t rc_cleanup = ui_css_rule_append_selector(
+                              nested_sr, UI_CSS_SELECTOR_TYPE_CLASS, "nested");
+                          TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+                        }
+                        {
+                          ui_error_t rc_cleanup =
+                              ui_css_rule_append_declaration(nested_sr,
+                                                             "margin", "0", 0);
+                          TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+                        }
+                        style_r->nested_rules = nested_sr;
+                        {
+                          ui_error_t rc_cleanup =
+                              ui_css_stylesheet_append_rule(sheet, style_r);
+                          TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+                        }
 
-    if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
-      {
-        ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
-        TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-      }
-    }
-  }
-  {
-    struct ui_css_rule *rule;
-    struct ui_css_selector *sel = NULL;
-    {
-      ui_error_t rc_cleanup =
-          ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
-      TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-    }
-    rule->supports_condition =
-        ui_mock_strdup("((display: flex) or )"); /* trailing paren */
-    {
-      ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule);
-      TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-    }
+                        /* Condition variations */
+                        {
+                          const char *conds[] = {
+                              "not (display: flex)",
+                              "(display: grid) or (display: flex)",
+                              "(display: flex) and (display: none)",
+                              "selector(:has(.a))",
+                              "selector(:invalid)",
+                              "(((a)))",
+                              "not not",
+                              "(not (display: flex))",
+                              "(not display: flex)",
+                              "(display: flex) and (not (display: grid))",
+                              "(display: flex) or (not (display: grid))",
+                              "and and or or not not",
+                              "and (display: flex)",
+                              "or (display: flex)",
+                              "not display: flex",
+                              "(((",
+                              "selector",
+                              "selector(",
+                              "selector(:has",
+                              "selector(:has()",
+                              "not",
+                              "not (",
+                              "not )",
+                              "(a) and",
+                              "(a) or"};
+                          size_t i;
+                          for (i = 0; i < sizeof(conds) / sizeof(conds[0]);
+                               i++) {
+                            if (r->supports_condition) {
+                              C_MULTIPLATFORM_FREE(r->supports_condition);
+                            }
+                            r->supports_condition = my_strdup(conds[i]);
+                            {
+                              ui_error_t rc_cleanup = ui_dom_node_create(
+                                  UI_DOM_NODE_TYPE_ELEMENT, &node);
+                              TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+                            }
+                            {
+                              ui_error_t rc_cleanup =
+                                  ui_css_resolve_style(sheet, node, &style);
+                              TEST_ASSERT(rc_cleanup == UI_ERROR_NONE ||
+                                          rc_cleanup == UI_ERROR_PARSE_FAILED);
+                            }
+                            if (style) {
+                              ui_error_t rc_cleanup =
+                                  ui_css_computed_style_destroy(style);
+                              TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+                              style = NULL;
+                            }
+                            {
+                              ui_error_t rc_cleanup = ui_dom_node_destroy(node);
+                              TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+                            }
+                          }
 
-    if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
-      {
-        ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
-        TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
-      }
-    }
-  }
+                          {
+                            ui_error_t rc_cleanup = ui_dom_node_create(
+                                UI_DOM_NODE_TYPE_ELEMENT, &node);
+                            TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+                          }
+                          {
+                            ui_error_t rc_cleanup =
+                                ui_dom_node_set_tag_name(node, "div");
+                            TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+                          }
+                          {
+                            ui_error_t rc_cleanup = ui_dom_node_set_attribute(
+                                node, "class", "nested");
+                            TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+                          }
+                          {
+                            int oom_cnt = 0;
+                            while (1) {
+                              g_malloc_fail_countdown = oom_cnt;
+                              if (ui_css_resolve_style(sheet, node, &style) ==
+                                  UI_ERROR_OUT_OF_MEMORY) {
+                                oom_cnt++;
+                              } else {
+                                break;
+                              }
+                            }
+                          }
+                          {
+                            ui_error_t rc_cleanup =
+                                ui_css_computed_style_destroy(style);
+                            TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+                          }
+                          g_malloc_fail_countdown = -1;
+                          {
+                            ui_error_t rc_cleanup = ui_dom_node_destroy(node);
+                            TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+                          }
 
-  {
-    /* Test style rule specificity comparison when selector has same specificity
-     * as best */
-    struct ui_css_rule *tie_rule = NULL;
-    struct ui_dom_node *tie_node = NULL;
-    struct ui_css_stylesheet *tie_sheet = NULL;
-    struct ui_css_computed_style *tie_style = NULL;
+                          /* Check supports evaluation failure */
+                          if (r->supports_condition) {
+                            C_MULTIPLATFORM_FREE(r->supports_condition);
+                          }
+                          r->supports_condition =
+                              my_strdup("(a) and"); /* parse error */
+                          {
+                            ui_error_t rc_cleanup = ui_dom_node_create(
+                                UI_DOM_NODE_TYPE_ELEMENT, &node);
+                            TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+                          }
+                          rc = ui_css_resolve_style(sheet, node, &style);
+                          if (rc != UI_ERROR_PARSE_FAILED) {
+                            printf("Expected PARSE_FAILED, got %d\n", rc);
+                            TEST_ASSERT(rc == UI_ERROR_PARSE_FAILED);
+                          }
+                          {
+                            ui_error_t rc_cleanup = ui_dom_node_destroy(node);
+                            TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+                          }
 
-    ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &tie_node);
-    ui_dom_node_set_tag_name(tie_node, "div");
+                          {
+                            /* Test evaluating condition parenthesis errors */
+                            struct ui_css_rule *rule_sub15;
+                            {
+                              ui_error_t rc_cleanup = ui_css_rule_create(
+                                  UI_CSS_RULE_TYPE_SUPPORTS, &rule_sub15);
+                              TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+                            }
+                            rule_sub15->supports_condition = ui_mock_strdup(
+                                "((display: flex"); /* missing ) */
+                            {
+                              ui_error_t rc_cleanup =
+                                  ui_css_stylesheet_append_rule(sheet,
+                                                                rule_sub15);
+                              TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+                            }
 
-    ui_css_stylesheet_create(&tie_sheet);
-    ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &tie_rule);
-    ui_css_rule_append_selector(tie_rule, UI_CSS_SELECTOR_TYPE_TAG, "div");
-    ui_css_rule_append_selector(tie_rule, UI_CSS_SELECTOR_TYPE_TAG, "div");
-    ui_css_rule_append_declaration(tie_rule, "color", "blue", 0);
-    ui_css_stylesheet_append_rule(tie_sheet, tie_rule);
+                            if (ui_css_resolve_style(sheet, node, &style) ==
+                                UI_ERROR_NONE) {
+                              {
+                                ui_error_t rc_cleanup =
+                                    ui_css_computed_style_destroy(style);
+                                TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+                              }
+                            }
+                          }
 
-    ui_css_resolve_style(tie_sheet, tie_node, &tie_style);
+                          {
+                            /* Test evaluating condition parenthesis errors */
+                            struct ui_css_rule *rule_sub16;
+                            {
+                              ui_error_t rc_cleanup = ui_css_rule_create(
+                                  UI_CSS_RULE_TYPE_SUPPORTS, &rule_sub16);
+                              TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+                            }
+                            rule_sub16->supports_condition = ui_mock_strdup(
+                                "((display: flex"); /* missing ) */
+                            {
+                              ui_error_t rc_cleanup =
+                                  ui_css_stylesheet_append_rule(sheet,
+                                                                rule_sub16);
+                              TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+                            }
 
-    if (tie_style) {
-      ui_css_computed_style_destroy(tie_style);
-    }
-    if (tie_sheet) {
-      ui_css_stylesheet_destroy(tie_sheet);
-    }
-    if (tie_node) {
-      ui_dom_node_destroy(tie_node);
-    }
-  }
+                            if (ui_css_resolve_style(sheet, node, &style) ==
+                                UI_ERROR_NONE) {
+                              {
+                                ui_error_t rc_cleanup =
+                                    ui_css_computed_style_destroy(style);
+                                TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+                              }
+                            }
+                          }
 
-  {
-    /* Test selector where a == best_a but b < best_b */
-    struct ui_css_rule *b_tie_rule = NULL;
-    struct ui_dom_node *b_tie_node = NULL;
-    struct ui_css_stylesheet *b_tie_sheet = NULL;
-    struct ui_css_computed_style *b_tie_style = NULL;
+                          {
+                            struct ui_css_rule *rule_sub17;
+                            {
+                              ui_error_t rc_cleanup = ui_css_rule_create(
+                                  UI_CSS_RULE_TYPE_SUPPORTS, &rule_sub17);
+                              TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+                            }
+                            rule_sub17->supports_condition = ui_mock_strdup(
+                                "((display: flex) and"); /* missing end term */
+                            {
+                              ui_error_t rc_cleanup =
+                                  ui_css_stylesheet_append_rule(sheet,
+                                                                rule_sub17);
+                              TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+                            }
 
-    ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &b_tie_node);
-    ui_dom_node_set_tag_name(b_tie_node, "div");
-    ui_dom_node_set_attribute(b_tie_node, "class", "mycls");
+                            if (ui_css_resolve_style(sheet, node, &style) ==
+                                UI_ERROR_NONE) {
+                              {
+                                ui_error_t rc_cleanup =
+                                    ui_css_computed_style_destroy(style);
+                                TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+                              }
+                            }
+                          }
 
-    ui_css_stylesheet_create(&b_tie_sheet);
-    ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &b_tie_rule);
-    ui_css_rule_append_selector(b_tie_rule, UI_CSS_SELECTOR_TYPE_CLASS,
+                          {
+                            struct ui_css_rule *rule_sub18;
+                            {
+                              ui_error_t rc_cleanup = ui_css_rule_create(
+                                  UI_CSS_RULE_TYPE_SUPPORTS, &rule_sub18);
+                              TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+                            }
+                            rule_sub18->supports_condition = ui_mock_strdup(
+                                "((display: flex) or"); /* missing end term */
+                            {
+                              ui_error_t rc_cleanup =
+                                  ui_css_stylesheet_append_rule(sheet,
+                                                                rule_sub18);
+                              TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+                            }
+
+                            if (ui_css_resolve_style(sheet, node, &style) ==
+                                UI_ERROR_NONE) {
+                              {
+                                ui_error_t rc_cleanup =
+                                    ui_css_computed_style_destroy(style);
+                                TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+                              }
+                            }
+                          }
+                          {
+                            struct ui_css_rule *rule_sub19;
+                            {
+                              ui_error_t rc_cleanup = ui_css_rule_create(
+                                  UI_CSS_RULE_TYPE_SUPPORTS, &rule_sub19);
+                              TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+                            }
+                            rule_sub19->supports_condition = ui_mock_strdup(
+                                "(not (display: flex)"); /* missing inner end */
+                            {
+                              ui_error_t rc_cleanup =
+                                  ui_css_stylesheet_append_rule(sheet,
+                                                                rule_sub19);
+                              TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+                            }
+
+                            if (ui_css_resolve_style(sheet, node, &style) ==
+                                UI_ERROR_NONE) {
+                              {
+                                ui_error_t rc_cleanup =
+                                    ui_css_computed_style_destroy(style);
+                                TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+                              }
+                            }
+                          }
+                          {
+                            struct ui_css_rule *rule_sub20;
+                            {
+                              ui_error_t rc_cleanup = ui_css_rule_create(
+                                  UI_CSS_RULE_TYPE_SUPPORTS, &rule_sub20);
+                              TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+                            }
+                            rule_sub20->supports_condition = ui_mock_strdup(
+                                "((display: flex) or )"); /* trailing paren */
+                            {
+                              ui_error_t rc_cleanup =
+                                  ui_css_stylesheet_append_rule(sheet,
+                                                                rule_sub20);
+                              TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+                            }
+
+                            if (ui_css_resolve_style(sheet, node, &style) ==
+                                UI_ERROR_NONE) {
+                              {
+                                ui_error_t rc_cleanup =
+                                    ui_css_computed_style_destroy(style);
+                                TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+                              }
+                            }
+                          }
+
+                          {
+                            /* Test style rule specificity comparison when
+                             * selector has same specificity as best */
+                            struct ui_css_rule *tie_rule = NULL;
+                            struct ui_dom_node *tie_node = NULL;
+                            struct ui_css_stylesheet *tie_sheet = NULL;
+                            struct ui_css_computed_style *tie_style = NULL;
+
+                            ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT,
+                                               &tie_node);
+                            ui_dom_node_set_tag_name(tie_node, "div");
+
+                            ui_css_stylesheet_create(&tie_sheet);
+                            ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE,
+                                               &tie_rule);
+                            ui_css_rule_append_selector(
+                                tie_rule, UI_CSS_SELECTOR_TYPE_TAG, "div");
+                            ui_css_rule_append_selector(
+                                tie_rule, UI_CSS_SELECTOR_TYPE_TAG, "div");
+                            ui_css_rule_append_declaration(tie_rule, "color",
+                                                           "blue", 0);
+                            ui_css_stylesheet_append_rule(tie_sheet, tie_rule);
+
+                            ui_css_resolve_style(tie_sheet, tie_node,
+                                                 &tie_style);
+
+                            if (tie_style) {
+                              ui_css_computed_style_destroy(tie_style);
+                            }
+                            if (tie_sheet) {
+                              ui_css_stylesheet_destroy(tie_sheet);
+                            }
+                            if (tie_node) {
+                              ui_dom_node_destroy(tie_node);
+                            }
+                          }
+
+                          {
+                            /* Test selector where a == best_a but b < best_b */
+                            struct ui_css_rule *b_tie_rule = NULL;
+                            struct ui_dom_node *b_tie_node = NULL;
+                            struct ui_css_stylesheet *b_tie_sheet = NULL;
+                            struct ui_css_computed_style *b_tie_style = NULL;
+
+                            ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT,
+                                               &b_tie_node);
+                            ui_dom_node_set_tag_name(b_tie_node, "div");
+                            ui_dom_node_set_attribute(b_tie_node, "class",
+                                                      "mycls");
+
+                            ui_css_stylesheet_create(&b_tie_sheet);
+                            ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE,
+                                               &b_tie_rule);
+                            ui_css_rule_append_selector(
+                                b_tie_rule, UI_CSS_SELECTOR_TYPE_CLASS,
                                 "mycls");
-    ui_css_rule_append_selector(b_tie_rule, UI_CSS_SELECTOR_TYPE_TAG, "div");
-    ui_css_rule_append_declaration(b_tie_rule, "color", "cyan", 0);
-    ui_css_stylesheet_append_rule(b_tie_sheet, b_tie_rule);
+                            ui_css_rule_append_selector(
+                                b_tie_rule, UI_CSS_SELECTOR_TYPE_TAG, "div");
+                            ui_css_rule_append_declaration(b_tie_rule, "color",
+                                                           "cyan", 0);
+                            ui_css_stylesheet_append_rule(b_tie_sheet,
+                                                          b_tie_rule);
 
-    ui_css_resolve_style(b_tie_sheet, b_tie_node, &b_tie_style);
+                            ui_css_resolve_style(b_tie_sheet, b_tie_node,
+                                                 &b_tie_style);
 
-    if (b_tie_style) {
-      ui_css_computed_style_destroy(b_tie_style);
-    }
-    if (b_tie_sheet) {
-      ui_css_stylesheet_destroy(b_tie_sheet);
-    }
-    if (b_tie_node) {
-      ui_dom_node_destroy(b_tie_node);
-    }
-  }
+                            if (b_tie_style) {
+                              ui_css_computed_style_destroy(b_tie_style);
+                            }
+                            if (b_tie_sheet) {
+                              ui_css_stylesheet_destroy(b_tie_sheet);
+                            }
+                            if (b_tie_node) {
+                              ui_dom_node_destroy(b_tie_node);
+                            }
+                          }
 
-  {
-    /* Test class list whitespace termination branches: ' ', '\t', '\r', '\n',
-     * '\0' */
-    static const char *classes[5];
-    int ci;
-    classes[0] = "x foo";
-    classes[1] = "x\tfoo";
-    classes[2] = "x\rfoo";
-    classes[3] = "x\nfoo";
-    classes[4] = "x";
-    for (ci = 0; ci < 5; ci++) {
-      struct ui_dom_node *c_node = NULL;
-      struct ui_css_stylesheet *c_sheet = NULL;
-      struct ui_css_rule *c_rule = NULL;
-      struct ui_css_computed_style *c_style = NULL;
+                          {
+                            /* Test class list whitespace termination branches:
+                             * ' ', '\t', '\r', '\n',
+                             * '\0' */
+                            static const char *classes[5];
+                            int ci;
+                            classes[0] = "x foo";
+                            classes[1] = "x\tfoo";
+                            classes[2] = "x\rfoo";
+                            classes[3] = "x\nfoo";
+                            classes[4] = "x";
+                            for (ci = 0; ci < 5; ci++) {
+                              struct ui_dom_node *c_node = NULL;
+                              struct ui_css_stylesheet *c_sheet = NULL;
+                              struct ui_css_rule *c_rule = NULL;
+                              struct ui_css_computed_style *c_style = NULL;
 
-      ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &c_node);
-      ui_dom_node_set_tag_name(c_node, "div");
-      ui_dom_node_set_attribute(c_node, "class", classes[ci]);
+                              ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT,
+                                                 &c_node);
+                              ui_dom_node_set_tag_name(c_node, "div");
+                              ui_dom_node_set_attribute(c_node, "class",
+                                                        classes[ci]);
 
-      ui_css_stylesheet_create(&c_sheet);
-      ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &c_rule);
-      ui_css_rule_append_selector(c_rule, UI_CSS_SELECTOR_TYPE_CLASS, "foo");
-      ui_css_rule_append_declaration(c_rule, "color", "green", 0);
-      ui_css_stylesheet_append_rule(c_sheet, c_rule);
+                              ui_css_stylesheet_create(&c_sheet);
+                              ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE,
+                                                 &c_rule);
+                              ui_css_rule_append_selector(
+                                  c_rule, UI_CSS_SELECTOR_TYPE_CLASS, "foo");
+                              ui_css_rule_append_declaration(c_rule, "color",
+                                                             "green", 0);
+                              ui_css_stylesheet_append_rule(c_sheet, c_rule);
 
-      ui_css_resolve_style(c_sheet, c_node, &c_style);
+                              ui_css_resolve_style(c_sheet, c_node, &c_style);
 
-      if (c_style) {
-        ui_css_computed_style_destroy(c_style);
-      }
-      if (c_sheet) {
-        ui_css_stylesheet_destroy(c_sheet);
-      }
-      if (c_node) {
-        ui_dom_node_destroy(c_node);
-      }
-    }
-  }
+                              if (c_style) {
+                                ui_css_computed_style_destroy(c_style);
+                              }
+                              if (c_sheet) {
+                                ui_css_stylesheet_destroy(c_sheet);
+                              }
+                              if (c_node) {
+                                ui_dom_node_destroy(c_node);
+                              }
+                            }
+                          }
 
-  {
-    /* Specificity for attribute selector and nested pseudo-element in :is() */
-    struct ui_dom_node *sp_node = NULL;
-    struct ui_css_stylesheet *sp_sheet = NULL;
-    struct ui_css_rule *sp_rule = NULL;
-    struct ui_css_rule *sp_rule2 = NULL;
-    struct ui_css_selector *is_sel = NULL;
-    struct ui_css_selector *pe_sel = NULL;
-    struct ui_css_computed_style *sp_style = NULL;
+                          {
+                            /* Specificity for attribute selector and nested
+                             * pseudo-element in :is() */
+                            struct ui_dom_node *sp_node = NULL;
+                            struct ui_css_stylesheet *sp_sheet = NULL;
+                            struct ui_css_rule *sp_rule = NULL;
+                            struct ui_css_rule *sp_rule2 = NULL;
+                            struct ui_css_selector *is_sel = NULL;
+                            struct ui_css_selector *pe_sel = NULL;
+                            struct ui_css_computed_style *sp_style = NULL;
 
-    ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &sp_node);
-    ui_dom_node_set_tag_name(sp_node, "div");
-    ui_dom_node_set_attribute(sp_node, "data-test", "val");
+                            ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT,
+                                               &sp_node);
+                            ui_dom_node_set_tag_name(sp_node, "div");
+                            ui_dom_node_set_attribute(sp_node, "data-test",
+                                                      "val");
 
-    ui_css_stylesheet_create(&sp_sheet);
-    ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &sp_rule);
-    ui_css_rule_append_selector_attr(sp_rule, "data-test",
-                                     UI_CSS_ATTR_OP_EQUALS, "val");
-    ui_css_rule_append_declaration(sp_rule, "color", "red", 0);
-    ui_css_stylesheet_append_rule(sp_sheet, sp_rule);
+                            ui_css_stylesheet_create(&sp_sheet);
+                            ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE,
+                                               &sp_rule);
+                            ui_css_rule_append_selector_attr(
+                                sp_rule, "data-test", UI_CSS_ATTR_OP_EQUALS,
+                                "val");
+                            ui_css_rule_append_declaration(sp_rule, "color",
+                                                           "red", 0);
+                            ui_css_stylesheet_append_rule(sp_sheet, sp_rule);
 
-    /* Rule with :is(::before) */
-    ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &sp_rule2);
-    ui_css_rule_append_selector(sp_rule2, UI_CSS_SELECTOR_TYPE_PSEUDO_CLASS,
+                            /* Rule with :is(::before) */
+                            ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE,
+                                               &sp_rule2);
+                            ui_css_rule_append_selector(
+                                sp_rule2, UI_CSS_SELECTOR_TYPE_PSEUDO_CLASS,
                                 "is");
-    is_sel = sp_rule2->selectors;
-    pe_sel =
-        create_mock_selector(UI_CSS_SELECTOR_TYPE_PSEUDO_ELEMENT, "before");
-    is_sel->nested_selector = pe_sel;
-    ui_css_rule_append_declaration(sp_rule2, "color", "purple", 0);
-    ui_css_stylesheet_append_rule(sp_sheet, sp_rule2);
+                            is_sel = sp_rule2->selectors;
+                            pe_sel = create_mock_selector(
+                                UI_CSS_SELECTOR_TYPE_PSEUDO_ELEMENT, "before");
+                            is_sel->nested_selector = pe_sel;
+                            ui_css_rule_append_declaration(sp_rule2, "color",
+                                                           "purple", 0);
+                            ui_css_stylesheet_append_rule(sp_sheet, sp_rule2);
 
-    ui_css_resolve_style(sp_sheet, sp_node, &sp_style);
+                            ui_css_resolve_style(sp_sheet, sp_node, &sp_style);
 
-    if (sp_style) {
-      ui_css_computed_style_destroy(sp_style);
-    }
-    if (sp_sheet) {
-      ui_css_stylesheet_destroy(sp_sheet);
-    }
-    if (sp_node) {
-      ui_dom_node_destroy(sp_node);
+                            if (sp_style) {
+                              ui_css_computed_style_destroy(sp_style);
+                            }
+                            if (sp_sheet) {
+                              ui_css_stylesheet_destroy(sp_sheet);
+                            }
+                            if (sp_node) {
+                              ui_dom_node_destroy(sp_node);
+                            }
+                          }
+
+                          return 0;
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
-
-  return 0;
 }

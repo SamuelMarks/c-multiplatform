@@ -164,37 +164,41 @@ mock_date_range_picker_base_clear(struct ui_date_range_picker_base *p) {
 
 #endif
 
+/** @brief md3_date_picker structure. */
 struct md3_date_picker {
-  struct ui_component *component;
-  struct ui_datepicker_base *base;
-  struct ui_input_base *input;
-  struct ui_popover_base *popover;
-  struct ui_calendar_base *calendar;
-  struct ui_control_value_accessor cva;
-  struct ui_control_value_accessor calendar_cva;
+  struct ui_component *component;                /**< component field. */
+  struct ui_datepicker_base *base;               /**< base field. */
+  struct ui_input_base *input;                   /**< input field. */
+  struct ui_popover_base *popover;               /**< popover field. */
+  struct ui_calendar_base *calendar;             /**< calendar field. */
+  struct ui_control_value_accessor cva;          /**< cva field. */
+  struct ui_control_value_accessor calendar_cva; /**< calendar_cva field. */
 };
 
+/** @brief md3_date_range_picker structure. */
 struct md3_date_range_picker {
-  struct ui_component *component;
-  struct ui_date_range_picker_base *base;
-  struct ui_control_value_accessor cva;
-  struct ui_date_range range;
-  struct ui_date hover_date;
-  int is_dual_month;
+  struct ui_component *component;         /**< component field. */
+  struct ui_date_range_picker_base *base; /**< base field. */
+  struct ui_control_value_accessor cva;   /**< cva field. */
+  struct ui_date_range range;             /**< range field. */
+  struct ui_date hover_date;              /**< hover_date field. */
+  int is_dual_month;                      /**< is_dual_month field. */
 };
 
+/** @brief md3_time_picker structure. */
 struct md3_time_picker {
-  struct ui_component *component;
-  struct ui_timepicker_base *base;
-  enum md3_time_picker_mode mode;
-  enum ui_timepicker_format format;
-  struct ui_control_value_accessor cva;
+  struct ui_component *component;       /**< component field. */
+  struct ui_timepicker_base *base;      /**< base field. */
+  enum md3_time_picker_mode mode;       /**< mode field. */
+  enum ui_timepicker_format format;     /**< format field. */
+  struct ui_control_value_accessor cva; /**< cva field. */
 };
 
 /* -------------------------------------------------------------------------
  * MD3 Date Picker
  * ------------------------------------------------------------------------- */
 
+/** @brief md3_date_picker_create function. */
 ui_error_t md3_date_picker_create(struct ui_engine *engine,
                                   struct md3_date_picker **out_picker) {
   struct md3_date_picker *picker;
@@ -247,6 +251,7 @@ ui_error_t md3_date_picker_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_date_picker_destroy function. */
 ui_error_t md3_date_picker_destroy(struct md3_date_picker *picker) {
   ui_error_t rc = UI_ERROR_NONE;
   ui_error_t temp_rc;
@@ -289,6 +294,7 @@ ui_error_t md3_date_picker_destroy(struct md3_date_picker *picker) {
  * MD3 Date Range Picker
  * ------------------------------------------------------------------------- */
 
+/** @brief md3_date_range_picker_create function. */
 ui_error_t
 md3_date_range_picker_create(struct ui_engine *engine,
                              struct md3_date_range_picker **out_picker) {
@@ -320,6 +326,7 @@ md3_date_range_picker_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_date_range_picker_destroy function. */
 ui_error_t md3_date_range_picker_destroy(struct md3_date_range_picker *picker) {
   ui_error_t rc = UI_ERROR_NONE;
   ui_error_t temp_rc;
@@ -348,6 +355,7 @@ ui_error_t md3_date_range_picker_destroy(struct md3_date_range_picker *picker) {
  * MD3 Time Picker
  * ------------------------------------------------------------------------- */
 
+/** @brief md3_time_picker_create function. */
 ui_error_t md3_time_picker_create(struct ui_engine *engine,
                                   enum md3_time_picker_mode mode,
                                   enum ui_timepicker_format format,
@@ -386,6 +394,7 @@ ui_error_t md3_time_picker_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_time_picker_destroy function. */
 ui_error_t md3_time_picker_destroy(struct md3_time_picker *picker) {
   ui_error_t rc = UI_ERROR_NONE;
   ui_error_t temp_rc;
@@ -410,6 +419,7 @@ ui_error_t md3_time_picker_destroy(struct md3_time_picker *picker) {
   return rc;
 }
 
+/** @brief md3_date_range_picker_select_date function. */
 ui_error_t
 md3_date_range_picker_select_date(struct md3_date_range_picker *picker,
                                   const struct ui_date *date) {
@@ -432,6 +442,7 @@ md3_date_range_picker_select_date(struct md3_date_range_picker *picker,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_date_range_picker_set_hover_date function. */
 ui_error_t
 md3_date_range_picker_set_hover_date(struct md3_date_range_picker *picker,
                                      const struct ui_date *date) {
@@ -450,6 +461,7 @@ md3_date_range_picker_set_hover_date(struct md3_date_range_picker *picker,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_date_range_picker_get_range function. */
 ui_error_t
 md3_date_range_picker_get_range(const struct md3_date_range_picker *picker,
                                 struct ui_date_range *out_range) {
@@ -461,6 +473,7 @@ md3_date_range_picker_get_range(const struct md3_date_range_picker *picker,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_date_range_picker_clear function. */
 ui_error_t md3_date_range_picker_clear(struct md3_date_range_picker *picker) {
   ui_error_t rc;
 

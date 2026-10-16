@@ -5,6 +5,8 @@
 #include <stdio.h>
 /* clang-format on */
 
+extern int g_split_pane_mock_fail;
+
 extern int g_malloc_fail_countdown;
 
 #define ASSERT_SUCCESS(expr)                                                   \
@@ -29,7 +31,7 @@ static int run_normal_tests(void) {
   struct ui_split_pane_base *pane = NULL;
   int pos;
   enum ui_split_pane_orientation ori;
-  struct ui_event ev;
+  struct ui_event ev = {0};
 
   /* Null checks */
   ASSERT_EQ(ui_split_pane_base_create(NULL), UI_ERROR_INVALID_ARGUMENT);
@@ -130,7 +132,6 @@ static int run_normal_tests(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_split_pane_mock_fail;
     ui_error_t rc;
     ev.type = UI_EVENT_MOUSE_DOWN;
     ev.event_data.mouse.x = 100;

@@ -230,7 +230,6 @@ int test_css_values_scalar_calc(void) {
   /* Color Tests */
   {
     struct ui_css_color color;
-    struct ui_css_paint paint;
     rc = ui_css_parse_color("#123456", &color);
     if (rc != UI_ERROR_NONE || color.space != UI_CSS_COLOR_SPACE_SRGB) {
       printf("Failed to parse color hex\n");

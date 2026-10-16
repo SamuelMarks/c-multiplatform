@@ -10,8 +10,10 @@
 #include <string.h>
 /* clang-format on */
 
+/** @brief CUPERTINO_HALF_PI macro definition. */
 #define CUPERTINO_HALF_PI 1.57079632679489661923f
 
+/** @brief cupertino_wheel_create function. */
 ui_error_t cupertino_wheel_create(struct ui_engine *engine,
                                   const struct cupertino_wheel_descriptor *desc,
                                   struct cupertino_wheel **out_wheel) {
@@ -52,6 +54,7 @@ ui_error_t cupertino_wheel_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_wheel_destroy function. */
 ui_error_t cupertino_wheel_destroy(struct cupertino_wheel *wheel) {
   if (!wheel) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -61,6 +64,7 @@ ui_error_t cupertino_wheel_destroy(struct cupertino_wheel *wheel) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_wheel_set_item_count function. */
 ui_error_t cupertino_wheel_set_item_count(struct cupertino_wheel *wheel,
                                           int count) {
   if (!wheel || count < 0) {
@@ -81,6 +85,7 @@ ui_error_t cupertino_wheel_set_item_count(struct cupertino_wheel *wheel,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_wheel_get_item_count function. */
 ui_error_t cupertino_wheel_get_item_count(const struct cupertino_wheel *wheel,
                                           int *out_count) {
   if (!wheel || !out_count) {
@@ -91,6 +96,7 @@ ui_error_t cupertino_wheel_get_item_count(const struct cupertino_wheel *wheel,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_wheel_set_selected_index function. */
 ui_error_t cupertino_wheel_set_selected_index(struct cupertino_wheel *wheel,
                                               int index, int animated) {
   if (!wheel || index < 0) {
@@ -114,6 +120,7 @@ ui_error_t cupertino_wheel_set_selected_index(struct cupertino_wheel *wheel,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_wheel_get_selected_index function. */
 ui_error_t
 cupertino_wheel_get_selected_index(const struct cupertino_wheel *wheel,
                                    int *out_index) {
@@ -125,6 +132,7 @@ cupertino_wheel_get_selected_index(const struct cupertino_wheel *wheel,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_wheel_drag_start function. */
 ui_error_t cupertino_wheel_drag_start(struct cupertino_wheel *wheel) {
   if (!wheel) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -136,6 +144,7 @@ ui_error_t cupertino_wheel_drag_start(struct cupertino_wheel *wheel) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_wheel_drag_update function. */
 ui_error_t cupertino_wheel_drag_update(struct cupertino_wheel *wheel,
                                        float delta_y) {
   float max_offset;
@@ -160,6 +169,7 @@ ui_error_t cupertino_wheel_drag_update(struct cupertino_wheel *wheel,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_wheel_drag_end function. */
 ui_error_t cupertino_wheel_drag_end(struct cupertino_wheel *wheel,
                                     float release_velocity_y) {
   float projected_y;
@@ -174,7 +184,7 @@ ui_error_t cupertino_wheel_drag_end(struct cupertino_wheel *wheel,
   wheel->is_settling = 1;
 
   projected_y = wheel->scroll_offset_y - (release_velocity_y * 0.20f);
-  target_idx = (int)floorf((projected_y / wheel->item_height) + 0.5f);
+  target_idx = (int)floor((double)(projected_y / wheel->item_height) + 0.5);
 
   max_idx = (wheel->item_count > 0) ? wheel->item_count - 1 : 0;
   if (target_idx < 0) {
@@ -187,6 +197,7 @@ ui_error_t cupertino_wheel_drag_end(struct cupertino_wheel *wheel,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_wheel_tick function. */
 ui_error_t cupertino_wheel_tick(struct cupertino_wheel *wheel, float delta_ms,
                                 int *out_haptic_tick) {
   float diff;
@@ -210,7 +221,7 @@ ui_error_t cupertino_wheel_tick(struct cupertino_wheel *wheel, float delta_ms,
   }
 
   current_idx =
-      (int)floorf((wheel->scroll_offset_y / wheel->item_height) + 0.5f);
+      (int)floor((double)(wheel->scroll_offset_y / wheel->item_height) + 0.5);
   max_idx = (wheel->item_count > 0) ? wheel->item_count - 1 : 0;
   if (current_idx < 0) {
     current_idx = 0;
@@ -227,6 +238,7 @@ ui_error_t cupertino_wheel_tick(struct cupertino_wheel *wheel, float delta_ms,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_wheel_calculate_item_transform function. */
 ui_error_t cupertino_wheel_calculate_item_transform(
     const struct cupertino_wheel *wheel, int item_index, float *out_y,
     float *out_scale, float *out_opacity, float *out_angle_rad) {
@@ -266,6 +278,7 @@ ui_error_t cupertino_wheel_calculate_item_transform(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_wheel_get_dimensions function. */
 ui_error_t cupertino_wheel_get_dimensions(const struct cupertino_wheel *wheel,
                                           float *out_width, float *out_height) {
   if (!wheel || !out_width || !out_height) {

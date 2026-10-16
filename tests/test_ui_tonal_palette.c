@@ -4,6 +4,8 @@
 #include <stdlib.h>
 /* clang-format on */
 
+extern int g_tonal_palette_mock_fail;
+
 static int test_tonal_palette(void) {
   ui_color_t key_color = UI_COLOR_ARGB(255, 0, 0, 255); /* Blue */
   struct ui_tonal_palette palette;
@@ -42,7 +44,6 @@ static int test_tonal_palette(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_tonal_palette_mock_fail;
     g_tonal_palette_mock_fail = 1;
     err = ui_tonal_palette_from_color(key_color, &palette);
     failed |= (err != UI_ERROR_UNKNOWN);

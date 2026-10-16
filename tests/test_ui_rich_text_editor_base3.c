@@ -1,6 +1,6 @@
+extern int g_malloc_fail_countdown;
 
 void test_ui_rte_coverage_errs15(void) {
-  extern int g_malloc_fail_countdown;
   struct ui_control_value_accessor cva;
   struct ui_rich_text_editor_base *rte = NULL;
   ui_rich_text_editor_base_create(&rte, &cva);

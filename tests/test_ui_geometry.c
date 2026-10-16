@@ -6,9 +6,7 @@
 
 static int test_invalid_args(void) {
   struct ui_dom_point p;
-  struct ui_dom_rect r;
   struct ui_dom_quad q;
-  struct ui_dom_matrix m;
 
   /* These should just return early, no crash */
   ui_dom_point_init(NULL, 1.0, 2.0, 3.0, 4.0);

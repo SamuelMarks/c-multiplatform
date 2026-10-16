@@ -17,7 +17,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 /**
  * @brief Opaque handle representing the base scroll field component.
@@ -139,6 +139,6 @@ extern C_MULTIPLATFORM_EXPORT ui_error_t ui_scroll_field_base_is_looping(
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* UI_SCROLL_FIELD_BASE_H */

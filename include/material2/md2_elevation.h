@@ -14,7 +14,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 /**
  * @enum md2_elevation_level
@@ -46,6 +46,6 @@ md2_elevation_get_dp(enum md2_elevation_level level, float *out_dp);
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* MATERIAL2_MD2_ELEVATION_H */

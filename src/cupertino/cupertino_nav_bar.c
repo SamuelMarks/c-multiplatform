@@ -67,10 +67,14 @@ static ui_error_t mock_ui_arena_destroy(struct ui_arena *arena) {
 
 #endif /* UI_TEST_MOCK_ALLOC */
 
+/** @brief CUPERTINO_NAV_BAR_COLLAPSED_HEIGHT macro definition. */
 #define CUPERTINO_NAV_BAR_COLLAPSED_HEIGHT 44.0f
+/** @brief CUPERTINO_NAV_BAR_LARGE_TITLE_EXTRA macro definition. */
 #define CUPERTINO_NAV_BAR_LARGE_TITLE_EXTRA 52.0f
+/** @brief CUPERTINO_NAV_BAR_PROMPT_HEIGHT macro definition. */
 #define CUPERTINO_NAV_BAR_PROMPT_HEIGHT 24.0f
 
+/** @brief cupertino_nav_bar_compute_base_collapsed function. */
 static float
 cupertino_nav_bar_compute_base_collapsed(const struct cupertino_nav_bar *bar) {
   float h;
@@ -84,6 +88,7 @@ cupertino_nav_bar_compute_base_collapsed(const struct cupertino_nav_bar *bar) {
   return h;
 }
 
+/** @brief cupertino_nav_bar_compute_base_expanded function. */
 static float
 cupertino_nav_bar_compute_base_expanded(const struct cupertino_nav_bar *bar) {
   float h;
@@ -97,6 +102,7 @@ cupertino_nav_bar_compute_base_expanded(const struct cupertino_nav_bar *bar) {
   return h;
 }
 
+/** @brief cupertino_nav_bar_update_metrics function. */
 static void cupertino_nav_bar_update_metrics(struct cupertino_nav_bar *bar) {
   float collapsed;
   float expanded;
@@ -158,6 +164,7 @@ static void cupertino_nav_bar_update_metrics(struct cupertino_nav_bar *bar) {
   }
 }
 
+/** @brief cupertino_nav_bar_create function. */
 ui_error_t
 cupertino_nav_bar_create(struct ui_engine *engine,
                          const struct cupertino_nav_bar_descriptor *desc,
@@ -241,6 +248,7 @@ cupertino_nav_bar_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_nav_bar_destroy function. */
 ui_error_t cupertino_nav_bar_destroy(struct cupertino_nav_bar *bar) {
   ui_error_t rc;
 
@@ -268,6 +276,7 @@ ui_error_t cupertino_nav_bar_destroy(struct cupertino_nav_bar *bar) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_nav_bar_set_title function. */
 ui_error_t cupertino_nav_bar_set_title(struct cupertino_nav_bar *bar,
                                        const char *title) {
   if (!bar || !title) {
@@ -284,6 +293,7 @@ ui_error_t cupertino_nav_bar_set_title(struct cupertino_nav_bar *bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_nav_bar_get_title function. */
 ui_error_t cupertino_nav_bar_get_title(const struct cupertino_nav_bar *bar,
                                        const char **out_title) {
   if (!bar || !out_title) {
@@ -294,6 +304,7 @@ ui_error_t cupertino_nav_bar_get_title(const struct cupertino_nav_bar *bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_nav_bar_set_prompt function. */
 ui_error_t cupertino_nav_bar_set_prompt(struct cupertino_nav_bar *bar,
                                         const char *prompt) {
   if (!bar) {
@@ -316,6 +327,7 @@ ui_error_t cupertino_nav_bar_set_prompt(struct cupertino_nav_bar *bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_nav_bar_get_prompt function. */
 ui_error_t cupertino_nav_bar_get_prompt(const struct cupertino_nav_bar *bar,
                                         const char **out_prompt) {
   if (!bar || !out_prompt) {
@@ -326,6 +338,7 @@ ui_error_t cupertino_nav_bar_get_prompt(const struct cupertino_nav_bar *bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_nav_bar_set_previous_title function. */
 ui_error_t cupertino_nav_bar_set_previous_title(struct cupertino_nav_bar *bar,
                                                 const char *prev_title) {
   if (!bar) {
@@ -347,6 +360,7 @@ ui_error_t cupertino_nav_bar_set_previous_title(struct cupertino_nav_bar *bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_nav_bar_get_previous_title function. */
 ui_error_t
 cupertino_nav_bar_get_previous_title(const struct cupertino_nav_bar *bar,
                                      const char **out_prev_title) {
@@ -359,6 +373,7 @@ cupertino_nav_bar_get_previous_title(const struct cupertino_nav_bar *bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_nav_bar_set_large_title_enabled function. */
 ui_error_t
 cupertino_nav_bar_set_large_title_enabled(struct cupertino_nav_bar *bar,
                                           int enabled) {
@@ -371,6 +386,7 @@ cupertino_nav_bar_set_large_title_enabled(struct cupertino_nav_bar *bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_nav_bar_is_large_title_enabled function. */
 ui_error_t
 cupertino_nav_bar_is_large_title_enabled(const struct cupertino_nav_bar *bar,
                                          int *out_enabled) {
@@ -382,6 +398,7 @@ cupertino_nav_bar_is_large_title_enabled(const struct cupertino_nav_bar *bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_nav_bar_handle_scroll function. */
 ui_error_t cupertino_nav_bar_handle_scroll(struct cupertino_nav_bar *bar,
                                            float scroll_y, float delta_y) {
   ui_error_t rc;
@@ -403,6 +420,7 @@ ui_error_t cupertino_nav_bar_handle_scroll(struct cupertino_nav_bar *bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_nav_bar_get_height function. */
 ui_error_t cupertino_nav_bar_get_height(const struct cupertino_nav_bar *bar,
                                         float *out_height) {
   if (!bar || !out_height) {
@@ -413,6 +431,7 @@ ui_error_t cupertino_nav_bar_get_height(const struct cupertino_nav_bar *bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_nav_bar_get_collapse_progress function. */
 ui_error_t
 cupertino_nav_bar_get_collapse_progress(const struct cupertino_nav_bar *bar,
                                         float *out_progress) {
@@ -424,6 +443,7 @@ cupertino_nav_bar_get_collapse_progress(const struct cupertino_nav_bar *bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_nav_bar_get_effective_back_title function. */
 ui_error_t
 cupertino_nav_bar_get_effective_back_title(const struct cupertino_nav_bar *bar,
                                            float available_width, char *out_buf,
@@ -471,6 +491,7 @@ cupertino_nav_bar_get_effective_back_title(const struct cupertino_nav_bar *bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_nav_bar_get_base function. */
 ui_error_t cupertino_nav_bar_get_base(struct cupertino_nav_bar *bar,
                                       struct ui_top_app_bar_base **out_base) {
   if (!bar || !out_base) {
@@ -481,6 +502,7 @@ ui_error_t cupertino_nav_bar_get_base(struct cupertino_nav_bar *bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_nav_bar_set_search_controller function. */
 ui_error_t
 cupertino_nav_bar_set_search_controller(struct cupertino_nav_bar *bar,
                                         struct cupertino_search_bar *search_bar,
@@ -497,6 +519,7 @@ cupertino_nav_bar_set_search_controller(struct cupertino_nav_bar *bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_nav_bar_get_search_controller function. */
 ui_error_t cupertino_nav_bar_get_search_controller(
     const struct cupertino_nav_bar *bar,
     struct cupertino_search_bar **out_search_bar,
@@ -510,6 +533,7 @@ ui_error_t cupertino_nav_bar_get_search_controller(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_nav_bar_get_search_collapse_progress function. */
 ui_error_t cupertino_nav_bar_get_search_collapse_progress(
     const struct cupertino_nav_bar *bar, float *out_progress,
     float *out_opacity) {
@@ -522,6 +546,7 @@ ui_error_t cupertino_nav_bar_get_search_collapse_progress(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_nav_bar_compute_title_scale function. */
 ui_error_t
 cupertino_nav_bar_compute_title_scale(const struct cupertino_nav_bar *bar,
                                       float available_width,

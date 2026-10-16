@@ -39,6 +39,7 @@ mock_ui_segmented_button_base_destroy(struct ui_segmented_button_base *btn) {
 /** @endcond */
 #endif
 
+/** @brief cupertino_segmented_control_cva_write_value function. */
 static ui_error_t
 cupertino_segmented_control_cva_write_value(void *component,
                                             union ui_signal_payload value) {
@@ -52,6 +53,7 @@ cupertino_segmented_control_cva_write_value(void *component,
   return cupertino_segmented_control_select_index(control, (int)value.int_val);
 }
 
+/** @brief cupertino_segmented_control_cva_set_disabled_state function. */
 static ui_error_t
 cupertino_segmented_control_cva_set_disabled_state(void *component,
                                                    ui_bool_t is_disabled) {

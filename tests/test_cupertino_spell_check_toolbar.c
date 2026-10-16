@@ -10,6 +10,8 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_cupertino_spell_check_mock_recompute_fail;
+
 extern int g_malloc_fail_countdown;
 
 TEST test_spell_check_toolbar_lifecycle_and_show(void) {
@@ -274,7 +276,6 @@ TEST test_spell_check_toolbar_edge_cases(void) {
   ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
 
 #ifdef UI_TEST_MOCK_ALLOC
-  extern int g_cupertino_spell_check_mock_recompute_fail;
   g_cupertino_spell_check_mock_recompute_fail = 1;
   rc = cupertino_spell_check_toolbar_show(tb, 0.0f, 0.0f, 10.0f, 10.0f, "word",
                                           suggestions, 2);

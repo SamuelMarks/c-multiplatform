@@ -273,8 +273,6 @@ void test_cssom_oom(void) {
     }
 
     {
-      struct ui_css_variable_store *store = NULL;
-      char *resolved = NULL;
       if (ui_css_variable_store_create(&store) == UI_ERROR_NONE) {
         if (ui_css_variable_store_set(store, "--my-var", "red") ==
             UI_ERROR_NONE) {
@@ -288,11 +286,13 @@ void test_cssom_oom(void) {
         if (ui_css_resolve_variables(store, "var(--my-var, blue)", &resolved) ==
             UI_ERROR_NONE) {
           C_MULTIPLATFORM_FREE(resolved);
+          resolved = NULL;
         }
         {
           ui_error_t rc_cleanup = ui_css_variable_store_destroy(store);
           TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
         }
+        store = NULL;
       }
     }
     if (g_malloc_fail_countdown > 0) {

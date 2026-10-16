@@ -7,7 +7,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 /* clang-format off */
 #include "ui_error.h"
@@ -42,10 +42,11 @@ enum md3_top_app_bar_scroll_behavior {
  * @brief Configuration for creating a Material 3 Top App Bar.
  */
 struct md3_top_app_bar_config {
-  enum md3_top_app_bar_variant variant;
-  enum md3_top_app_bar_scroll_behavior scroll_behavior;
-  const char *title;
-  const char *subtitle;
+  enum md3_top_app_bar_variant variant; /**< variant field. */
+  enum md3_top_app_bar_scroll_behavior
+      scroll_behavior;  /**< scroll_behavior field. */
+  const char *title;    /**< title field. */
+  const char *subtitle; /**< subtitle field. */
 };
 
 /**

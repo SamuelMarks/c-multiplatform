@@ -9,10 +9,12 @@
 #include "ui_internal_mem.h"
 /* clang-format on */
 
+/** @brief md2_dialog structure. */
 struct md2_dialog {
-  struct ui_dialog_base *base;
+  struct ui_dialog_base *base; /**< base field. */
 };
 
+/** @brief md2_dialog_create function. */
 ui_error_t md2_dialog_create(struct md2_dialog **out_dialog) {
   struct md2_dialog *dialog;
   ui_error_t rc;
@@ -37,6 +39,7 @@ ui_error_t md2_dialog_create(struct md2_dialog **out_dialog) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md2_dialog_destroy function. */
 ui_error_t md2_dialog_destroy(struct md2_dialog *dialog) {
   if (dialog == NULL) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -47,6 +50,7 @@ ui_error_t md2_dialog_destroy(struct md2_dialog *dialog) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md2_dialog_get_base function. */
 ui_error_t md2_dialog_get_base(struct md2_dialog *dialog,
                                struct ui_dialog_base **out_base) {
   if (dialog == NULL || out_base == NULL) {
@@ -57,10 +61,12 @@ ui_error_t md2_dialog_get_base(struct md2_dialog *dialog,
   return UI_ERROR_NONE;
 }
 
+/** @brief md2_bottom_sheet structure. */
 struct md2_bottom_sheet {
-  struct ui_bottom_sheet_base *base;
+  struct ui_bottom_sheet_base *base; /**< base field. */
 };
 
+/** @brief md2_bottom_sheet_create function. */
 ui_error_t md2_bottom_sheet_create(struct md2_bottom_sheet **out_sheet) {
   struct md2_bottom_sheet *sheet;
   ui_error_t rc;
@@ -85,6 +91,7 @@ ui_error_t md2_bottom_sheet_create(struct md2_bottom_sheet **out_sheet) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md2_bottom_sheet_destroy function. */
 ui_error_t md2_bottom_sheet_destroy(struct md2_bottom_sheet *sheet) {
   if (sheet == NULL) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -95,6 +102,7 @@ ui_error_t md2_bottom_sheet_destroy(struct md2_bottom_sheet *sheet) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md2_bottom_sheet_get_base function. */
 ui_error_t md2_bottom_sheet_get_base(struct md2_bottom_sheet *sheet,
                                      struct ui_bottom_sheet_base **out_base) {
   if (sheet == NULL || out_base == NULL) {
@@ -105,10 +113,12 @@ ui_error_t md2_bottom_sheet_get_base(struct md2_bottom_sheet *sheet,
   return UI_ERROR_NONE;
 }
 
+/** @brief md2_snackbar structure. */
 struct md2_snackbar {
-  struct ui_snackbar_base *base;
+  struct ui_snackbar_base *base; /**< base field. */
 };
 
+/** @brief md2_snackbar_create function. */
 ui_error_t md2_snackbar_create(struct ui_timer *timer,
                                struct ui_overlay_director *director,
                                struct md2_snackbar **out_snackbar) {
@@ -135,6 +145,7 @@ ui_error_t md2_snackbar_create(struct ui_timer *timer,
   return UI_ERROR_NONE;
 }
 
+/** @brief md2_snackbar_destroy function. */
 ui_error_t md2_snackbar_destroy(struct md2_snackbar *snackbar) {
   if (snackbar == NULL) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -145,6 +156,7 @@ ui_error_t md2_snackbar_destroy(struct md2_snackbar *snackbar) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md2_snackbar_get_base function. */
 ui_error_t md2_snackbar_get_base(struct md2_snackbar *snackbar,
                                  struct ui_snackbar_base **out_base) {
   if (snackbar == NULL || out_base == NULL) {
@@ -155,10 +167,12 @@ ui_error_t md2_snackbar_get_base(struct md2_snackbar *snackbar,
   return UI_ERROR_NONE;
 }
 
+/** @brief md2_tabs structure. */
 struct md2_tabs {
-  struct ui_tabs_base *base;
+  struct ui_tabs_base *base; /**< base field. */
 };
 
+/** @brief md2_tabs_create function. */
 ui_error_t md2_tabs_create(struct md2_tabs **out_tabs) {
   struct md2_tabs *tabs;
   ui_error_t rc;
@@ -182,6 +196,7 @@ ui_error_t md2_tabs_create(struct md2_tabs **out_tabs) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md2_tabs_destroy function. */
 ui_error_t md2_tabs_destroy(struct md2_tabs *tabs) {
   if (tabs == NULL) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -192,6 +207,7 @@ ui_error_t md2_tabs_destroy(struct md2_tabs *tabs) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md2_tabs_get_base function. */
 ui_error_t md2_tabs_get_base(struct md2_tabs *tabs,
                              struct ui_tabs_base **out_base) {
   if (tabs == NULL || out_base == NULL) {

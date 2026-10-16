@@ -6,6 +6,8 @@
 #include <stdio.h>
 /* clang-format on */
 
+extern int g_datagrid_mock_fail;
+
 extern int g_malloc_fail_countdown;
 
 static int test_datagrid_base_lifecycle(void) {
@@ -124,18 +126,20 @@ static int test_datagrid_base_errors(void) {
   if (ui_datagrid_base_bind_data(NULL, signal) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
 
-  int i;
-  for (i = 1; i < 100; ++i) {
-    ui_error_t create_rc;
-    g_malloc_fail_countdown = i;
-    create_rc = ui_datagrid_base_create(&datagrid);
-    g_malloc_fail_countdown = -1;
-    if (create_rc == UI_ERROR_NONE) {
-      if (ui_datagrid_base_destroy(datagrid) != UI_ERROR_NONE)
-        return 1;
+  {
+    int i;
+    for (i = 1; i < 100; ++i) {
+      ui_error_t create_rc;
+      g_malloc_fail_countdown = i;
+      create_rc = ui_datagrid_base_create(&datagrid);
+      g_malloc_fail_countdown = -1;
+      if (create_rc == UI_ERROR_NONE) {
+        if (ui_datagrid_base_destroy(datagrid) != UI_ERROR_NONE)
+          return 1;
+      }
     }
+    return 0;
   }
-  return 0;
 }
 
 #ifdef UI_TEST_MOCK_ALLOC
@@ -147,7 +151,6 @@ struct ui_datagrid_base_internal {
 static ui_error_t run_datagrid_coverage(void) {
   struct ui_datagrid_base *datagrid = NULL;
   ui_error_t rc;
-  extern int g_datagrid_mock_fail;
 
   g_datagrid_mock_fail = 1;
   rc = ui_datagrid_base_create(&datagrid);

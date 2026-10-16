@@ -51,6 +51,7 @@ static ui_error_t mock_ui_component_destroy(struct ui_component *comp) {
 /** @endcond */
 #endif
 
+/** @brief cupertino_popup_surface_compute_params function. */
 static void cupertino_popup_surface_compute_params(
     struct cupertino_popup_surface *surface) {
   if (surface->reduce_transparency) {
@@ -96,6 +97,7 @@ static void cupertino_popup_surface_compute_params(
   }
 }
 
+/** @brief cupertino_popup_surface_create function. */
 ui_error_t cupertino_popup_surface_create(
     struct ui_engine *engine,
     const struct cupertino_popup_surface_descriptor *desc,
@@ -160,6 +162,7 @@ ui_error_t cupertino_popup_surface_create(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_popup_surface_destroy function. */
 ui_error_t
 cupertino_popup_surface_destroy(struct cupertino_popup_surface *surface) {
   ui_error_t rc;
@@ -180,6 +183,7 @@ cupertino_popup_surface_destroy(struct cupertino_popup_surface *surface) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_popup_surface_set_corner_radius function. */
 ui_error_t cupertino_popup_surface_set_corner_radius(
     struct cupertino_popup_surface *surface, float radius) {
   if (!surface || radius < 0.0f) {
@@ -189,6 +193,7 @@ ui_error_t cupertino_popup_surface_set_corner_radius(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_popup_surface_get_corner_radius function. */
 ui_error_t cupertino_popup_surface_get_corner_radius(
     const struct cupertino_popup_surface *surface, float *out_radius) {
   if (!surface || !out_radius) {
@@ -198,6 +203,7 @@ ui_error_t cupertino_popup_surface_get_corner_radius(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_popup_surface_set_dark_mode function. */
 ui_error_t
 cupertino_popup_surface_set_dark_mode(struct cupertino_popup_surface *surface,
                                       int is_dark) {
@@ -209,6 +215,7 @@ cupertino_popup_surface_set_dark_mode(struct cupertino_popup_surface *surface,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_popup_surface_get_dark_mode function. */
 ui_error_t cupertino_popup_surface_get_dark_mode(
     const struct cupertino_popup_surface *surface, int *out_is_dark) {
   if (!surface || !out_is_dark) {
@@ -218,6 +225,7 @@ ui_error_t cupertino_popup_surface_get_dark_mode(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_popup_surface_set_reduce_transparency function. */
 ui_error_t cupertino_popup_surface_set_reduce_transparency(
     struct cupertino_popup_surface *surface, int reduce) {
   if (!surface) {
@@ -228,6 +236,7 @@ ui_error_t cupertino_popup_surface_set_reduce_transparency(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_popup_surface_get_reduce_transparency function. */
 ui_error_t cupertino_popup_surface_get_reduce_transparency(
     const struct cupertino_popup_surface *surface, int *out_reduce) {
   if (!surface || !out_reduce) {
@@ -237,6 +246,7 @@ ui_error_t cupertino_popup_surface_get_reduce_transparency(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_popup_surface_get_vibrancy_material function. */
 ui_error_t cupertino_popup_surface_get_vibrancy_material(
     const struct cupertino_popup_surface *surface,
     enum ui_vibrancy_material *out_material) {
@@ -247,6 +257,7 @@ ui_error_t cupertino_popup_surface_get_vibrancy_material(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_popup_surface_get_elevation function. */
 ui_error_t cupertino_popup_surface_get_elevation(
     const struct cupertino_popup_surface *surface,
     enum ui_elevation_level *out_elevation) {
@@ -257,6 +268,7 @@ ui_error_t cupertino_popup_surface_get_elevation(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_popup_surface_set_elevation function. */
 ui_error_t
 cupertino_popup_surface_set_elevation(struct cupertino_popup_surface *surface,
                                       enum ui_elevation_level elevation) {
@@ -279,6 +291,7 @@ cupertino_popup_surface_set_elevation(struct cupertino_popup_surface *surface,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_popup_surface_get_shadow_params function. */
 ui_error_t cupertino_popup_surface_get_shadow_params(
     const struct cupertino_popup_surface *surface, float *out_blur,
     float *out_spread, float *out_opacity, float *out_offset_y) {
@@ -292,6 +305,7 @@ ui_error_t cupertino_popup_surface_get_shadow_params(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_popup_surface_set_dimensions function. */
 ui_error_t
 cupertino_popup_surface_set_dimensions(struct cupertino_popup_surface *surface,
                                        float width, float height) {
@@ -303,6 +317,7 @@ cupertino_popup_surface_set_dimensions(struct cupertino_popup_surface *surface,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_popup_surface_get_dimensions function. */
 ui_error_t cupertino_popup_surface_get_dimensions(
     const struct cupertino_popup_surface *surface, float *out_width,
     float *out_height) {
@@ -314,6 +329,7 @@ ui_error_t cupertino_popup_surface_get_dimensions(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_popup_surface_get_base function. */
 ui_error_t
 cupertino_popup_surface_get_base(struct cupertino_popup_surface *surface,
                                  struct ui_surface_base **out_base) {

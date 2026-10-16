@@ -18,14 +18,17 @@ static ui_error_t make_path(char *dest, size_t dest_sz, const char *dir,
   if (!dest || dest_sz == 0 || !dir || !filename) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
+  if (strlen(dir) + 1 + strlen(filename) >= dest_sz) {
+    return UI_ERROR_IO_FAILED;
+  }
 #if defined(_MSC_VER)
   written = sprintf_s(dest, dest_sz, "%s/%s", dir, filename);
   if (written < 0) {
     return UI_ERROR_IO_FAILED;
   }
 #else
-  written = snprintf(dest, dest_sz, "%s/%s", dir, filename);
-  if (written < 0 || (size_t)written >= dest_sz) {
+  written = sprintf(dest, "%s/%s", dir, filename);
+  if (written < 0) {
     return UI_ERROR_IO_FAILED;
   }
 #endif
@@ -809,8 +812,8 @@ static ui_error_t fluent2_render_all(const struct design_system_options *opts) {
   }
   for (i = 0; i < 16; ++i) {
     float a = -1.5707963f + (float)i * 0.28f;
-    float px = 70.0f + cosf(a) * 36.0f;
-    float py = 70.0f + sinf(a) * 36.0f;
+    float px = 70.0f + (float)cos((double)a) * 36.0f;
+    float py = 70.0f + (float)sin((double)a) * 36.0f;
     rc = draw_circle(c, px, py, 2.5f, p.brand);
     if (rc != UI_ERROR_NONE) {
       canvas_destroy(c);

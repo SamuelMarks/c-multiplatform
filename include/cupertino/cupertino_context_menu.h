@@ -15,13 +15,16 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 struct ui_overlay_director;
 
+/** @brief CUPERTINO_CONTEXT_MENU_MAX_ACTIONS constant. */
 #define CUPERTINO_CONTEXT_MENU_MAX_ACTIONS 16
+/** @brief CUPERTINO_CONTEXT_MENU_DEFAULT_WIDTH constant. */
 #define CUPERTINO_CONTEXT_MENU_DEFAULT_WIDTH 250.0f
+/** @brief CUPERTINO_CONTEXT_MENU_ITEM_HEIGHT constant. */
 #define CUPERTINO_CONTEXT_MENU_ITEM_HEIGHT 44.0f
 
 /**

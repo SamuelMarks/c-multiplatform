@@ -6,6 +6,9 @@
 #include <assert.h>
 /* clang-format on */
 
+extern int g_meter_mock_fail;
+extern int g_meter_attr_fail_idx;
+
 extern int g_malloc_fail_countdown;
 
 static ui_error_t test_meter_base(void) {
@@ -86,8 +89,6 @@ static ui_error_t test_edge_cases(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_meter_mock_fail;
-    extern int g_meter_attr_fail_idx;
     int k;
 
     /* set_tag_name fails */

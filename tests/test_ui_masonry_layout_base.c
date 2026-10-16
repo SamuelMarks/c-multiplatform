@@ -6,6 +6,8 @@
 #include <assert.h>
 /* clang-format on */
 
+extern int g_masonry_mock_fail;
+
 struct ui_masonry_layout_base {
   struct ui_component *component;
   struct ui_computed *data_signal;
@@ -95,7 +97,6 @@ static ui_error_t test_masonry_errors(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_masonry_mock_fail;
     g_masonry_mock_fail = 1;
     rc = ui_masonry_layout_base_create(&masonry);
     assert(rc == UI_ERROR_UNKNOWN);

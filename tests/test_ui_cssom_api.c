@@ -6,6 +6,8 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_mock_strcpy_fail;
+
 extern int g_malloc_fail_countdown;
 extern int g_malloc_called;
 
@@ -79,7 +81,6 @@ int main(void) {
   /* Set Property (Overwrite) */
 #if defined(UI_TEST_MOCK_ALLOC)
   {
-    extern int g_mock_strcpy_fail;
     g_mock_strcpy_fail = 1;
     rc = ui_cssom_set_property(rule, "color", "red", 1);
     TEST_ASSERT(rc == UI_ERROR_NONE);

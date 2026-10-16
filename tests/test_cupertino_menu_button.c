@@ -10,13 +10,25 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_cupertino_menu_button_mock_button_create_fail;
+extern int g_cupertino_menu_button_mock_button_destroy_fail;
+extern int g_cupertino_menu_button_mock_set_text_fail;
+extern int g_cupertino_menu_button_mock_get_base_fail;
+
 static int g_selected_call_count = 0;
-static void dummy_on_select(void *user_data) {
+static ui_error_t dummy_on_select(void *user_data) {
   int *p = (int *)user_data;
   if (p) {
     (*p)++;
   }
   g_selected_call_count++;
+  return UI_ERROR_NONE;
+}
+
+static ui_error_t failing_on_select(void *user_data) {
+  if (user_data) {
+  }
+  return UI_ERROR_UNKNOWN;
 }
 
 TEST test_cupertino_menu_button_lifecycle(void) {
@@ -30,7 +42,12 @@ TEST test_cupertino_menu_button_lifecycle(void) {
   memset(&desc, 0, sizeof(desc));
   desc.mode = CUPERTINO_MENU_BUTTON_POP_UP;
   desc.style = CUPERTINO_BUTTON_FILLED;
+#if defined(_MSC_VER)
+  strncpy_s(desc.initial_title, sizeof(desc.initial_title), "Options",
+            _TRUNCATE);
+#else
   strncpy(desc.initial_title, "Options", sizeof(desc.initial_title) - 1);
+#endif
 
   /* Null arg validations */
   rc = cupertino_menu_button_create(NULL, &desc, &menu);
@@ -83,18 +100,31 @@ TEST test_cupertino_menu_button_pop_up_mode(void) {
   memset(&desc, 0, sizeof(desc));
   desc.mode = CUPERTINO_MENU_BUTTON_POP_UP;
   desc.style = CUPERTINO_BUTTON_GRAY;
+#if defined(_MSC_VER)
+  strncpy_s(desc.initial_title, sizeof(desc.initial_title), "Sort By",
+            _TRUNCATE);
+#else
   strncpy(desc.initial_title, "Sort By", sizeof(desc.initial_title) - 1);
+#endif
 
   rc = cupertino_menu_button_create((struct ui_engine *)1, &desc, &menu);
   ASSERT_EQ(UI_ERROR_NONE, rc);
 
   memset(&item1, 0, sizeof(item1));
+#if defined(_MSC_VER)
+  strncpy_s(item1.title, sizeof(item1.title), "Date Added", _TRUNCATE);
+#else
   strncpy(item1.title, "Date Added", sizeof(item1.title) - 1);
+#endif
   item1.on_select = dummy_on_select;
   item1.user_data = &cb_counter;
 
   memset(&item2, 0, sizeof(item2));
+#if defined(_MSC_VER)
+  strncpy_s(item2.title, sizeof(item2.title), "Name A-Z", _TRUNCATE);
+#else
   strncpy(item2.title, "Name A-Z", sizeof(item2.title) - 1);
+#endif
   item2.is_destructive = 0;
 
   rc = cupertino_menu_button_add_item(menu, &item1);
@@ -146,18 +176,32 @@ TEST test_cupertino_menu_button_pull_down_mode(void) {
   memset(&desc, 0, sizeof(desc));
   desc.mode = CUPERTINO_MENU_BUTTON_PULL_DOWN;
   desc.style = CUPERTINO_BUTTON_PLAIN;
+#if defined(_MSC_VER)
+  strncpy_s(desc.initial_title, sizeof(desc.initial_title), "Actions",
+            _TRUNCATE);
+#else
   strncpy(desc.initial_title, "Actions", sizeof(desc.initial_title) - 1);
+#endif
 
   rc = cupertino_menu_button_create((struct ui_engine *)1, &desc, &menu);
   ASSERT_EQ(UI_ERROR_NONE, rc);
 
   memset(&item1, 0, sizeof(item1));
+#if defined(_MSC_VER)
+  strncpy_s(item1.title, sizeof(item1.title), "Duplicate", _TRUNCATE);
+#else
   strncpy(item1.title, "Duplicate", sizeof(item1.title) - 1);
+#endif
   rc = cupertino_menu_button_add_item(menu, &item1);
   ASSERT_EQ(UI_ERROR_NONE, rc);
 
   memset(&item_disabled, 0, sizeof(item_disabled));
+#if defined(_MSC_VER)
+  strncpy_s(item_disabled.title, sizeof(item_disabled.title), "Delete",
+            _TRUNCATE);
+#else
   strncpy(item_disabled.title, "Delete", sizeof(item_disabled.title) - 1);
+#endif
   item_disabled.is_destructive = 1;
   item_disabled.is_disabled = 1;
   rc = cupertino_menu_button_add_item(menu, &item_disabled);
@@ -191,12 +235,16 @@ TEST test_cupertino_menu_button_pull_down_mode(void) {
 TEST test_cupertino_menu_button_invalid_args_and_capacity(void) {
   struct cupertino_menu_button *menu = NULL;
   struct cupertino_menu_button_descriptor desc;
-  struct cupertino_menu_button_item item;
+  struct cupertino_menu_button_item item = {0};
   ui_error_t rc;
   size_t i;
 
   memset(&desc, 0, sizeof(desc));
+#if defined(_MSC_VER)
+  strncpy_s(desc.initial_title, sizeof(desc.initial_title), "Menu", _TRUNCATE);
+#else
   strncpy(desc.initial_title, "Menu", sizeof(desc.initial_title) - 1);
+#endif
 
   rc = cupertino_menu_button_create((struct ui_engine *)1, &desc, &menu);
   ASSERT_EQ(UI_ERROR_NONE, rc);
@@ -229,7 +277,11 @@ TEST test_cupertino_menu_button_invalid_args_and_capacity(void) {
 
   /* Max capacity check */
   memset(&item, 0, sizeof(item));
+#if defined(_MSC_VER)
+  strncpy_s(item.title, sizeof(item.title), "Entry", _TRUNCATE);
+#else
   strncpy(item.title, "Entry", sizeof(item.title) - 1);
+#endif
   for (i = 0; i < CUPERTINO_MENU_BUTTON_MAX_ITEMS; i++) {
     rc = cupertino_menu_button_add_item(menu, &item);
     ASSERT_EQ(UI_ERROR_NONE, rc);
@@ -264,12 +316,14 @@ TEST test_cupertino_menu_button_oom_mock(void) {
   ui_error_t rc;
 
   memset(&desc, 0, sizeof(desc));
+#if defined(_MSC_VER)
+  strncpy_s(desc.initial_title, sizeof(desc.initial_title), "OOM Menu",
+            _TRUNCATE);
+#else
   strncpy(desc.initial_title, "OOM Menu", sizeof(desc.initial_title) - 1);
+#endif
 
 #ifdef UI_TEST_MOCK_ALLOC
-  extern int g_cupertino_menu_button_mock_button_create_fail;
-  extern int g_cupertino_menu_button_mock_button_destroy_fail;
-  extern int g_cupertino_menu_button_mock_set_text_fail;
 
   g_malloc_fail_countdown = 0;
   rc = cupertino_menu_button_create((struct ui_engine *)1, &desc, &menu);
@@ -305,11 +359,14 @@ TEST test_cupertino_menu_button_oom_mock(void) {
   rc = cupertino_menu_button_create((struct ui_engine *)1, &desc, &menu);
   ASSERT_EQ(UI_ERROR_NONE, rc);
   memset(&item, 0, sizeof(item));
+#if defined(_MSC_VER)
+  strncpy_s(item.title, sizeof(item.title), "Choice", _TRUNCATE);
+#else
   strncpy(item.title, "Choice", sizeof(item.title) - 1);
+#endif
   rc = cupertino_menu_button_add_item(menu, &item);
   ASSERT_EQ(UI_ERROR_NONE, rc);
 
-  extern int g_cupertino_menu_button_mock_get_base_fail;
   g_cupertino_menu_button_mock_get_base_fail = 1;
   rc = cupertino_menu_button_select_item(menu, 0);
   ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
@@ -340,16 +397,23 @@ TEST test_cupertino_menu_button_oom_mock(void) {
   ASSERT_EQ(UI_ERROR_NONE, rc);
   rc = cupertino_menu_button_add_item(menu, &item);
   ASSERT_EQ(UI_ERROR_NONE, rc);
-  struct ui_button_base *saved_bb = menu->button->base;
-  menu->button->base = NULL;
-  rc = cupertino_menu_button_select_item(menu, 0);
-  ASSERT_EQ(UI_ERROR_NONE, rc);
-  menu->button->base = saved_bb;
-  rc = cupertino_menu_button_destroy(menu);
-  ASSERT_EQ(UI_ERROR_NONE, rc);
+  {
+    struct ui_button_base *saved_bb = menu->button->base;
+    menu->button->base = NULL;
+    rc = cupertino_menu_button_select_item(menu, 0);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+    menu->button->base = saved_bb;
+    item.on_select = failing_on_select;
+    rc = cupertino_menu_button_add_item(menu, &item);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+    rc = cupertino_menu_button_select_item(menu, 1);
+    ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+    rc = cupertino_menu_button_destroy(menu);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
 #endif
 
-  PASS();
+    PASS();
+  }
 }
 
 SUITE(cupertino_menu_button_suite) {

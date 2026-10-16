@@ -5,6 +5,8 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_webview_mock_fail;
+
 #ifdef UI_TEST_MOCK_ALLOC
 extern int g_malloc_fail_countdown;
 #endif
@@ -79,7 +81,6 @@ int main(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_webview_mock_fail;
     struct ui_webview_base *fail_wv = NULL;
 
     /* Fail 1: set_tag_name */
@@ -308,7 +309,6 @@ int main(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_webview_mock_fail;
     struct ui_webview_base *fail_wv = NULL;
 
     /* Fail 1: set_tag_name */

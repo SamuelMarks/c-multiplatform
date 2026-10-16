@@ -4,6 +4,10 @@
 #include "ui_css_contain.h"
 /* clang-format on */
 
+extern int g_contain_mock_fail;
+extern ui_error_t run_contain_coverage(void);
+extern int g_contain_mock_fail_count;
+
 static int test_parse_contain(void) {
   unsigned int flags = 0;
 
@@ -168,8 +172,6 @@ int main(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_contain_mock_fail;
-    extern ui_error_t run_contain_coverage(void);
     unsigned int flags;
     enum ui_css_content_visibility vis;
     struct ui_css_contain_intrinsic_size size;
@@ -185,7 +187,6 @@ int main(void) {
 
     /* Fail 2nd skip_whitespace (first one in parse_intrinsic_dim) */
     {
-      extern int g_contain_mock_fail_count;
       g_contain_mock_fail_count = 0;
       g_contain_mock_fail = 2;
       if (ui_css_parse_contain_intrinsic_size("auto 100px", &size) !=
@@ -196,7 +197,6 @@ int main(void) {
 
     /* Fail 3rd skip_whitespace (after 'auto' inside parse_intrinsic_dim) */
     {
-      extern int g_contain_mock_fail_count;
       g_contain_mock_fail_count = 0;
       g_contain_mock_fail = 3;
       if (ui_css_parse_contain_intrinsic_size("auto 100px", &size) !=
@@ -207,7 +207,6 @@ int main(void) {
 
     /* Fail 3rd skip_whitespace (between width and height in "100px 200px") */
     {
-      extern int g_contain_mock_fail_count;
       g_contain_mock_fail_count = 0;
       g_contain_mock_fail = 3;
       if (ui_css_parse_contain_intrinsic_size("100px 200px", &size) !=
@@ -218,7 +217,6 @@ int main(void) {
 
     /* Fail 5th skip_whitespace (after height in "100px 200px") */
     {
-      extern int g_contain_mock_fail_count;
       g_contain_mock_fail_count = 0;
       g_contain_mock_fail = 5;
       if (ui_css_parse_contain_intrinsic_size("100px 200px", &size) !=

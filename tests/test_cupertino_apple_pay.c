@@ -10,6 +10,17 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_cupertino_apple_pay_mock_base_create_fail;
+extern int g_cupertino_apple_pay_mock_base_set_text_fail;
+extern int g_cupertino_apple_pay_mock_base_destroy_fail;
+extern struct ui_button_base *g_cupertino_apple_pay_last_created_base;
+#ifdef UI_TEST_MOCK_ALLOC
+extern const char *
+test_cupertino_get_apple_pay_label(enum cupertino_apple_pay_type type);
+extern const char *
+test_cupertino_get_apple_id_label(enum cupertino_apple_id_button_type type);
+#endif
+
 SUITE(cupertino_apple_pay_suite);
 
 TEST test_apple_pay_invalid_arguments(void) {
@@ -149,11 +160,6 @@ TEST test_apple_pay_styles_types_and_press(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern const char *test_cupertino_get_apple_pay_label(
-        enum cupertino_apple_pay_type type);
-    extern const char *test_cupertino_get_apple_id_label(
-        enum cupertino_apple_id_button_type type);
-
     const char *fallback_lbl;
     fallback_lbl =
         test_cupertino_get_apple_pay_label((enum cupertino_apple_pay_type)999);
@@ -341,10 +347,6 @@ TEST test_apple_pay_mock_failures(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_cupertino_apple_pay_mock_base_create_fail;
-    extern int g_cupertino_apple_pay_mock_base_set_text_fail;
-    extern int g_cupertino_apple_pay_mock_base_destroy_fail;
-    extern struct ui_button_base *g_cupertino_apple_pay_last_created_base;
 
     /* Apple Pay: base_create fail */
     g_cupertino_apple_pay_mock_base_create_fail = 1;

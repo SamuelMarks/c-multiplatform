@@ -5,6 +5,9 @@
 #include "ui_css_round_display.h"
 /* clang-format on */
 
+extern int g_round_display_mock_fail;
+extern ui_error_t run_round_display_coverage(void);
+
 #define TEST_ASSERT(cond)                                                      \
   do {                                                                         \
     if (!(cond)) {                                                             \
@@ -168,7 +171,6 @@ int main(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_round_display_mock_fail;
     struct ui_css_shape_inside shape;
     enum ui_css_border_boundary boundary;
 
@@ -196,10 +198,7 @@ int main(void) {
     TEST_ASSERT(ui_css_parse_shape_inside(NULL, &shape) ==
                 UI_ERROR_INVALID_ARGUMENT);
 
-    {
-      extern ui_error_t run_round_display_coverage(void);
-      TEST_ASSERT(run_round_display_coverage() == UI_ERROR_NONE);
-    }
+    { TEST_ASSERT(run_round_display_coverage() == UI_ERROR_NONE); }
   }
 #endif
 

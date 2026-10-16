@@ -10,6 +10,7 @@
 #include <string.h>
 /* clang-format on */
 
+/** @brief md3_slider_create function. */
 ui_error_t md3_slider_create(struct ui_engine *engine,
                              enum md3_slider_type type, float min, float max,
                              struct md3_slider **out_slider,
@@ -55,6 +56,7 @@ ui_error_t md3_slider_create(struct ui_engine *engine,
   return rc;
 }
 
+/** @brief md3_slider_destroy function. */
 ui_error_t md3_slider_destroy(struct md3_slider *slider) {
   ui_error_t rc;
 
@@ -67,6 +69,7 @@ ui_error_t md3_slider_destroy(struct md3_slider *slider) {
   return rc;
 }
 
+/** @brief md3_slider_set_value function. */
 ui_error_t md3_slider_set_value(struct md3_slider *slider, float value) {
   if (!slider) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -75,6 +78,7 @@ ui_error_t md3_slider_set_value(struct md3_slider *slider, float value) {
   return ui_slider_base_set_value(slider->base, value);
 }
 
+/** @brief md3_slider_get_value function. */
 ui_error_t md3_slider_get_value(const struct md3_slider *slider,
                                 float *out_value) {
   if (!slider || !out_value) {
@@ -84,6 +88,7 @@ ui_error_t md3_slider_get_value(const struct md3_slider *slider,
   return ui_slider_base_get_value(slider->base, out_value);
 }
 
+/** @brief md3_slider_set_step function. */
 ui_error_t md3_slider_set_step(struct md3_slider *slider, float step) {
   if (!slider || step < 0.0f) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -93,6 +98,7 @@ ui_error_t md3_slider_set_step(struct md3_slider *slider, float step) {
   return ui_slider_base_set_step(slider->base, step);
 }
 
+/** @brief md3_slider_set_disabled function. */
 ui_error_t md3_slider_set_disabled(struct md3_slider *slider, int disabled) {
   if (!slider) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -101,6 +107,7 @@ ui_error_t md3_slider_set_disabled(struct md3_slider *slider, int disabled) {
   return ui_slider_base_set_disabled(slider->base, disabled);
 }
 
+/** @brief md3_slider_set_on_change function. */
 ui_error_t md3_slider_set_on_change(struct md3_slider *slider,
                                     ui_slider_on_change_t on_change,
                                     void *user_data) {
@@ -111,6 +118,7 @@ ui_error_t md3_slider_set_on_change(struct md3_slider *slider,
   return ui_slider_base_set_on_change(slider->base, on_change, user_data);
 }
 
+/** @brief md3_slider_get_base function. */
 ui_error_t md3_slider_get_base(struct md3_slider *slider,
                                struct ui_slider_base **out_base) {
   if (!slider || !out_base) {
@@ -121,6 +129,7 @@ ui_error_t md3_slider_get_base(struct md3_slider *slider,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_range_slider_create function. */
 ui_error_t md3_range_slider_create(struct ui_engine *engine, float min,
                                    float max,
                                    struct md3_range_slider **out_slider) {
@@ -154,6 +163,7 @@ ui_error_t md3_range_slider_create(struct ui_engine *engine, float min,
   return rc;
 }
 
+/** @brief md3_range_slider_destroy function. */
 ui_error_t md3_range_slider_destroy(struct md3_range_slider *slider) {
   ui_error_t rc;
 
@@ -166,6 +176,7 @@ ui_error_t md3_range_slider_destroy(struct md3_range_slider *slider) {
   return rc;
 }
 
+/** @brief md3_range_slider_set_values function. */
 ui_error_t md3_range_slider_set_values(struct md3_range_slider *slider,
                                        float low, float high) {
   if (!slider) {
@@ -175,6 +186,7 @@ ui_error_t md3_range_slider_set_values(struct md3_range_slider *slider,
   return ui_range_slider_base_set_values(slider->base, low, high);
 }
 
+/** @brief md3_range_slider_get_values function. */
 ui_error_t md3_range_slider_get_values(const struct md3_range_slider *slider,
                                        float *out_low, float *out_high) {
   if (!slider || !out_low || !out_high) {
@@ -184,6 +196,7 @@ ui_error_t md3_range_slider_get_values(const struct md3_range_slider *slider,
   return ui_range_slider_base_get_values(slider->base, out_low, out_high);
 }
 
+/** @brief md3_range_slider_get_base function. */
 ui_error_t md3_range_slider_get_base(struct md3_range_slider *slider,
                                      struct ui_range_slider_base **out_base) {
   if (!slider || !out_base) {

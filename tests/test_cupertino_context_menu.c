@@ -10,6 +10,11 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_cupertino_context_menu_mock_create_fail;
+extern int g_cupertino_context_menu_mock_destroy_fail;
+extern int g_cupertino_context_menu_mock_open_fail;
+extern int g_cupertino_context_menu_mock_close_fail;
+
 SUITE(cupertino_context_menu_suite);
 
 TEST test_context_menu_invalid_arguments(void) {
@@ -96,13 +101,15 @@ TEST test_context_menu_invalid_arguments(void) {
   ASSERT_EQ(UI_ERROR_OUT_OF_BOUNDS, rc);
 
   /* Destroy with menu->base == NULL */
-  struct ui_context_menu_base *saved_base = menu->base;
-  menu->base = NULL;
-  rc = cupertino_context_menu_destroy(menu);
-  ASSERT_EQ(UI_ERROR_NONE, rc);
-  ui_context_menu_base_destroy(saved_base);
+  {
+    struct ui_context_menu_base *saved_base = menu->base;
+    menu->base = NULL;
+    rc = cupertino_context_menu_destroy(menu);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+    ui_context_menu_base_destroy(saved_base);
 
-  PASS();
+    PASS();
+  }
 }
 
 TEST test_context_menu_actions_and_interaction(void) {
@@ -135,8 +142,17 @@ TEST test_context_menu_actions_and_interaction(void) {
 
   /* Add Action 1: Reply */
   memset(&action, 0, sizeof(action));
+#if defined(_MSC_VER)
+  strcpy_s(action.title, sizeof(action.title), "Reply");
+#else
   strcpy(action.title, "Reply");
+#endif
+#if defined(_MSC_VER)
+  strcpy_s(action.symbol_name, sizeof(action.symbol_name),
+           "arrowshape.turn.up.left");
+#else
   strcpy(action.symbol_name, "arrowshape.turn.up.left");
+#endif
   action.is_destructive = 0;
   action.is_disabled = 0;
   action.is_checked = 0;
@@ -146,24 +162,48 @@ TEST test_context_menu_actions_and_interaction(void) {
 
   /* Add Action 2: Star (Checked) */
   memset(&action, 0, sizeof(action));
+#if defined(_MSC_VER)
+  strcpy_s(action.title, sizeof(action.title), "Star");
+#else
   strcpy(action.title, "Star");
+#endif
+#if defined(_MSC_VER)
+  strcpy_s(action.symbol_name, sizeof(action.symbol_name), "star.fill");
+#else
   strcpy(action.symbol_name, "star.fill");
+#endif
   action.is_checked = 1;
   rc = cupertino_context_menu_add_action(menu, &action);
   ASSERT_EQ(UI_ERROR_NONE, rc);
 
   /* Add Action 3: Archive (Disabled) */
   memset(&action, 0, sizeof(action));
+#if defined(_MSC_VER)
+  strcpy_s(action.title, sizeof(action.title), "Archive");
+#else
   strcpy(action.title, "Archive");
+#endif
+#if defined(_MSC_VER)
+  strcpy_s(action.symbol_name, sizeof(action.symbol_name), "archivebox");
+#else
   strcpy(action.symbol_name, "archivebox");
+#endif
   action.is_disabled = 1;
   rc = cupertino_context_menu_add_action(menu, &action);
   ASSERT_EQ(UI_ERROR_NONE, rc);
 
   /* Add Action 4: Delete (Destructive) */
   memset(&action, 0, sizeof(action));
+#if defined(_MSC_VER)
+  strcpy_s(action.title, sizeof(action.title), "Delete");
+#else
   strcpy(action.title, "Delete");
+#endif
+#if defined(_MSC_VER)
+  strcpy_s(action.symbol_name, sizeof(action.symbol_name), "trash");
+#else
   strcpy(action.symbol_name, "trash");
+#endif
   action.is_destructive = 1;
   rc = cupertino_context_menu_add_action(menu, &action);
   ASSERT_EQ(UI_ERROR_NONE, rc);
@@ -216,7 +256,11 @@ TEST test_context_menu_actions_and_interaction(void) {
   /* Fill remaining slots to reach CUPERTINO_CONTEXT_MENU_MAX_ACTIONS */
   for (i = 4; i < CUPERTINO_CONTEXT_MENU_MAX_ACTIONS; i++) {
     memset(&action, 0, sizeof(action));
+#if defined(_MSC_VER)
+    strcpy_s(action.title, sizeof(action.title), "Item");
+#else
     strcpy(action.title, "Item");
+#endif
     rc = cupertino_context_menu_add_action(menu, &action);
     ASSERT_EQ(UI_ERROR_NONE, rc);
   }
@@ -245,13 +289,6 @@ TEST test_context_menu_oom_simulation(void) {
   desc.title = "Menu";
 
 #ifdef UI_TEST_MOCK_ALLOC
-  extern int g_cupertino_context_menu_mock_create_fail;
-  extern int g_cupertino_context_menu_mock_destroy_fail;
-  extern int g_cupertino_context_menu_mock_open_fail;
-  extern int g_cupertino_context_menu_mock_close_fail;
-
-  struct ui_overlay_director *dummy_director =
-      (struct ui_overlay_director *)0x5678;
 
   g_malloc_fail_countdown = 0;
   rc = cupertino_context_menu_create(dummy_engine, &desc, &menu);
@@ -275,70 +312,90 @@ TEST test_context_menu_oom_simulation(void) {
   g_cupertino_context_menu_mock_destroy_fail = 0;
 
   /* Open with director (menu_h < 44 test with action_count == 0) */
-  struct ui_dom_node *body = NULL;
-  struct ui_overlay_director *director = NULL;
-  rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &body);
-  ASSERT_EQ(UI_ERROR_NONE, rc);
-  rc = ui_overlay_director_create(body, &director);
-  ASSERT_EQ(UI_ERROR_NONE, rc);
+  {
+    struct ui_dom_node *body = NULL;
+    struct ui_overlay_director *director = NULL;
+    rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &body);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+    rc = ui_overlay_director_create(body, &director);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
 
-  rc = cupertino_context_menu_create(dummy_engine, &desc, &menu);
-  ASSERT_EQ(UI_ERROR_NONE, rc);
-  rc = cupertino_context_menu_open_at(menu, director, 100.0f, 100.0f, 800.0f,
-                                      600.0f);
-  ASSERT_EQ(UI_ERROR_NONE, rc);
+    rc = cupertino_context_menu_create(dummy_engine, &desc, &menu);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+    rc = cupertino_context_menu_open_at(menu, director, 100.0f, 100.0f, 800.0f,
+                                        600.0f);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
 
-  /* Open with director and 2 actions so menu_h (2 * 44 = 88) >= 44 */
-  struct cupertino_context_menu_action act;
-  memset(&act, 0, sizeof(act));
-  strcpy(act.title, "A1");
-  rc = cupertino_context_menu_add_action(menu, &act);
-  ASSERT_EQ(UI_ERROR_NONE, rc);
-  strcpy(act.title, "A2");
-  rc = cupertino_context_menu_add_action(menu, &act);
-  ASSERT_EQ(UI_ERROR_NONE, rc);
-  rc = cupertino_context_menu_open_at(menu, director, 100.0f, 100.0f, 800.0f,
-                                      600.0f);
-  ASSERT_EQ(UI_ERROR_NONE, rc);
+    /* Open with director and 2 actions so menu_h (2 * 44 = 88) >= 44 */
+    {
+      struct cupertino_context_menu_action act;
+      memset(&act, 0, sizeof(act));
+#if defined(_MSC_VER)
+      strcpy_s(act.title, sizeof(act.title), "A1");
+#else
+      strcpy(act.title, "A1");
+#endif
+      rc = cupertino_context_menu_add_action(menu, &act);
+      ASSERT_EQ(UI_ERROR_NONE, rc);
+#if defined(_MSC_VER)
+      strcpy_s(act.title, sizeof(act.title), "A2");
+#else
+      strcpy(act.title, "A2");
+#endif
+      rc = cupertino_context_menu_add_action(menu, &act);
+      ASSERT_EQ(UI_ERROR_NONE, rc);
+      rc = cupertino_context_menu_open_at(menu, director, 100.0f, 100.0f,
+                                          800.0f, 600.0f);
+      ASSERT_EQ(UI_ERROR_NONE, rc);
 
-  /* Open when menu->base == NULL */
-  struct ui_context_menu_base *temp_base = menu->base;
-  menu->base = NULL;
-  rc = cupertino_context_menu_open_at(menu, director, 100.0f, 100.0f, 800.0f,
-                                      600.0f);
-  ASSERT_EQ(UI_ERROR_NONE, rc);
-  menu->base = temp_base;
+      /* Open when menu->base == NULL */
+      {
+        struct ui_context_menu_base *temp_base = menu->base;
+        menu->base = NULL;
+        rc = cupertino_context_menu_open_at(menu, director, 100.0f, 100.0f,
+                                            800.0f, 600.0f);
+        ASSERT_EQ(UI_ERROR_NONE, rc);
+        menu->base = temp_base;
 
-  /* Open with director (mock open failure) */
-  g_cupertino_context_menu_mock_open_fail = 1;
-  rc = cupertino_context_menu_open_at(menu, director, 100.0f, 100.0f, 800.0f,
-                                      600.0f);
-  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
-  g_cupertino_context_menu_mock_open_fail = 0;
+        /* Open with director (mock open failure) */
+        g_cupertino_context_menu_mock_open_fail = 1;
+        rc = cupertino_context_menu_open_at(menu, director, 100.0f, 100.0f,
+                                            800.0f, 600.0f);
+        ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+        g_cupertino_context_menu_mock_open_fail = 0;
 
-  /* Select action with mock close failure */
-  struct cupertino_context_menu_action action;
-  memset(&action, 0, sizeof(action));
-  strcpy(action.title, "Act");
-  rc = cupertino_context_menu_add_action(menu, &action);
-  ASSERT_EQ(UI_ERROR_NONE, rc);
+        /* Select action with mock close failure */
+        {
+          struct cupertino_context_menu_action action;
+          memset(&action, 0, sizeof(action));
+#if defined(_MSC_VER)
+          strcpy_s(action.title, sizeof(action.title), "Act");
+#else
+          strcpy(action.title, "Act");
+#endif
+          rc = cupertino_context_menu_add_action(menu, &action);
+          ASSERT_EQ(UI_ERROR_NONE, rc);
 
-  g_cupertino_context_menu_mock_close_fail = 1;
-  rc = cupertino_context_menu_select_action(menu, 0);
-  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
-  g_cupertino_context_menu_mock_close_fail = 0;
+          g_cupertino_context_menu_mock_close_fail = 1;
+          rc = cupertino_context_menu_select_action(menu, 0);
+          ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+          g_cupertino_context_menu_mock_close_fail = 0;
 
-  rc = cupertino_context_menu_destroy(menu);
-  ASSERT_EQ(UI_ERROR_NONE, rc);
+          rc = cupertino_context_menu_destroy(menu);
+          ASSERT_EQ(UI_ERROR_NONE, rc);
 
-  ui_overlay_director_destroy(director);
-  ui_dom_node_destroy(body);
+          ui_overlay_director_destroy(director);
+          ui_dom_node_destroy(body);
 #else
   rc = cupertino_context_menu_create(NULL, &desc, &menu);
   ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
 #endif
 
-  PASS();
+          PASS();
+        }
+      }
+    }
+  }
 }
 
 SUITE(cupertino_context_menu_suite) {

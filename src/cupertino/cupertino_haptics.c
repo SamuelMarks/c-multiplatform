@@ -23,6 +23,7 @@ mock_cupertino_haptics_trigger(enum ui_haptic_feedback_type type) {
 /** @endcond */
 #endif
 
+/** @brief cupertino_haptic_impact function. */
 ui_error_t cupertino_haptic_impact(enum cupertino_haptic_impact_style style,
                                    float intensity) {
   enum ui_haptic_feedback_type cdk_type;
@@ -60,6 +61,7 @@ ui_error_t cupertino_haptic_impact(enum cupertino_haptic_impact_style style,
   return rc;
 }
 
+/** @brief cupertino_haptic_notification function. */
 ui_error_t
 cupertino_haptic_notification(enum cupertino_haptic_notification_type type) {
   enum ui_haptic_feedback_type cdk_type;
@@ -86,6 +88,7 @@ cupertino_haptic_notification(enum cupertino_haptic_notification_type type) {
   return rc;
 }
 
+/** @brief cupertino_haptic_selection function. */
 ui_error_t cupertino_haptic_selection(void) {
   ui_error_t rc;
 
@@ -96,6 +99,7 @@ ui_error_t cupertino_haptic_selection(void) {
   return rc;
 }
 
+/** @brief cupertino_haptic_prepare function. */
 ui_error_t cupertino_haptic_prepare(void) {
   /* Pre-warms the haptic actuator state */
   return UI_ERROR_NONE;

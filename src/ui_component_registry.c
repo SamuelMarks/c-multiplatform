@@ -113,6 +113,7 @@ struct ui_component_registry {
   struct ui_registry_entry *head; /**< Head of registered entries linked list */
 };
 
+/** @brief g_default_registry variable. */
 static struct ui_component_registry *g_default_registry = NULL;
 
 /**
@@ -257,6 +258,7 @@ ui_component_registry_lookup(const struct ui_component_registry *registry,
 /* ========================================================================= */
 
 /* --- ui_button_base wrapper --- */
+/** @brief def_button_factory function. */
 static ui_error_t def_button_factory(void **out_instance,
                                      struct ui_dom_node **out_dom_node) {
   struct ui_button_base *btn = NULL;
@@ -279,6 +281,7 @@ static ui_error_t def_button_factory(void **out_instance,
   return UI_ERROR_NONE;
 }
 
+/** @brief def_button_set_prop function. */
 static ui_error_t def_button_set_prop(void *instance, const char *key,
                                       const char *value) {
   struct ui_button_base *btn = (struct ui_button_base *)instance;
@@ -313,6 +316,7 @@ struct btn_event_adapter {
   struct ui_button_base *btn;
 };
 
+/** @brief on_button_click_adapter function. */
 static ui_error_t on_button_click_adapter(struct ui_button_base *btn,
                                           void *user_data) {
   struct btn_event_adapter *ad = (struct btn_event_adapter *)user_data;
@@ -320,6 +324,7 @@ static ui_error_t on_button_click_adapter(struct ui_button_base *btn,
   return ad->callback(ad->user_data);
 }
 
+/** @brief def_button_event function. */
 static ui_error_t def_button_event(void *instance, const char *event_name,
                                    ui_error_t (*callback)(void *user_data),
                                    void *user_data) {
@@ -344,11 +349,13 @@ static ui_error_t def_button_event(void *instance, const char *event_name,
   return UI_ERROR_NONE;
 }
 
+/** @brief def_button_destroy function. */
 static ui_error_t def_button_destroy(void *instance) {
   return ui_button_base_destroy((struct ui_button_base *)instance);
 }
 
 /* --- ui_input_base wrapper --- */
+/** @brief def_input_factory function. */
 static ui_error_t def_input_factory(void **out_instance,
                                     struct ui_dom_node **out_dom_node) {
   struct ui_input_base *inp = NULL;
@@ -371,11 +378,13 @@ static ui_error_t def_input_factory(void **out_instance,
   return UI_ERROR_NONE;
 }
 
+/** @brief def_input_get_cva function. */
 static ui_error_t def_input_get_cva(void *instance,
                                     struct ui_control_value_accessor *out_cva) {
   return ui_input_base_get_cva((struct ui_input_base *)instance, out_cva);
 }
 
+/** @brief def_input_set_prop function. */
 static ui_error_t def_input_set_prop(void *instance, const char *key,
                                      const char *value) {
   struct ui_input_base *inp = (struct ui_input_base *)instance;
@@ -404,11 +413,13 @@ static ui_error_t def_input_set_prop(void *instance, const char *key,
   return UI_ERROR_NONE;
 }
 
+/** @brief def_input_destroy function. */
 static ui_error_t def_input_destroy(void *instance) {
   return ui_input_base_destroy((struct ui_input_base *)instance);
 }
 
 /* --- ui_card_base wrapper --- */
+/** @brief def_card_factory function. */
 static ui_error_t def_card_factory(void **out_instance,
                                    struct ui_dom_node **out_dom_node) {
   struct ui_card_base *card = NULL;
@@ -431,6 +442,7 @@ static ui_error_t def_card_factory(void **out_instance,
   return UI_ERROR_NONE;
 }
 
+/** @brief def_card_set_prop function. */
 static ui_error_t def_card_set_prop(void *instance, const char *key,
                                     const char *value) {
   struct ui_card_base *card = (struct ui_card_base *)instance;
@@ -448,6 +460,7 @@ static ui_error_t def_card_set_prop(void *instance, const char *key,
   return UI_ERROR_NONE;
 }
 
+/** @brief def_card_append function. */
 static ui_error_t def_card_append(void *instance,
                                   struct ui_dom_node *child_node) {
   struct ui_card_base *card = (struct ui_card_base *)instance;
@@ -466,11 +479,13 @@ static ui_error_t def_card_append(void *instance,
   return ui_dom_node_append_child(comp->shadow_root, child_node);
 }
 
+/** @brief def_card_destroy function. */
 static ui_error_t def_card_destroy(void *instance) {
   return ui_card_base_destroy((struct ui_card_base *)instance);
 }
 
 /* --- ui_checkbox_base wrapper --- */
+/** @brief def_checkbox_factory function. */
 static ui_error_t def_checkbox_factory(void **out_instance,
                                        struct ui_dom_node **out_dom_node) {
   struct ui_checkbox_base *chk = NULL;
@@ -493,12 +508,14 @@ static ui_error_t def_checkbox_factory(void **out_instance,
   return UI_ERROR_NONE;
 }
 
+/** @brief def_checkbox_get_cva function. */
 static ui_error_t
 def_checkbox_get_cva(void *instance,
                      struct ui_control_value_accessor *out_cva) {
   return ui_checkbox_base_get_cva((struct ui_checkbox_base *)instance, out_cva);
 }
 
+/** @brief def_checkbox_set_prop function. */
 static ui_error_t def_checkbox_set_prop(void *instance, const char *key,
                                         const char *value) {
   struct ui_checkbox_base *chk = (struct ui_checkbox_base *)instance;
@@ -521,11 +538,13 @@ static ui_error_t def_checkbox_set_prop(void *instance, const char *key,
   return UI_ERROR_NONE;
 }
 
+/** @brief def_checkbox_destroy function. */
 static ui_error_t def_checkbox_destroy(void *instance) {
   return ui_checkbox_base_destroy((struct ui_checkbox_base *)instance);
 }
 
 /* --- ui_label_base wrapper --- */
+/** @brief def_label_factory function. */
 static ui_error_t def_label_factory(void **out_instance,
                                     struct ui_dom_node **out_dom_node) {
   struct ui_label_base *lbl = NULL;
@@ -548,6 +567,7 @@ static ui_error_t def_label_factory(void **out_instance,
   return UI_ERROR_NONE;
 }
 
+/** @brief def_label_set_prop function. */
 static ui_error_t def_label_set_prop(void *instance, const char *key,
                                      const char *value) {
   struct ui_label_base *lbl = (struct ui_label_base *)instance;
@@ -562,11 +582,13 @@ static ui_error_t def_label_set_prop(void *instance, const char *key,
   return UI_ERROR_NONE;
 }
 
+/** @brief def_label_destroy function. */
 static ui_error_t def_label_destroy(void *instance) {
   return ui_label_base_destroy((struct ui_label_base *)instance);
 }
 
 /* --- ui_slider_base wrapper --- */
+/** @brief def_slider_factory function. */
 static ui_error_t def_slider_factory(void **out_instance,
                                      struct ui_dom_node **out_dom_node) {
   struct ui_slider_base *sld = NULL;
@@ -590,6 +612,7 @@ static ui_error_t def_slider_factory(void **out_instance,
   return UI_ERROR_NONE;
 }
 
+/** @brief def_slider_get_cva function. */
 static ui_error_t
 def_slider_get_cva(void *instance, struct ui_control_value_accessor *out_cva) {
   struct ui_slider_base *sld = (struct ui_slider_base *)instance;
@@ -611,11 +634,13 @@ def_slider_get_cva(void *instance, struct ui_control_value_accessor *out_cva) {
   return rc;
 }
 
+/** @brief def_slider_destroy function. */
 static ui_error_t def_slider_destroy(void *instance) {
   return ui_slider_base_destroy((struct ui_slider_base *)instance);
 }
 
 /* --- Layout Primitives: row, column, grid, container --- */
+/** @brief def_layout_factory_internal function. */
 static ui_error_t
 def_layout_factory_internal(const char *style_str, void **out_instance,
                             struct ui_dom_node **out_dom_node) {
@@ -644,30 +669,35 @@ def_layout_factory_internal(const char *style_str, void **out_instance,
   return UI_ERROR_NONE;
 }
 
+/** @brief def_row_factory function. */
 static ui_error_t def_row_factory(void **out_instance,
                                   struct ui_dom_node **out_dom_node) {
   return def_layout_factory_internal("display: flex; flex-direction: row;",
                                      out_instance, out_dom_node);
 }
 
+/** @brief def_col_factory function. */
 static ui_error_t def_col_factory(void **out_instance,
                                   struct ui_dom_node **out_dom_node) {
   return def_layout_factory_internal("display: flex; flex-direction: column;",
                                      out_instance, out_dom_node);
 }
 
+/** @brief def_grid_factory function. */
 static ui_error_t def_grid_factory(void **out_instance,
                                    struct ui_dom_node **out_dom_node) {
   return def_layout_factory_internal("display: grid;", out_instance,
                                      out_dom_node);
 }
 
+/** @brief def_container_factory function. */
 static ui_error_t def_container_factory(void **out_instance,
                                         struct ui_dom_node **out_dom_node) {
   return def_layout_factory_internal("display: block;", out_instance,
                                      out_dom_node);
 }
 
+/** @brief def_dom_set_prop function. */
 static ui_error_t def_dom_set_prop(void *instance, const char *key,
                                    const char *value) {
   struct ui_dom_node *node = (struct ui_dom_node *)instance;
@@ -677,6 +707,7 @@ static ui_error_t def_dom_set_prop(void *instance, const char *key,
   return ui_dom_node_set_attribute(node, key, value);
 }
 
+/** @brief def_dom_append function. */
 static ui_error_t def_dom_append(void *instance,
                                  struct ui_dom_node *child_node) {
   struct ui_dom_node *parent = (struct ui_dom_node *)instance;
@@ -686,6 +717,7 @@ static ui_error_t def_dom_append(void *instance,
   return ui_dom_node_append_child(parent, child_node);
 }
 
+/** @brief def_dom_destroy function. */
 static ui_error_t def_dom_destroy(void *instance) {
   return ui_dom_node_destroy((struct ui_dom_node *)instance);
 }

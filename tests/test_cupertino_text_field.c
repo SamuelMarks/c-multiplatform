@@ -13,6 +13,12 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_cupertino_text_field_mock_destroy_fail;
+extern int g_cupertino_text_field_mock_set_placeholder_fail;
+extern int g_cupertino_text_field_mock_get_text_fail;
+extern int g_cupertino_text_field_mock_set_type_fail;
+extern int g_cupertino_text_field_mock_get_text_null;
+
 extern int g_malloc_fail_countdown;
 
 TEST test_cupertino_text_field_lifecycle(void) {
@@ -337,10 +343,6 @@ TEST test_cupertino_text_field_oom(void) {
   g_malloc_fail_countdown = -1;
 
 #ifdef UI_TEST_MOCK_ALLOC
-  extern int g_cupertino_text_field_mock_destroy_fail;
-  extern int g_cupertino_text_field_mock_set_placeholder_fail;
-  extern int g_cupertino_text_field_mock_get_text_fail;
-  extern int g_cupertino_text_field_mock_set_type_fail;
 
   rc = cupertino_text_field_create(dummy_engine, &field, NULL);
   ASSERT_EQ(UI_ERROR_NONE, rc);
@@ -359,7 +361,6 @@ TEST test_cupertino_text_field_oom(void) {
 
   /* Mock get_text returning NULL text in is_clear_button_visible */
   {
-    extern int g_cupertino_text_field_mock_get_text_null;
     g_cupertino_text_field_mock_get_text_null = 1;
     rc = cupertino_text_field_is_clear_button_visible(field, &is_visible);
     ASSERT_EQ(UI_ERROR_NONE, rc);

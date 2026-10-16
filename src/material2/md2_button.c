@@ -11,12 +11,14 @@
 #include <ctype.h>
 /* clang-format on */
 
+/** @brief md2_button structure. */
 struct md2_button {
-  struct ui_component *component;
-  struct ui_button_base *base;
-  enum md2_button_variant variant;
+  struct ui_component *component;  /**< component field. */
+  struct ui_button_base *base;     /**< base field. */
+  enum md2_button_variant variant; /**< variant field. */
 };
 
+/** @brief md2_to_uppercase function. */
 static void md2_to_uppercase(char *str) {
   while (*str) {
     *str = (char)toupper((unsigned char)*str);
@@ -24,6 +26,7 @@ static void md2_to_uppercase(char *str) {
   }
 }
 
+/** @brief md2_button_create function. */
 ui_error_t md2_button_create(struct ui_engine *engine,
                              enum md2_button_variant variant, const char *text,
                              struct md2_button **out_button) {
@@ -87,6 +90,7 @@ ui_error_t md2_button_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md2_button_destroy function. */
 ui_error_t md2_button_destroy(struct md2_button *button) {
   if (!button) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -99,6 +103,7 @@ ui_error_t md2_button_destroy(struct md2_button *button) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md2_button_set_text function. */
 ui_error_t md2_button_set_text(struct md2_button *button, const char *text) {
   char *upper_text;
   size_t len;
@@ -127,6 +132,7 @@ ui_error_t md2_button_set_text(struct md2_button *button, const char *text) {
   return rc;
 }
 
+/** @brief md2_button_set_on_click function. */
 ui_error_t md2_button_set_on_click(struct md2_button *button,
                                    ui_button_on_click_t on_click,
                                    void *user_data) {
@@ -137,6 +143,7 @@ ui_error_t md2_button_set_on_click(struct md2_button *button,
   return ui_button_base_set_on_click(button->base, on_click, user_data);
 }
 
+/** @brief md2_button_get_base function. */
 ui_error_t md2_button_get_base(struct md2_button *button,
                                struct ui_button_base **out_base) {
   if (!button || !out_base) {

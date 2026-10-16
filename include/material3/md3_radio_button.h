@@ -15,7 +15,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
@@ -24,10 +24,10 @@ struct ui_engine;
  * @brief Material 3 Radio Group wrapper managing selection with CVA support.
  */
 struct md3_radio_group {
-  struct ui_radio_group_base *base;
-  struct ui_control_value_accessor cva;
-  int selected_index;
-  int is_disabled;
+  struct ui_radio_group_base *base;     /**< base field. */
+  struct ui_control_value_accessor cva; /**< cva field. */
+  int selected_index;                   /**< selected_index field. */
+  int is_disabled;                      /**< is_disabled field. */
 };
 
 /**

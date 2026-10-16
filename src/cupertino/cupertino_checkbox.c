@@ -26,6 +26,7 @@ mock_checkbox_base_get_state(struct ui_checkbox_base *base,
 /** @endcond */
 #endif
 
+/** @brief cupertino_checkbox_cva_write_value function. */
 static ui_error_t
 cupertino_checkbox_cva_write_value(void *component,
                                    union ui_signal_payload value) {
@@ -41,6 +42,7 @@ cupertino_checkbox_cva_write_value(void *component,
   return cupertino_checkbox_set_state(cb, st);
 }
 
+/** @brief cupertino_checkbox_cva_set_disabled_state function. */
 static ui_error_t
 cupertino_checkbox_cva_set_disabled_state(void *component,
                                           ui_bool_t is_disabled) {
@@ -210,6 +212,7 @@ ui_error_t cupertino_checkbox_get_base(struct cupertino_checkbox *cb,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_checkbox_set_stroke_progress function. */
 ui_error_t cupertino_checkbox_set_stroke_progress(struct cupertino_checkbox *cb,
                                                   float progress) {
   if (!cb || progress < 0.0f || progress > 1.0f) {
@@ -220,6 +223,7 @@ ui_error_t cupertino_checkbox_set_stroke_progress(struct cupertino_checkbox *cb,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_checkbox_get_stroke_progress function. */
 ui_error_t
 cupertino_checkbox_get_stroke_progress(const struct cupertino_checkbox *cb,
                                        float *out_progress) {
@@ -231,6 +235,7 @@ cupertino_checkbox_get_stroke_progress(const struct cupertino_checkbox *cb,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_checkbox_compute_checkmark_path function. */
 ui_error_t cupertino_checkbox_compute_checkmark_path(
     const struct cupertino_checkbox *cb, float *out_x1, float *out_y1,
     float *out_x2, float *out_y2, float *out_x3, float *out_y3) {

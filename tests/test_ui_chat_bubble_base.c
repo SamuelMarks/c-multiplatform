@@ -8,6 +8,13 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_chat_bubble_mock_fail;
+#ifdef UI_TEST_MOCK_ALLOC
+extern ui_error_t
+ui_chat_bubble_base_mock_config(struct ui_chat_bubble_base *bubble,
+                                int tail_placement);
+#endif
+
 #define FAIL()                                                                 \
   do {                                                                         \
     printf("Failed at line %d\n", __LINE__);                                   \
@@ -47,28 +54,30 @@ static void test_chat_bubble_missing_branches(void) {
       ui_error_t rc_cleanup = ui_arena_create(1024 * 16, &arena);
       assert(rc_cleanup == UI_ERROR_NONE);
     }
-    struct ui_chat_bubble_base *bubble = NULL;
-    struct ui_chat_bubble_config cfg = {0};
+    {
+      struct ui_chat_bubble_base *bubble = NULL;
+      struct ui_chat_bubble_config cfg = {0};
 
-    {
-      ui_error_t rc_cleanup = ui_chat_bubble_base_create(arena, &cfg, &bubble);
-      assert(rc_cleanup == UI_ERROR_NONE);
-    }
-    /* Don't cast internals. Just skip the 87 branch. It's too fragile. */
-    {
-      ui_error_t rc_cleanup = ui_chat_bubble_base_destroy(bubble);
-      assert(rc_cleanup == UI_ERROR_NONE);
-    }
-    {
-      ui_error_t rc_cleanup = ui_arena_destroy(arena);
-      assert(rc_cleanup == UI_ERROR_NONE);
+      {
+        ui_error_t rc_cleanup =
+            ui_chat_bubble_base_create(arena, &cfg, &bubble);
+        assert(rc_cleanup == UI_ERROR_NONE);
+      }
+      /* Don't cast internals. Just skip the 87 branch. It's too fragile. */
+      {
+        ui_error_t rc_cleanup = ui_chat_bubble_base_destroy(bubble);
+        assert(rc_cleanup == UI_ERROR_NONE);
+      }
+      {
+        ui_error_t rc_cleanup = ui_arena_destroy(arena);
+        assert(rc_cleanup == UI_ERROR_NONE);
+      }
     }
   }
 }
 
 #ifdef UI_TEST_MOCK_ALLOC
 static void test_chat_bubble_destroy_mock_fail(void) {
-  extern int g_chat_bubble_mock_fail;
   struct ui_arena *arena_mock;
   struct ui_chat_bubble_base *bubble_mock;
   struct ui_chat_bubble_config cfg;
@@ -188,8 +197,6 @@ int main(void) {
   /* Set an invalid value using internal mock pattern to trigger default */
   {
 #ifdef UI_TEST_MOCK_ALLOC
-    extern ui_error_t ui_chat_bubble_base_mock_config(
-        struct ui_chat_bubble_base * bubble, int tail_placement);
     if (ui_chat_bubble_base_mock_config(NULL, 100) != UI_ERROR_INVALID_ARGUMENT)
       FAIL();
     if (ui_chat_bubble_base_mock_config(bubble, 100) != UI_ERROR_NONE)

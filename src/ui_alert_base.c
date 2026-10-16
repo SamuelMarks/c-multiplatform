@@ -126,6 +126,7 @@ struct ui_alert_base {
   struct ui_computed *animating_signal; /**< animating_signal */
 };
 
+/** @brief ui_alert_base_create function. */
 ui_error_t ui_alert_base_create(struct ui_alert_base **out_alert) {
   struct ui_alert_base *alert;
   ui_error_t rc;
@@ -190,6 +191,7 @@ cleanup:
   return rc;
 }
 
+/** @brief ui_alert_base_destroy function. */
 ui_error_t ui_alert_base_destroy(struct ui_alert_base *alert) {
   if (!alert) {
     return UI_ERROR_NONE;
@@ -201,6 +203,7 @@ ui_error_t ui_alert_base_destroy(struct ui_alert_base *alert) {
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_alert_base_get_component function. */
 ui_error_t ui_alert_base_get_component(struct ui_alert_base *alert,
                                        struct ui_component **out_component) {
   if (!alert || !out_component) {
@@ -210,6 +213,7 @@ ui_error_t ui_alert_base_get_component(struct ui_alert_base *alert,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_alert_base_set_role function. */
 ui_error_t ui_alert_base_set_role(struct ui_alert_base *alert,
                                   enum ui_alert_role role) {
   if (!alert) {
@@ -219,6 +223,7 @@ ui_error_t ui_alert_base_set_role(struct ui_alert_base *alert,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_alert_base_get_role function. */
 ui_error_t ui_alert_base_get_role(struct ui_alert_base *alert,
                                   enum ui_alert_role *out_role) {
   if (!alert || !out_role) {
@@ -228,6 +233,7 @@ ui_error_t ui_alert_base_get_role(struct ui_alert_base *alert,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_alert_base_set_dismissible function. */
 ui_error_t ui_alert_base_set_dismissible(struct ui_alert_base *alert,
                                          int dismissible) {
   if (!alert) {
@@ -237,6 +243,7 @@ ui_error_t ui_alert_base_set_dismissible(struct ui_alert_base *alert,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_alert_base_is_dismissible function. */
 ui_error_t ui_alert_base_is_dismissible(struct ui_alert_base *alert,
                                         int *out_dismissible) {
   if (!alert || !out_dismissible) {
@@ -246,6 +253,7 @@ ui_error_t ui_alert_base_is_dismissible(struct ui_alert_base *alert,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_alert_base_set_on_dismiss function. */
 ui_error_t ui_alert_base_set_on_dismiss(struct ui_alert_base *alert,
                                         ui_alert_on_dismiss_t on_dismiss,
                                         void *user_data) {
@@ -257,6 +265,7 @@ ui_error_t ui_alert_base_set_on_dismiss(struct ui_alert_base *alert,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_alert_base_dismiss function. */
 ui_error_t ui_alert_base_dismiss(struct ui_alert_base *alert) {
   if (!alert) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -265,6 +274,7 @@ ui_error_t ui_alert_base_dismiss(struct ui_alert_base *alert) {
   return ui_alert_base_set_open(alert, 0);
 }
 
+/** @brief ui_alert_base_set_focus_return function. */
 ui_error_t ui_alert_base_set_focus_return(struct ui_alert_base *alert,
                                           struct ui_component *focus_return) {
   if (!alert) {
@@ -274,6 +284,7 @@ ui_error_t ui_alert_base_set_focus_return(struct ui_alert_base *alert,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_alert_base_set_open function. */
 ui_error_t ui_alert_base_set_open(struct ui_alert_base *alert, int is_open) {
   ui_error_t rc = UI_ERROR_NONE;
   if (!alert) {
@@ -325,6 +336,7 @@ ui_error_t ui_alert_base_set_open(struct ui_alert_base *alert, int is_open) {
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_alert_base_is_open function. */
 ui_error_t ui_alert_base_is_open(const struct ui_alert_base *alert,
                                  int *out_is_open) {
   if (!alert || !out_is_open) {
@@ -334,6 +346,7 @@ ui_error_t ui_alert_base_is_open(const struct ui_alert_base *alert,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_alert_base_bind_open function. */
 ui_error_t ui_alert_base_bind_open(struct ui_alert_base *alert,
                                    struct ui_signal *open_signal) {
   if (!alert) {
@@ -343,6 +356,7 @@ ui_error_t ui_alert_base_bind_open(struct ui_alert_base *alert,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_alert_base_get_animating_signal function. */
 ui_error_t
 ui_alert_base_get_animating_signal(struct ui_alert_base *alert,
                                    struct ui_computed **out_animating) {

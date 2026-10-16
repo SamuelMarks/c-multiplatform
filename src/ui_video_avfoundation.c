@@ -188,6 +188,7 @@ ui_error_t ui_video_decoder_get_default_backend(
 
 #else
 
+/** @brief ui_video_decoder_avfoundation_get_backend function. */
 ui_error_t ui_video_decoder_avfoundation_get_backend(
     struct ui_video_decoder_backend *out_backend) {
   if (!out_backend) {

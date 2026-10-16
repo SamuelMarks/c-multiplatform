@@ -15,6 +15,7 @@ int g_cupertino_desktop_text_mock_recompute_fail = 0;
 int g_cupertino_desktop_text_mock_test_helpers = 0;
 #endif
 
+/** @brief cupertino_desktop_add_item function. */
 static ui_error_t cupertino_desktop_add_item(
     struct cupertino_desktop_text_selection_toolbar *toolbar, const char *title,
     const char *shortcut, int action_id, int has_separator, int is_disabled) {
@@ -56,6 +57,7 @@ static ui_error_t cupertino_desktop_add_item(
   toolbar->item_count++;
   return UI_ERROR_NONE;
 }
+/** @brief cupertino_desktop_recompute_bounds function. */
 static ui_error_t cupertino_desktop_recompute_bounds(
     struct cupertino_desktop_text_selection_toolbar *toolbar) {
   size_t i;
@@ -83,6 +85,7 @@ static ui_error_t cupertino_desktop_recompute_bounds(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_desktop_text_selection_toolbar_create function. */
 ui_error_t cupertino_desktop_text_selection_toolbar_create(
     struct ui_engine *engine,
     const struct cupertino_desktop_text_selection_toolbar_descriptor *desc,
@@ -181,6 +184,7 @@ ui_error_t cupertino_desktop_text_selection_toolbar_create(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_desktop_text_selection_toolbar_destroy function. */
 ui_error_t cupertino_desktop_text_selection_toolbar_destroy(
     struct cupertino_desktop_text_selection_toolbar *toolbar) {
   if (!toolbar) {
@@ -191,6 +195,7 @@ ui_error_t cupertino_desktop_text_selection_toolbar_destroy(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_desktop_text_selection_toolbar_show function. */
 ui_error_t cupertino_desktop_text_selection_toolbar_show(
     struct cupertino_desktop_text_selection_toolbar *toolbar, float x,
     float y) {
@@ -206,6 +211,7 @@ ui_error_t cupertino_desktop_text_selection_toolbar_show(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_desktop_text_selection_toolbar_hide function. */
 ui_error_t cupertino_desktop_text_selection_toolbar_hide(
     struct cupertino_desktop_text_selection_toolbar *toolbar) {
   if (!toolbar) {
@@ -217,6 +223,7 @@ ui_error_t cupertino_desktop_text_selection_toolbar_hide(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_desktop_text_selection_toolbar_is_visible function. */
 ui_error_t cupertino_desktop_text_selection_toolbar_is_visible(
     const struct cupertino_desktop_text_selection_toolbar *toolbar,
     int *out_visible) {
@@ -228,6 +235,7 @@ ui_error_t cupertino_desktop_text_selection_toolbar_is_visible(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_desktop_text_selection_toolbar_set_hover_index function. */
 ui_error_t cupertino_desktop_text_selection_toolbar_set_hover_index(
     struct cupertino_desktop_text_selection_toolbar *toolbar, int index) {
   if (!toolbar) {
@@ -242,6 +250,7 @@ ui_error_t cupertino_desktop_text_selection_toolbar_set_hover_index(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_desktop_text_selection_toolbar_get_hover_index function. */
 ui_error_t cupertino_desktop_text_selection_toolbar_get_hover_index(
     const struct cupertino_desktop_text_selection_toolbar *toolbar,
     int *out_index) {
@@ -253,6 +262,7 @@ ui_error_t cupertino_desktop_text_selection_toolbar_get_hover_index(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_desktop_text_selection_toolbar_trigger_action function. */
 ui_error_t cupertino_desktop_text_selection_toolbar_trigger_action(
     struct cupertino_desktop_text_selection_toolbar *toolbar, int action_id,
     int *out_handled) {
@@ -276,6 +286,7 @@ ui_error_t cupertino_desktop_text_selection_toolbar_trigger_action(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_desktop_text_selection_toolbar_get_item_count function. */
 ui_error_t cupertino_desktop_text_selection_toolbar_get_item_count(
     const struct cupertino_desktop_text_selection_toolbar *toolbar,
     size_t *out_count) {
@@ -287,6 +298,7 @@ ui_error_t cupertino_desktop_text_selection_toolbar_get_item_count(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_desktop_text_selection_toolbar_get_item_at function. */
 ui_error_t cupertino_desktop_text_selection_toolbar_get_item_at(
     const struct cupertino_desktop_text_selection_toolbar *toolbar,
     size_t index, const char **out_title, const char **out_shortcut,
@@ -311,6 +323,7 @@ ui_error_t cupertino_desktop_text_selection_toolbar_get_item_at(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_desktop_text_selection_toolbar_get_bounds function. */
 ui_error_t cupertino_desktop_text_selection_toolbar_get_bounds(
     const struct cupertino_desktop_text_selection_toolbar *toolbar,
     float *out_x, float *out_y, float *out_w, float *out_h) {

@@ -17,12 +17,15 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
+/** @brief CUPERTINO_TABLE_VIEW_MAX_SECTIONS constant. */
 #define CUPERTINO_TABLE_VIEW_MAX_SECTIONS 16
+/** @brief CUPERTINO_TABLE_VIEW_MAX_SWIPE_ACTIONS constant. */
 #define CUPERTINO_TABLE_VIEW_MAX_SWIPE_ACTIONS 4
+/** @brief CUPERTINO_TABLE_VIEW_MAX_INDEX_TITLES constant. */
 #define CUPERTINO_TABLE_VIEW_MAX_INDEX_TITLES 32
 
 /**
@@ -57,7 +60,7 @@ struct cupertino_swipe_action {
   char title[32];                          /**< Button title text. */
   char icon[32];                           /**< SF symbol icon name. */
   enum cupertino_swipe_action_style style; /**< Semantic action style. */
-  int (*handler)(void *user_data);         /**< Callback handler on trigger. */
+  ui_error_t (*handler)(void *user_data);  /**< Callback handler on trigger. */
   void *user_data;                         /**< User context pointer. */
 };
 
@@ -362,6 +365,6 @@ cupertino_table_view_get_separator_layout(
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* CUPERTINO_CUPERTINO_TABLE_VIEW_H */

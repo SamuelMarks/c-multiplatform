@@ -6,6 +6,8 @@
 #include <assert.h>
 /* clang-format on */
 
+extern int g_link_base_mock_fail;
+
 extern int g_malloc_fail_countdown;
 
 static ui_error_t test_link_base(void) {
@@ -37,7 +39,6 @@ static ui_error_t test_link_base(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_link_base_mock_fail;
     g_link_base_mock_fail = 1;
     g_malloc_fail_countdown = 1;
     err = ui_link_base_create(&link);
@@ -58,7 +59,6 @@ static ui_error_t test_link_base(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_link_base_mock_fail;
     g_link_base_mock_fail = 3;
     err = ui_link_base_set_text(link, "Fail Append");
     assert(err != UI_ERROR_NONE);

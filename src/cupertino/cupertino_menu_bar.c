@@ -9,6 +9,7 @@
 #include <string.h>
 /* clang-format on */
 
+/** @brief cupertino_menu_bar_create function. */
 ui_error_t
 cupertino_menu_bar_create(struct ui_engine *engine,
                           const struct cupertino_menu_bar_descriptor *desc,
@@ -59,6 +60,7 @@ cupertino_menu_bar_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_menu_bar_destroy function. */
 ui_error_t cupertino_menu_bar_destroy(struct cupertino_menu_bar *bar) {
   if (!bar) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -68,6 +70,7 @@ ui_error_t cupertino_menu_bar_destroy(struct cupertino_menu_bar *bar) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_menu_bar_add_menu function. */
 ui_error_t cupertino_menu_bar_add_menu(struct cupertino_menu_bar *bar,
                                        const char *title, int *out_menu_index) {
   int idx;
@@ -95,6 +98,7 @@ ui_error_t cupertino_menu_bar_add_menu(struct cupertino_menu_bar *bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_menu_bar_add_item function. */
 ui_error_t cupertino_menu_bar_add_item(struct cupertino_menu_bar *bar,
                                        int menu_index, const char *title,
                                        const char *shortcut, int is_separator,
@@ -144,6 +148,7 @@ ui_error_t cupertino_menu_bar_add_item(struct cupertino_menu_bar *bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_menu_bar_set_item_enabled function. */
 ui_error_t cupertino_menu_bar_set_item_enabled(struct cupertino_menu_bar *bar,
                                                int menu_index, int item_index,
                                                int is_enabled) {
@@ -156,6 +161,7 @@ ui_error_t cupertino_menu_bar_set_item_enabled(struct cupertino_menu_bar *bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_menu_bar_set_item_state function. */
 ui_error_t
 cupertino_menu_bar_set_item_state(struct cupertino_menu_bar *bar,
                                   int menu_index, int item_index,
@@ -170,6 +176,7 @@ cupertino_menu_bar_set_item_state(struct cupertino_menu_bar *bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_menu_bar_open_menu function. */
 ui_error_t cupertino_menu_bar_open_menu(struct cupertino_menu_bar *bar,
                                         int menu_index) {
   if (!bar || menu_index < 0 || menu_index >= bar->menu_count) {
@@ -180,6 +187,7 @@ ui_error_t cupertino_menu_bar_open_menu(struct cupertino_menu_bar *bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_menu_bar_close function. */
 ui_error_t cupertino_menu_bar_close(struct cupertino_menu_bar *bar) {
   if (!bar) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -189,6 +197,7 @@ ui_error_t cupertino_menu_bar_close(struct cupertino_menu_bar *bar) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_menu_bar_get_active_menu function. */
 ui_error_t
 cupertino_menu_bar_get_active_menu(const struct cupertino_menu_bar *bar,
                                    int *out_menu_index) {
@@ -200,6 +209,7 @@ cupertino_menu_bar_get_active_menu(const struct cupertino_menu_bar *bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_menu_bar_get_dimensions function. */
 ui_error_t
 cupertino_menu_bar_get_dimensions(const struct cupertino_menu_bar *bar,
                                   float *out_width, float *out_height) {

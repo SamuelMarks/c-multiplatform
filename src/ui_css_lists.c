@@ -47,6 +47,7 @@ static ui_error_t skip_whitespace(const char **p_str) {
 
 /* \brief ui_error
  */
+/** @brief ui_css_parse_list_style_type function. */
 ui_error_t
 ui_css_parse_list_style_type(const char *str,
                              struct ui_css_list_style_type_ext *out_type) {
@@ -116,6 +117,7 @@ ui_css_parse_list_style_type(const char *str,
 
 /* \brief ui_css_parse_list_style_position
  */
+/** @brief ui_css_parse_list_style_position function. */
 ui_error_t ui_css_parse_list_style_position(
     const char *str, enum ui_css_list_style_position *out_position) {
   ui_error_t rc;
@@ -256,6 +258,7 @@ ui_error_t ui_css_parse_list_style(const char *str,
 
 /* \brief ui_error
  */
+/** @brief ui_css_parse_counter_action function. */
 ui_error_t
 ui_css_parse_counter_action(const char *str,
                             struct ui_css_counter_action **out_actions) {
@@ -353,6 +356,7 @@ ui_css_parse_counter_action(const char *str,
 
 /* \brief ui_error
  */
+/** @brief ui_css_counter_action_destroy function. */
 ui_error_t
 ui_css_counter_action_destroy(struct ui_css_counter_action *actions) {
   while (actions) {

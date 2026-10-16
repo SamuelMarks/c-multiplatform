@@ -13,10 +13,11 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
+/** @brief CUPERTINO_PHOTO_PICKER_MAX_ASSETS constant. */
 #define CUPERTINO_PHOTO_PICKER_MAX_ASSETS 64
 
 /**
@@ -35,10 +36,10 @@ enum cupertino_photo_filter {
  * @brief Single media asset in the picker grid.
  */
 struct cupertino_photo_item {
-  char id[64];
-  char title[64];
-  int is_video;
-  int is_selected;
+  char id[64];         /**< id[64] field. */
+  char title[64];      /**< title[64] field. */
+  int is_video;        /**< is_video field. */
+  int is_selected;     /**< is_selected field. */
   int selection_order; /**< 1-based order badge number. */
   int is_visible;      /**< Visibility after search filter. */
 };
@@ -57,13 +58,16 @@ struct cupertino_photo_picker_descriptor {
  * @brief Photo picker instance.
  */
 struct cupertino_photo_picker {
-  int selection_limit;
-  enum cupertino_photo_filter filter;
-  int asset_count;
-  struct cupertino_photo_item assets[CUPERTINO_PHOTO_PICKER_MAX_ASSETS];
-  int selected_count;
-  float width;
-  float height;
+  int selection_limit;                /**< selection_limit field. */
+  enum cupertino_photo_filter filter; /**< filter field. */
+  int asset_count;                    /**< asset_count field. */
+  struct cupertino_photo_item assets
+      [CUPERTINO_PHOTO_PICKER_MAX_ASSETS]; /**<
+                                              assets[CUPERTINO_PHOTO_PICKER_MAX_ASSETS]
+                                              field. */
+  int selected_count;                      /**< selected_count field. */
+  float width;                             /**< width field. */
+  float height;                            /**< height field. */
 };
 
 /**

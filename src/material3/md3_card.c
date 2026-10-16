@@ -9,6 +9,7 @@
 #include <string.h>
 /* clang-format on */
 
+/** @brief md3_card_create function. */
 ui_error_t md3_card_create(struct ui_engine *engine,
                            enum md3_card_variant variant,
                            struct md3_card **out_card) {
@@ -37,6 +38,7 @@ ui_error_t md3_card_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_card_destroy function. */
 ui_error_t md3_card_destroy(struct md3_card *card) {
   ui_error_t rc;
 
@@ -49,6 +51,7 @@ ui_error_t md3_card_destroy(struct md3_card *card) {
   return rc;
 }
 
+/** @brief md3_card_set_title function. */
 ui_error_t md3_card_set_title(struct md3_card *card, const char *title) {
   ui_error_t rc;
 
@@ -75,6 +78,7 @@ ui_error_t md3_card_set_title(struct md3_card *card, const char *title) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_card_set_subtitle function. */
 ui_error_t md3_card_set_subtitle(struct md3_card *card, const char *subtitle) {
   ui_error_t rc;
 
@@ -102,6 +106,7 @@ ui_error_t md3_card_set_subtitle(struct md3_card *card, const char *subtitle) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_card_set_header function. */
 ui_error_t md3_card_set_header(struct md3_card *card,
                                struct ui_component *header) {
   if (!card) {
@@ -111,6 +116,7 @@ ui_error_t md3_card_set_header(struct md3_card *card,
   return ui_card_base_set_header(card->base, header);
 }
 
+/** @brief md3_card_set_content function. */
 ui_error_t md3_card_set_content(struct md3_card *card,
                                 struct ui_component *content) {
   if (!card) {
@@ -120,6 +126,7 @@ ui_error_t md3_card_set_content(struct md3_card *card,
   return ui_card_base_set_content(card->base, content);
 }
 
+/** @brief md3_card_set_actions function. */
 ui_error_t md3_card_set_actions(struct md3_card *card,
                                 struct ui_component *actions) {
   if (!card) {
@@ -129,6 +136,7 @@ ui_error_t md3_card_set_actions(struct md3_card *card,
   return ui_card_base_set_actions(card->base, actions);
 }
 
+/** @brief md3_card_get_base function. */
 ui_error_t md3_card_get_base(struct md3_card *card,
                              struct ui_card_base **out_base) {
   if (!card || !out_base) {

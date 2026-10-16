@@ -6,6 +6,9 @@
 #include <string.h>
 /* clang-format on */
 
+extern void C_MULTIPLATFORM_FREE(void *);
+extern int g_mock_io_fail;
+
 extern int g_malloc_fail_countdown;
 
 static ui_error_t dummy_on_change(union ui_signal_payload value,
@@ -23,16 +26,27 @@ static ui_error_t dummy_on_touched(void *user_data) {
 }
 
 static int run_coverage_tests(void) {
-  FILE *fp_empty = fopen("empty_test.txt", "wb");
-  FILE *fptest = fopen("test_coverage.txt", "wb");
-  FILE *fp2 = fopen("test.txt", "wb");
-  extern void C_MULTIPLATFORM_FREE(void *);
-  extern int g_mock_io_fail;
+  FILE *fp_empty = NULL;
+  FILE *fptest = NULL;
+  FILE *fp2 = NULL;
   struct ui_file_uploader_base uploader;
   struct ui_control_value_accessor cva;
   union ui_signal_payload payload;
   int touched_called = 0;
   int change_called = 0;
+
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+  if (fopen_s(&fp_empty, "empty_test.txt", "wb") != 0)
+    fp_empty = NULL;
+  if (fopen_s(&fptest, "test_coverage.txt", "wb") != 0)
+    fptest = NULL;
+  if (fopen_s(&fp2, "test.txt", "wb") != 0)
+    fp2 = NULL;
+#else
+  fp_empty = fopen("empty_test.txt", "wb");
+  fptest = fopen("test_coverage.txt", "wb");
+  fp2 = fopen("test.txt", "wb");
+#endif
 
   if (ui_file_uploader_init(&uploader, 2, 0, 0, 100, 100, &cva) !=
       UI_ERROR_NONE)
@@ -228,7 +242,12 @@ static int run_normal_tests(void) {
   if (rc != UI_ERROR_NONE || uploader.state != UI_FILE_UPLOADER_STATE_IDLE)
     return 1;
 
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+  if (fopen_s(&fp, "test_upload.txt", "wb") != 0)
+    fp = NULL;
+#else
   fp = fopen("test_upload.txt", "wb");
+#endif
   if (fp) {
     fwrite("Hello Uploader", 1, 14, fp);
     fclose(fp);
@@ -302,8 +321,15 @@ static ui_error_t mock_change_fail(union ui_signal_payload v, void *ud) {
 }
 
 static void test_failing_callbacks(void) {
-  FILE *fp = fopen("fail_test.txt", "w");
+  FILE *fp = NULL;
   struct ui_file_uploader_base uploader;
+
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+  if (fopen_s(&fp, "fail_test.txt", "w") != 0)
+    fp = NULL;
+#else
+  fp = fopen("fail_test.txt", "w");
+#endif
 
   ui_file_uploader_init(&uploader, 2, 0, 0, 100, 100, NULL);
   uploader.on_touched_cb = mock_touch_fail;

@@ -29,10 +29,7 @@ ui_css_scroll_anchoring_parse(const struct ui_css_computed_style *style,
 
   rc = ui_css_computed_style_get_property(style, "overflow-anchor", &val);
   if (rc != UI_ERROR_NONE) {
-    if (rc == UI_ERROR_NOT_FOUND) {
-      return UI_ERROR_NONE; /* keep default */
-    }
-    return rc;
+    return (rc == UI_ERROR_NOT_FOUND) ? UI_ERROR_NONE : rc;
   }
   if (val[0] == 'n') {
     *out_anchor = UI_CSS_OVERFLOW_ANCHOR_NONE;

@@ -153,6 +153,7 @@ struct ui_banner_base {
   struct ui_computed *animating_signal; /**< Animating state signal */
 };
 
+/** @brief ui_banner_base_create function. */
 ui_error_t ui_banner_base_create(struct ui_banner_base **out_banner) {
   struct ui_banner_base *banner;
   struct ui_component *base_comp;
@@ -210,6 +211,7 @@ ui_error_t ui_banner_base_create(struct ui_banner_base **out_banner) {
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_banner_base_set_text function. */
 ui_error_t ui_banner_base_set_text(struct ui_banner_base *banner,
                                    const char *text) {
   struct ui_dom_node *text_node;
@@ -237,6 +239,7 @@ ui_error_t ui_banner_base_set_text(struct ui_banner_base *banner,
   return ui_dom_node_set_text_content(text_node, text);
 }
 
+/** @brief ui_banner_base_set_dismissible function. */
 ui_error_t ui_banner_base_set_dismissible(struct ui_banner_base *banner,
                                           int is_dismissible) {
   if (!banner) {
@@ -252,6 +255,7 @@ ui_error_t ui_banner_base_set_dismissible(struct ui_banner_base *banner,
   }
 }
 
+/** @brief ui_banner_base_set_open function. */
 ui_error_t ui_banner_base_set_open(struct ui_banner_base *banner, int is_open) {
   ui_error_t rc;
   if (!banner) {
@@ -289,6 +293,7 @@ ui_error_t ui_banner_base_set_open(struct ui_banner_base *banner, int is_open) {
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_banner_base_is_open function. */
 ui_error_t ui_banner_base_is_open(const struct ui_banner_base *banner,
                                   int *out_is_open) {
   if (!banner || !out_is_open) {
@@ -298,6 +303,7 @@ ui_error_t ui_banner_base_is_open(const struct ui_banner_base *banner,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_banner_base_bind_open function. */
 ui_error_t ui_banner_base_bind_open(struct ui_banner_base *banner,
                                     struct ui_signal *open_signal) {
   if (!banner) {
@@ -307,6 +313,7 @@ ui_error_t ui_banner_base_bind_open(struct ui_banner_base *banner,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_banner_base_get_animating_signal function. */
 ui_error_t
 ui_banner_base_get_animating_signal(struct ui_banner_base *banner,
                                     struct ui_computed **out_animating) {
@@ -317,6 +324,7 @@ ui_banner_base_get_animating_signal(struct ui_banner_base *banner,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_banner_base_get_component function. */
 ui_error_t ui_banner_base_get_component(struct ui_banner_base *banner,
                                         struct ui_component **out_component) {
   if (!banner || !out_component) {
@@ -326,6 +334,7 @@ ui_error_t ui_banner_base_get_component(struct ui_banner_base *banner,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_banner_base_destroy function. */
 ui_error_t ui_banner_base_destroy(struct ui_banner_base *banner) {
   if (!banner) {
     return UI_ERROR_NONE;

@@ -14,6 +14,9 @@
 #include <assert.h>
 /* clang-format on */
 
+extern int g_malloc_fail_countdown;
+extern int g_mock_strcpy_fail;
+
 static int s_parson_calls = 0;
 static int s_parson_fail_at = -1;
 static void *mock_parson_malloc(size_t size) {
@@ -30,79 +33,36 @@ int main(void) {
   struct ui_runtime_app_manifest *manifest = NULL;
   struct ui_runtime_node *single_node = NULL;
 
-  json_set_allocation_functions(mock_parson_malloc, free);
-
-  const char *valid_manifest_json =
-      "{\n"
-      "  \"app_id\": \"survey_app\",\n"
-      "  \"initial_route\": \"/home\",\n"
-      "  \"global_state\": {\n"
-      "    \"user_name\": \"Alice\",\n"
-      "    \"cart_count\": 5,\n"
-      "    \"is_admin\": true\n"
-      "  },\n"
-      "  \"routes\": [\n"
-      "    {\n"
-      "      \"path\": \"/home\",\n"
-      "      \"title\": \"Home Screen\",\n"
-      "      \"root\": {\n"
-      "        \"id\": \"root_card\",\n"
-      "        \"type\": \"ui_card_base\",\n"
-      "        \"props\": {\n"
-      "          \"title\": \"Welcome\",\n"
-      "          \"elevation\": 2\n"
-      "        },\n"
-      "        \"bindings\": {\n"
-      "          \"bind_text\": \"app.user_name\"\n"
-      "        },\n"
-      "        \"validators\": [\n"
-      "          {\"type\": \"required\"},\n"
-      "          {\"type\": \"pattern\", \"pattern\": \"^[a-z]+$\"},\n"
-      "          {\"type\": \"min_length\", \"min_length\": 3},\n"
-      "          {\"type\": \"max_length\", \"max_length\": 50}\n"
-      "        ],\n"
-      "        \"events\": {\n"
-      "          \"on_click\": {\n"
-      "            \"steps\": [\n"
-      "              {\"stepId\": \"step1\", \"action\": \"mutate_state\", "
-      "\"target\": \"cart_count\", \"value\": \"6\"},\n"
-      "              {\"stepId\": \"step2\", \"action\": \"navigate\", "
-      "\"target\": \"/checkout\"},\n"
-      "              {\"stepId\": \"step3\", \"action\": \"http_request\", "
-      "\"target\": \"/api/submit\", \"successCriteria\": \"$code == 200\"}\n"
-      "            ]\n"
-      "          }\n"
-      "        },\n"
-      "        \"children\": [\n"
-      "          {\n"
-      "            \"id\": \"btn_submit\",\n"
-      "            \"type\": \"ui_button_base\",\n"
-      "            \"props\": {\n"
-      "              \"text\": \"Submit\"\n"
-      "            },\n"
-      "            \"bindings\": {\n"
-      "              \"bind_disabled\": \"is_submitting\",\n"
-      "              \"bind_visibility\": \"show_btn\"\n"
-      "            }\n"
-      "          },\n"
-      "          {\n"
-      "            \"id\": \"btn_cancel\",\n"
-      "            \"type\": \"ui_button_base\",\n"
-      "            \"props\": {\n"
-      "              \"text\": \"Cancel\"\n"
-      "            }\n"
-      "          }\n"
-      "        ]\n"
-      "      }\n"
-      "    },\n"
-      "    {\n"
-      "      \"path\": \"/about\",\n"
-      "      \"root\": {\n"
-      "        \"type\": \"ui_label_base\"\n"
-      "      }\n"
-      "    }\n"
-      "  ]\n"
-      "}";
+  char valid_manifest_json[1024];
+  const char *valid_manifest_p1 =
+      "{\"app_id\":\"survey_app\",\"initial_route\":\"/home\","
+      "\"global_state\":{\"user_name\":\"Alice\",\"cart_count\":5,\"is_admin\":"
+      "true},"
+      "\"routes\":[{\"path\":\"/home\",\"title\":\"Home Screen\",\"root\":{"
+      "\"id\":\"root_card\",\"type\":\"ui_card_base\","
+      "\"props\":{\"title\":\"Welcome\",\"elevation\":2},"
+      "\"bindings\":{\"bind_text\":\"app.user_name\"},"
+      "\"validators\":[{\"type\":\"required\"},{\"type\":\"pattern\","
+      "\"pattern\":\"^[a-z]+$\"},"
+      "{\"type\":\"min_length\",\"min_length\":3},{\"type\":\"max_length\","
+      "\"max_length\":50}],";
+  const char *valid_manifest_p2 =
+      "\"events\":{\"on_click\":{\"steps\":["
+      "{\"stepId\":\"step1\",\"action\":\"mutate_state\",\"target\":\"cart_"
+      "count\",\"value\":\"6\"},"
+      "{\"stepId\":\"step2\",\"action\":\"navigate\",\"target\":\"/checkout\"},"
+      "{\"stepId\":\"step3\",\"action\":\"http_request\",\"target\":\"/api/"
+      "submit\",\"successCriteria\":\"$code == 200\"}"
+      "]}},";
+  const char *valid_manifest_p3 =
+      "\"children\":["
+      "{\"id\":\"btn_submit\",\"type\":\"ui_button_base\",\"props\":{\"text\":"
+      "\"Submit\"},"
+      "\"bindings\":{\"bind_disabled\":\"is_submitting\",\"bind_visibility\":"
+      "\"show_btn\"}},"
+      "{\"id\":\"btn_cancel\",\"type\":\"ui_button_base\",\"props\":{\"text\":"
+      "\"Cancel\"}}"
+      "]}},{\"path\":\"/about\",\"root\":{\"type\":\"ui_label_base\"}}]}";
 
   const char *valid_node_json = "{\n"
                                 "  \"id\": \"input_email\",\n"
@@ -132,41 +92,28 @@ int main(void) {
                                         "}";
 
   const char *rich_node_json =
-      "{\n"
-      "  \"id\": \"rich_node\",\n"
-      "  \"type\": \"custom_widget\",\n"
-      "  \"props\": {\n"
-      "    \"bool_p\": false,\n"
-      "    \"num_p\": 12.34,\n"
-      "    \"str_p\": \"text\"\n"
-      "  },\n"
-      "  \"bindings\": {\n"
-      "    \"bind_disabled\": \"app.is_disabled\",\n"
-      "    \"bind_visibility\": \"app.is_visible\",\n"
-      "    \"bind_signal\": \"app.custom_sig\"\n"
-      "  },\n"
-      "  \"validators\": [\n"
-      "    {\"type\": \"pattern\"},\n"
-      "    {\"type\": \"pattern\", \"pattern\": \"^\\\\d+$\"},\n"
-      "    {\"type\": \"min_length\", \"value\": 5},\n"
-      "    {\"type\": \"max_length\", \"value\": 10}\n"
-      "  ],\n"
-      "  \"events\": {\n"
-      "    \"on_change\": {\n"
-      "      \"steps\": [\n"
-      "        {\"stepId\": \"s1\", \"action\": \"navigate\", \"target\": "
-      "\"/next\"},\n"
-      "        {\"action\": \"http_request\"}\n"
-      "      ]\n"
-      "    },\n"
-      "    \"on_submit\": {\n"
-      "      \"steps\": []\n"
-      "    },\n"
-      "    \"on_blur\": {\n"
-      "      \"steps\": []\n"
-      "    }\n"
-      "  }\n"
-      "}";
+      "{\"id\":\"rich_node\",\"type\":\"custom_widget\","
+      "\"props\":{\"bool_p\":false,\"num_p\":12.34,\"str_p\":\"text\"},"
+      "\"bindings\":{\"bind_disabled\":\"app.is_disabled\",\"bind_visibility\":"
+      "\"app.is_visible\",\"bind_signal\":\"app.custom_sig\"},"
+      "\"validators\":[{\"type\":\"pattern\"},{\"type\":\"pattern\","
+      "\"pattern\":\"^\\\\d+$\"},"
+      "{\"type\":\"min_length\",\"value\":5},{\"type\":\"max_length\","
+      "\"value\":10}],"
+      "\"events\":{\"on_change\":{\"steps\":[{\"stepId\":\"s1\",\"action\":"
+      "\"navigate\",\"target\":\"/next\"},{\"action\":\"http_request\"}]},"
+      "\"on_submit\":{\"steps\":[]},\"on_blur\":{\"steps\":[]}}}";
+
+  json_set_allocation_functions(mock_parson_malloc, free);
+#if defined(_MSC_VER)
+  strcpy_s(valid_manifest_json, sizeof(valid_manifest_json), valid_manifest_p1);
+  strcat_s(valid_manifest_json, sizeof(valid_manifest_json), valid_manifest_p2);
+  strcat_s(valid_manifest_json, sizeof(valid_manifest_json), valid_manifest_p3);
+#else
+  strcpy(valid_manifest_json, valid_manifest_p1);
+  strcat(valid_manifest_json, valid_manifest_p2);
+  strcat(valid_manifest_json, valid_manifest_p3);
+#endif
 
   rc = ui_arena_create(65536, &arena);
   assert(rc == UI_ERROR_NONE);
@@ -381,8 +328,6 @@ int main(void) {
   /* Test arena OOM during parse */
   {
     int i;
-    extern int g_malloc_fail_countdown;
-    extern int g_mock_strcpy_fail;
     struct ui_runtime_node *fail_node = NULL;
     struct ui_runtime_app_manifest *fail_m = NULL;
     struct ui_arena *small_arena = NULL;

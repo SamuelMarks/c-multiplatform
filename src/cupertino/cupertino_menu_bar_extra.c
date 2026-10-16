@@ -13,6 +13,7 @@
 int g_cupertino_menu_bar_extra_mock_recompute_fail = 0;
 #endif
 
+/** @brief cupertino_menu_bar_extra_recompute_bounds function. */
 ui_error_t cupertino_menu_bar_extra_recompute_bounds(
     struct cupertino_menu_bar_extra *extra) {
   size_t title_len;
@@ -58,6 +59,7 @@ ui_error_t cupertino_menu_bar_extra_recompute_bounds(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_menu_bar_extra_create function. */
 ui_error_t cupertino_menu_bar_extra_create(
     struct ui_engine *engine,
     const struct cupertino_menu_bar_extra_descriptor *desc,
@@ -114,6 +116,7 @@ ui_error_t cupertino_menu_bar_extra_create(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_menu_bar_extra_destroy function. */
 ui_error_t
 cupertino_menu_bar_extra_destroy(struct cupertino_menu_bar_extra *extra) {
   if (!extra) {
@@ -124,6 +127,7 @@ cupertino_menu_bar_extra_destroy(struct cupertino_menu_bar_extra *extra) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_menu_bar_extra_set_title function. */
 ui_error_t
 cupertino_menu_bar_extra_set_title(struct cupertino_menu_bar_extra *extra,
                                    const char *title) {
@@ -145,6 +149,7 @@ cupertino_menu_bar_extra_set_title(struct cupertino_menu_bar_extra *extra,
   return cupertino_menu_bar_extra_recompute_bounds(extra);
 }
 
+/** @brief cupertino_menu_bar_extra_get_title function. */
 ui_error_t
 cupertino_menu_bar_extra_get_title(const struct cupertino_menu_bar_extra *extra,
                                    const char **out_title) {
@@ -156,6 +161,7 @@ cupertino_menu_bar_extra_get_title(const struct cupertino_menu_bar_extra *extra,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_menu_bar_extra_set_icon function. */
 ui_error_t
 cupertino_menu_bar_extra_set_icon(struct cupertino_menu_bar_extra *extra,
                                   const char *icon_symbol) {
@@ -178,6 +184,7 @@ cupertino_menu_bar_extra_set_icon(struct cupertino_menu_bar_extra *extra,
   return cupertino_menu_bar_extra_recompute_bounds(extra);
 }
 
+/** @brief cupertino_menu_bar_extra_get_icon function. */
 ui_error_t
 cupertino_menu_bar_extra_get_icon(const struct cupertino_menu_bar_extra *extra,
                                   const char **out_symbol) {
@@ -189,6 +196,7 @@ cupertino_menu_bar_extra_get_icon(const struct cupertino_menu_bar_extra *extra,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_menu_bar_extra_set_animating function. */
 ui_error_t
 cupertino_menu_bar_extra_set_animating(struct cupertino_menu_bar_extra *extra,
                                        int is_animating,
@@ -202,6 +210,7 @@ cupertino_menu_bar_extra_set_animating(struct cupertino_menu_bar_extra *extra,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_menu_bar_extra_is_animating function. */
 ui_error_t cupertino_menu_bar_extra_is_animating(
     const struct cupertino_menu_bar_extra *extra, int *out_is_animating,
     float *out_phase) {
@@ -217,6 +226,7 @@ ui_error_t cupertino_menu_bar_extra_is_animating(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_menu_bar_extra_set_menu_open function. */
 ui_error_t
 cupertino_menu_bar_extra_set_menu_open(struct cupertino_menu_bar_extra *extra,
                                        int is_open) {
@@ -228,6 +238,7 @@ cupertino_menu_bar_extra_set_menu_open(struct cupertino_menu_bar_extra *extra,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_menu_bar_extra_is_menu_open function. */
 ui_error_t cupertino_menu_bar_extra_is_menu_open(
     const struct cupertino_menu_bar_extra *extra, int *out_is_open) {
   if (!extra || !out_is_open) {
@@ -238,6 +249,7 @@ ui_error_t cupertino_menu_bar_extra_is_menu_open(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_menu_bar_extra_click function. */
 ui_error_t
 cupertino_menu_bar_extra_click(struct cupertino_menu_bar_extra *extra) {
   if (!extra) {
@@ -248,6 +260,7 @@ cupertino_menu_bar_extra_click(struct cupertino_menu_bar_extra *extra) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_menu_bar_extra_get_bounds function. */
 ui_error_t cupertino_menu_bar_extra_get_bounds(
     const struct cupertino_menu_bar_extra *extra, float *out_w, float *out_h) {
   if (!extra || !out_w || !out_h) {

@@ -426,7 +426,7 @@ TEST test_md3_contrast_schemes(void) {
 }
 
 TEST test_md3_expressive_ripple(void) {
-  struct md3_ripple_params params;
+  struct md3_ripple_params params = {0};
   struct md3_ripple_frame frame;
   ui_error_t rc;
 

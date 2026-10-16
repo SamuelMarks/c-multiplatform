@@ -14,12 +14,15 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
+/** @brief CUPERTINO_REFRESH_DEFAULT_TRIGGER_DISTANCE constant. */
 #define CUPERTINO_REFRESH_DEFAULT_TRIGGER_DISTANCE 60.0f
+/** @brief CUPERTINO_REFRESH_DEFAULT_RESTING_DISTANCE constant. */
 #define CUPERTINO_REFRESH_DEFAULT_RESTING_DISTANCE 44.0f
+/** @brief CUPERTINO_REFRESH_SPOKE_COUNT constant. */
 #define CUPERTINO_REFRESH_SPOKE_COUNT 8
 
 /**

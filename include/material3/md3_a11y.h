@@ -20,7 +20,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_component;
 struct ui_dom_node;

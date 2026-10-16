@@ -94,75 +94,78 @@ int main(void) {
   }
 
   /* Null checks for uniforms */
-  float matrix[16] = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
-  failed |= (ui_shader_manager_set_uniform_matrix(
-                 NULL, program_id1, "u", matrix) != UI_ERROR_INVALID_ARGUMENT);
-  failed |=
-      (ui_shader_manager_set_uniform_matrix(
-           manager, program_id1, NULL, matrix) != UI_ERROR_INVALID_ARGUMENT);
-  failed |= (ui_shader_manager_set_uniform_matrix(
-                 manager, program_id1, "u", NULL) != UI_ERROR_INVALID_ARGUMENT);
-
-  failed |=
-      (ui_shader_manager_set_uniform_color(NULL, program_id1, "u", 1, 1, 1,
-                                           1) != UI_ERROR_INVALID_ARGUMENT);
-  failed |=
-      (ui_shader_manager_set_uniform_color(manager, program_id1, NULL, 1, 1, 1,
-                                           1) != UI_ERROR_INVALID_ARGUMENT);
-
-  failed |= (ui_shader_manager_set_uniform_float(NULL, program_id1, "u", 1) !=
-             UI_ERROR_INVALID_ARGUMENT);
-  failed |= (ui_shader_manager_set_uniform_float(
-                 manager, program_id1, NULL, 1) != UI_ERROR_INVALID_ARGUMENT);
-
-  /* Test uniform injection */
-  {
-    rc = ui_shader_manager_set_uniform_matrix(manager, program_id1, "u_matrix",
-                                              matrix);
-    if (rc != UI_ERROR_NONE) {
-      printf("Failed to set uniform matrix.\n");
-      return 1;
-    }
-    rc = ui_shader_manager_set_uniform_color(manager, program_id1, "u_color",
-                                             1.0f, 0.0f, 0.0f, 1.0f);
-    if (rc != UI_ERROR_NONE) {
-      printf("Failed to set uniform color.\n");
-      return 1;
-    }
-    rc = ui_shader_manager_set_uniform_float(manager, program_id1, "u_time",
-                                             1.5f);
-    if (rc != UI_ERROR_NONE) {
-      printf("Failed to set uniform float.\n");
-      return 1;
-    }
-  }
-
-  /* Uniform failing location lookup */
   {
     float matrix[16] = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
-    {
-      ui_error_t rc_cleanup = ui_shader_manager_set_uniform_matrix(
-          manager, program_id1, "invalid_u", matrix);
-      assert(rc_cleanup == UI_ERROR_NONE);
-    }
-    {
-      ui_error_t rc_cleanup = ui_shader_manager_set_uniform_color(
-          manager, program_id1, "invalid_u", 1.0f, 0.0f, 0.0f, 1.0f);
-      assert(rc_cleanup == UI_ERROR_NONE);
-    }
-    {
-      ui_error_t rc_cleanup = ui_shader_manager_set_uniform_float(
-          manager, program_id1, "invalid_u", 1.5f);
-      assert(rc_cleanup == UI_ERROR_NONE);
-    }
-  }
+    failed |=
+        (ui_shader_manager_set_uniform_matrix(NULL, program_id1, "u", matrix) !=
+         UI_ERROR_INVALID_ARGUMENT);
+    failed |=
+        (ui_shader_manager_set_uniform_matrix(
+             manager, program_id1, NULL, matrix) != UI_ERROR_INVALID_ARGUMENT);
+    failed |=
+        (ui_shader_manager_set_uniform_matrix(
+             manager, program_id1, "u", NULL) != UI_ERROR_INVALID_ARGUMENT);
 
-  rc = ui_shader_manager_destroy(manager);
-  if (rc != UI_ERROR_NONE) {
-    printf("Failed to destroy shader manager.\n");
-    return 1;
-  }
+    failed |=
+        (ui_shader_manager_set_uniform_color(NULL, program_id1, "u", 1, 1, 1,
+                                             1) != UI_ERROR_INVALID_ARGUMENT);
+    failed |= (ui_shader_manager_set_uniform_color(manager, program_id1, NULL,
+                                                   1, 1, 1, 1) !=
+               UI_ERROR_INVALID_ARGUMENT);
 
-  printf("ui_shader_manager tests finished.\n");
-  return failed;
+    failed |= (ui_shader_manager_set_uniform_float(NULL, program_id1, "u", 1) !=
+               UI_ERROR_INVALID_ARGUMENT);
+    failed |= (ui_shader_manager_set_uniform_float(
+                   manager, program_id1, NULL, 1) != UI_ERROR_INVALID_ARGUMENT);
+
+    /* Test uniform injection */
+    {
+      rc = ui_shader_manager_set_uniform_matrix(manager, program_id1,
+                                                "u_matrix", matrix);
+      if (rc != UI_ERROR_NONE) {
+        printf("Failed to set uniform matrix.\n");
+        return 1;
+      }
+      rc = ui_shader_manager_set_uniform_color(manager, program_id1, "u_color",
+                                               1.0f, 0.0f, 0.0f, 1.0f);
+      if (rc != UI_ERROR_NONE) {
+        printf("Failed to set uniform color.\n");
+        return 1;
+      }
+      rc = ui_shader_manager_set_uniform_float(manager, program_id1, "u_time",
+                                               1.5f);
+      if (rc != UI_ERROR_NONE) {
+        printf("Failed to set uniform float.\n");
+        return 1;
+      }
+    }
+
+    /* Uniform failing location lookup */
+    {
+      {
+        ui_error_t rc_cleanup = ui_shader_manager_set_uniform_matrix(
+            manager, program_id1, "invalid_u", matrix);
+        assert(rc_cleanup == UI_ERROR_NONE);
+      }
+      {
+        ui_error_t rc_cleanup = ui_shader_manager_set_uniform_color(
+            manager, program_id1, "invalid_u", 1.0f, 0.0f, 0.0f, 1.0f);
+        assert(rc_cleanup == UI_ERROR_NONE);
+      }
+      {
+        ui_error_t rc_cleanup = ui_shader_manager_set_uniform_float(
+            manager, program_id1, "invalid_u", 1.5f);
+        assert(rc_cleanup == UI_ERROR_NONE);
+      }
+    }
+
+    rc = ui_shader_manager_destroy(manager);
+    if (rc != UI_ERROR_NONE) {
+      printf("Failed to destroy shader manager.\n");
+      return 1;
+    }
+
+    printf("ui_shader_manager tests finished.\n");
+    return failed;
+  }
 }

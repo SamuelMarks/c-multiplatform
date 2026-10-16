@@ -30,7 +30,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
@@ -62,13 +62,13 @@ enum md3_loading_indicator_size {
  * @brief Material 3 Expressive Loading Indicator wrapping ui_progress_base.
  */
 struct md3_loading_indicator {
-  struct ui_progress_base *base;
-  enum md3_loading_indicator_style style;
-  enum md3_loading_indicator_size size;
-  float progress;
-  int shape_stage;
-  int is_reduced_motion;
-  float pulse_opacity;
+  struct ui_progress_base *base;          /**< base field. */
+  enum md3_loading_indicator_style style; /**< style field. */
+  enum md3_loading_indicator_size size;   /**< size field. */
+  float progress;                         /**< progress field. */
+  int shape_stage;                        /**< shape_stage field. */
+  int is_reduced_motion;                  /**< is_reduced_motion field. */
+  float pulse_opacity;                    /**< pulse_opacity field. */
 };
 
 /**
@@ -142,11 +142,11 @@ enum md3_stepper_orientation {
  * @brief Step configuration item inside a Material 3 stepper.
  */
 struct md3_step {
-  char step_id[64];
-  char title[128];
-  char subtitle[128];
-  enum ui_stepper_step_state state;
-  int is_editable;
+  char step_id[64];                 /**< step_id[64] field. */
+  char title[128];                  /**< title[128] field. */
+  char subtitle[128];               /**< subtitle[128] field. */
+  enum ui_stepper_step_state state; /**< state field. */
+  int is_editable;                  /**< is_editable field. */
 };
 
 /**
@@ -154,14 +154,14 @@ struct md3_step {
  * @brief Material 3 Stepper wrapping ui_stepper_base.
  */
 struct md3_stepper {
-  struct ui_stepper_base *base;
-  enum ui_stepper_mode mode;
-  enum md3_stepper_orientation orientation;
-  struct md3_step steps[32];
-  size_t step_count;
-  int active_index;
-  ui_stepper_validate_t validate_hook;
-  void *validate_user_data;
+  struct ui_stepper_base *base;             /**< base field. */
+  enum ui_stepper_mode mode;                /**< mode field. */
+  enum md3_stepper_orientation orientation; /**< orientation field. */
+  struct md3_step steps[32];                /**< steps[32] field. */
+  size_t step_count;                        /**< step_count field. */
+  int active_index;                         /**< active_index field. */
+  ui_stepper_validate_t validate_hook;      /**< validate_hook field. */
+  void *validate_user_data;                 /**< validate_user_data field. */
 };
 
 /**
@@ -292,20 +292,20 @@ extern C_MULTIPLATFORM_EXPORT ui_error_t md3_stepper_set_editable(
  * @brief Material 3 Application Scaffold wrapping ui_scaffold_base.
  */
 struct md3_scaffold {
-  struct ui_scaffold_base *base;
-  struct ui_component *top_bar;
-  struct ui_component *bottom_bar;
-  struct ui_component *side_nav;
-  struct ui_component *main_content;
-  struct ui_component *fab;
-  int fab_cradle_docked;
-  float safe_area_top;
-  float safe_area_bottom;
-  float safe_area_left;
-  float safe_area_right;
-  float scroll_offset_y;
-  float top_bar_elevation;
-  float bottom_bar_elevation;
+  struct ui_scaffold_base *base;     /**< base field. */
+  struct ui_component *top_bar;      /**< top_bar field. */
+  struct ui_component *bottom_bar;   /**< bottom_bar field. */
+  struct ui_component *side_nav;     /**< side_nav field. */
+  struct ui_component *main_content; /**< main_content field. */
+  struct ui_component *fab;          /**< fab field. */
+  int fab_cradle_docked;             /**< fab_cradle_docked field. */
+  float safe_area_top;               /**< safe_area_top field. */
+  float safe_area_bottom;            /**< safe_area_bottom field. */
+  float safe_area_left;              /**< safe_area_left field. */
+  float safe_area_right;             /**< safe_area_right field. */
+  float scroll_offset_y;             /**< scroll_offset_y field. */
+  float top_bar_elevation;           /**< top_bar_elevation field. */
+  float bottom_bar_elevation;        /**< bottom_bar_elevation field. */
 };
 
 /**
@@ -421,15 +421,15 @@ enum md3_canonical_layout_type {
  * @brief Material 3 Canonical Layout wrapping ui_canonical_layout_base.
  */
 struct md3_canonical_layout {
-  struct ui_canonical_layout_base *base;
-  struct ui_arena *arena;
-  enum md3_canonical_layout_type type;
-  enum ui_window_size_class size_class;
-  struct ui_component *body;
-  struct ui_component *leading_pane;
-  struct ui_component *trailing_pane;
-  float split_ratio;
-  int feed_columns;
+  struct ui_canonical_layout_base *base; /**< base field. */
+  struct ui_arena *arena;                /**< arena field. */
+  enum md3_canonical_layout_type type;   /**< type field. */
+  enum ui_window_size_class size_class;  /**< size_class field. */
+  struct ui_component *body;             /**< body field. */
+  struct ui_component *leading_pane;     /**< leading_pane field. */
+  struct ui_component *trailing_pane;    /**< trailing_pane field. */
+  float split_ratio;                     /**< split_ratio field. */
+  int feed_columns;                      /**< feed_columns field. */
 };
 
 /**
@@ -523,8 +523,8 @@ extern C_MULTIPLATFORM_EXPORT ui_error_t md3_canonical_layout_set_split_ratio(
  * @brief Breadcrumb link destination item.
  */
 struct md3_breadcrumb_item {
-  char label[64];
-  char href[128];
+  char label[64]; /**< label[64] field. */
+  char href[128]; /**< href[128] field. */
 };
 
 /**
@@ -532,12 +532,12 @@ struct md3_breadcrumb_item {
  * @brief Material 3 Breadcrumbs trail wrapping ui_breadcrumbs_base.
  */
 struct md3_breadcrumbs {
-  struct ui_breadcrumbs_base *base;
-  struct md3_breadcrumb_item items[32];
-  size_t item_count;
-  size_t max_items;
-  char separator[16];
-  size_t active_index;
+  struct ui_breadcrumbs_base *base;     /**< base field. */
+  struct md3_breadcrumb_item items[32]; /**< items[32] field. */
+  size_t item_count;                    /**< item_count field. */
+  size_t max_items;                     /**< max_items field. */
+  char separator[16];                   /**< separator[16] field. */
+  size_t active_index;                  /**< active_index field. */
 };
 
 /**
@@ -609,10 +609,10 @@ extern C_MULTIPLATFORM_EXPORT ui_error_t md3_breadcrumbs_simulate_click(
  * @brief Material 3 Page Indicator wrapping ui_page_control_base.
  */
 struct md3_page_indicator {
-  struct ui_page_control_base *base;
-  int page_count;
-  int current_page;
-  float pill_width;
+  struct ui_page_control_base *base; /**< base field. */
+  int page_count;                    /**< page_count field. */
+  int current_page;                  /**< current_page field. */
+  float pill_width;                  /**< pill_width field. */
 };
 
 /**

@@ -1,5 +1,5 @@
+extern int g_malloc_fail_countdown;
 void test_ui_router_oom_add2(void) {
-  extern int g_malloc_fail_countdown;
   struct ui_router *router = NULL;
   ui_router_create(&router);
   if (router) {

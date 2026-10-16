@@ -25,6 +25,7 @@ static ui_error_t mock_ui_list_base_destroy(struct ui_list_base *list) {
 /** @endcond */
 #endif
 
+/** @brief cupertino_table_view_create function. */
 ui_error_t
 cupertino_table_view_create(struct ui_engine *engine,
                             const struct cupertino_table_view_descriptor *desc,
@@ -64,6 +65,7 @@ cupertino_table_view_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_table_view_destroy function. */
 ui_error_t cupertino_table_view_destroy(struct cupertino_table_view *table) {
   ui_error_t rc;
 
@@ -82,6 +84,7 @@ ui_error_t cupertino_table_view_destroy(struct cupertino_table_view *table) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_table_view_add_section function. */
 ui_error_t
 cupertino_table_view_add_section(struct cupertino_table_view *table,
                                  struct cupertino_list_section *section) {
@@ -98,6 +101,7 @@ cupertino_table_view_add_section(struct cupertino_table_view *table,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_table_view_get_section_count function. */
 ui_error_t
 cupertino_table_view_get_section_count(const struct cupertino_table_view *table,
                                        size_t *out_count) {
@@ -109,6 +113,7 @@ cupertino_table_view_get_section_count(const struct cupertino_table_view *table,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_table_view_get_section function. */
 ui_error_t
 cupertino_table_view_get_section(const struct cupertino_table_view *table,
                                  size_t index,
@@ -125,6 +130,7 @@ cupertino_table_view_get_section(const struct cupertino_table_view *table,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_table_view_set_edit_mode function. */
 ui_error_t
 cupertino_table_view_set_edit_mode(struct cupertino_table_view *table,
                                    int edit_mode) {
@@ -143,6 +149,7 @@ cupertino_table_view_set_edit_mode(struct cupertino_table_view *table,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_table_view_get_edit_mode function. */
 ui_error_t
 cupertino_table_view_get_edit_mode(const struct cupertino_table_view *table,
                                    int *out_edit_mode) {
@@ -154,6 +161,7 @@ cupertino_table_view_get_edit_mode(const struct cupertino_table_view *table,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_table_view_add_leading_swipe_action function. */
 ui_error_t cupertino_table_view_add_leading_swipe_action(
     struct cupertino_table_view *table,
     const struct cupertino_swipe_action *action) {
@@ -170,6 +178,7 @@ ui_error_t cupertino_table_view_add_leading_swipe_action(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_table_view_add_trailing_swipe_action function. */
 ui_error_t cupertino_table_view_add_trailing_swipe_action(
     struct cupertino_table_view *table,
     const struct cupertino_swipe_action *action) {
@@ -186,6 +195,7 @@ ui_error_t cupertino_table_view_add_trailing_swipe_action(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_table_view_clear_swipe_actions function. */
 ui_error_t
 cupertino_table_view_clear_swipe_actions(struct cupertino_table_view *table) {
   if (table == NULL) {
@@ -201,6 +211,7 @@ cupertino_table_view_clear_swipe_actions(struct cupertino_table_view *table) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_table_view_swipe_pan function. */
 ui_error_t cupertino_table_view_swipe_pan(struct cupertino_table_view *table,
                                           int section, int row, float offset,
                                           float row_width) {
@@ -222,6 +233,7 @@ ui_error_t cupertino_table_view_swipe_pan(struct cupertino_table_view *table,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_table_view_swipe_release function. */
 ui_error_t
 cupertino_table_view_swipe_release(struct cupertino_table_view *table,
                                    float row_width, int *out_action_triggered) {
@@ -235,13 +247,20 @@ cupertino_table_view_swipe_release(struct cupertino_table_view *table,
   if (table->full_swipe_triggered) {
     if (table->swipe_offset > 0.0f && table->leading_action_count > 0) {
       if (table->leading_actions[0].handler != NULL) {
-        table->leading_actions[0].handler(table->leading_actions[0].user_data);
+        {
+          ui_error_t rc = table->leading_actions[0].handler(
+              table->leading_actions[0].user_data);
+          if (rc != UI_ERROR_NONE)
+            return rc;
+        }
       }
       triggered = 1;
     } else if (table->swipe_offset < 0.0f && table->trailing_action_count > 0) {
       if (table->trailing_actions[0].handler != NULL) {
-        table->trailing_actions[0].handler(
+        ui_error_t rc = table->trailing_actions[0].handler(
             table->trailing_actions[0].user_data);
+        if (rc != UI_ERROR_NONE)
+          return rc;
       }
       triggered = 1;
     }
@@ -257,6 +276,7 @@ cupertino_table_view_swipe_release(struct cupertino_table_view *table,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_table_view_set_index_titles function. */
 ui_error_t
 cupertino_table_view_set_index_titles(struct cupertino_table_view *table,
                                       const char *const *titles, size_t count) {
@@ -290,6 +310,7 @@ cupertino_table_view_set_index_titles(struct cupertino_table_view *table,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_table_view_scrub_index function. */
 ui_error_t cupertino_table_view_scrub_index(struct cupertino_table_view *table,
                                             float touch_y, float bar_height,
                                             int *out_selected_section) {
@@ -324,6 +345,7 @@ ui_error_t cupertino_table_view_scrub_index(struct cupertino_table_view *table,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_table_view_scrub_release function. */
 ui_error_t
 cupertino_table_view_scrub_release(struct cupertino_table_view *table) {
   if (table == NULL) {
@@ -336,6 +358,7 @@ cupertino_table_view_scrub_release(struct cupertino_table_view *table) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_table_view_reorder_begin function. */
 ui_error_t
 cupertino_table_view_reorder_begin(struct cupertino_table_view *table,
                                    int section, int row) {
@@ -364,6 +387,7 @@ cupertino_table_view_reorder_begin(struct cupertino_table_view *table,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_table_view_reorder_update function. */
 ui_error_t
 cupertino_table_view_reorder_update(struct cupertino_table_view *table,
                                     int to_section, int to_row) {
@@ -388,6 +412,7 @@ cupertino_table_view_reorder_update(struct cupertino_table_view *table,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_table_view_reorder_commit function. */
 ui_error_t
 cupertino_table_view_reorder_commit(struct cupertino_table_view *table) {
   struct cupertino_list_section *src_sec;
@@ -441,6 +466,7 @@ cupertino_table_view_reorder_commit(struct cupertino_table_view *table) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_table_view_reorder_cancel function. */
 ui_error_t
 cupertino_table_view_reorder_cancel(struct cupertino_table_view *table) {
   if (table == NULL) {
@@ -456,6 +482,7 @@ cupertino_table_view_reorder_cancel(struct cupertino_table_view *table) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_table_view_get_separator_layout function. */
 ui_error_t cupertino_table_view_get_separator_layout(
     const struct cupertino_table_view *table, size_t section, size_t row,
     float *out_inset, int *out_hidden) {

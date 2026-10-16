@@ -146,7 +146,11 @@ TEST test_tabs_lifecycle_and_events(void) {
   /* Add 5 tabs to test reallocation capacity growth (4 -> 8) */
   for (i = 0; i < 5; i++) {
     char tid[16];
+#if defined(_MSC_VER)
+    sprintf_s(tid, sizeof(tid), "tab%d", i);
+#else
     sprintf(tid, "tab%d", i);
+#endif
     rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &h[i]);
     ASSERT_EQ(UI_ERROR_NONE, rc);
     rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &p[i]);
@@ -403,7 +407,11 @@ TEST test_tabs_error_branches(void) {
   ASSERT_EQ(UI_ERROR_NONE, rc);
   for (i = 0; i < 2; i++) {
     char tid[16];
+#if defined(_MSC_VER)
+    sprintf_s(tid, sizeof(tid), "t%d", i);
+#else
     sprintf(tid, "t%d", i);
+#endif
     rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &h);
     ASSERT_EQ(UI_ERROR_NONE, rc);
     rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &p);

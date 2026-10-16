@@ -11,12 +11,14 @@
 #include <string.h>
 /* clang-format on */
 
+/** @brief md2_fab structure. */
 struct md2_fab {
-  struct ui_component *component;
-  struct ui_fab_base *base;
-  enum md2_fab_size size;
+  struct ui_component *component; /**< component field. */
+  struct ui_fab_base *base;       /**< base field. */
+  enum md2_fab_size size;         /**< size field. */
 };
 
+/** @brief md2_fab_create function. */
 ui_error_t md2_fab_create(struct ui_engine *engine, enum md2_fab_size size,
                           const char *icon, const char *label,
                           struct md2_fab **out_fab) {
@@ -74,6 +76,7 @@ ui_error_t md2_fab_create(struct ui_engine *engine, enum md2_fab_size size,
   return UI_ERROR_NONE;
 }
 
+/** @brief md2_fab_destroy function. */
 ui_error_t md2_fab_destroy(struct md2_fab *fab) {
   if (!fab) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -86,6 +89,7 @@ ui_error_t md2_fab_destroy(struct md2_fab *fab) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md2_fab_set_on_click function. */
 ui_error_t md2_fab_set_on_click(struct md2_fab *fab,
                                 ui_button_on_click_t on_click,
                                 void *user_data) {
@@ -100,6 +104,7 @@ ui_error_t md2_fab_set_on_click(struct md2_fab *fab,
   return ui_button_base_set_on_click(main_button, on_click, user_data);
 }
 
+/** @brief md2_fab_get_base function. */
 ui_error_t md2_fab_get_base(struct md2_fab *fab,
                             struct ui_fab_base **out_base) {
   if (!fab || !out_base) {

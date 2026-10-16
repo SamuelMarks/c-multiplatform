@@ -14,15 +14,21 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
+/** @brief CUPERTINO_TEXT_TOOLBAR_ITEM_WIDTH constant. */
 #define CUPERTINO_TEXT_TOOLBAR_ITEM_WIDTH 54.0f
+/** @brief CUPERTINO_TEXT_TOOLBAR_HEIGHT constant. */
 #define CUPERTINO_TEXT_TOOLBAR_HEIGHT 44.0f
+/** @brief CUPERTINO_TEXT_TOOLBAR_ARROW_HEIGHT constant. */
 #define CUPERTINO_TEXT_TOOLBAR_ARROW_HEIGHT 8.0f
+/** @brief CUPERTINO_TEXT_TOOLBAR_PAGE_SIZE constant. */
 #define CUPERTINO_TEXT_TOOLBAR_PAGE_SIZE 4
+/** @brief CUPERTINO_TEXT_HANDLE_RADIUS constant. */
 #define CUPERTINO_TEXT_HANDLE_RADIUS 5.0f
+/** @brief CUPERTINO_TEXT_HANDLE_BAR_HEIGHT constant. */
 #define CUPERTINO_TEXT_HANDLE_BAR_HEIGHT 22.0f
 
 /**
@@ -53,20 +59,23 @@ struct cupertino_text_selection_toolbar_descriptor {
  * @brief Text selection toolbar instance.
  */
 struct cupertino_text_selection_toolbar {
-  int is_visible;
-  int current_page;
-  int total_pages;
-  float anchor_x;
-  float anchor_y;
-  float selection_w;
-  float selection_h;
-  float bubble_x;
-  float bubble_y;
-  float bubble_w;
-  float bubble_h;
+  int is_visible;      /**< is_visible field. */
+  int current_page;    /**< current_page field. */
+  int total_pages;     /**< total_pages field. */
+  float anchor_x;      /**< anchor_x field. */
+  float anchor_y;      /**< anchor_y field. */
+  float selection_w;   /**< selection_w field. */
+  float selection_h;   /**< selection_h field. */
+  float bubble_x;      /**< bubble_x field. */
+  float bubble_y;      /**< bubble_y field. */
+  float bubble_w;      /**< bubble_w field. */
+  float bubble_h;      /**< bubble_h field. */
   int arrow_on_bottom; /**< 1 if arrow points down towards text, 0 if up. */
-  int action_count;
-  enum cupertino_text_action actions[CUPERTINO_TEXT_ACTION_COUNT];
+  int action_count;    /**< action_count field. */
+  enum cupertino_text_action actions
+      [CUPERTINO_TEXT_ACTION_COUNT]; /**<
+                                        actions[CUPERTINO_TEXT_ACTION_COUNT]
+                                        field. */
 };
 
 /**

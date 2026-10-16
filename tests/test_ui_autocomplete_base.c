@@ -16,6 +16,10 @@
 #include <assert.h>
 /* clang-format on */
 
+extern int g_popover_is_open_calls;
+extern int g_ac_mock_is_open;
+extern ui_error_t run_ac_coverage(void);
+
 extern int g_ac_mock_fail;
 
 static ui_error_t failing_cva_on_change(union ui_signal_payload payload,
@@ -51,8 +55,6 @@ static void test_autocomplete_process_event_explicit(void) {
                                                void *);
   struct ui_event ev = {0};
   ui_error_t rc;
-  extern int g_popover_is_open_calls;
-  extern int g_ac_mock_is_open;
   struct ui_layout_node dummy_layout;
   struct ui_selection_model *model = NULL;
   struct ui_autocomplete_base *ac = NULL;
@@ -637,7 +639,6 @@ SUITE(ui_autocomplete_suite) {
 GREATEST_MAIN_DEFS();
 
 int main(int argc, char **argv) {
-  extern ui_error_t run_ac_coverage(void);
   GREATEST_MAIN_BEGIN();
 
 #ifdef UI_TEST_MOCK_ALLOC

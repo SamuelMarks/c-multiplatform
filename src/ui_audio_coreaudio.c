@@ -262,6 +262,7 @@ ui_audio_sink_get_default_backend(struct ui_audio_sink_backend *out_backend) {
 
 #else
 
+/** @brief ui_audio_sink_coreaudio_get_backend function. */
 ui_error_t
 ui_audio_sink_coreaudio_get_backend(struct ui_audio_sink_backend *out_backend) {
   if (!out_backend) {

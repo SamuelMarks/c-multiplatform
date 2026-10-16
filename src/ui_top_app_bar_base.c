@@ -116,6 +116,7 @@ static ui_error_t height_equality(union ui_signal_payload a,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_top_app_bar_base_create function. */
 ui_error_t
 ui_top_app_bar_base_create(struct ui_arena *arena,
                            const struct ui_top_app_bar_config *config,
@@ -181,6 +182,7 @@ ui_top_app_bar_base_create(struct ui_arena *arena,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_top_app_bar_base_destroy function. */
 ui_error_t ui_top_app_bar_base_destroy(struct ui_top_app_bar_base *bar) {
   if (!bar)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -199,6 +201,7 @@ ui_error_t ui_top_app_bar_base_destroy(struct ui_top_app_bar_base *bar) {
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_top_app_bar_base_handle_scroll function. */
 ui_error_t ui_top_app_bar_base_handle_scroll(struct ui_top_app_bar_base *bar,
                                              float scroll_y, float delta_y) {
   union ui_signal_payload state_payload;
@@ -265,6 +268,7 @@ ui_error_t ui_top_app_bar_base_handle_scroll(struct ui_top_app_bar_base *bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_top_app_bar_base_get_state_signal function. */
 ui_error_t ui_top_app_bar_base_get_state_signal(struct ui_top_app_bar_base *bar,
                                                 ui_signal_t **out_signal) {
   if (!bar || !out_signal)
@@ -273,6 +277,7 @@ ui_error_t ui_top_app_bar_base_get_state_signal(struct ui_top_app_bar_base *bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_top_app_bar_base_get_height_signal function. */
 ui_error_t
 ui_top_app_bar_base_get_height_signal(struct ui_top_app_bar_base *bar,
                                       ui_signal_t **out_signal) {
@@ -282,6 +287,7 @@ ui_top_app_bar_base_get_height_signal(struct ui_top_app_bar_base *bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_top_app_bar_base_get_component function. */
 ui_error_t
 ui_top_app_bar_base_get_component(struct ui_top_app_bar_base *bar,
                                   struct ui_component **out_component) {

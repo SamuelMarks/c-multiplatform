@@ -10,6 +10,11 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_cupertino_page_scaffold_mock_create_fail;
+extern int g_cupertino_page_scaffold_mock_set_top_bar_fail;
+extern int g_cupertino_page_scaffold_mock_set_main_fail;
+extern int g_cupertino_page_scaffold_mock_destroy_fail;
+
 SUITE(cupertino_page_scaffold_suite);
 
 TEST test_page_scaffold_invalid_arguments(void) {
@@ -314,10 +319,6 @@ TEST test_page_scaffold_lifecycle_and_insets(void) {
 
 TEST test_page_scaffold_oom_simulation(void) {
 #ifdef UI_TEST_MOCK_ALLOC
-  extern int g_cupertino_page_scaffold_mock_create_fail;
-  extern int g_cupertino_page_scaffold_mock_set_top_bar_fail;
-  extern int g_cupertino_page_scaffold_mock_set_main_fail;
-  extern int g_cupertino_page_scaffold_mock_destroy_fail;
 #endif
   struct cupertino_page_scaffold_descriptor desc;
   struct cupertino_page_scaffold *scaffold = NULL;

@@ -9,6 +9,7 @@
 #include <string.h>
 /* clang-format on */
 
+/** @brief color_well_cva_write_value function. */
 static ui_error_t color_well_cva_write_value(void *component,
                                              union ui_signal_payload value) {
   struct cupertino_color_well *well = (struct cupertino_color_well *)component;
@@ -21,6 +22,7 @@ static ui_error_t color_well_cva_write_value(void *component,
   return UI_ERROR_NONE;
 }
 
+/** @brief color_well_cva_set_disabled function. */
 static ui_error_t color_well_cva_set_disabled(void *component,
                                               ui_bool_t is_disabled) {
   if (!component) {
@@ -32,6 +34,7 @@ static ui_error_t color_well_cva_set_disabled(void *component,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_color_well_create function. */
 ui_error_t
 cupertino_color_well_create(struct ui_engine *engine,
                             const struct cupertino_color_well_descriptor *desc,
@@ -73,6 +76,7 @@ cupertino_color_well_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_color_well_destroy function. */
 ui_error_t cupertino_color_well_destroy(struct cupertino_color_well *well) {
   ui_error_t rc = UI_ERROR_NONE;
 
@@ -89,6 +93,7 @@ ui_error_t cupertino_color_well_destroy(struct cupertino_color_well *well) {
   return rc;
 }
 
+/** @brief cupertino_color_well_set_color function. */
 ui_error_t cupertino_color_well_set_color(struct cupertino_color_well *well,
                                           ui_color_t color) {
   if (!well) {
@@ -99,6 +104,7 @@ ui_error_t cupertino_color_well_set_color(struct cupertino_color_well *well,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_color_well_get_color function. */
 ui_error_t
 cupertino_color_well_get_color(const struct cupertino_color_well *well,
                                ui_color_t *out_color) {
@@ -110,6 +116,7 @@ cupertino_color_well_get_color(const struct cupertino_color_well *well,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_color_well_open_panel function. */
 ui_error_t cupertino_color_well_open_panel(struct cupertino_color_well *well) {
   if (!well) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -119,6 +126,7 @@ ui_error_t cupertino_color_well_open_panel(struct cupertino_color_well *well) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_color_well_close_panel function. */
 ui_error_t cupertino_color_well_close_panel(struct cupertino_color_well *well) {
   if (!well) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -128,6 +136,7 @@ ui_error_t cupertino_color_well_close_panel(struct cupertino_color_well *well) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_color_well_is_panel_open function. */
 ui_error_t
 cupertino_color_well_is_panel_open(const struct cupertino_color_well *well,
                                    int *out_is_open) {
@@ -139,6 +148,7 @@ cupertino_color_well_is_panel_open(const struct cupertino_color_well *well,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_color_well_start_drag function. */
 ui_error_t cupertino_color_well_start_drag(struct cupertino_color_well *well) {
   if (!well) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -148,6 +158,7 @@ ui_error_t cupertino_color_well_start_drag(struct cupertino_color_well *well) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_color_well_end_drag function. */
 ui_error_t cupertino_color_well_end_drag(struct cupertino_color_well *well) {
   if (!well) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -157,6 +168,7 @@ ui_error_t cupertino_color_well_end_drag(struct cupertino_color_well *well) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_color_well_get_dimensions function. */
 ui_error_t
 cupertino_color_well_get_dimensions(const struct cupertino_color_well *well,
                                     float *out_width, float *out_height) {
@@ -169,6 +181,7 @@ cupertino_color_well_get_dimensions(const struct cupertino_color_well *well,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_color_well_get_cva function. */
 ui_error_t
 cupertino_color_well_get_cva(struct cupertino_color_well *well,
                              struct ui_control_value_accessor **out_cva) {

@@ -16,7 +16,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
@@ -37,9 +37,9 @@ enum md3_chip_type {
  * @brief Material 3 Chip collection manager wrapping ui_chips_base.
  */
 struct md3_chip {
-  struct ui_chips_base *base;
-  enum md3_chip_type type;
-  int elevated;
+  struct ui_chips_base *base; /**< base field. */
+  enum md3_chip_type type;    /**< type field. */
+  int elevated;               /**< elevated field. */
 };
 
 /**

@@ -8,6 +8,8 @@
 #include <assert.h>
 /* clang-format on */
 
+extern int g_label_mock_fail;
+
 extern int g_malloc_fail_countdown;
 
 struct ui_label_base {
@@ -265,7 +267,6 @@ static ui_error_t test_label_set_text(void) {
   /* Test append_child failure */
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_label_mock_fail;
     rc = ui_label_base_create(&lbl);
     assert(rc == UI_ERROR_NONE);
     g_label_mock_fail = 1;

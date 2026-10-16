@@ -95,6 +95,7 @@ static ui_error_t mock_floating_toolbar_comp_destroy(struct ui_component *c) {
 /** @endcond */
 #endif
 
+/** @brief UI_FLOATING_TOOLBAR_INITIAL_CAPACITY macro definition. */
 #define UI_FLOATING_TOOLBAR_INITIAL_CAPACITY 4
 
 /**
@@ -118,6 +119,7 @@ struct ui_floating_toolbar_base {
   enum ui_floating_toolbar_state state; /**< Current expansion state. */
 };
 
+/** @brief ui_floating_toolbar_base_create function. */
 ui_error_t
 ui_floating_toolbar_base_create(struct ui_floating_toolbar_base **out_toolbar) {
   struct ui_floating_toolbar_base *tb = NULL;
@@ -252,6 +254,7 @@ cleanup:
   return rc;
 }
 
+/** @brief ui_floating_toolbar_base_destroy function. */
 ui_error_t
 ui_floating_toolbar_base_destroy(struct ui_floating_toolbar_base *toolbar) {
   ui_error_t rc = UI_ERROR_NONE;
@@ -278,6 +281,7 @@ ui_floating_toolbar_base_destroy(struct ui_floating_toolbar_base *toolbar) {
   return rc;
 }
 
+/** @brief ui_floating_toolbar_base_get_component function. */
 ui_error_t
 ui_floating_toolbar_base_get_component(struct ui_floating_toolbar_base *toolbar,
                                        struct ui_component **out_component) {
@@ -289,6 +293,7 @@ ui_floating_toolbar_base_get_component(struct ui_floating_toolbar_base *toolbar,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_floating_toolbar_base_set_orientation function. */
 ui_error_t ui_floating_toolbar_base_set_orientation(
     struct ui_floating_toolbar_base *toolbar,
     enum ui_floating_toolbar_orientation orientation) {
@@ -310,6 +315,7 @@ ui_error_t ui_floating_toolbar_base_set_orientation(
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_floating_toolbar_base_get_orientation function. */
 ui_error_t ui_floating_toolbar_base_get_orientation(
     const struct ui_floating_toolbar_base *toolbar,
     enum ui_floating_toolbar_orientation *out_orientation) {
@@ -321,6 +327,7 @@ ui_error_t ui_floating_toolbar_base_get_orientation(
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_floating_toolbar_base_set_state function. */
 ui_error_t
 ui_floating_toolbar_base_set_state(struct ui_floating_toolbar_base *toolbar,
                                    enum ui_floating_toolbar_state state) {
@@ -341,6 +348,7 @@ ui_floating_toolbar_base_set_state(struct ui_floating_toolbar_base *toolbar,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_floating_toolbar_base_get_state function. */
 ui_error_t ui_floating_toolbar_base_get_state(
     const struct ui_floating_toolbar_base *toolbar,
     enum ui_floating_toolbar_state *out_state) {
@@ -352,6 +360,7 @@ ui_error_t ui_floating_toolbar_base_get_state(
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_floating_toolbar_base_set_fab_slot function. */
 ui_error_t
 ui_floating_toolbar_base_set_fab_slot(struct ui_floating_toolbar_base *toolbar,
                                       struct ui_component *fab_component) {
@@ -372,6 +381,7 @@ ui_floating_toolbar_base_set_fab_slot(struct ui_floating_toolbar_base *toolbar,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_floating_toolbar_base_append_action function. */
 ui_error_t
 ui_floating_toolbar_base_append_action(struct ui_floating_toolbar_base *toolbar,
                                        struct ui_component *action_component) {
@@ -407,6 +417,7 @@ ui_floating_toolbar_base_append_action(struct ui_floating_toolbar_base *toolbar,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_floating_toolbar_base_get_action_count function. */
 ui_error_t ui_floating_toolbar_base_get_action_count(
     const struct ui_floating_toolbar_base *toolbar, size_t *out_count) {
   if (toolbar == NULL || out_count == NULL) {

@@ -317,34 +317,21 @@ static ui_error_t create_value_ext_env(const char *name,
  * @return Return value.
  */
 static ui_error_t destroy_math_node(struct ui_css_math_expr *math) {
-  ui_error_t rc;
   if (!math)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  {
-    rc = ui_css_value_ext_destroy(math->left);
-    if (rc != UI_ERROR_NONE && rc != UI_ERROR_INVALID_ARGUMENT)
-      return rc;
-  }
-  {
-    rc = ui_css_value_ext_destroy(math->right);
-    if (rc != UI_ERROR_NONE && rc != UI_ERROR_INVALID_ARGUMENT)
-      return rc;
-  }
-  {
-    rc = ui_css_value_ext_destroy(math->ext);
-    if (rc != UI_ERROR_NONE && rc != UI_ERROR_INVALID_ARGUMENT)
-      return rc;
-  }
+  if (math->left)
+    ui_css_value_ext_destroy(math->left);
+  if (math->right)
+    ui_css_value_ext_destroy(math->right);
+  if (math->ext)
+    ui_css_value_ext_destroy(math->ext);
 
   while (math->next) {
     struct ui_css_math_expr *next = math->next;
     math->next = next->next;
-    {
-      rc = ui_css_value_ext_destroy(next->left);
-      if (rc != UI_ERROR_NONE && rc != UI_ERROR_INVALID_ARGUMENT)
-        return rc;
-    }
+    if (next->left)
+      ui_css_value_ext_destroy(next->left);
     C_MULTIPLATFORM_FREE(next);
   }
   C_MULTIPLATFORM_FREE(math);

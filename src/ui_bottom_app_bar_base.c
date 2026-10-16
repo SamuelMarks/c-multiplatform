@@ -68,6 +68,7 @@ struct ui_bottom_app_bar_base {
   struct ui_signal *active_index_signal; /**< Optional active index signal */
 };
 
+/** @brief ui_bottom_app_bar_base_create function. */
 ui_error_t
 ui_bottom_app_bar_base_create(struct ui_bottom_app_bar_base **out_bar) {
   struct ui_bottom_app_bar_base *bar;
@@ -136,6 +137,7 @@ cleanup:
   return rc;
 }
 
+/** @brief ui_bottom_app_bar_base_destroy function. */
 ui_error_t ui_bottom_app_bar_base_destroy(struct ui_bottom_app_bar_base *bar) {
   if (!bar) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -145,6 +147,7 @@ ui_error_t ui_bottom_app_bar_base_destroy(struct ui_bottom_app_bar_base *bar) {
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_bottom_app_bar_base_get_component function. */
 ui_error_t
 ui_bottom_app_bar_base_get_component(struct ui_bottom_app_bar_base *bar,
                                      struct ui_component **out_component) {
@@ -155,6 +158,7 @@ ui_bottom_app_bar_base_get_component(struct ui_bottom_app_bar_base *bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_bottom_app_bar_base_set_fab function. */
 ui_error_t
 ui_bottom_app_bar_base_set_fab(struct ui_bottom_app_bar_base *bar,
                                struct ui_fab_base *fab,
@@ -197,6 +201,7 @@ ui_bottom_app_bar_base_set_fab(struct ui_bottom_app_bar_base *bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_bottom_app_bar_base_bind_active_index function. */
 ui_error_t
 ui_bottom_app_bar_base_bind_active_index(struct ui_bottom_app_bar_base *widget,
                                          struct ui_signal *signal) {

@@ -1263,7 +1263,7 @@ TEST test_md3_data_hierarchy_branches(void) {
   ASSERT_EQ(UI_ERROR_NONE, rc);
 
   for (i = 0; i < 128; ++i) {
-    rc = md3_tree_set_node_expanded(tree, (void *)(uintptr_t)(i + 1), 1);
+    rc = md3_tree_set_node_expanded(tree, (void *)(size_t)(i + 1), 1);
     ASSERT_EQ(UI_ERROR_NONE, rc);
   }
   rc = md3_tree_set_node_expanded(tree, (void *)9999, 1);
@@ -1326,7 +1326,7 @@ TEST test_md3_data_hierarchy_branches(void) {
   ASSERT_EQ(UI_ERROR_NONE, rc);
 
   for (i = 0; i < 128; ++i) {
-    rc = md3_tree_select_node(tree, (void *)(uintptr_t)(i + 1), 1);
+    rc = md3_tree_select_node(tree, (void *)(size_t)(i + 1), 1);
     ASSERT_EQ(UI_ERROR_NONE, rc);
   }
   rc = md3_tree_select_node(tree, (void *)9999, 1);
@@ -1360,7 +1360,7 @@ TEST test_md3_data_hierarchy_branches(void) {
   ASSERT_EQ(UI_ERROR_NONE, rc);
 
   for (i = 1; i < 128; ++i) {
-    rc = md3_tree_set_node_checked_state(tree, (void *)(uintptr_t)(i + 1), 1);
+    rc = md3_tree_set_node_checked_state(tree, (void *)(size_t)(i + 1), 1);
     ASSERT_EQ(UI_ERROR_NONE, rc);
   }
   rc = md3_tree_set_node_checked_state(tree, (void *)9999, 1);
@@ -1428,7 +1428,7 @@ TEST test_md3_data_hierarchy_branches(void) {
   ASSERT_EQ(UI_ERROR_NONE, rc);
 
   for (i = 0; i < 128; ++i) {
-    rc = md3_tree_grid_set_node_expanded(tg, (void *)(uintptr_t)(i + 1), 1);
+    rc = md3_tree_grid_set_node_expanded(tg, (void *)(size_t)(i + 1), 1);
     ASSERT_EQ(UI_ERROR_NONE, rc);
   }
   rc = md3_tree_grid_set_node_expanded(tg, (void *)9999, 1);
@@ -1469,7 +1469,7 @@ TEST test_md3_data_hierarchy_branches(void) {
   ASSERT_EQ(UI_ERROR_NONE, rc);
 
   for (i = 0; i < 128; ++i) {
-    rc = md3_tree_grid_select_row(tg, (void *)(uintptr_t)(i + 1), 1);
+    rc = md3_tree_grid_select_row(tg, (void *)(size_t)(i + 1), 1);
     ASSERT_EQ(UI_ERROR_NONE, rc);
   }
   rc = md3_tree_grid_select_row(tg, (void *)9999, 1);

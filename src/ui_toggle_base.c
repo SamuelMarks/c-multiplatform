@@ -268,6 +268,7 @@ enforce_radio_exclusion(struct ui_toggle_base *checked_radio) {
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_toggle_base_create function. */
 ui_error_t ui_toggle_base_create(enum ui_toggle_type type,
                                  struct ui_toggle_base **out_toggle) {
   struct ui_toggle_base *toggle;
@@ -383,6 +384,7 @@ cleanup:
   return rc;
 }
 
+/** @brief ui_toggle_base_destroy function. */
 ui_error_t ui_toggle_base_destroy(struct ui_toggle_base *toggle) {
   ui_error_t rc = UI_ERROR_NONE;
   ui_error_t rc_cleanup;
@@ -422,6 +424,7 @@ ui_error_t ui_toggle_base_destroy(struct ui_toggle_base *toggle) {
   return rc;
 }
 
+/** @brief ui_toggle_base_set_disabled function. */
 ui_error_t ui_toggle_base_set_disabled(struct ui_toggle_base *toggle,
                                        int disabled) {
   ui_error_t rc;
@@ -469,6 +472,7 @@ ui_error_t ui_toggle_base_set_disabled(struct ui_toggle_base *toggle,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_toggle_base_is_checked function. */
 ui_error_t ui_toggle_base_is_checked(const struct ui_toggle_base *toggle,
                                      int *out_is_checked) {
   if (!toggle || !out_is_checked) {
@@ -478,6 +482,7 @@ ui_error_t ui_toggle_base_is_checked(const struct ui_toggle_base *toggle,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_toggle_base_set_checked function. */
 ui_error_t ui_toggle_base_set_checked(struct ui_toggle_base *toggle,
                                       int checked) {
   ui_error_t rc;
@@ -504,6 +509,7 @@ ui_error_t ui_toggle_base_set_checked(struct ui_toggle_base *toggle,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_toggle_base_set_group_name function. */
 ui_error_t ui_toggle_base_set_group_name(struct ui_toggle_base *toggle,
                                          const char *group_name) {
   ui_error_t rc;
@@ -555,6 +561,7 @@ ui_error_t ui_toggle_base_set_group_name(struct ui_toggle_base *toggle,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_toggle_base_set_on_change function. */
 ui_error_t ui_toggle_base_set_on_change(struct ui_toggle_base *toggle,
                                         ui_toggle_on_change_t on_change,
                                         void *user_data) {
@@ -567,6 +574,7 @@ ui_error_t ui_toggle_base_set_on_change(struct ui_toggle_base *toggle,
 
   return UI_ERROR_NONE;
 }
+/** @brief ui_toggle_base_process_event function. */
 ui_error_t ui_toggle_base_process_event(struct ui_toggle_base *toggle,
                                         const struct ui_event *event,
                                         double timestamp_ms) {
@@ -655,6 +663,7 @@ ui_error_t ui_toggle_base_process_event(struct ui_toggle_base *toggle,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_toggle_base_get_component function. */
 ui_error_t ui_toggle_base_get_component(struct ui_toggle_base *toggle,
                                         struct ui_component **out_component) {
   if (!toggle || !out_component) {
@@ -726,6 +735,7 @@ static ui_error_t toggle_cva_set_disabled_state(void *component,
   return ui_toggle_base_set_disabled(toggle, (int)is_disabled);
 }
 
+/** @brief ui_toggle_base_get_cva function. */
 ui_error_t ui_toggle_base_get_cva(struct ui_toggle_base *toggle,
                                   struct ui_control_value_accessor *out_cva) {
   if (!toggle || !out_cva) {

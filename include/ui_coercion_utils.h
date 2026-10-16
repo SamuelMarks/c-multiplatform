@@ -8,7 +8,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 /* clang-format off */
 #include "ui_error.h"
@@ -69,7 +69,7 @@ ui_coerce_string_to_float(const char *str, float *out_val);
 
 /**
  * @brief Safely parses a string into a color.
- * Supports hex (#RGB, #RGBA, #RRGGBB, #RRGGBBAA) and standard named colors.
+ * Supports hex (\#RGB, \#RGBA, \#RRGGBB, \#RRGGBBAA) and standard named colors.
  *
  * @param str The string to parse.
  * @param out_color Pointer to receive the parsed ARGB color value.

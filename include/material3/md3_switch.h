@@ -15,7 +15,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
@@ -24,9 +24,9 @@ struct ui_engine;
  * @brief Material 3 Switch skin wrapping ui_slide_toggle_base with CVA export.
  */
 struct md3_switch {
-  struct ui_slide_toggle_base *base;
-  struct ui_control_value_accessor cva;
-  int show_icon;
+  struct ui_slide_toggle_base *base;    /**< base field. */
+  struct ui_control_value_accessor cva; /**< cva field. */
+  int show_icon;                        /**< show_icon field. */
 };
 
 /**

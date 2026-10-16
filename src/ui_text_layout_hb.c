@@ -25,6 +25,7 @@ ui_error_t ui_text_layout_hb_init(void) {
 
 /* \brief ui_text_layout_shape_with_harfbuzz
  */
+/** @brief ui_text_layout_shape_with_harfbuzz function. */
 ui_error_t ui_text_layout_shape_with_harfbuzz(
     struct ui_text_layout *layout, struct ui_font *font, float font_size,
     const char *text, float max_width, enum ui_text_direction direction) {

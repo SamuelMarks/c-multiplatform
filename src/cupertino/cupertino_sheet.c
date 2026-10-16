@@ -38,6 +38,7 @@ mock_bottom_sheet_base_set_open(struct ui_bottom_sheet_base *sheet,
 /** @endcond */
 #endif
 
+/** @brief cupertino_sheet_create function. */
 ui_error_t cupertino_sheet_create(struct ui_engine *engine,
                                   const struct cupertino_sheet_descriptor *desc,
                                   struct cupertino_sheet **out_sheet) {
@@ -94,6 +95,7 @@ ui_error_t cupertino_sheet_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_sheet_destroy function. */
 ui_error_t cupertino_sheet_destroy(struct cupertino_sheet *sheet) {
   ui_error_t rc = UI_ERROR_NONE;
 
@@ -110,6 +112,7 @@ ui_error_t cupertino_sheet_destroy(struct cupertino_sheet *sheet) {
   return rc;
 }
 
+/** @brief cupertino_sheet_set_open function. */
 ui_error_t cupertino_sheet_set_open(struct cupertino_sheet *sheet,
                                     int is_open) {
   ui_error_t rc;
@@ -130,6 +133,7 @@ ui_error_t cupertino_sheet_set_open(struct cupertino_sheet *sheet,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_sheet_is_open function. */
 ui_error_t cupertino_sheet_is_open(const struct cupertino_sheet *sheet,
                                    int *out_is_open) {
   if (!sheet || !out_is_open) {
@@ -140,6 +144,7 @@ ui_error_t cupertino_sheet_is_open(const struct cupertino_sheet *sheet,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_sheet_set_detent function. */
 ui_error_t cupertino_sheet_set_detent(struct cupertino_sheet *sheet,
                                       enum cupertino_sheet_detent detent) {
   if (!sheet || (int)detent < 0 ||
@@ -151,6 +156,7 @@ ui_error_t cupertino_sheet_set_detent(struct cupertino_sheet *sheet,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_sheet_get_detent function. */
 ui_error_t cupertino_sheet_get_detent(const struct cupertino_sheet *sheet,
                                       enum cupertino_sheet_detent *out_detent) {
   if (!sheet || !out_detent) {
@@ -161,6 +167,7 @@ ui_error_t cupertino_sheet_get_detent(const struct cupertino_sheet *sheet,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_sheet_set_custom_detent_height function. */
 ui_error_t
 cupertino_sheet_set_custom_detent_height(struct cupertino_sheet *sheet,
                                          float height) {
@@ -172,6 +179,7 @@ cupertino_sheet_set_custom_detent_height(struct cupertino_sheet *sheet,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_sheet_get_computed_height function. */
 ui_error_t
 cupertino_sheet_get_computed_height(const struct cupertino_sheet *sheet,
                                     float viewport_height, float *out_height) {
@@ -206,6 +214,7 @@ cupertino_sheet_get_computed_height(const struct cupertino_sheet *sheet,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_sheet_get_parent_card_scale function. */
 ui_error_t
 cupertino_sheet_get_parent_card_scale(const struct cupertino_sheet *sheet,
                                       float progress, float *out_scale,
@@ -223,6 +232,7 @@ cupertino_sheet_get_parent_card_scale(const struct cupertino_sheet *sheet,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_sheet_add_action function. */
 ui_error_t cupertino_sheet_add_action(struct cupertino_sheet *sheet,
                                       const char *title, int is_destructive,
                                       size_t *out_index) {
@@ -256,6 +266,7 @@ ui_error_t cupertino_sheet_add_action(struct cupertino_sheet *sheet,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_sheet_set_cancel_action function. */
 ui_error_t cupertino_sheet_set_cancel_action(struct cupertino_sheet *sheet,
                                              const char *title) {
   if (!sheet) {
@@ -279,6 +290,7 @@ ui_error_t cupertino_sheet_set_cancel_action(struct cupertino_sheet *sheet,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_sheet_get_action_count function. */
 ui_error_t cupertino_sheet_get_action_count(const struct cupertino_sheet *sheet,
                                             size_t *out_count) {
   if (!sheet || !out_count) {
@@ -289,6 +301,7 @@ ui_error_t cupertino_sheet_get_action_count(const struct cupertino_sheet *sheet,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_sheet_get_base function. */
 ui_error_t cupertino_sheet_get_base(struct cupertino_sheet *sheet,
                                     struct ui_bottom_sheet_base **out_base) {
   if (!sheet || !out_base) {
@@ -299,32 +312,35 @@ ui_error_t cupertino_sheet_get_base(struct cupertino_sheet *sheet,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_sheet_set_largest_undimmed_detent function. */
 ui_error_t
 cupertino_sheet_set_largest_undimmed_detent(struct cupertino_sheet *sheet,
                                             enum cupertino_sheet_detent detent,
-                                            int enable_passthrough) {
+                                            int enabled) {
   if (!sheet || (int)detent < 0 ||
       (int)detent > CUPERTINO_SHEET_DETENT_CUSTOM) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
   sheet->largest_undimmed_detent = detent;
-  sheet->passthrough_enabled = enable_passthrough ? 1 : 0;
+  sheet->passthrough_enabled = enabled ? 1 : 0;
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_sheet_get_largest_undimmed_detent function. */
 ui_error_t cupertino_sheet_get_largest_undimmed_detent(
     const struct cupertino_sheet *sheet,
-    enum cupertino_sheet_detent *out_detent, int *out_passthrough_enabled) {
-  if (!sheet || !out_detent || !out_passthrough_enabled) {
+    enum cupertino_sheet_detent *out_detent, int *out_enabled) {
+  if (!sheet || !out_detent || !out_enabled) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
   *out_detent = sheet->largest_undimmed_detent;
-  *out_passthrough_enabled = sheet->passthrough_enabled;
+  *out_enabled = sheet->passthrough_enabled;
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_sheet_is_passthrough_active function. */
 ui_error_t
 cupertino_sheet_is_passthrough_active(const struct cupertino_sheet *sheet,
                                       int *out_active) {

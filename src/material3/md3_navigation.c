@@ -13,6 +13,7 @@
  * MD3 Navigation Bar
  * ========================================================================= */
 
+/** @brief md3_navigation_bar_create function. */
 ui_error_t md3_navigation_bar_create(struct ui_engine *engine,
                                      struct md3_navigation_bar **out_bar) {
   struct md3_navigation_bar *bar;
@@ -40,6 +41,7 @@ ui_error_t md3_navigation_bar_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_navigation_bar_destroy function. */
 ui_error_t md3_navigation_bar_destroy(struct md3_navigation_bar *bar) {
   ui_error_t rc;
 
@@ -52,6 +54,7 @@ ui_error_t md3_navigation_bar_destroy(struct md3_navigation_bar *bar) {
   return rc;
 }
 
+/** @brief md3_navigation_bar_add_item function. */
 ui_error_t md3_navigation_bar_add_item(struct md3_navigation_bar *bar,
                                        const char *label,
                                        const char *icon_name) {
@@ -87,6 +90,7 @@ ui_error_t md3_navigation_bar_add_item(struct md3_navigation_bar *bar,
   return rc;
 }
 
+/** @brief md3_navigation_bar_set_selected function. */
 ui_error_t md3_navigation_bar_set_selected(struct md3_navigation_bar *bar,
                                            size_t index) {
   if (!bar) {
@@ -97,6 +101,7 @@ ui_error_t md3_navigation_bar_set_selected(struct md3_navigation_bar *bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_navigation_bar_get_selected function. */
 ui_error_t md3_navigation_bar_get_selected(const struct md3_navigation_bar *bar,
                                            size_t *out_index) {
   if (!bar || !out_index) {
@@ -111,6 +116,7 @@ ui_error_t md3_navigation_bar_get_selected(const struct md3_navigation_bar *bar,
  * MD3 Navigation Rail
  * ========================================================================= */
 
+/** @brief md3_navigation_rail_create function. */
 ui_error_t md3_navigation_rail_create(struct ui_engine *engine,
                                       struct md3_navigation_rail **out_rail) {
   struct md3_navigation_rail *rail;
@@ -138,6 +144,7 @@ ui_error_t md3_navigation_rail_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_navigation_rail_destroy function. */
 ui_error_t md3_navigation_rail_destroy(struct md3_navigation_rail *rail) {
   ui_error_t rc;
 
@@ -150,6 +157,7 @@ ui_error_t md3_navigation_rail_destroy(struct md3_navigation_rail *rail) {
   return rc;
 }
 
+/** @brief md3_navigation_rail_set_expanded function. */
 ui_error_t md3_navigation_rail_set_expanded(struct md3_navigation_rail *rail,
                                             int expanded) {
   if (!rail) {
@@ -164,6 +172,7 @@ ui_error_t md3_navigation_rail_set_expanded(struct md3_navigation_rail *rail,
  * MD3 Navigation Drawer
  * ========================================================================= */
 
+/** @brief md3_navigation_drawer_create function. */
 ui_error_t
 md3_navigation_drawer_create(struct ui_engine *engine,
                              enum md3_navigation_drawer_variant variant,
@@ -195,6 +204,7 @@ md3_navigation_drawer_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_navigation_drawer_destroy function. */
 ui_error_t md3_navigation_drawer_destroy(struct md3_navigation_drawer *drawer) {
   ui_error_t rc;
 
@@ -207,6 +217,7 @@ ui_error_t md3_navigation_drawer_destroy(struct md3_navigation_drawer *drawer) {
   return rc;
 }
 
+/** @brief md3_navigation_drawer_set_open function. */
 ui_error_t md3_navigation_drawer_set_open(struct md3_navigation_drawer *drawer,
                                           int is_open) {
   if (!drawer) {
@@ -221,6 +232,7 @@ ui_error_t md3_navigation_drawer_set_open(struct md3_navigation_drawer *drawer,
  * MD3 Navigation Suite (Adaptive navigation)
  * ========================================================================= */
 
+/** @brief md3_navigation_suite_create function. */
 ui_error_t
 md3_navigation_suite_create(struct ui_engine *engine,
                             struct md3_navigation_suite **out_suite) {
@@ -266,6 +278,7 @@ md3_navigation_suite_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_navigation_suite_destroy function. */
 ui_error_t md3_navigation_suite_destroy(struct md3_navigation_suite *suite) {
   ui_error_t rc = UI_ERROR_NONE;
 
@@ -281,6 +294,7 @@ ui_error_t md3_navigation_suite_destroy(struct md3_navigation_suite *suite) {
   return rc;
 }
 
+/** @brief md3_navigation_suite_update_size_class function. */
 ui_error_t
 md3_navigation_suite_update_size_class(struct md3_navigation_suite *suite,
                                        enum md3_window_size_class size_class) {
@@ -296,6 +310,7 @@ md3_navigation_suite_update_size_class(struct md3_navigation_suite *suite,
  * MD3 Bottom App Bar
  * ========================================================================= */
 
+/** @brief md3_bottom_app_bar_create function. */
 ui_error_t md3_bottom_app_bar_create(struct ui_engine *engine, int has_fab,
                                      struct md3_bottom_app_bar **out_bar) {
   struct md3_bottom_app_bar *bar;
@@ -324,6 +339,7 @@ ui_error_t md3_bottom_app_bar_create(struct ui_engine *engine, int has_fab,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_bottom_app_bar_destroy function. */
 ui_error_t md3_bottom_app_bar_destroy(struct md3_bottom_app_bar *bar) {
   ui_error_t rc;
 
@@ -340,6 +356,7 @@ ui_error_t md3_bottom_app_bar_destroy(struct md3_bottom_app_bar *bar) {
  * MD3 Tabs
  * ========================================================================= */
 
+/** @brief md3_tabs_create function. */
 ui_error_t md3_tabs_create(struct ui_engine *engine,
                            enum md3_tabs_variant variant,
                            struct md3_tabs **out_tabs) {
@@ -369,6 +386,7 @@ ui_error_t md3_tabs_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_tabs_destroy function. */
 ui_error_t md3_tabs_destroy(struct md3_tabs *tabs) {
   ui_error_t rc;
 
@@ -381,6 +399,7 @@ ui_error_t md3_tabs_destroy(struct md3_tabs *tabs) {
   return rc;
 }
 
+/** @brief md3_tabs_set_selected function. */
 ui_error_t md3_tabs_set_selected(struct md3_tabs *tabs, size_t index) {
   if (!tabs) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -390,6 +409,7 @@ ui_error_t md3_tabs_set_selected(struct md3_tabs *tabs, size_t index) {
   return ui_tabs_base_set_active_index(tabs->base, (int)index);
 }
 
+/** @brief md3_tabs_get_selected function. */
 ui_error_t md3_tabs_get_selected(const struct md3_tabs *tabs,
                                  size_t *out_index) {
   if (!tabs || !out_index) {

@@ -13,6 +13,14 @@
 #include "../include/ui_error.h"
 /* clang-format on */
 
+extern int g_mock_macos_font_cfname_fail;
+extern int g_mock_macos_font_desc_fail;
+extern int g_mock_macos_font_font_fail;
+extern int g_mock_macos_font_url_fail;
+extern int g_mock_macos_font_url_not_ok;
+extern int g_mock_macos_font_load_fail;
+extern int g_mock_macos_font_set_metadata_fail;
+
 static const unsigned char test_ttf_bytes[] = {
     0x00, 0x01, 0x00, 0x00, 0x00, 0x07, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x63, 0x6d, 0x61, 0x70, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x7c,
@@ -224,13 +232,6 @@ static ui_error_t test_system_font_discovery(void) {
 
 #if defined(__APPLE__) && defined(UI_TEST_MOCK_ALLOC)
   {
-    extern int g_mock_macos_font_cfname_fail;
-    extern int g_mock_macos_font_desc_fail;
-    extern int g_mock_macos_font_font_fail;
-    extern int g_mock_macos_font_url_fail;
-    extern int g_mock_macos_font_url_not_ok;
-    extern int g_mock_macos_font_load_fail;
-    extern int g_mock_macos_font_set_metadata_fail;
 
     g_mock_macos_font_cfname_fail = 1;
     rc =

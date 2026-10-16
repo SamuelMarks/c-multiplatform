@@ -6,6 +6,8 @@
 #include "ui_error.h"
 /* clang-format on */
 
+extern int g_malloc_fail_countdown;
+
 struct ui_component {
   int id;
 };
@@ -76,7 +78,6 @@ static ui_error_t test_speed_dial_operations(void) {
   assert(sd.actions == NULL);
 
   {
-    extern int g_malloc_fail_countdown;
     g_malloc_fail_countdown = 0;
     err = ui_speed_dial_base_add_action(&sd, 300, &fab1);
     assert(err == UI_ERROR_OUT_OF_MEMORY);

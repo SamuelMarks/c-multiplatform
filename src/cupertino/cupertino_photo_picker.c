@@ -9,6 +9,7 @@
 #include <string.h>
 /* clang-format on */
 
+/** @brief cupertino_photo_picker_create function. */
 ui_error_t cupertino_photo_picker_create(
     struct ui_engine *engine,
     const struct cupertino_photo_picker_descriptor *desc,
@@ -41,6 +42,7 @@ ui_error_t cupertino_photo_picker_create(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_photo_picker_destroy function. */
 ui_error_t
 cupertino_photo_picker_destroy(struct cupertino_photo_picker *picker) {
   if (!picker) {
@@ -51,6 +53,7 @@ cupertino_photo_picker_destroy(struct cupertino_photo_picker *picker) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_photo_picker_add_asset function. */
 ui_error_t
 cupertino_photo_picker_add_asset(struct cupertino_photo_picker *picker,
                                  const char *id, const char *title,
@@ -88,6 +91,7 @@ cupertino_photo_picker_add_asset(struct cupertino_photo_picker *picker,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_photo_picker_toggle_selection function. */
 ui_error_t
 cupertino_photo_picker_toggle_selection(struct cupertino_photo_picker *picker,
                                         int asset_index, int *out_is_selected) {
@@ -132,6 +136,7 @@ cupertino_photo_picker_toggle_selection(struct cupertino_photo_picker *picker,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_photo_picker_get_selected_count function. */
 ui_error_t cupertino_photo_picker_get_selected_count(
     const struct cupertino_photo_picker *picker, int *out_count) {
   if (!picker || !out_count) {
@@ -142,6 +147,7 @@ ui_error_t cupertino_photo_picker_get_selected_count(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_photo_picker_get_selection_limit function. */
 ui_error_t cupertino_photo_picker_get_selection_limit(
     const struct cupertino_photo_picker *picker, int *out_limit) {
   if (!picker || !out_limit) {
@@ -152,6 +158,7 @@ ui_error_t cupertino_photo_picker_get_selection_limit(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_photo_picker_clear_selection function. */
 ui_error_t
 cupertino_photo_picker_clear_selection(struct cupertino_photo_picker *picker) {
   int i;
@@ -168,6 +175,7 @@ cupertino_photo_picker_clear_selection(struct cupertino_photo_picker *picker) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_photo_picker_set_filter function. */
 ui_error_t
 cupertino_photo_picker_set_filter(struct cupertino_photo_picker *picker,
                                   enum cupertino_photo_filter filter) {
@@ -192,6 +200,7 @@ cupertino_photo_picker_set_filter(struct cupertino_photo_picker *picker,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_photo_picker_get_filter function. */
 ui_error_t
 cupertino_photo_picker_get_filter(const struct cupertino_photo_picker *picker,
                                   enum cupertino_photo_filter *out_filter) {
@@ -203,6 +212,7 @@ cupertino_photo_picker_get_filter(const struct cupertino_photo_picker *picker,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_photo_picker_filter_search function. */
 ui_error_t
 cupertino_photo_picker_filter_search(struct cupertino_photo_picker *picker,
                                      const char *query,
@@ -247,6 +257,7 @@ cupertino_photo_picker_filter_search(struct cupertino_photo_picker *picker,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_photo_picker_get_dimensions function. */
 ui_error_t cupertino_photo_picker_get_dimensions(
     const struct cupertino_photo_picker *picker, float *out_width,
     float *out_height) {

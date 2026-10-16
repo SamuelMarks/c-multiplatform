@@ -28,6 +28,7 @@ mock_cupertino_tab_bar_set_selected(struct cupertino_tab_bar *tab_bar,
 /** @endcond */
 #endif
 
+/** @brief cupertino_tab_controller_create function. */
 ui_error_t cupertino_tab_controller_create(
     size_t initial_index, size_t tab_count,
     struct cupertino_tab_controller **out_controller) {
@@ -51,6 +52,7 @@ ui_error_t cupertino_tab_controller_create(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_tab_controller_destroy function. */
 ui_error_t
 cupertino_tab_controller_destroy(struct cupertino_tab_controller *controller) {
   if (!controller) {
@@ -65,6 +67,7 @@ cupertino_tab_controller_destroy(struct cupertino_tab_controller *controller) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_tab_controller_set_index function. */
 ui_error_t
 cupertino_tab_controller_set_index(struct cupertino_tab_controller *controller,
                                    size_t index) {
@@ -78,6 +81,7 @@ cupertino_tab_controller_set_index(struct cupertino_tab_controller *controller,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_tab_controller_get_index function. */
 ui_error_t cupertino_tab_controller_get_index(
     const struct cupertino_tab_controller *controller, size_t *out_index) {
   if (!controller || !out_index) {
@@ -87,6 +91,7 @@ ui_error_t cupertino_tab_controller_get_index(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_tab_controller_get_tab_count function. */
 ui_error_t cupertino_tab_controller_get_tab_count(
     const struct cupertino_tab_controller *controller, size_t *out_count) {
   if (!controller || !out_count) {
@@ -96,6 +101,7 @@ ui_error_t cupertino_tab_controller_get_tab_count(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_tab_scaffold_create function. */
 ui_error_t cupertino_tab_scaffold_create(
     struct ui_engine *engine,
     const struct cupertino_tab_scaffold_descriptor *desc,
@@ -133,6 +139,7 @@ ui_error_t cupertino_tab_scaffold_create(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_tab_scaffold_destroy function. */
 ui_error_t
 cupertino_tab_scaffold_destroy(struct cupertino_tab_scaffold *scaffold) {
   ui_error_t rc;
@@ -153,6 +160,7 @@ cupertino_tab_scaffold_destroy(struct cupertino_tab_scaffold *scaffold) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_tab_scaffold_set_tab_bar function. */
 ui_error_t
 cupertino_tab_scaffold_set_tab_bar(struct cupertino_tab_scaffold *scaffold,
                                    struct cupertino_tab_bar *tab_bar) {
@@ -174,6 +182,7 @@ cupertino_tab_scaffold_set_tab_bar(struct cupertino_tab_scaffold *scaffold,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_tab_scaffold_get_tab_bar function. */
 ui_error_t cupertino_tab_scaffold_get_tab_bar(
     const struct cupertino_tab_scaffold *scaffold,
     struct cupertino_tab_bar **out_tab_bar) {
@@ -184,6 +193,7 @@ ui_error_t cupertino_tab_scaffold_get_tab_bar(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_tab_scaffold_set_controller function. */
 ui_error_t cupertino_tab_scaffold_set_controller(
     struct cupertino_tab_scaffold *scaffold,
     struct cupertino_tab_controller *controller) {
@@ -215,6 +225,7 @@ ui_error_t cupertino_tab_scaffold_set_controller(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_tab_scaffold_get_controller function. */
 ui_error_t cupertino_tab_scaffold_get_controller(
     const struct cupertino_tab_scaffold *scaffold,
     struct cupertino_tab_controller **out_controller) {
@@ -225,6 +236,7 @@ ui_error_t cupertino_tab_scaffold_get_controller(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_tab_scaffold_set_tab_view function. */
 ui_error_t
 cupertino_tab_scaffold_set_tab_view(struct cupertino_tab_scaffold *scaffold,
                                     size_t tab_index,
@@ -242,6 +254,7 @@ cupertino_tab_scaffold_set_tab_view(struct cupertino_tab_scaffold *scaffold,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_tab_scaffold_get_tab_view function. */
 ui_error_t cupertino_tab_scaffold_get_tab_view(
     const struct cupertino_tab_scaffold *scaffold, size_t tab_index,
     struct ui_component **out_view) {
@@ -257,6 +270,7 @@ ui_error_t cupertino_tab_scaffold_get_tab_view(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_tab_scaffold_get_active_view function. */
 ui_error_t cupertino_tab_scaffold_get_active_view(
     const struct cupertino_tab_scaffold *scaffold,
     struct ui_component **out_view) {
@@ -281,6 +295,7 @@ ui_error_t cupertino_tab_scaffold_get_active_view(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_tab_scaffold_set_bar_hidden function. */
 ui_error_t
 cupertino_tab_scaffold_set_bar_hidden(struct cupertino_tab_scaffold *scaffold,
                                       int hidden) {
@@ -291,6 +306,7 @@ cupertino_tab_scaffold_set_bar_hidden(struct cupertino_tab_scaffold *scaffold,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_tab_scaffold_get_bar_hidden function. */
 ui_error_t cupertino_tab_scaffold_get_bar_hidden(
     const struct cupertino_tab_scaffold *scaffold, int *out_hidden) {
   if (!scaffold || !out_hidden) {

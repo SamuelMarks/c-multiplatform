@@ -14,13 +14,15 @@ extern int g_md2_nav_mock_set_on_close_fail;
 int g_md2_nav_mock_set_on_close_fail = 0;
 #endif
 
+/** @brief md2_navigation_drawer structure. */
 struct md2_navigation_drawer {
-  struct ui_sidenav_base *base;
-  enum md2_navigation_drawer_type type;
-  md2_navigation_drawer_on_close_t on_close;
-  void *user_data;
+  struct ui_sidenav_base *base;              /**< base field. */
+  enum md2_navigation_drawer_type type;      /**< type field. */
+  md2_navigation_drawer_on_close_t on_close; /**< on_close field. */
+  void *user_data;                           /**< user_data field. */
 };
 
+/** @brief on_base_close function. */
 static ui_error_t on_base_close(struct ui_sidenav_base *sidenav,
                                 void *user_data) {
   struct md2_navigation_drawer *drawer;
@@ -34,6 +36,7 @@ static ui_error_t on_base_close(struct ui_sidenav_base *sidenav,
   return UI_ERROR_NONE;
 }
 
+/** @brief md2_navigation_drawer_create function. */
 ui_error_t
 md2_navigation_drawer_create(enum md2_navigation_drawer_type type,
                              struct md2_navigation_drawer **out_drawer) {
@@ -91,6 +94,7 @@ md2_navigation_drawer_create(enum md2_navigation_drawer_type type,
   return UI_ERROR_NONE;
 }
 
+/** @brief md2_navigation_drawer_destroy function. */
 ui_error_t md2_navigation_drawer_destroy(struct md2_navigation_drawer *drawer) {
   if (drawer == NULL) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -101,6 +105,7 @@ ui_error_t md2_navigation_drawer_destroy(struct md2_navigation_drawer *drawer) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md2_navigation_drawer_set_drawer_content function. */
 ui_error_t
 md2_navigation_drawer_set_drawer_content(struct md2_navigation_drawer *drawer,
                                          struct ui_component *content) {
@@ -110,6 +115,7 @@ md2_navigation_drawer_set_drawer_content(struct md2_navigation_drawer *drawer,
   return ui_sidenav_base_set_drawer_content(drawer->base, content);
 }
 
+/** @brief md2_navigation_drawer_set_main_content function. */
 ui_error_t
 md2_navigation_drawer_set_main_content(struct md2_navigation_drawer *drawer,
                                        struct ui_component *content) {
@@ -119,6 +125,7 @@ md2_navigation_drawer_set_main_content(struct md2_navigation_drawer *drawer,
   return ui_sidenav_base_set_main_content(drawer->base, content);
 }
 
+/** @brief md2_navigation_drawer_set_open function. */
 ui_error_t md2_navigation_drawer_set_open(struct md2_navigation_drawer *drawer,
                                           int is_open) {
   if (drawer == NULL) {
@@ -127,6 +134,7 @@ ui_error_t md2_navigation_drawer_set_open(struct md2_navigation_drawer *drawer,
   return ui_sidenav_base_set_open(drawer->base, is_open);
 }
 
+/** @brief md2_navigation_drawer_is_open function. */
 ui_error_t
 md2_navigation_drawer_is_open(const struct md2_navigation_drawer *drawer,
                               int *out_is_open) {
@@ -136,6 +144,7 @@ md2_navigation_drawer_is_open(const struct md2_navigation_drawer *drawer,
   return ui_sidenav_base_is_open(drawer->base, out_is_open);
 }
 
+/** @brief md2_navigation_drawer_set_overlay_director function. */
 ui_error_t md2_navigation_drawer_set_overlay_director(
     struct md2_navigation_drawer *drawer,
     struct ui_overlay_director *director) {
@@ -145,6 +154,7 @@ ui_error_t md2_navigation_drawer_set_overlay_director(
   return ui_sidenav_base_set_overlay_director(drawer->base, director);
 }
 
+/** @brief md2_navigation_drawer_set_on_close function. */
 ui_error_t
 md2_navigation_drawer_set_on_close(struct md2_navigation_drawer *drawer,
                                    md2_navigation_drawer_on_close_t on_close,
@@ -157,6 +167,7 @@ md2_navigation_drawer_set_on_close(struct md2_navigation_drawer *drawer,
   return UI_ERROR_NONE;
 }
 
+/** @brief md2_navigation_drawer_get_component function. */
 ui_error_t
 md2_navigation_drawer_get_component(struct md2_navigation_drawer *drawer,
                                     struct ui_component **out_component) {

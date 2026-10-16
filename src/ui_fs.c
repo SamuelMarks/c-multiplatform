@@ -161,12 +161,18 @@ ui_error_t ui_fs_read_file(const char *path, void **out_data,
 #else
   {
     /* Use standard C library for native builds */
-    FILE *f = fopen(path, "rb");
+    FILE *f = NULL;
     long sz;
     size_t read_bytes;
 
+#if defined(_MSC_VER)
+    if (fopen_s(&f, path, "rb") != 0 || !f)
+      return UI_ERROR_IO_FAILED;
+#else
+    f = fopen(path, "rb");
     if (!f)
       return UI_ERROR_IO_FAILED;
+#endif
 
     if (UI_FSEEK(f, 0, SEEK_END) != 0) {
       fclose(f);
@@ -232,11 +238,17 @@ ui_error_t ui_fs_write_file(const char *path, const void *data, size_t size) {
   }
 #else
   {
-    FILE *f = fopen(path, "wb");
+    FILE *f = NULL;
     size_t written;
 
+#if defined(_MSC_VER)
+    if (fopen_s(&f, path, "wb") != 0 || !f)
+      return UI_ERROR_IO_FAILED;
+#else
+    f = fopen(path, "wb");
     if (!f)
       return UI_ERROR_IO_FAILED;
+#endif
 
     written = UI_FWRITE(data, 1, size, f);
     fclose(f);

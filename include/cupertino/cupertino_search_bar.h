@@ -15,13 +15,17 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
+/** @brief CUPERTINO_SEARCH_BAR_MAX_SCOPES constant. */
 #define CUPERTINO_SEARCH_BAR_MAX_SCOPES 8
+/** @brief CUPERTINO_SEARCH_BAR_MAX_TOKENS constant. */
 #define CUPERTINO_SEARCH_BAR_MAX_TOKENS 4
+/** @brief CUPERTINO_SEARCH_BAR_HEIGHT constant. */
 #define CUPERTINO_SEARCH_BAR_HEIGHT 36.0f
+/** @brief CUPERTINO_SEARCH_BAR_CORNER_RADIUS constant. */
 #define CUPERTINO_SEARCH_BAR_CORNER_RADIUS 10.0f
 
 /**

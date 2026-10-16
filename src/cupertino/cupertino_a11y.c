@@ -11,6 +11,7 @@
 #include <string.h>
 /* clang-format on */
 
+/** @brief cupertino_a11y_enforce_touch_target function. */
 ui_error_t cupertino_a11y_enforce_touch_target(float width, float height,
                                                float *out_pad_x,
                                                float *out_pad_y) {
@@ -31,6 +32,7 @@ ui_error_t cupertino_a11y_enforce_touch_target(float width, float height,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_a11y_validate_touch_target function. */
 ui_error_t cupertino_a11y_validate_touch_target(float width, float height,
                                                 int *out_is_valid) {
   if (width < 0.0f || height < 0.0f || !out_is_valid) {
@@ -41,6 +43,7 @@ ui_error_t cupertino_a11y_validate_touch_target(float width, float height,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_a11y_traits_to_aria_role function. */
 ui_error_t cupertino_a11y_traits_to_aria_role(unsigned int traits,
                                               enum ui_aria_role *out_role) {
   if (!out_role) {
@@ -66,6 +69,7 @@ ui_error_t cupertino_a11y_traits_to_aria_role(unsigned int traits,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_a11y_post_notification function. */
 ui_error_t
 cupertino_a11y_post_notification(enum cupertino_a11y_notification notif,
                                  const char *announcement) {
@@ -83,6 +87,7 @@ cupertino_a11y_post_notification(enum cupertino_a11y_notification notif,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_a11y_get_default_settings function. */
 ui_error_t cupertino_a11y_get_default_settings(
     struct cupertino_a11y_settings *out_settings) {
   if (!out_settings) {
@@ -94,6 +99,7 @@ ui_error_t cupertino_a11y_get_default_settings(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_a11y_should_render_button_shapes function. */
 ui_error_t cupertino_a11y_should_render_button_shapes(
     const struct cupertino_a11y_settings *settings, int is_borderless,
     int *out_needs_backing) {
@@ -105,6 +111,7 @@ ui_error_t cupertino_a11y_should_render_button_shapes(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_a11y_format_page_scrolled_announcement function. */
 ui_error_t cupertino_a11y_format_page_scrolled_announcement(size_t current_page,
                                                             size_t total_pages,
                                                             char *out_buf,
@@ -121,8 +128,8 @@ ui_error_t cupertino_a11y_format_page_scrolled_announcement(size_t current_page,
   sprintf_s(temp, sizeof(temp), "Page %lu of %lu", (unsigned long)current_page,
             (unsigned long)total_pages);
 #else
-  snprintf(temp, sizeof(temp), "Page %lu of %lu", (unsigned long)current_page,
-           (unsigned long)total_pages);
+  sprintf(temp, "Page %lu of %lu", (unsigned long)current_page,
+          (unsigned long)total_pages);
 #endif
 
   len = strlen(temp);

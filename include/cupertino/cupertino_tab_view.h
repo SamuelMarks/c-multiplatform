@@ -15,10 +15,11 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
+/** @brief CUPERTINO_TAB_VIEW_MAX_STACK_DEPTH constant. */
 #define CUPERTINO_TAB_VIEW_MAX_STACK_DEPTH 16
 
 /**

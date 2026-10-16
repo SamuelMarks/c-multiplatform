@@ -10,6 +10,9 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_cupertino_list_tile_mock_create_fail;
+extern int g_cupertino_list_tile_mock_destroy_fail;
+
 SUITE(cupertino_list_tile_suite);
 
 TEST test_list_tile_invalid_args(void) {
@@ -259,8 +262,6 @@ TEST test_list_tile_lifecycle_and_properties(void) {
 
 TEST test_list_tile_oom_mock(void) {
 #ifdef UI_TEST_MOCK_ALLOC
-  extern int g_cupertino_list_tile_mock_create_fail;
-  extern int g_cupertino_list_tile_mock_destroy_fail;
 #endif
   struct cupertino_list_tile_descriptor desc;
   struct cupertino_list_tile *tile = NULL;

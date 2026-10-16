@@ -72,13 +72,20 @@ static ui_error_t mock_card_base_destroy(struct ui_card_base *card) {
 /** @endcond */
 #endif
 
+/** @brief CUPERTINO_CARD_COMPACT_WIDTH macro definition. */
 #define CUPERTINO_CARD_COMPACT_WIDTH 360.0f
+/** @brief CUPERTINO_CARD_COMPACT_HEIGHT macro definition. */
 #define CUPERTINO_CARD_COMPACT_HEIGHT 88.0f
+/** @brief CUPERTINO_CARD_MINIMAL_WIDTH macro definition. */
 #define CUPERTINO_CARD_MINIMAL_WIDTH 88.0f
+/** @brief CUPERTINO_CARD_MINIMAL_HEIGHT macro definition. */
 #define CUPERTINO_CARD_MINIMAL_HEIGHT 88.0f
+/** @brief CUPERTINO_CARD_EXPANDED_WIDTH macro definition. */
 #define CUPERTINO_CARD_EXPANDED_WIDTH 360.0f
+/** @brief CUPERTINO_CARD_EXPANDED_HEIGHT macro definition. */
 #define CUPERTINO_CARD_EXPANDED_HEIGHT 160.0f
 
+/** @brief cupertino_live_activity_update_palette function. */
 static ui_error_t cupertino_live_activity_update_palette(
     struct cupertino_live_activity *activity) {
   if (!activity) {
@@ -110,6 +117,7 @@ static ui_error_t cupertino_live_activity_update_palette(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_live_activity_apply_geometry function. */
 static ui_error_t cupertino_live_activity_apply_geometry(
     struct cupertino_live_activity *activity) {
   if (!activity) {
@@ -144,6 +152,7 @@ static ui_error_t cupertino_live_activity_apply_geometry(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_live_activity_create function. */
 ui_error_t cupertino_live_activity_create(
     struct ui_engine *engine,
     const struct cupertino_live_activity_descriptor *desc,
@@ -247,6 +256,7 @@ ui_error_t cupertino_live_activity_create(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_live_activity_destroy function. */
 ui_error_t
 cupertino_live_activity_destroy(struct cupertino_live_activity *activity) {
   ui_error_t rc;
@@ -266,6 +276,7 @@ cupertino_live_activity_destroy(struct cupertino_live_activity *activity) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_live_activity_set_layout function. */
 ui_error_t
 cupertino_live_activity_set_layout(struct cupertino_live_activity *activity,
                                    enum cupertino_live_activity_layout layout) {
@@ -277,6 +288,7 @@ cupertino_live_activity_set_layout(struct cupertino_live_activity *activity,
   return cupertino_live_activity_apply_geometry(activity);
 }
 
+/** @brief cupertino_live_activity_tick_timer function. */
 ui_error_t
 cupertino_live_activity_tick_timer(struct cupertino_live_activity *activity,
                                    float delta_seconds, float *out_progress) {
@@ -306,6 +318,7 @@ cupertino_live_activity_tick_timer(struct cupertino_live_activity *activity,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_live_activity_set_ambient_light function. */
 ui_error_t cupertino_live_activity_set_ambient_light(
     struct cupertino_live_activity *activity, float ambient_lux,
     int *out_is_night_mode) {
@@ -325,6 +338,7 @@ ui_error_t cupertino_live_activity_set_ambient_light(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_live_activity_set_standby_mode function. */
 ui_error_t cupertino_live_activity_set_standby_mode(
     struct cupertino_live_activity *activity, int enabled) {
   if (!activity) {
@@ -335,6 +349,7 @@ ui_error_t cupertino_live_activity_set_standby_mode(
   return cupertino_live_activity_update_palette(activity);
 }
 
+/** @brief cupertino_live_activity_get_timer_string function. */
 ui_error_t cupertino_live_activity_get_timer_string(
     const struct cupertino_live_activity *activity, char *buffer,
     size_t buffer_size) {
@@ -356,17 +371,23 @@ ui_error_t cupertino_live_activity_get_timer_string(
   seconds = (unsigned int)(rem) % 60;
   centiseconds = (unsigned int)((rem - (float)((unsigned int)rem)) * 100.0f);
 
+  {
+    char tmp_buf[64];
 #if defined(_MSC_VER)
-  sprintf_s(buffer, buffer_size, "%02u:%02u.%02u", minutes, seconds,
-            centiseconds);
+    sprintf_s(tmp_buf, sizeof(tmp_buf), "%02u:%02u.%02u", minutes, seconds,
+              centiseconds);
+    strncpy_s(buffer, buffer_size, tmp_buf, _TRUNCATE);
 #else
-  snprintf(buffer, buffer_size, "%02u:%02u.%02u", minutes, seconds,
-           centiseconds);
+    sprintf(tmp_buf, "%02u:%02u.%02u", minutes, seconds, centiseconds);
+    strncpy(buffer, tmp_buf, buffer_size - 1);
+    buffer[buffer_size - 1] = '\0';
 #endif
+  }
 
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_live_activity_get_card_base function. */
 ui_error_t
 cupertino_live_activity_get_card_base(struct cupertino_live_activity *activity,
                                       struct ui_card_base **out_card) {

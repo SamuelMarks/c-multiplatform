@@ -37,10 +37,14 @@ static ui_error_t mock_list_item_base_destroy(struct ui_list_item_base *base) {
 /** @endcond */
 #endif
 
+/** @brief CUPERTINO_LIST_TILE_HEIGHT_DEFAULT macro definition. */
 #define CUPERTINO_LIST_TILE_HEIGHT_DEFAULT 44.0f
+/** @brief CUPERTINO_LIST_TILE_HEIGHT_SUBTITLE macro definition. */
 #define CUPERTINO_LIST_TILE_HEIGHT_SUBTITLE 54.0f
+/** @brief CUPERTINO_LIST_TILE_HIGHLIGHT_MAX_OPACITY macro definition. */
 #define CUPERTINO_LIST_TILE_HIGHLIGHT_MAX_OPACITY 0.15f
 
+/** @brief cupertino_list_tile_create function. */
 ui_error_t
 cupertino_list_tile_create(struct ui_engine *engine,
                            const struct cupertino_list_tile_descriptor *desc,
@@ -116,6 +120,7 @@ cupertino_list_tile_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_list_tile_destroy function. */
 ui_error_t cupertino_list_tile_destroy(struct cupertino_list_tile *tile) {
   ui_error_t rc;
 
@@ -135,6 +140,7 @@ ui_error_t cupertino_list_tile_destroy(struct cupertino_list_tile *tile) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_list_tile_set_title function. */
 ui_error_t cupertino_list_tile_set_title(struct cupertino_list_tile *tile,
                                          const char *title) {
   if (!tile || !title) {
@@ -151,6 +157,7 @@ ui_error_t cupertino_list_tile_set_title(struct cupertino_list_tile *tile,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_list_tile_get_title function. */
 ui_error_t cupertino_list_tile_get_title(const struct cupertino_list_tile *tile,
                                          const char **out_title) {
   if (!tile || !out_title) {
@@ -161,6 +168,7 @@ ui_error_t cupertino_list_tile_get_title(const struct cupertino_list_tile *tile,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_list_tile_set_subtitle function. */
 ui_error_t cupertino_list_tile_set_subtitle(struct cupertino_list_tile *tile,
                                             const char *subtitle) {
   if (!tile) {
@@ -182,6 +190,7 @@ ui_error_t cupertino_list_tile_set_subtitle(struct cupertino_list_tile *tile,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_list_tile_get_subtitle function. */
 ui_error_t
 cupertino_list_tile_get_subtitle(const struct cupertino_list_tile *tile,
                                  const char **out_subtitle) {
@@ -193,6 +202,7 @@ cupertino_list_tile_get_subtitle(const struct cupertino_list_tile *tile,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_list_tile_set_additional_info function. */
 ui_error_t
 cupertino_list_tile_set_additional_info(struct cupertino_list_tile *tile,
                                         const char *info) {
@@ -215,6 +225,7 @@ cupertino_list_tile_set_additional_info(struct cupertino_list_tile *tile,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_list_tile_get_additional_info function. */
 ui_error_t
 cupertino_list_tile_get_additional_info(const struct cupertino_list_tile *tile,
                                         const char **out_info) {
@@ -226,6 +237,7 @@ cupertino_list_tile_get_additional_info(const struct cupertino_list_tile *tile,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_list_tile_set_accessory function. */
 ui_error_t cupertino_list_tile_set_accessory(
     struct cupertino_list_tile *tile,
     enum cupertino_list_tile_accessory accessory) {
@@ -239,6 +251,7 @@ ui_error_t cupertino_list_tile_set_accessory(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_list_tile_get_accessory function. */
 ui_error_t cupertino_list_tile_get_accessory(
     const struct cupertino_list_tile *tile,
     enum cupertino_list_tile_accessory *out_accessory) {
@@ -250,6 +263,7 @@ ui_error_t cupertino_list_tile_get_accessory(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_list_tile_set_pressed function. */
 ui_error_t cupertino_list_tile_set_pressed(struct cupertino_list_tile *tile,
                                            int pressed) {
   if (!tile) {
@@ -262,6 +276,7 @@ ui_error_t cupertino_list_tile_set_pressed(struct cupertino_list_tile *tile,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_list_tile_is_pressed function. */
 ui_error_t
 cupertino_list_tile_is_pressed(const struct cupertino_list_tile *tile,
                                int *out_pressed) {
@@ -273,6 +288,7 @@ cupertino_list_tile_is_pressed(const struct cupertino_list_tile *tile,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_list_tile_get_highlight_opacity function. */
 ui_error_t cupertino_list_tile_get_highlight_opacity(
     const struct cupertino_list_tile *tile, float *out_opacity) {
   if (!tile || !out_opacity) {
@@ -283,6 +299,7 @@ ui_error_t cupertino_list_tile_get_highlight_opacity(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_list_tile_get_height function. */
 ui_error_t
 cupertino_list_tile_get_height(const struct cupertino_list_tile *tile,
                                float *out_height) {
@@ -296,6 +313,7 @@ cupertino_list_tile_get_height(const struct cupertino_list_tile *tile,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_list_tile_get_base function. */
 ui_error_t cupertino_list_tile_get_base(struct cupertino_list_tile *tile,
                                         struct ui_list_item_base **out_base) {
   if (!tile || !out_base) {
@@ -306,6 +324,7 @@ ui_error_t cupertino_list_tile_get_base(struct cupertino_list_tile *tile,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_list_tile_set_scale_factor function. */
 ui_error_t
 cupertino_list_tile_set_scale_factor(struct cupertino_list_tile *tile,
                                      float scale_factor) {
@@ -323,6 +342,7 @@ cupertino_list_tile_set_scale_factor(struct cupertino_list_tile *tile,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_list_tile_is_stacked function. */
 ui_error_t
 cupertino_list_tile_is_stacked(const struct cupertino_list_tile *tile,
                                int *out_is_stacked) {
@@ -334,6 +354,7 @@ cupertino_list_tile_is_stacked(const struct cupertino_list_tile *tile,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_list_tile_compute_height function. */
 ui_error_t
 cupertino_list_tile_compute_height(const struct cupertino_list_tile *tile,
                                    float *out_height) {

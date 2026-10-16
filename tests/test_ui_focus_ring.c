@@ -13,14 +13,12 @@ static ui_error_t test_focus_ring(void) {
   if (err != UI_ERROR_INVALID_ARGUMENT) {
     fprintf(stderr, "ui_focus_ring_get_standard(NULL) failed\n");
     exit(1);
-    return UI_ERROR_NONE;
   }
 
   err = ui_focus_ring_get_standard(primary, &ring);
   if (err != UI_ERROR_NONE) {
     fprintf(stderr, "ui_focus_ring_get_standard failed\n");
     exit(1);
-    return UI_ERROR_NONE;
   }
 
   if (ring.color != primary || ring.offset != 2.0f) {

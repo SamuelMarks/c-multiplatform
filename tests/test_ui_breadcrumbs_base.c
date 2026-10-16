@@ -4,6 +4,8 @@
 #include <stdlib.h>
 /* clang-format on */
 
+extern ui_error_t run_bc_coverage(void);
+
 extern int g_malloc_fail_countdown;
 extern int g_breadcrumbs_mock_fail;
 int g_breadcrumbs_mock_target = 0;
@@ -25,9 +27,6 @@ static ui_error_t mock_factory(const struct ui_route_request *req,
     return rc;
   *out_screen = mock_screen;
   mock_navigated = 1;
-  return UI_ERROR_NONE;
-  return UI_ERROR_NONE;
-  return UI_ERROR_NONE;
   return UI_ERROR_NONE;
 }
 
@@ -115,63 +114,65 @@ static ui_error_t run_normal_tests(void) {
     return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
   /* Click with NULL router */
-  struct ui_breadcrumbs_base *bc_no_router = NULL;
-  rc = ui_breadcrumbs_base_create(NULL, &bc_no_router);
-  if (rc != UI_ERROR_NONE)
-    return rc;
-  rc = ui_breadcrumbs_base_set_path(bc_no_router, "/a/b");
-  if (rc != UI_ERROR_NONE)
-    return rc;
-  rc = ui_breadcrumbs_base_simulate_click(bc_no_router, 0);
-  if (rc != UI_ERROR_NONE)
-    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
-
-  /* Poke internal segments to test NULL path click branch */
   {
-    struct ui_breadcrumbs_base_internal {
-      struct ui_router *router;
-      struct ui_component *component;
-      struct ui_dom_node *nav_node;
-      struct ui_dom_node *ol_node;
-      struct ui_breadcrumb_segment {
-        char *label;
-        char *path;
-      } *segments;
-      size_t segment_count;
-    } *internal = (struct ui_breadcrumbs_base_internal *)bc_no_router;
-    if (internal->segments && internal->segment_count > 0) {
-      char *old_path = internal->segments[0].path;
-      internal->segments[0].path = NULL;
-      /* Also test with router present but path NULL */
-      internal->router = router;
-      rc = ui_breadcrumbs_base_simulate_click(bc_no_router, 0);
-      if (rc != UI_ERROR_NONE)
-        return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
-      internal->segments[0].path =
-          old_path; /* restore to not crash on destroy */
+    struct ui_breadcrumbs_base *bc_no_router = NULL;
+    rc = ui_breadcrumbs_base_create(NULL, &bc_no_router);
+    if (rc != UI_ERROR_NONE)
+      return rc;
+    rc = ui_breadcrumbs_base_set_path(bc_no_router, "/a/b");
+    if (rc != UI_ERROR_NONE)
+      return rc;
+    rc = ui_breadcrumbs_base_simulate_click(bc_no_router, 0);
+    if (rc != UI_ERROR_NONE)
+      return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+
+    /* Poke internal segments to test NULL path click branch */
+    {
+      struct ui_breadcrumbs_base_internal {
+        struct ui_router *router;
+        struct ui_component *component;
+        struct ui_dom_node *nav_node;
+        struct ui_dom_node *ol_node;
+        struct ui_breadcrumb_segment {
+          char *label;
+          char *path;
+        } *segments;
+        size_t segment_count;
+      } *internal = (struct ui_breadcrumbs_base_internal *)bc_no_router;
+      if (internal->segments && internal->segment_count > 0) {
+        char *old_path = internal->segments[0].path;
+        internal->segments[0].path = NULL;
+        /* Also test with router present but path NULL */
+        internal->router = router;
+        rc = ui_breadcrumbs_base_simulate_click(bc_no_router, 0);
+        if (rc != UI_ERROR_NONE)
+          return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+        internal->segments[0].path =
+            old_path; /* restore to not crash on destroy */
+      }
     }
-  }
 
-  rc = ui_breadcrumbs_base_destroy(bc_no_router);
+    rc = ui_breadcrumbs_base_destroy(bc_no_router);
 
-  if (rc != UI_ERROR_NONE)
-    return rc;
+    if (rc != UI_ERROR_NONE)
+      return rc;
 
-  /* Test empty path (count == 0) */
-  rc = ui_breadcrumbs_base_set_path(bc, "/");
-  if (rc != UI_ERROR_NONE)
-    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
-  rc = ui_breadcrumbs_base_set_path(bc, "");
-  if (rc != UI_ERROR_NONE)
-    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+    /* Test empty path (count == 0) */
+    rc = ui_breadcrumbs_base_set_path(bc, "/");
+    if (rc != UI_ERROR_NONE)
+      return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+    rc = ui_breadcrumbs_base_set_path(bc, "");
+    if (rc != UI_ERROR_NONE)
+      return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
-  /* Simulate container width shrinking causing Ellipsis injection */
-  /* Validation is handled by shadow DOM text-overflow mechanics implicitly
-   * mapped to properties */
-  printf("Ellipsis injection metrics when container width shrinks verified.\n");
-  rc = ui_breadcrumbs_base_destroy(bc);
-  if (rc != UI_ERROR_NONE)
-    return rc;
+    /* Simulate container width shrinking causing Ellipsis injection */
+    /* Validation is handled by shadow DOM text-overflow mechanics implicitly
+     * mapped to properties */
+    printf(
+        "Ellipsis injection metrics when container width shrinks verified.\n");
+    rc = ui_breadcrumbs_base_destroy(bc);
+    if (rc != UI_ERROR_NONE)
+      return rc;
 
 #define TEST_BC_MOCK(fail_id)                                                  \
   do {                                                                         \
@@ -183,22 +184,22 @@ static ui_error_t run_normal_tests(void) {
       ui_breadcrumbs_base_destroy(tmp);                                        \
   } while (0)
 
-  TEST_BC_MOCK(138);
-  TEST_BC_MOCK(175);
-  TEST_BC_MOCK(179);
-  TEST_BC_MOCK(198);
-  TEST_BC_MOCK(1987);
-  TEST_BC_MOCK(206);
-  TEST_BC_MOCK(277);
-  TEST_BC_MOCK(240);
-  TEST_BC_MOCK(323);
-  TEST_BC_MOCK(339);
-  TEST_BC_MOCK(353);
-  TEST_BC_MOCK(455);
-  TEST_BC_MOCK(130);
-  TEST_BC_MOCK(397);
-  TEST_BC_MOCK(413);
-  TEST_BC_MOCK(427);
+    TEST_BC_MOCK(138);
+    TEST_BC_MOCK(175);
+    TEST_BC_MOCK(179);
+    TEST_BC_MOCK(198);
+    TEST_BC_MOCK(1987);
+    TEST_BC_MOCK(206);
+    TEST_BC_MOCK(277);
+    TEST_BC_MOCK(240);
+    TEST_BC_MOCK(323);
+    TEST_BC_MOCK(339);
+    TEST_BC_MOCK(353);
+    TEST_BC_MOCK(455);
+    TEST_BC_MOCK(130);
+    TEST_BC_MOCK(397);
+    TEST_BC_MOCK(413);
+    TEST_BC_MOCK(427);
 
 #define TEST_BC_SET_PATH_MOCK(fail_id)                                         \
   do {                                                                         \
@@ -210,72 +211,72 @@ static ui_error_t run_normal_tests(void) {
     ui_breadcrumbs_base_destroy(tmp);                                          \
   } while (0)
 
-  TEST_BC_SET_PATH_MOCK(130);
-  TEST_BC_SET_PATH_MOCK(397);
-  TEST_BC_SET_PATH_MOCK(413);
-  TEST_BC_SET_PATH_MOCK(427);
-  TEST_BC_SET_PATH_MOCK(240);
-  TEST_BC_SET_PATH_MOCK(175);
-  TEST_BC_SET_PATH_MOCK(253);
-  TEST_BC_SET_PATH_MOCK(198);
-  TEST_BC_SET_PATH_MOCK(277);
-  TEST_BC_SET_PATH_MOCK(1987);
+    TEST_BC_SET_PATH_MOCK(130);
+    TEST_BC_SET_PATH_MOCK(397);
+    TEST_BC_SET_PATH_MOCK(413);
+    TEST_BC_SET_PATH_MOCK(427);
+    TEST_BC_SET_PATH_MOCK(240);
+    TEST_BC_SET_PATH_MOCK(175);
+    TEST_BC_SET_PATH_MOCK(253);
+    TEST_BC_SET_PATH_MOCK(198);
+    TEST_BC_SET_PATH_MOCK(277);
+    TEST_BC_SET_PATH_MOCK(1987);
 
-  TEST_BC_MOCK(1);
-  TEST_BC_MOCK(2);
-  TEST_BC_MOCK(9);
+    TEST_BC_MOCK(1);
+    TEST_BC_MOCK(2);
+    TEST_BC_MOCK(9);
 
-  TEST_BC_SET_PATH_MOCK(1);
-  TEST_BC_SET_PATH_MOCK(6);
-  TEST_BC_SET_PATH_MOCK(8);
+    TEST_BC_SET_PATH_MOCK(1);
+    TEST_BC_SET_PATH_MOCK(6);
+    TEST_BC_SET_PATH_MOCK(8);
 
-  {
-    struct ui_breadcrumbs_base *tmp = NULL;
-    ui_breadcrumbs_base_create(router, &tmp);
-    ui_breadcrumbs_base_set_path(tmp, "/settings/profile");
-    g_breadcrumbs_mock_fail = 3;
-    ui_breadcrumbs_base_destroy(tmp);
-    g_breadcrumbs_mock_fail = 0;
-  }
-  {
-    struct ui_breadcrumbs_base *tmp = NULL;
-    ui_breadcrumbs_base_create(router, &tmp);
-    ui_breadcrumbs_base_set_path(tmp, "/settings/profile");
-    g_breadcrumbs_mock_fail = 4;
-    ui_breadcrumbs_base_destroy(tmp);
-    g_breadcrumbs_mock_fail = 0;
-  }
-  {
-    struct ui_breadcrumbs_base *tmp = NULL;
-    ui_breadcrumbs_base_create(router, &tmp);
-    g_breadcrumbs_mock_fail = 5;
-    ui_breadcrumbs_base_destroy(tmp);
-    g_breadcrumbs_mock_fail = 0;
-  }
-  {
-    struct ui_breadcrumbs_base *tmp = NULL;
-    ui_breadcrumbs_base_create(router, &tmp);
-    ui_breadcrumbs_base_set_path(tmp, "/settings/profile");
-    g_breadcrumbs_mock_fail = 7;
-    ui_breadcrumbs_base_simulate_click(tmp, 0);
-    g_breadcrumbs_mock_fail = 0;
-    ui_breadcrumbs_base_destroy(tmp);
-  }
-  {
-    struct ui_breadcrumbs_base *tmp = NULL;
-    ui_breadcrumbs_base_create(router, &tmp);
-    ui_breadcrumbs_base_set_path(tmp, "/settings/profile");
-    g_breadcrumbs_mock_fail = 3;
-    ui_breadcrumbs_base_set_path(tmp, "/other");
-    g_breadcrumbs_mock_fail = 0;
-    ui_breadcrumbs_base_destroy(tmp);
-  }
+    {
+      struct ui_breadcrumbs_base *tmp = NULL;
+      ui_breadcrumbs_base_create(router, &tmp);
+      ui_breadcrumbs_base_set_path(tmp, "/settings/profile");
+      g_breadcrumbs_mock_fail = 3;
+      ui_breadcrumbs_base_destroy(tmp);
+      g_breadcrumbs_mock_fail = 0;
+    }
+    {
+      struct ui_breadcrumbs_base *tmp = NULL;
+      ui_breadcrumbs_base_create(router, &tmp);
+      ui_breadcrumbs_base_set_path(tmp, "/settings/profile");
+      g_breadcrumbs_mock_fail = 4;
+      ui_breadcrumbs_base_destroy(tmp);
+      g_breadcrumbs_mock_fail = 0;
+    }
+    {
+      struct ui_breadcrumbs_base *tmp = NULL;
+      ui_breadcrumbs_base_create(router, &tmp);
+      g_breadcrumbs_mock_fail = 5;
+      ui_breadcrumbs_base_destroy(tmp);
+      g_breadcrumbs_mock_fail = 0;
+    }
+    {
+      struct ui_breadcrumbs_base *tmp = NULL;
+      ui_breadcrumbs_base_create(router, &tmp);
+      ui_breadcrumbs_base_set_path(tmp, "/settings/profile");
+      g_breadcrumbs_mock_fail = 7;
+      ui_breadcrumbs_base_simulate_click(tmp, 0);
+      g_breadcrumbs_mock_fail = 0;
+      ui_breadcrumbs_base_destroy(tmp);
+    }
+    {
+      struct ui_breadcrumbs_base *tmp = NULL;
+      ui_breadcrumbs_base_create(router, &tmp);
+      ui_breadcrumbs_base_set_path(tmp, "/settings/profile");
+      g_breadcrumbs_mock_fail = 3;
+      ui_breadcrumbs_base_set_path(tmp, "/other");
+      g_breadcrumbs_mock_fail = 0;
+      ui_breadcrumbs_base_destroy(tmp);
+    }
 
-  rc = ui_router_destroy(router);
-  if (rc != UI_ERROR_NONE)
-    return rc;
-  return UI_ERROR_NONE;
-  return UI_ERROR_NONE;
+    rc = ui_router_destroy(router);
+    if (rc != UI_ERROR_NONE)
+      return rc;
+    return UI_ERROR_NONE;
+  }
 }
 
 static ui_error_t run_oom_tests(void) {
@@ -436,7 +437,6 @@ static ui_error_t run_oom_tests(void) {
     return rc;
 #endif
   return UI_ERROR_NONE;
-  return UI_ERROR_NONE;
 }
 
 int main(void) {
@@ -450,7 +450,6 @@ int main(void) {
     return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
   }
 #ifdef UI_TEST_MOCK_ALLOC
-  extern ui_error_t run_bc_coverage(void);
   rc = run_bc_coverage();
   if (rc != UI_ERROR_NONE) {
     return 1;

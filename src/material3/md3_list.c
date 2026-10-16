@@ -9,6 +9,7 @@
 #include <string.h>
 /* clang-format on */
 
+/** @brief md3_list_create function. */
 ui_error_t md3_list_create(struct ui_engine *engine,
                            struct md3_list **out_list) {
   struct md3_list *list;
@@ -35,6 +36,7 @@ ui_error_t md3_list_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_list_destroy function. */
 ui_error_t md3_list_destroy(struct md3_list *list) {
   ui_error_t rc;
 
@@ -47,6 +49,7 @@ ui_error_t md3_list_destroy(struct md3_list *list) {
   return rc;
 }
 
+/** @brief md3_list_set_segmented function. */
 ui_error_t md3_list_set_segmented(struct md3_list *list, int is_segmented) {
   if (!list) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -55,6 +58,7 @@ ui_error_t md3_list_set_segmented(struct md3_list *list, int is_segmented) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_list_append_item function. */
 ui_error_t md3_list_append_item(struct md3_list *list,
                                 struct md3_list_item *item) {
   ui_error_t rc;
@@ -71,6 +75,7 @@ ui_error_t md3_list_append_item(struct md3_list *list,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_list_item_create function. */
 ui_error_t md3_list_item_create(struct ui_engine *engine,
                                 enum md3_list_item_lines lines,
                                 struct md3_list_item **out_item) {
@@ -102,6 +107,7 @@ ui_error_t md3_list_item_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_list_item_destroy function. */
 ui_error_t md3_list_item_destroy(struct md3_list_item *item) {
   ui_error_t rc;
 
@@ -114,6 +120,7 @@ ui_error_t md3_list_item_destroy(struct md3_list_item *item) {
   return rc;
 }
 
+/** @brief md3_list_item_set_headline function. */
 ui_error_t md3_list_item_set_headline(struct md3_list_item *item,
                                       const char *headline) {
   if (!item) {
@@ -135,6 +142,7 @@ ui_error_t md3_list_item_set_headline(struct md3_list_item *item,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_list_item_set_supporting_text function. */
 ui_error_t md3_list_item_set_supporting_text(struct md3_list_item *item,
                                              const char *supporting_text) {
   if (!item) {
@@ -157,6 +165,7 @@ ui_error_t md3_list_item_set_supporting_text(struct md3_list_item *item,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_list_item_set_trailing_supporting_text function. */
 ui_error_t
 md3_list_item_set_trailing_supporting_text(struct md3_list_item *item,
                                            const char *trailing_text) {
@@ -182,6 +191,7 @@ md3_list_item_set_trailing_supporting_text(struct md3_list_item *item,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_list_item_set_selected function. */
 ui_error_t md3_list_item_set_selected(struct md3_list_item *item,
                                       int selected) {
   if (!item) {
@@ -191,6 +201,7 @@ ui_error_t md3_list_item_set_selected(struct md3_list_item *item,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_list_item_get_selected function. */
 ui_error_t md3_list_item_get_selected(const struct md3_list_item *item,
                                       int *out_selected) {
   if (!item || !out_selected) {
@@ -200,6 +211,7 @@ ui_error_t md3_list_item_get_selected(const struct md3_list_item *item,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_list_item_get_component function. */
 ui_error_t md3_list_item_get_component(struct md3_list_item *item,
                                        struct ui_component **out_component) {
   ui_error_t rc;

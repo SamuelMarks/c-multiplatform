@@ -103,32 +103,6 @@ static ui_error_t mock_set_on_dpi_change_callback(
   return UI_ERROR_NONE;
 }
 
-/**
- * @brief Coordinate transformation test function: transforms logical points to
- * physical pixels.
- * @param logical_x Logical X coordinate in points.
- * @param logical_y Logical Y coordinate in points.
- * @param scale_factor DPI scale factor.
- * @param out_physical_x Output physical pixel X.
- * @param out_physical_y Output physical pixel Y.
- * @return UI_ERROR_NONE on success.
- */
-static ui_error_t transform_logical_to_physical(float logical_x,
-                                                float logical_y,
-                                                float scale_factor,
-                                                int *out_physical_x,
-                                                int *out_physical_y) {
-  if (!out_physical_x || !out_physical_y) {
-    return UI_ERROR_INVALID_ARGUMENT;
-  }
-  if (scale_factor <= 0.0f) {
-    return UI_ERROR_INVALID_ARGUMENT;
-  }
-  *out_physical_x = (int)(logical_x * scale_factor);
-  *out_physical_y = (int)(logical_y * scale_factor);
-  return UI_ERROR_NONE;
-}
-
 int main(void) {
   struct ui_window_backend backend;
   struct ui_window *dummy_window;

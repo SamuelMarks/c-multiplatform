@@ -26,6 +26,7 @@ mock_avatar_group_base_destroy(struct ui_avatar_group_base *group) {
 /** @endcond */
 #endif
 
+/** @brief cupertino_shareplay_create function. */
 ui_error_t
 cupertino_shareplay_create(struct ui_engine *engine,
                            const struct cupertino_shareplay_descriptor *desc,
@@ -67,6 +68,7 @@ cupertino_shareplay_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_shareplay_destroy function. */
 ui_error_t
 cupertino_shareplay_destroy(struct cupertino_shareplay_control *control) {
   ui_error_t rc = UI_ERROR_NONE;
@@ -84,6 +86,7 @@ cupertino_shareplay_destroy(struct cupertino_shareplay_control *control) {
   return rc;
 }
 
+/** @brief cupertino_shareplay_set_session_active function. */
 ui_error_t cupertino_shareplay_set_session_active(
     struct cupertino_shareplay_control *control, int is_active) {
   if (!control) {
@@ -94,6 +97,7 @@ ui_error_t cupertino_shareplay_set_session_active(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_shareplay_is_session_active function. */
 ui_error_t cupertino_shareplay_is_session_active(
     const struct cupertino_shareplay_control *control, int *out_active) {
   if (!control || !out_active) {
@@ -104,6 +108,7 @@ ui_error_t cupertino_shareplay_is_session_active(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_shareplay_set_participant_count function. */
 ui_error_t cupertino_shareplay_set_participant_count(
     struct cupertino_shareplay_control *control, int count) {
   if (!control || count < 0) {
@@ -114,6 +119,7 @@ ui_error_t cupertino_shareplay_set_participant_count(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_shareplay_get_participant_count function. */
 ui_error_t cupertino_shareplay_get_participant_count(
     const struct cupertino_shareplay_control *control, int *out_count) {
   if (!control || !out_count) {
@@ -124,6 +130,7 @@ ui_error_t cupertino_shareplay_get_participant_count(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_shareplay_tick function. */
 ui_error_t cupertino_shareplay_tick(struct cupertino_shareplay_control *control,
                                     float delta_ms) {
   if (!control || delta_ms < 0.0f) {
@@ -149,6 +156,7 @@ ui_error_t cupertino_shareplay_tick(struct cupertino_shareplay_control *control,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_shareplay_get_wave_heights function. */
 ui_error_t cupertino_shareplay_get_wave_heights(
     const struct cupertino_shareplay_control *control, float out_heights[3]) {
   if (!control || !out_heights) {
@@ -161,6 +169,7 @@ ui_error_t cupertino_shareplay_get_wave_heights(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_shareplay_trigger_action function. */
 ui_error_t
 cupertino_shareplay_trigger_action(struct cupertino_shareplay_control *control,
                                    enum cupertino_shareplay_action action) {
@@ -177,6 +186,7 @@ cupertino_shareplay_trigger_action(struct cupertino_shareplay_control *control,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_shareplay_get_dimensions function. */
 ui_error_t cupertino_shareplay_get_dimensions(
     const struct cupertino_shareplay_control *control, float *out_width,
     float *out_height) {
@@ -189,6 +199,7 @@ ui_error_t cupertino_shareplay_get_dimensions(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_shareplay_get_avatar_group function. */
 ui_error_t cupertino_shareplay_get_avatar_group(
     struct cupertino_shareplay_control *control,
     struct ui_avatar_group_base **out_avatar_group) {

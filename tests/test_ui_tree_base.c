@@ -131,8 +131,9 @@ static ui_error_t mock_render_node(void *node_id, struct ui_dom_node *cell_node,
 
 #define EXPECT_EQ(actual, expected)                                            \
   if ((size_t)(actual) != (size_t)(expected)) {                                \
-    printf("Failed at %d: %zu != %zu\n", __LINE__, (size_t)(actual),           \
-           (size_t)(expected));                                                \
+    printf("Failed at %d: %lu != %lu\n", __LINE__,                             \
+           (unsigned long)(size_t)(actual),                                    \
+           (unsigned long)(size_t)(expected));                                 \
     failed = 1;                                                                \
   }
 
@@ -233,138 +234,139 @@ static int test_tree_render(void) {
   }
 
 #ifdef UI_TEST_MOCK_ALLOC
-  int i;
-  for (i = 0; i < 4; i++) {
-    g_malloc_fail_countdown = i;
-    if (ui_tree_base_create(&tree, &model) == UI_ERROR_NONE) {
-      {
-        ui_error_t rc_cleanup = ui_tree_base_destroy(tree);
-        assert(rc_cleanup == UI_ERROR_NONE);
-      }
-    }
-  }
-  g_malloc_fail_countdown = -1;
-#endif
-
-  rc = ui_tree_base_create(&tree, &model);
-  EXPECT_EQ(rc, UI_ERROR_NONE);
-
-  /* Set expanded OOM */
-#ifdef UI_TEST_MOCK_ALLOC
-  for (i = 0; i < 3; i++) {
-    g_malloc_fail_countdown = i;
-    ui_tree_base_set_expanded(tree, &root2, 1);
-  }
-  g_malloc_fail_countdown = -1;
-#endif
-
-  ui_tree_base_set_expanded(tree, &root1, 1);
-  ui_tree_base_set_expanded(tree, &root2, 1);
-  ui_tree_base_set_expanded(tree, &root2, 0);
-
-  /* NULL checks for coverage */
   {
-    int is_exp;
-    struct ui_selection_model *sm;
-    EXPECT_EQ(ui_tree_base_get_selection_model(tree, NULL),
-              UI_ERROR_INVALID_ARGUMENT);
-    EXPECT_EQ(ui_tree_base_is_expanded(NULL, &root1, &is_exp),
-              UI_ERROR_INVALID_ARGUMENT);
-    EXPECT_EQ(ui_tree_base_is_expanded(tree, NULL, &is_exp),
-              UI_ERROR_INVALID_ARGUMENT);
-    EXPECT_EQ(ui_tree_base_is_expanded(tree, &root1, NULL),
-              UI_ERROR_INVALID_ARGUMENT);
-    EXPECT_EQ(ui_tree_base_set_expanded(NULL, &root1, 1),
-              UI_ERROR_INVALID_ARGUMENT);
-    EXPECT_EQ(ui_tree_base_set_expanded(tree, NULL, 1),
-              UI_ERROR_INVALID_ARGUMENT);
-  }
-
-  /* Trigger reallocation of expanded_nodes (cap > 8) */
-  {
-    size_t k;
-    for (k = 0; k < 20; k++) {
-      ui_tree_base_set_expanded(tree, (void *)((size_t)(100 + k)), 1);
-    }
-  }
-
-  /* Select a node */
-  {
-    struct ui_selection_model *sm;
-    ui_tree_base_get_selection_model(tree, &sm);
-    ui_selection_model_toggle(sm, &root1);
-  }
-
-  /* test get_selection_model */
-  {
-    struct ui_selection_model *sm;
-    EXPECT_EQ(ui_tree_base_get_selection_model(tree, &sm), UI_ERROR_NONE);
-  }
-
-  /* test bind_data */
-  EXPECT_EQ(ui_tree_base_bind_data(tree, (struct ui_computed *)0x1),
-            UI_ERROR_NONE);
-
-  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &container);
-
-  /* Render OOM */
-#ifdef UI_TEST_MOCK_ALLOC
-  for (i = 0; i < 100; i++) {
-    g_malloc_fail_countdown = i;
-    if (ui_tree_base_render(tree, container) == UI_ERROR_NONE) {
-      if (container->first_child) {
+    int i;
+    for (i = 0; i < 4; i++) {
+      g_malloc_fail_countdown = i;
+      if (ui_tree_base_create(&tree, &model) == UI_ERROR_NONE) {
         {
-          ui_error_t rc_cleanup = ui_dom_node_destroy(container->first_child);
+          ui_error_t rc_cleanup = ui_tree_base_destroy(tree);
           assert(rc_cleanup == UI_ERROR_NONE);
         }
-        container->first_child = NULL;
-        container->last_child = NULL;
       }
     }
-  }
-  g_malloc_fail_countdown = -1;
+    g_malloc_fail_countdown = -1;
 #endif
 
-  /* Unexpand root2 to test rendering of a collapsed node */
-  ui_tree_base_set_expanded(tree, &root2, 0);
+    rc = ui_tree_base_create(&tree, &model);
+    EXPECT_EQ(rc, UI_ERROR_NONE);
 
-  rc = ui_tree_base_render(tree, container);
-  EXPECT_EQ(rc, UI_ERROR_NONE);
+    /* Set expanded OOM */
+#ifdef UI_TEST_MOCK_ALLOC
+    for (i = 0; i < 3; i++) {
+      g_malloc_fail_countdown = i;
+      ui_tree_base_set_expanded(tree, &root2, 1);
+    }
+    g_malloc_fail_countdown = -1;
+#endif
 
-  {
-    /* Test rendering when selection_model is NULL */
-    struct ui_tree_base_mock {
-      struct ui_tree_model model;
-      void **expanded_nodes;
-      size_t num_expanded;
-      size_t expanded_cap;
-      void *active_node;
-      struct ui_selection_model *selection_model;
-      struct ui_computed *data_signal;
-    };
-    struct ui_tree_base_mock *m = (struct ui_tree_base_mock *)tree;
-    struct ui_selection_model *saved_sm = m->selection_model;
-    m->selection_model = NULL;
+    ui_tree_base_set_expanded(tree, &root1, 1);
+    ui_tree_base_set_expanded(tree, &root2, 1);
+    ui_tree_base_set_expanded(tree, &root2, 0);
+
+    /* NULL checks for coverage */
+    {
+      int is_exp;
+      EXPECT_EQ(ui_tree_base_get_selection_model(tree, NULL),
+                UI_ERROR_INVALID_ARGUMENT);
+      EXPECT_EQ(ui_tree_base_is_expanded(NULL, &root1, &is_exp),
+                UI_ERROR_INVALID_ARGUMENT);
+      EXPECT_EQ(ui_tree_base_is_expanded(tree, NULL, &is_exp),
+                UI_ERROR_INVALID_ARGUMENT);
+      EXPECT_EQ(ui_tree_base_is_expanded(tree, &root1, NULL),
+                UI_ERROR_INVALID_ARGUMENT);
+      EXPECT_EQ(ui_tree_base_set_expanded(NULL, &root1, 1),
+                UI_ERROR_INVALID_ARGUMENT);
+      EXPECT_EQ(ui_tree_base_set_expanded(tree, NULL, 1),
+                UI_ERROR_INVALID_ARGUMENT);
+    }
+
+    /* Trigger reallocation of expanded_nodes (cap > 8) */
+    {
+      size_t k;
+      for (k = 0; k < 20; k++) {
+        ui_tree_base_set_expanded(tree, (void *)((size_t)(100 + k)), 1);
+      }
+    }
+
+    /* Select a node */
+    {
+      struct ui_selection_model *sm;
+      ui_tree_base_get_selection_model(tree, &sm);
+      ui_selection_model_toggle(sm, &root1);
+    }
+
+    /* test get_selection_model */
+    {
+      struct ui_selection_model *sm;
+      EXPECT_EQ(ui_tree_base_get_selection_model(tree, &sm), UI_ERROR_NONE);
+    }
+
+    /* test bind_data */
+    EXPECT_EQ(ui_tree_base_bind_data(tree, (struct ui_computed *)0x1),
+              UI_ERROR_NONE);
+
+    ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &container);
+
+    /* Render OOM */
+#ifdef UI_TEST_MOCK_ALLOC
+    for (i = 0; i < 100; i++) {
+      g_malloc_fail_countdown = i;
+      if (ui_tree_base_render(tree, container) == UI_ERROR_NONE) {
+        if (container->first_child) {
+          {
+            ui_error_t rc_cleanup = ui_dom_node_destroy(container->first_child);
+            assert(rc_cleanup == UI_ERROR_NONE);
+          }
+          container->first_child = NULL;
+          container->last_child = NULL;
+        }
+      }
+    }
+    g_malloc_fail_countdown = -1;
+#endif
+
+    /* Unexpand root2 to test rendering of a collapsed node */
+    ui_tree_base_set_expanded(tree, &root2, 0);
+
     rc = ui_tree_base_render(tree, container);
     EXPECT_EQ(rc, UI_ERROR_NONE);
-    m->selection_model = saved_sm;
-  }
 
-  {
-    ui_error_t rc_cleanup = ui_tree_base_destroy(tree);
-    assert(rc_cleanup == UI_ERROR_NONE);
+    {
+      /* Test rendering when selection_model is NULL */
+      struct ui_tree_base_mock {
+        struct ui_tree_model model;
+        void **expanded_nodes;
+        size_t num_expanded;
+        size_t expanded_cap;
+        void *active_node;
+        struct ui_selection_model *selection_model;
+        struct ui_computed *data_signal;
+      };
+      struct ui_tree_base_mock *m = (struct ui_tree_base_mock *)tree;
+      struct ui_selection_model *saved_sm = m->selection_model;
+      m->selection_model = NULL;
+      rc = ui_tree_base_render(tree, container);
+      EXPECT_EQ(rc, UI_ERROR_NONE);
+      m->selection_model = saved_sm;
+    }
+
+    {
+      ui_error_t rc_cleanup = ui_tree_base_destroy(tree);
+      assert(rc_cleanup == UI_ERROR_NONE);
+    }
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(container);
+      assert(rc_cleanup == UI_ERROR_NONE);
+    }
+    return failed;
   }
-  {
-    ui_error_t rc_cleanup = ui_dom_node_destroy(container);
-    assert(rc_cleanup == UI_ERROR_NONE);
-  }
-  return failed;
 }
 
 static int test_tree_navigation(void) {
   struct ui_tree_model model;
   struct ui_tree_base *tree;
-  struct ui_keyboard_event ev;
+  struct ui_keyboard_event ev = {0};
   ui_error_t rc;
   void *tmp_node = NULL;
   int is_expanded = 0;
@@ -509,138 +511,141 @@ static int test_tree_navigation(void) {
   ui_tree_base_handle_key_event(tree, &ev);
 
   /* Trigger line 167: search for non-existent node */
-  static struct mock_node fake_node;
-  fake_node.id = 999;
-  fake_node.parent = &root1;
-  fake_node.children = NULL;
-  fake_node.child_count = 0;
-  ui_tree_base_set_active_node(tree, &fake_node);
-  ev.key_code = UI_KEY_UP;
-  ui_tree_base_handle_key_event(tree, &ev);
-
-  /* Test DOWN on empty tree */
   {
-    struct ui_tree_base *empty_tree;
-    struct ui_tree_model empty_model = model;
-    empty_model.get_root_count = mock_get_root_count_empty;
-    ui_tree_base_create(&empty_tree, &empty_model);
-    ev.key_code = UI_KEY_DOWN;
-    ui_tree_base_handle_key_event(empty_tree, &ev);
-    ui_tree_base_destroy(empty_tree);
-  }
+    static struct mock_node fake_node;
+    fake_node.id = 999;
+    fake_node.parent = &root1;
+    fake_node.children = NULL;
+    fake_node.child_count = 0;
+    ui_tree_base_set_active_node(tree, &fake_node);
+    ev.key_code = UI_KEY_UP;
+    ui_tree_base_handle_key_event(tree, &ev);
 
-  /* Test toggle with mock alloc */
-  rc = ui_tree_base_toggle_node(tree, &root1);
-  {
-    is_expanded = 0;
-    ui_tree_base_is_expanded(tree, &root1, &is_expanded);
-    EXPECT_TRUE(is_expanded);
-  }
-  ui_tree_base_toggle_node(tree, &root1);
-  {
-    is_expanded = 0;
-    ui_tree_base_is_expanded(tree, &root1, &is_expanded);
-    EXPECT_TRUE(!is_expanded);
-  }
+    /* Test DOWN on empty tree */
+    {
+      struct ui_tree_base *empty_tree;
+      struct ui_tree_model empty_model = model;
+      empty_model.get_root_count = mock_get_root_count_empty;
+      ui_tree_base_create(&empty_tree, &empty_model);
+      ev.key_code = UI_KEY_DOWN;
+      ui_tree_base_handle_key_event(empty_tree, &ev);
+      ui_tree_base_destroy(empty_tree);
+    }
 
-  rc = ui_tree_base_set_active_node(tree, &child1_2);
-  {
-    EXPECT_EQ(rc, UI_ERROR_NONE);
-    EXPECT_EQ(ui_tree_base_get_active_node(tree, &tmp_node), UI_ERROR_NONE);
-    EXPECT_EQ(tmp_node, &child1_2);
-  }
+    /* Test toggle with mock alloc */
+    rc = ui_tree_base_toggle_node(tree, &root1);
+    {
+      is_expanded = 0;
+      ui_tree_base_is_expanded(tree, &root1, &is_expanded);
+      EXPECT_TRUE(is_expanded);
+    }
+    ui_tree_base_toggle_node(tree, &root1);
+    {
+      is_expanded = 0;
+      ui_tree_base_is_expanded(tree, &root1, &is_expanded);
+      EXPECT_TRUE(!is_expanded);
+    }
 
-  /* Trigger line 291: unregistered key */
-  ev.key_code = UI_KEY_TAB;
-  ui_tree_base_handle_key_event(tree, &ev);
+    rc = ui_tree_base_set_active_node(tree, &child1_2);
+    {
+      EXPECT_EQ(rc, UI_ERROR_NONE);
+      EXPECT_EQ(ui_tree_base_get_active_node(tree, &tmp_node), UI_ERROR_NONE);
+      EXPECT_EQ(tmp_node, &child1_2);
+    }
+
+    /* Trigger line 291: unregistered key */
+    ev.key_code = UI_KEY_TAB;
+    ui_tree_base_handle_key_event(tree, &ev);
 
 #ifdef UI_TEST_MOCK_ALLOC
-  /* Test allocation failures in navigation handling */
-  {
-    int j;
-    for (j = 0; j < 3; j++) {
-      struct ui_tree_base *mock_tree;
-      g_malloc_fail_countdown = -1; /* Reset for tree creation */
-      {
-        ui_error_t rc_cleanup = ui_tree_base_create(&mock_tree, &model);
-        assert(rc_cleanup == UI_ERROR_NONE);
-      }
-
-      g_malloc_fail_countdown = j;
-      ui_tree_base_set_active_node(mock_tree, &root1);
-      ev.key_code = UI_KEY_RIGHT;
-      {
-        ui_error_t rc_cleanup = ui_tree_base_handle_key_event(mock_tree, &ev);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          /* expected error during OOM */
+    /* Test allocation failures in navigation handling */
+    {
+      int j;
+      for (j = 0; j < 3; j++) {
+        struct ui_tree_base *mock_tree;
+        g_malloc_fail_countdown = -1; /* Reset for tree creation */
+        {
+          ui_error_t rc_cleanup = ui_tree_base_create(&mock_tree, &model);
+          assert(rc_cleanup == UI_ERROR_NONE);
         }
-      }
 
-      g_malloc_fail_countdown = -1; /* Reset to allow cleanup */
-      {
-        ui_error_t rc_cleanup = ui_tree_base_destroy(mock_tree);
-        assert(rc_cleanup == UI_ERROR_NONE);
-      }
-
-      {
-        ui_error_t rc_cleanup = ui_tree_base_create(&mock_tree, &model);
-        assert(rc_cleanup == UI_ERROR_NONE);
-      }
-      g_malloc_fail_countdown = j;
-      ui_tree_base_set_active_node(mock_tree, &root1);
-      ev.key_code = UI_KEY_ENTER;
-      {
-        ui_error_t rc_cleanup = ui_tree_base_handle_key_event(mock_tree, &ev);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          /* expected error during OOM */
+        g_malloc_fail_countdown = j;
+        ui_tree_base_set_active_node(mock_tree, &root1);
+        ev.key_code = UI_KEY_RIGHT;
+        {
+          ui_error_t rc_cleanup = ui_tree_base_handle_key_event(mock_tree, &ev);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            /* expected error during OOM */
+          }
         }
-      }
 
-      g_malloc_fail_countdown = -1;
-      {
-        ui_error_t rc_cleanup = ui_tree_base_destroy(mock_tree);
-        assert(rc_cleanup == UI_ERROR_NONE);
+        g_malloc_fail_countdown = -1; /* Reset to allow cleanup */
+        {
+          ui_error_t rc_cleanup = ui_tree_base_destroy(mock_tree);
+          assert(rc_cleanup == UI_ERROR_NONE);
+        }
+
+        {
+          ui_error_t rc_cleanup = ui_tree_base_create(&mock_tree, &model);
+          assert(rc_cleanup == UI_ERROR_NONE);
+        }
+        g_malloc_fail_countdown = j;
+        ui_tree_base_set_active_node(mock_tree, &root1);
+        ev.key_code = UI_KEY_ENTER;
+        {
+          ui_error_t rc_cleanup = ui_tree_base_handle_key_event(mock_tree, &ev);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            /* expected error during OOM */
+          }
+        }
+
+        g_malloc_fail_countdown = -1;
+        {
+          ui_error_t rc_cleanup = ui_tree_base_destroy(mock_tree);
+          assert(rc_cleanup == UI_ERROR_NONE);
+        }
       }
     }
-  }
 #endif
 
-  /* Trigger line 167: search for non-existent node */
-  ui_tree_base_set_active_node(tree, (void *)(size_t)0xdeadbeef);
+    /* Trigger line 167: search for non-existent node */
+    ui_tree_base_set_active_node(tree, (void *)(size_t)0xdeadbeef);
 
-  /* Null checks */
-  EXPECT_EQ(ui_tree_base_set_active_node(NULL, &child1_2),
-            UI_ERROR_INVALID_ARGUMENT);
-  EXPECT_EQ(ui_tree_base_get_active_node(NULL, &tmp_node),
-            UI_ERROR_INVALID_ARGUMENT);
-  EXPECT_EQ(ui_tree_base_is_expanded(NULL, &root1, &is_expanded),
-            UI_ERROR_INVALID_ARGUMENT);
-  EXPECT_EQ(ui_tree_base_set_expanded(NULL, &root1, 1),
-            UI_ERROR_INVALID_ARGUMENT);
-  EXPECT_EQ(ui_tree_base_toggle_node(NULL, &root1), UI_ERROR_INVALID_ARGUMENT);
-  EXPECT_EQ(ui_tree_base_toggle_node(tree, NULL), UI_ERROR_INVALID_ARGUMENT);
-  EXPECT_EQ(ui_tree_base_get_active_node(tree, NULL),
-            UI_ERROR_INVALID_ARGUMENT);
-  EXPECT_EQ(ui_tree_base_handle_key_event(NULL, &ev),
-            UI_ERROR_INVALID_ARGUMENT);
-  EXPECT_EQ(ui_tree_base_handle_key_event(tree, NULL),
-            UI_ERROR_INVALID_ARGUMENT);
-  EXPECT_EQ(ui_tree_base_render(NULL, NULL), UI_ERROR_INVALID_ARGUMENT);
-  EXPECT_EQ(ui_tree_base_render(tree, NULL), UI_ERROR_INVALID_ARGUMENT);
+    /* Null checks */
+    EXPECT_EQ(ui_tree_base_set_active_node(NULL, &child1_2),
+              UI_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(ui_tree_base_get_active_node(NULL, &tmp_node),
+              UI_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(ui_tree_base_is_expanded(NULL, &root1, &is_expanded),
+              UI_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(ui_tree_base_set_expanded(NULL, &root1, 1),
+              UI_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(ui_tree_base_toggle_node(NULL, &root1),
+              UI_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(ui_tree_base_toggle_node(tree, NULL), UI_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(ui_tree_base_get_active_node(tree, NULL),
+              UI_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(ui_tree_base_handle_key_event(NULL, &ev),
+              UI_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(ui_tree_base_handle_key_event(tree, NULL),
+              UI_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(ui_tree_base_render(NULL, NULL), UI_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(ui_tree_base_render(tree, NULL), UI_ERROR_INVALID_ARGUMENT);
 
-  /* Trigger mock callbacks via model structure for extra coverage */
-  EXPECT_EQ(model.get_root_count(NULL), 2);
-  EXPECT_EQ(model.get_root_node(0, NULL), &root1);
-  EXPECT_EQ(model.get_parent(&child1_1, NULL), &root1);
-  EXPECT_EQ(model.get_child_count(&root1, NULL), 2);
-  EXPECT_EQ(model.get_child(&root1, 0, NULL), &child1_1);
-  EXPECT_EQ(model.render_node(NULL, NULL, NULL), UI_ERROR_NONE);
+    /* Trigger mock callbacks via model structure for extra coverage */
+    EXPECT_EQ(model.get_root_count(NULL), 2);
+    EXPECT_EQ(model.get_root_node(0, NULL), &root1);
+    EXPECT_EQ(model.get_parent(&child1_1, NULL), &root1);
+    EXPECT_EQ(model.get_child_count(&root1, NULL), 2);
+    EXPECT_EQ(model.get_child(&root1, 0, NULL), &child1_1);
+    EXPECT_EQ(model.render_node(NULL, NULL, NULL), UI_ERROR_NONE);
 
-  {
-    ui_error_t rc_cleanup = ui_tree_base_destroy(tree);
-    assert(rc_cleanup == UI_ERROR_NONE);
+    {
+      ui_error_t rc_cleanup = ui_tree_base_destroy(tree);
+      assert(rc_cleanup == UI_ERROR_NONE);
+    }
+    return failed;
   }
-  return failed;
 }
 
 #ifdef UI_TEST_MOCK_ALLOC
@@ -803,24 +808,26 @@ int main(void) {
   failed |= test_tree_render();
   if (failed)
     printf("test_tree_render failed\n");
-  int old_failed = failed;
-  failed |= test_tree_navigation();
-  if (failed > old_failed)
-    printf("test_tree_navigation failed\n");
-  old_failed = failed;
+  {
+    int old_failed = failed;
+    failed |= test_tree_navigation();
+    if (failed > old_failed)
+      printf("test_tree_navigation failed\n");
+    old_failed = failed;
 
 #ifdef UI_TEST_MOCK_ALLOC
-  failed |= test_tree_mock_failures();
-  if (failed > old_failed)
-    printf("test_tree_mock_failures failed\n");
-  old_failed = failed;
+    failed |= test_tree_mock_failures();
+    if (failed > old_failed)
+      printf("test_tree_mock_failures failed\n");
+    old_failed = failed;
 #endif
 
-  teardown_mock_tree();
+    teardown_mock_tree();
 
-  if (!failed) {
-    printf("All tree base tests PASSED\n");
+    if (!failed) {
+      printf("All tree base tests PASSED\n");
+    }
+
+    return failed;
   }
-
-  return failed;
 }

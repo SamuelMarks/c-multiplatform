@@ -14,7 +14,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
@@ -23,9 +23,9 @@ struct ui_engine;
  * @brief Material 3 Divider skin wrapping ui_divider_base.
  */
 struct md3_divider {
-  struct ui_divider_base *base;
-  enum ui_divider_orientation orientation;
-  int is_inset;
+  struct ui_divider_base *base;            /**< base field. */
+  enum ui_divider_orientation orientation; /**< orientation field. */
+  int is_inset;                            /**< is_inset field. */
 };
 
 /**
@@ -82,6 +82,6 @@ extern C_MULTIPLATFORM_EXPORT ui_error_t md3_divider_get_base(
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* MATERIAL3_MD3_DIVIDER_H */

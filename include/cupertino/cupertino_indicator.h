@@ -14,13 +14,17 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
+/** @brief CUPERTINO_INDICATOR_STEP_INTERVAL_MS constant. */
 #define CUPERTINO_INDICATOR_STEP_INTERVAL_MS 83.33f
+/** @brief CUPERTINO_INDICATOR_SMALL_DIM constant. */
 #define CUPERTINO_INDICATOR_SMALL_DIM 20.0f
+/** @brief CUPERTINO_INDICATOR_LARGE_DIM constant. */
 #define CUPERTINO_INDICATOR_LARGE_DIM 37.0f
+/** @brief CUPERTINO_INDICATOR_BAR_HEIGHT constant. */
 #define CUPERTINO_INDICATOR_BAR_HEIGHT 4.0f
 
 /**

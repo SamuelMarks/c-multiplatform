@@ -16,7 +16,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
@@ -103,6 +103,6 @@ extern C_MULTIPLATFORM_EXPORT ui_error_t md3_floating_toolbar_is_expanded(
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* MATERIAL3_MD3_FLOATING_TOOLBAR_H */

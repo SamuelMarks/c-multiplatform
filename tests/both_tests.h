@@ -17,44 +17,50 @@ static void test_anonymous_box_cleanup(void) {
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &child_inline1);
   ui_dom_node_set_tag_name(child_inline1, "span");
   ui_dom_node_set_attribute(child_inline1, "class", "inl");
-  struct ui_dom_node *t1;
-  ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &t1);
-  ui_dom_node_append_child(child_inline1, t1);
-  ui_dom_node_append_child(root, child_inline1);
+  {
+    struct ui_dom_node *t1;
+    ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &t1);
+    ui_dom_node_append_child(child_inline1, t1);
+    ui_dom_node_append_child(root, child_inline1);
 
-  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &child_block);
-  ui_dom_node_set_tag_name(child_block, "div");
-  ui_dom_node_set_attribute(child_block, "class", "blk");
-  struct ui_dom_node *t2;
-  ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &t2);
-  ui_dom_node_append_child(child_block, t2);
-  ui_dom_node_append_child(root, child_block);
+    ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &child_block);
+    ui_dom_node_set_tag_name(child_block, "div");
+    ui_dom_node_set_attribute(child_block, "class", "blk");
+    {
+      struct ui_dom_node *t2;
+      ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &t2);
+      ui_dom_node_append_child(child_block, t2);
+      ui_dom_node_append_child(root, child_block);
 
-  ui_css_stylesheet_create(&sheet);
+      ui_css_stylesheet_create(&sheet);
 
-  ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule_block);
-  ui_css_rule_append_selector(rule_block, UI_CSS_SELECTOR_TYPE_CLASS, "blk");
-  ui_css_rule_append_declaration(rule_block, "display", "block", 0);
-  rule_block->next = sheet->rules;
-  sheet->rules = rule_block;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule_block);
+      ui_css_rule_append_selector(rule_block, UI_CSS_SELECTOR_TYPE_CLASS,
+                                  "blk");
+      ui_css_rule_append_declaration(rule_block, "display", "block", 0);
+      rule_block->next = sheet->rules;
+      sheet->rules = rule_block;
 
-  ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule_inline);
-  ui_css_rule_append_selector(rule_inline, UI_CSS_SELECTOR_TYPE_CLASS, "inl");
-  ui_css_rule_append_declaration(rule_inline, "display", "inline", 0);
-  rule_inline->next = sheet->rules;
-  sheet->rules = rule_inline;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule_inline);
+      ui_css_rule_append_selector(rule_inline, UI_CSS_SELECTOR_TYPE_CLASS,
+                                  "inl");
+      ui_css_rule_append_declaration(rule_inline, "display", "inline", 0);
+      rule_inline->next = sheet->rules;
+      sheet->rules = rule_inline;
 
-  ui_layout_tree_generate(root, sheet, &lroot);
-  if (lroot)
-    ui_layout_tree_destroy(lroot);
-  g_malloc_fail_countdown = 2; /* Target the anonymous node alloc */
-  ui_layout_tree_generate(root, sheet, &lroot);
-  g_malloc_fail_countdown = -1;
-  if (lroot)
-    ui_layout_tree_destroy(lroot);
+      ui_layout_tree_generate(root, sheet, &lroot);
+      if (lroot)
+        ui_layout_tree_destroy(lroot);
+      g_malloc_fail_countdown = 2; /* Target the anonymous node alloc */
+      ui_layout_tree_generate(root, sheet, &lroot);
+      g_malloc_fail_countdown = -1;
+      if (lroot)
+        ui_layout_tree_destroy(lroot);
 
-  ui_css_stylesheet_destroy(sheet);
-  ui_dom_node_destroy(root);
+      ui_css_stylesheet_destroy(sheet);
+      ui_dom_node_destroy(root);
+    }
+  }
 }
 
 static void test_more_layout_coverage6(void) {
@@ -102,24 +108,28 @@ static void test_more_layout_coverage5(void) {
   ui_dom_node_set_attribute(root, "class", "blk");
   ui_dom_node_set_attribute(root, "class", "test-class");
 
-  const char *displays[] = {"run-in",      "grid",         "table", "flow-root",
-                            "inline-grid", "inline-table", "ruby"};
+  {
+    const char *displays[] = {"run-in",    "grid",        "table",
+                              "flow-root", "inline-grid", "inline-table",
+                              "ruby"};
 
-  int i;
-  for (i = 0; i < 7; i++) {
-    ui_css_stylesheet_create(&sheet);
-    ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
-    ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_CLASS, "test-class");
-    ui_css_rule_append_declaration(rule, "display", displays[i], 0);
-    rule->next = sheet->rules;
-    sheet->rules = rule;
+    int i;
+    for (i = 0; i < 7; i++) {
+      ui_css_stylesheet_create(&sheet);
+      ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
+      ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_CLASS,
+                                  "test-class");
+      ui_css_rule_append_declaration(rule, "display", displays[i], 0);
+      rule->next = sheet->rules;
+      sheet->rules = rule;
 
-    ui_layout_tree_generate(root, sheet, &lroot);
-    if (lroot)
-      ui_layout_tree_destroy(lroot);
-    ui_css_stylesheet_destroy(sheet);
+      ui_layout_tree_generate(root, sheet, &lroot);
+      if (lroot)
+        ui_layout_tree_destroy(lroot);
+      ui_css_stylesheet_destroy(sheet);
+    }
+    ui_dom_node_destroy(root);
   }
-  ui_dom_node_destroy(root);
 }
 
 static void test_css_parsers2(void) {
@@ -3371,22 +3381,25 @@ static void test_lengths(void) {
   ui_dom_node_set_attribute(root, "class", "blk");
   ui_dom_node_set_attribute(root, "class", "test-class");
 
-  const char *lengths[] = {"1em", "1rem", "50vw", "50vh", "50vmin", "50vmax",
-                           "5cm", "10mm", "1in",  "10pt", "10pc"};
-  int i;
-  for (i = 0; i < (int)(sizeof(lengths) / sizeof(lengths[0])); i++) {
-    ui_css_stylesheet_create(&sheet);
-    ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
-    ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_CLASS, "test-class");
-    ui_css_rule_append_declaration(rule, "width", lengths[i], 0);
-    rule->next = sheet->rules;
-    sheet->rules = rule;
-    ui_layout_tree_generate(root, sheet, &lroot);
-    if (lroot)
-      ui_layout_tree_destroy(lroot);
-    ui_css_stylesheet_destroy(sheet);
+  {
+    const char *lengths[] = {"1em", "1rem", "50vw", "50vh", "50vmin", "50vmax",
+                             "5cm", "10mm", "1in",  "10pt", "10pc"};
+    int i;
+    for (i = 0; i < (int)(sizeof(lengths) / sizeof(lengths[0])); i++) {
+      ui_css_stylesheet_create(&sheet);
+      ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
+      ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_CLASS,
+                                  "test-class");
+      ui_css_rule_append_declaration(rule, "width", lengths[i], 0);
+      rule->next = sheet->rules;
+      sheet->rules = rule;
+      ui_layout_tree_generate(root, sheet, &lroot);
+      if (lroot)
+        ui_layout_tree_destroy(lroot);
+      ui_css_stylesheet_destroy(sheet);
+    }
+    ui_dom_node_destroy(root);
   }
-  ui_dom_node_destroy(root);
 }
 static void test_flex_coverage(void) {
   struct ui_dom_node *root = NULL;
@@ -3492,75 +3505,83 @@ static void test_anonymous_box(void) {
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &child_inline1);
   ui_dom_node_set_tag_name(child_inline1, "span");
   ui_dom_node_set_attribute(child_inline1, "class", "inl");
-  struct ui_dom_node *t1;
-  ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &t1);
-  ui_dom_node_append_child(child_inline1, t1);
-  ui_dom_node_append_child(root, child_inline1);
-
-  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &child_block);
-  ui_dom_node_set_tag_name(child_block, "div");
-  ui_dom_node_set_attribute(child_block, "class", "blk");
-  struct ui_dom_node *t2;
-  ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &t2);
-  ui_dom_node_append_child(child_block, t2);
-  ui_dom_node_append_child(root, child_block);
-
-  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &child_inline2);
-  ui_dom_node_set_tag_name(child_inline2, "span");
-  ui_dom_node_set_attribute(child_inline2, "class", "inl");
-  struct ui_dom_node *t3;
-  ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &t3);
-  ui_dom_node_append_child(child_inline2, t3);
-  ui_dom_node_append_child(root, child_inline2);
-
-  ui_css_stylesheet_create(&sheet);
-
-  ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule_block);
-  ui_css_rule_append_selector(rule_block, UI_CSS_SELECTOR_TYPE_CLASS, "blk");
-  ui_css_rule_append_declaration(rule_block, "display", "block", 0);
-  rule_block->next = sheet->rules;
-  sheet->rules = rule_block;
-
-  ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule_inline);
-  ui_css_rule_append_selector(rule_inline, UI_CSS_SELECTOR_TYPE_CLASS, "inl");
-  ui_css_rule_append_declaration(rule_inline, "display", "inline", 0);
-  rule_inline->next = sheet->rules;
-  sheet->rules = rule_inline;
-
-  ui_layout_tree_generate(root, sheet, &lroot);
-  if (lroot) {
-    ui_layout_compute(lroot, 800, 600);
-    ui_layout_tree_destroy(lroot);
-  }
-
-  /* Anon box starting with block child */
   {
-    struct ui_dom_node *root2 = NULL;
-    struct ui_dom_node *c_block = NULL;
-    struct ui_dom_node *c_inline = NULL;
-    struct ui_layout_node *lroot2 = NULL;
-    ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root2);
-    ui_dom_node_set_tag_name(root2, "div");
-    ui_dom_node_set_attribute(root2, "class", "blk");
+    struct ui_dom_node *t1;
+    ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &t1);
+    ui_dom_node_append_child(child_inline1, t1);
+    ui_dom_node_append_child(root, child_inline1);
 
-    ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &c_block);
-    ui_dom_node_set_tag_name(c_block, "div");
-    ui_dom_node_set_attribute(c_block, "class", "blk");
-    ui_dom_node_append_child(root2, c_block);
+    ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &child_block);
+    ui_dom_node_set_tag_name(child_block, "div");
+    ui_dom_node_set_attribute(child_block, "class", "blk");
+    {
+      struct ui_dom_node *t2;
+      ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &t2);
+      ui_dom_node_append_child(child_block, t2);
+      ui_dom_node_append_child(root, child_block);
 
-    ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &c_inline);
-    ui_dom_node_set_tag_name(c_inline, "span");
-    ui_dom_node_set_attribute(c_inline, "class", "inl");
-    ui_dom_node_append_child(root2, c_inline);
+      ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &child_inline2);
+      ui_dom_node_set_tag_name(child_inline2, "span");
+      ui_dom_node_set_attribute(child_inline2, "class", "inl");
+      {
+        struct ui_dom_node *t3;
+        ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &t3);
+        ui_dom_node_append_child(child_inline2, t3);
+        ui_dom_node_append_child(root, child_inline2);
 
-    ui_layout_tree_generate(root2, sheet, &lroot2);
-    if (lroot2)
-      ui_layout_tree_destroy(lroot2);
-    ui_dom_node_destroy(root2);
+        ui_css_stylesheet_create(&sheet);
+
+        ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule_block);
+        ui_css_rule_append_selector(rule_block, UI_CSS_SELECTOR_TYPE_CLASS,
+                                    "blk");
+        ui_css_rule_append_declaration(rule_block, "display", "block", 0);
+        rule_block->next = sheet->rules;
+        sheet->rules = rule_block;
+
+        ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule_inline);
+        ui_css_rule_append_selector(rule_inline, UI_CSS_SELECTOR_TYPE_CLASS,
+                                    "inl");
+        ui_css_rule_append_declaration(rule_inline, "display", "inline", 0);
+        rule_inline->next = sheet->rules;
+        sheet->rules = rule_inline;
+
+        ui_layout_tree_generate(root, sheet, &lroot);
+        if (lroot) {
+          ui_layout_compute(lroot, 800, 600);
+          ui_layout_tree_destroy(lroot);
+        }
+
+        /* Anon box starting with block child */
+        {
+          struct ui_dom_node *root2 = NULL;
+          struct ui_dom_node *c_block = NULL;
+          struct ui_dom_node *c_inline = NULL;
+          struct ui_layout_node *lroot2 = NULL;
+          ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root2);
+          ui_dom_node_set_tag_name(root2, "div");
+          ui_dom_node_set_attribute(root2, "class", "blk");
+
+          ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &c_block);
+          ui_dom_node_set_tag_name(c_block, "div");
+          ui_dom_node_set_attribute(c_block, "class", "blk");
+          ui_dom_node_append_child(root2, c_block);
+
+          ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &c_inline);
+          ui_dom_node_set_tag_name(c_inline, "span");
+          ui_dom_node_set_attribute(c_inline, "class", "inl");
+          ui_dom_node_append_child(root2, c_inline);
+
+          ui_layout_tree_generate(root2, sheet, &lroot2);
+          if (lroot2)
+            ui_layout_tree_destroy(lroot2);
+          ui_dom_node_destroy(root2);
+        }
+
+        ui_css_stylesheet_destroy(sheet);
+        ui_dom_node_destroy(root);
+      }
+    }
   }
-
-  ui_css_stylesheet_destroy(sheet);
-  ui_dom_node_destroy(root);
 }
 
 static void test_display_none(void) {
@@ -3600,43 +3621,49 @@ static void test_anonymous_box_oom(void) {
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &child_inline1);
   ui_dom_node_set_tag_name(child_inline1, "span");
   ui_dom_node_set_attribute(child_inline1, "class", "inl");
-  struct ui_dom_node *t1;
-  ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &t1);
-  ui_dom_node_append_child(child_inline1, t1);
-  ui_dom_node_append_child(root, child_inline1);
+  {
+    struct ui_dom_node *t1;
+    ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &t1);
+    ui_dom_node_append_child(child_inline1, t1);
+    ui_dom_node_append_child(root, child_inline1);
 
-  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &child_block);
-  ui_dom_node_set_tag_name(child_block, "div");
-  ui_dom_node_set_attribute(child_block, "class", "blk");
-  struct ui_dom_node *t2;
-  ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &t2);
-  ui_dom_node_append_child(child_block, t2);
-  ui_dom_node_append_child(root, child_block);
+    ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &child_block);
+    ui_dom_node_set_tag_name(child_block, "div");
+    ui_dom_node_set_attribute(child_block, "class", "blk");
+    {
+      struct ui_dom_node *t2;
+      ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &t2);
+      ui_dom_node_append_child(child_block, t2);
+      ui_dom_node_append_child(root, child_block);
 
-  ui_css_stylesheet_create(&sheet);
+      ui_css_stylesheet_create(&sheet);
 
-  ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule_block);
-  ui_css_rule_append_selector(rule_block, UI_CSS_SELECTOR_TYPE_CLASS, "blk");
-  ui_css_rule_append_declaration(rule_block, "display", "block", 0);
-  rule_block->next = sheet->rules;
-  sheet->rules = rule_block;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule_block);
+      ui_css_rule_append_selector(rule_block, UI_CSS_SELECTOR_TYPE_CLASS,
+                                  "blk");
+      ui_css_rule_append_declaration(rule_block, "display", "block", 0);
+      rule_block->next = sheet->rules;
+      sheet->rules = rule_block;
 
-  ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule_inline);
-  ui_css_rule_append_selector(rule_inline, UI_CSS_SELECTOR_TYPE_CLASS, "inl");
-  ui_css_rule_append_declaration(rule_inline, "display", "inline", 0);
-  rule_inline->next = sheet->rules;
-  sheet->rules = rule_inline;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule_inline);
+      ui_css_rule_append_selector(rule_inline, UI_CSS_SELECTOR_TYPE_CLASS,
+                                  "inl");
+      ui_css_rule_append_declaration(rule_inline, "display", "inline", 0);
+      rule_inline->next = sheet->rules;
+      sheet->rules = rule_inline;
 
-  for (i = 1; i < 50; i++) {
-    g_malloc_fail_countdown = i;
-    ui_layout_tree_generate(root, sheet, &lroot);
-    g_malloc_fail_countdown = -1;
-    if (lroot)
-      ui_layout_tree_destroy(lroot);
+      for (i = 1; i < 50; i++) {
+        g_malloc_fail_countdown = i;
+        ui_layout_tree_generate(root, sheet, &lroot);
+        g_malloc_fail_countdown = -1;
+        if (lroot)
+          ui_layout_tree_destroy(lroot);
+      }
+
+      ui_css_stylesheet_destroy(sheet);
+      ui_dom_node_destroy(root);
+    }
   }
-
-  ui_css_stylesheet_destroy(sheet);
-  ui_dom_node_destroy(root);
 }
 static void test_sanity_check_violation(void) {
   struct ui_layout_node parent;

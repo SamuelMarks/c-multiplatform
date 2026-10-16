@@ -214,6 +214,8 @@ TEST test_md2_top_app_bar_strcpy_fail(void) {
   g_mock_strcpy_fail = 1;
   rc = md2_top_app_bar_create(engine, MD2_TOP_APP_BAR_REGULAR, "Test Title",
                               &bar);
+  if (rc) {
+  }
   md2_top_app_bar_destroy(bar);
 
   rc = md2_top_app_bar_create(engine, MD2_TOP_APP_BAR_REGULAR, "Test Title",

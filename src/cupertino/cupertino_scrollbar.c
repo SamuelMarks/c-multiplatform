@@ -9,6 +9,7 @@
 #include <string.h>
 /* clang-format on */
 
+/** @brief cupertino_scrollbar_recalculate_geometry function. */
 static void cupertino_scrollbar_recalculate_geometry(
     struct cupertino_scrollbar *scrollbar) {
   float track_h;
@@ -51,6 +52,7 @@ static void cupertino_scrollbar_recalculate_geometry(
   scrollbar->thumb_offset = scrollbar->safe_area_top + (p * max_travel);
 }
 
+/** @brief cupertino_scrollbar_create function. */
 ui_error_t
 cupertino_scrollbar_create(struct ui_engine *engine,
                            const struct cupertino_scrollbar_descriptor *desc,
@@ -78,6 +80,7 @@ cupertino_scrollbar_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_scrollbar_destroy function. */
 ui_error_t cupertino_scrollbar_destroy(struct cupertino_scrollbar *scrollbar) {
   if (!scrollbar) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -87,6 +90,7 @@ ui_error_t cupertino_scrollbar_destroy(struct cupertino_scrollbar *scrollbar) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_scrollbar_handle_scroll function. */
 ui_error_t
 cupertino_scrollbar_handle_scroll(struct cupertino_scrollbar *scrollbar,
                                   float content_offset, float content_length,
@@ -105,6 +109,7 @@ cupertino_scrollbar_handle_scroll(struct cupertino_scrollbar *scrollbar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_scrollbar_tick function. */
 ui_error_t cupertino_scrollbar_tick(struct cupertino_scrollbar *scrollbar,
                                     float delta_ms) {
   float fade_elapsed;
@@ -135,6 +140,7 @@ ui_error_t cupertino_scrollbar_tick(struct cupertino_scrollbar *scrollbar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_scrollbar_set_dragging function. */
 ui_error_t
 cupertino_scrollbar_set_dragging(struct cupertino_scrollbar *scrollbar,
                                  int dragging) {
@@ -152,6 +158,7 @@ cupertino_scrollbar_set_dragging(struct cupertino_scrollbar *scrollbar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_scrollbar_is_dragging function. */
 ui_error_t
 cupertino_scrollbar_is_dragging(const struct cupertino_scrollbar *scrollbar,
                                 int *out_dragging) {
@@ -163,6 +170,7 @@ cupertino_scrollbar_is_dragging(const struct cupertino_scrollbar *scrollbar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_scrollbar_get_thickness function. */
 ui_error_t
 cupertino_scrollbar_get_thickness(const struct cupertino_scrollbar *scrollbar,
                                   float *out_thickness) {
@@ -174,6 +182,7 @@ cupertino_scrollbar_get_thickness(const struct cupertino_scrollbar *scrollbar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_scrollbar_get_opacity function. */
 ui_error_t
 cupertino_scrollbar_get_opacity(const struct cupertino_scrollbar *scrollbar,
                                 float *out_opacity) {
@@ -185,6 +194,7 @@ cupertino_scrollbar_get_opacity(const struct cupertino_scrollbar *scrollbar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_scrollbar_get_thumb_geometry function. */
 ui_error_t cupertino_scrollbar_get_thumb_geometry(
     const struct cupertino_scrollbar *scrollbar, float *out_offset,
     float *out_size) {
@@ -197,6 +207,7 @@ ui_error_t cupertino_scrollbar_get_thumb_geometry(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_scrollbar_set_safe_area_insets function. */
 ui_error_t
 cupertino_scrollbar_set_safe_area_insets(struct cupertino_scrollbar *scrollbar,
                                          float top, float bottom) {

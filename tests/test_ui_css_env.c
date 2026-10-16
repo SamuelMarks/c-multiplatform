@@ -11,7 +11,6 @@ static int test_env_manager(void) {
   struct ui_css_env_manager *manager = NULL;
   struct ui_css_value_ext *value = NULL;
   struct ui_css_value_ext *value2 = NULL;
-  struct ui_css_value_ext *val_ptr = NULL;
   const struct ui_css_value_ext *retrieved = NULL;
   ui_error_t rc;
 

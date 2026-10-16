@@ -14,11 +14,13 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
+/** @brief CUPERTINO_LIST_TILE_HEIGHT_DEFAULT constant. */
 #define CUPERTINO_LIST_TILE_HEIGHT_DEFAULT 44.0f
+/** @brief CUPERTINO_LIST_TILE_HEIGHT_SUBTITLE constant. */
 #define CUPERTINO_LIST_TILE_HEIGHT_SUBTITLE 54.0f
 
 /**

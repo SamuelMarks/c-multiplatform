@@ -10,6 +10,13 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_cupertino_badge_mock_get_system_color_fail;
+extern int g_cupertino_badge_mock_create_fail;
+extern int g_cupertino_badge_mock_set_text_fail;
+extern int g_cupertino_badge_mock_set_value_fail;
+extern int g_cupertino_badge_mock_set_hidden_fail;
+extern int g_cupertino_badge_mock_destroy_fail;
+
 SUITE(cupertino_badge_suite);
 
 TEST test_badge_invalid_arguments(void) {
@@ -316,12 +323,6 @@ TEST test_badge_oom_mock(void) {
   desc.count = 10;
 
 #ifdef UI_TEST_MOCK_ALLOC
-  extern int g_cupertino_badge_mock_get_system_color_fail;
-  extern int g_cupertino_badge_mock_create_fail;
-  extern int g_cupertino_badge_mock_set_text_fail;
-  extern int g_cupertino_badge_mock_set_value_fail;
-  extern int g_cupertino_badge_mock_set_hidden_fail;
-  extern int g_cupertino_badge_mock_destroy_fail;
 
   g_malloc_fail_countdown = 0;
   rc = cupertino_badge_create(dummy_engine, &desc, &badge);

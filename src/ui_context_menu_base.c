@@ -40,6 +40,7 @@ struct ui_context_menu_base {
 
 /* \brief ui_error
  */
+/** @brief ui_context_menu_base_create function. */
 ui_error_t ui_context_menu_base_create(struct ui_context_menu_base **out_menu) {
   struct ui_context_menu_base *ctx_menu;
   ui_error_t rc;
@@ -144,6 +145,7 @@ ui_error_t ui_context_menu_base_open_at(struct ui_context_menu_base *menu,
 
 /* \brief ui_error
  */
+/** @brief ui_context_menu_base_bind_open function. */
 ui_error_t ui_context_menu_base_bind_open(struct ui_context_menu_base *widget,
                                           struct ui_signal *open_signal) {
   if (!widget) {
@@ -155,6 +157,7 @@ ui_error_t ui_context_menu_base_bind_open(struct ui_context_menu_base *widget,
 
 /* \brief ui_error
  */
+/** @brief ui_context_menu_base_get_animating_signal function. */
 ui_error_t
 ui_context_menu_base_get_animating_signal(struct ui_context_menu_base *widget,
                                           struct ui_computed **out_animating) {

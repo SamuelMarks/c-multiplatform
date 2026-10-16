@@ -12,21 +12,23 @@
 #include <string.h>
 /* clang-format on */
 
+/** @brief ui_adaptive_pane_scaffold_base structure. */
 struct ui_adaptive_pane_scaffold_base {
-  struct ui_component *component;
-  struct ui_dom_node *root_node;
-  struct ui_dom_node *primary_slot_node;
-  struct ui_dom_node *secondary_slot_node;
-  struct ui_dom_node *supporting_slot_node;
-  struct ui_component *primary_pane;
-  struct ui_component *secondary_pane;
-  struct ui_component *supporting_pane;
-  enum ui_adaptive_scaffold_type type;
-  enum ui_adaptive_window_width_class width_class;
-  enum ui_adaptive_pane_role active_pane;
-  int dialog_levitation;
+  struct ui_component *component;           /**< component field. */
+  struct ui_dom_node *root_node;            /**< root_node field. */
+  struct ui_dom_node *primary_slot_node;    /**< primary_slot_node field. */
+  struct ui_dom_node *secondary_slot_node;  /**< secondary_slot_node field. */
+  struct ui_dom_node *supporting_slot_node; /**< supporting_slot_node field. */
+  struct ui_component *primary_pane;        /**< primary_pane field. */
+  struct ui_component *secondary_pane;      /**< secondary_pane field. */
+  struct ui_component *supporting_pane;     /**< supporting_pane field. */
+  enum ui_adaptive_scaffold_type type;      /**< type field. */
+  enum ui_adaptive_window_width_class width_class; /**< width_class field. */
+  enum ui_adaptive_pane_role active_pane;          /**< active_pane field. */
+  int dialog_levitation; /**< dialog_levitation field. */
 };
 
+/** @brief sampler_width_class_to_str function. */
 static const char *
 sampler_width_class_to_str(enum ui_adaptive_window_width_class wc) {
   switch (wc) {
@@ -39,6 +41,7 @@ sampler_width_class_to_str(enum ui_adaptive_window_width_class wc) {
   }
 }
 
+/** @brief sampler_update_pane_visibility function. */
 static ui_error_t sampler_update_pane_visibility(
     struct ui_adaptive_pane_scaffold_base *scaffold) {
   ui_error_t rc;
@@ -104,6 +107,7 @@ static ui_error_t sampler_update_pane_visibility(
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_adaptive_pane_scaffold_base_create function. */
 ui_error_t ui_adaptive_pane_scaffold_base_create(
     enum ui_adaptive_scaffold_type type,
     struct ui_adaptive_pane_scaffold_base **out_scaffold) {
@@ -239,6 +243,7 @@ ui_error_t ui_adaptive_pane_scaffold_base_create(
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_adaptive_pane_scaffold_base_destroy function. */
 ui_error_t ui_adaptive_pane_scaffold_base_destroy(
     struct ui_adaptive_pane_scaffold_base *scaffold) {
   if (scaffold == NULL) {
@@ -252,6 +257,7 @@ ui_error_t ui_adaptive_pane_scaffold_base_destroy(
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_adaptive_pane_scaffold_base_get_component function. */
 ui_error_t ui_adaptive_pane_scaffold_base_get_component(
     struct ui_adaptive_pane_scaffold_base *scaffold,
     struct ui_component **out_component) {
@@ -263,6 +269,7 @@ ui_error_t ui_adaptive_pane_scaffold_base_get_component(
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_adaptive_pane_scaffold_base_set_window_width_class function. */
 ui_error_t ui_adaptive_pane_scaffold_base_set_window_width_class(
     struct ui_adaptive_pane_scaffold_base *scaffold,
     enum ui_adaptive_window_width_class width_class) {
@@ -282,6 +289,7 @@ ui_error_t ui_adaptive_pane_scaffold_base_set_window_width_class(
   return sampler_update_pane_visibility(scaffold);
 }
 
+/** @brief ui_adaptive_pane_scaffold_base_get_window_width_class function. */
 ui_error_t ui_adaptive_pane_scaffold_base_get_window_width_class(
     const struct ui_adaptive_pane_scaffold_base *scaffold,
     enum ui_adaptive_window_width_class *out_width_class) {
@@ -293,6 +301,7 @@ ui_error_t ui_adaptive_pane_scaffold_base_get_window_width_class(
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_adaptive_pane_scaffold_base_set_pane function. */
 ui_error_t ui_adaptive_pane_scaffold_base_set_pane(
     struct ui_adaptive_pane_scaffold_base *scaffold,
     enum ui_adaptive_pane_role role, struct ui_component *pane_component) {
@@ -325,6 +334,7 @@ ui_error_t ui_adaptive_pane_scaffold_base_set_pane(
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_adaptive_pane_scaffold_base_get_pane function. */
 ui_error_t ui_adaptive_pane_scaffold_base_get_pane(
     const struct ui_adaptive_pane_scaffold_base *scaffold,
     enum ui_adaptive_pane_role role, struct ui_component **out_pane_component) {
@@ -348,6 +358,7 @@ ui_error_t ui_adaptive_pane_scaffold_base_get_pane(
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_adaptive_pane_scaffold_base_set_active_pane function. */
 ui_error_t ui_adaptive_pane_scaffold_base_set_active_pane(
     struct ui_adaptive_pane_scaffold_base *scaffold,
     enum ui_adaptive_pane_role role) {
@@ -359,6 +370,7 @@ ui_error_t ui_adaptive_pane_scaffold_base_set_active_pane(
   return sampler_update_pane_visibility(scaffold);
 }
 
+/** @brief ui_adaptive_pane_scaffold_base_get_active_pane function. */
 ui_error_t ui_adaptive_pane_scaffold_base_get_active_pane(
     const struct ui_adaptive_pane_scaffold_base *scaffold,
     enum ui_adaptive_pane_role *out_role) {
@@ -370,6 +382,7 @@ ui_error_t ui_adaptive_pane_scaffold_base_get_active_pane(
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_adaptive_pane_scaffold_base_set_dialog_levitation function. */
 ui_error_t ui_adaptive_pane_scaffold_base_set_dialog_levitation(
     struct ui_adaptive_pane_scaffold_base *scaffold, int levitate_in_dialog) {
   ui_error_t rc;
@@ -388,6 +401,7 @@ ui_error_t ui_adaptive_pane_scaffold_base_set_dialog_levitation(
   return sampler_update_pane_visibility(scaffold);
 }
 
+/** @brief ui_adaptive_pane_scaffold_base_is_dialog_levitated function. */
 ui_error_t ui_adaptive_pane_scaffold_base_is_dialog_levitated(
     const struct ui_adaptive_pane_scaffold_base *scaffold, int *out_levitated) {
   if (scaffold == NULL || out_levitated == NULL) {

@@ -5,6 +5,8 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_nav_rail_mock_fail;
+
 struct ui_nav_rail_base {
   struct ui_component *component;
   struct ui_signal *active_index_signal;
@@ -134,7 +136,6 @@ static int run_normal_tests(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_nav_rail_mock_fail;
     struct ui_nav_rail_base *fail_rail = NULL;
     struct ui_nav_rail_item_base *fail_item = NULL;
 

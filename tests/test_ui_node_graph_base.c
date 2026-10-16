@@ -8,6 +8,10 @@
 #include <assert.h>
 /* clang-format on */
 
+extern int g_node_graph_matrix_init_mock_fail;
+extern int g_node_graph_signal_destroy_mock_fail;
+extern int g_malloc_fail_countdown;
+
 #define ASSERT_SUCCESS(expr)                                                   \
   do {                                                                         \
     ui_error_t err = (expr);                                                   \
@@ -84,8 +88,8 @@ int main(void) {
   struct ui_node_graph_camera_config config;
   ui_signal_t *cam_sig = NULL;
   ui_signal_t *top_sig = NULL;
-  struct ui_dom_point screen_pt, graph_pt, focal_pt;
-  struct ui_node_graph_connection conn;
+  struct ui_dom_point screen_pt = {0}, graph_pt = {0}, focal_pt = {0};
+  struct ui_node_graph_connection conn = {0};
   int i;
 
   if (ui_arena_create(1024 * 16, &arena) != UI_ERROR_NONE) {
@@ -206,37 +210,39 @@ int main(void) {
             UI_ERROR_OUT_OF_BOUNDS);
 
   /* Test Marquee Selection */
-  struct ui_dom_rect rect;
-  rect.left = 0;
-  rect.top = 0;
-  rect.right = 100;
-  rect.bottom = 100;
-  rect.width = 100;
-  rect.height = 100;
-  ASSERT_SUCCESS(ui_node_graph_base_set_marquee_selection(graph, &rect));
-  ASSERT_SUCCESS(ui_node_graph_base_set_marquee_selection(graph, NULL));
-
-  ASSERT_SUCCESS(ui_node_graph_base_destroy(graph));
   {
-    ui_error_t rc_cleanup = ui_arena_destroy(arena);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      return 1;
+    struct ui_dom_rect rect;
+    rect.left = 0;
+    rect.top = 0;
+    rect.right = 100;
+    rect.bottom = 100;
+    rect.width = 100;
+    rect.height = 100;
+    ASSERT_SUCCESS(ui_node_graph_base_set_marquee_selection(graph, &rect));
+    ASSERT_SUCCESS(ui_node_graph_base_set_marquee_selection(graph, NULL));
+
+    ASSERT_SUCCESS(ui_node_graph_base_destroy(graph));
+    {
+      ui_error_t rc_cleanup = ui_arena_destroy(arena);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        return 1;
+      }
     }
+
+    test_extra_node_graph_more();
+    test_extra_node_graph_error();
+    test_extra_node_graph_errors();
+    test_extra_node_graph_errors2();
+    test_extra_node_graph_error_matrix();
+    test_node_graph_oom_2();
+    test_node_graph_oom_3();
+    test_node_graph_update_camera_matrix_err();
+    test_extra_node_graph();
+    test_node_graph_no_bounds();
+
+    printf("All tests passed!\n");
+    return 0;
   }
-
-  test_extra_node_graph_more();
-  test_extra_node_graph_error();
-  test_extra_node_graph_errors();
-  test_extra_node_graph_errors2();
-  test_extra_node_graph_error_matrix();
-  test_node_graph_oom_2();
-  test_node_graph_oom_3();
-  test_node_graph_update_camera_matrix_err();
-  test_extra_node_graph();
-  test_node_graph_no_bounds();
-
-  printf("All tests passed!\n");
-  return 0;
 }
 void test_extra_node_graph_more(void) {
   ui_node_graph_base_get_camera_signal(NULL, NULL);
@@ -285,8 +291,6 @@ void test_extra_node_graph_errors2(void) {
 }
 void test_extra_node_graph_error_matrix(void) {
 #ifdef UI_TEST_MOCK_ALLOC
-  extern int g_node_graph_matrix_init_mock_fail;
-  extern int g_node_graph_signal_destroy_mock_fail;
   struct ui_arena *arena = NULL;
   struct ui_node_graph_base *graph = NULL;
   struct ui_node_graph_camera_config config;
@@ -335,28 +339,15 @@ void test_extra_node_graph_error_matrix(void) {
 }
 void test_node_graph_oom_2(void) {
   struct ui_arena *arena;
-  struct ui_node_graph_base *graph = NULL;
-  struct ui_node_graph_camera_config config;
   if (ui_arena_create(1024 * 16, &arena) != UI_ERROR_NONE) {
     return;
   }
-  config.min_zoom = 0.1f;
-  config.max_zoom = 5.0f;
-  config.bounds.left = -1000.0f;
-  config.bounds.top = -1000.0f;
-  config.bounds.right = 1000.0f;
-  config.bounds.bottom = 1000.0f;
-  config.bounds.width = 2000.0f;
-  config.bounds.height = 2000.0f;
-
-  /* We need to use ui_test_mock_mem to simulate failure, wait arena alloc
-   * doesn't use standard malloc */
+  ui_arena_destroy(arena);
 }
 void test_node_graph_oom_3(void) {
-  extern int g_malloc_fail_countdown;
   struct ui_arena *arena;
   struct ui_node_graph_base *graph = NULL;
-  struct ui_node_graph_camera_config config;
+  struct ui_node_graph_camera_config config = {0};
   int i;
   for (i = 0; i < 10; ++i) {
     if (ui_arena_create(16, &arena) == UI_ERROR_NONE) {

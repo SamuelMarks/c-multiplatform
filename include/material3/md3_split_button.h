@@ -16,7 +16,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
@@ -25,8 +25,8 @@ struct ui_engine;
  * @brief Material 3 Expressive Split Button skin wrapping ui_split_button_base.
  */
 struct md3_split_button {
-  struct ui_split_button_base *base;
-  enum md3_button_variant variant;
+  struct ui_split_button_base *base; /**< base field. */
+  enum md3_button_variant variant;   /**< variant field. */
 };
 
 /**
@@ -130,6 +130,6 @@ extern C_MULTIPLATFORM_EXPORT ui_error_t md3_split_button_set_on_trigger_click(
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* MATERIAL3_MD3_SPLIT_BUTTON_H */

@@ -77,7 +77,11 @@ ui_error_t ui_event_dispatch(const struct ui_layout_node *,
                              const struct ui_event *, struct ui_mouse_state *,
                              void *);
 
+#ifdef UI_TEST_MOCK_ALLOC
+extern int g_mock_focus_fail;
+#else
 int g_mock_focus_fail = 0;
+#endif
 static void trigger_null_branches(void) {
   struct ui_mouse_state mouse_state = {NULL, NULL, 0.0, 0};
   struct ui_layout_node root_layout;

@@ -7,6 +7,7 @@
 #include "material2/md2_shape.h"
 /* clang-format on */
 
+/** @brief md2_shape_get_corner_radius function. */
 ui_error_t md2_shape_get_corner_radius(enum md2_shape_category category,
                                        float *out_radius_dp) {
   if (out_radius_dp == NULL) {

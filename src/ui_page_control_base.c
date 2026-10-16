@@ -167,6 +167,7 @@ update_page_control_dom(struct ui_page_control_base *control) {
 
 /* \brief ui_error
  */
+/** @brief ui_page_control_base_set_number_of_pages function. */
 ui_error_t
 ui_page_control_base_set_number_of_pages(struct ui_page_control_base *control,
                                          int count) {
@@ -185,6 +186,7 @@ ui_page_control_base_set_number_of_pages(struct ui_page_control_base *control,
 
 /* \brief ui_error
  */
+/** @brief ui_page_control_base_set_current_page function. */
 ui_error_t
 ui_page_control_base_set_current_page(struct ui_page_control_base *control,
                                       int page) {
@@ -203,6 +205,7 @@ ui_page_control_base_set_current_page(struct ui_page_control_base *control,
 
 /* \brief ui_error
  */
+/** @brief ui_page_control_base_bind_current_page function. */
 ui_error_t
 ui_page_control_base_bind_current_page(struct ui_page_control_base *widget,
                                        struct ui_signal *signal) {

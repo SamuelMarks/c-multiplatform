@@ -539,6 +539,7 @@ static ui_error_t mock_dom_node_destroy(struct ui_dom_node *n) {
 /* Loading Indicator Implementation                                          */
 /* ========================================================================= */
 
+/** @brief md3_loading_indicator_create function. */
 ui_error_t
 md3_loading_indicator_create(struct ui_engine *engine,
                              enum md3_loading_indicator_style style,
@@ -583,6 +584,7 @@ md3_loading_indicator_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_loading_indicator_destroy function. */
 ui_error_t
 md3_loading_indicator_destroy(struct md3_loading_indicator *indicator) {
   ui_error_t rc;
@@ -602,6 +604,7 @@ md3_loading_indicator_destroy(struct md3_loading_indicator *indicator) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_loading_indicator_set_size function. */
 ui_error_t
 md3_loading_indicator_set_size(struct md3_loading_indicator *indicator,
                                enum md3_loading_indicator_size size) {
@@ -615,6 +618,7 @@ md3_loading_indicator_set_size(struct md3_loading_indicator *indicator,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_loading_indicator_set_reduced_motion function. */
 ui_error_t md3_loading_indicator_set_reduced_motion(
     struct md3_loading_indicator *indicator, int enabled) {
   if (!indicator) {
@@ -625,6 +629,7 @@ ui_error_t md3_loading_indicator_set_reduced_motion(
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_loading_indicator_update function. */
 ui_error_t md3_loading_indicator_update(struct md3_loading_indicator *indicator,
                                         float elapsed_s) {
   if (!indicator || elapsed_s < 0.0f) {
@@ -651,6 +656,7 @@ ui_error_t md3_loading_indicator_update(struct md3_loading_indicator *indicator,
 /* Stepper Implementation                                                    */
 /* ========================================================================= */
 
+/** @brief md3_stepper_create function. */
 ui_error_t md3_stepper_create(struct ui_engine *engine,
                               enum ui_stepper_mode mode,
                               enum md3_stepper_orientation orientation,
@@ -694,6 +700,7 @@ ui_error_t md3_stepper_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_stepper_destroy function. */
 ui_error_t md3_stepper_destroy(struct md3_stepper *stepper) {
   ui_error_t rc;
 
@@ -712,6 +719,7 @@ ui_error_t md3_stepper_destroy(struct md3_stepper *stepper) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_stepper_add_step function. */
 ui_error_t md3_stepper_add_step(struct md3_stepper *stepper,
                                 const char *step_id, const char *title,
                                 const char *subtitle) {
@@ -770,6 +778,7 @@ ui_error_t md3_stepper_add_step(struct md3_stepper *stepper,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_stepper_set_step_state function. */
 ui_error_t md3_stepper_set_step_state(struct md3_stepper *stepper,
                                       int step_index,
                                       enum ui_stepper_step_state state) {
@@ -792,6 +801,7 @@ ui_error_t md3_stepper_set_step_state(struct md3_stepper *stepper,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_stepper_get_step_state function. */
 ui_error_t md3_stepper_get_step_state(const struct md3_stepper *stepper,
                                       int step_index,
                                       enum ui_stepper_step_state *out_state) {
@@ -804,6 +814,7 @@ ui_error_t md3_stepper_get_step_state(const struct md3_stepper *stepper,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_stepper_set_active_index function. */
 ui_error_t md3_stepper_set_active_index(struct md3_stepper *stepper,
                                         int index) {
   int i;
@@ -846,6 +857,7 @@ ui_error_t md3_stepper_set_active_index(struct md3_stepper *stepper,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_stepper_get_active_index function. */
 ui_error_t md3_stepper_get_active_index(const struct md3_stepper *stepper,
                                         int *out_index) {
   if (!stepper || !out_index) {
@@ -856,6 +868,7 @@ ui_error_t md3_stepper_get_active_index(const struct md3_stepper *stepper,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_stepper_next_step function. */
 ui_error_t md3_stepper_next_step(struct md3_stepper *stepper) {
   if (!stepper) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -868,6 +881,7 @@ ui_error_t md3_stepper_next_step(struct md3_stepper *stepper) {
   return md3_stepper_set_active_index(stepper, stepper->active_index + 1);
 }
 
+/** @brief md3_stepper_prev_step function. */
 ui_error_t md3_stepper_prev_step(struct md3_stepper *stepper) {
   if (!stepper) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -880,6 +894,7 @@ ui_error_t md3_stepper_prev_step(struct md3_stepper *stepper) {
   return md3_stepper_set_active_index(stepper, stepper->active_index - 1);
 }
 
+/** @brief md3_stepper_set_validate_hook function. */
 ui_error_t md3_stepper_set_validate_hook(struct md3_stepper *stepper,
                                          ui_stepper_validate_t hook,
                                          void *user_data) {
@@ -900,6 +915,7 @@ ui_error_t md3_stepper_set_validate_hook(struct md3_stepper *stepper,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_stepper_set_editable function. */
 ui_error_t md3_stepper_set_editable(struct md3_stepper *stepper, int step_index,
                                     int editable) {
   if (!stepper || step_index < 0 || (size_t)step_index >= stepper->step_count) {
@@ -914,6 +930,7 @@ ui_error_t md3_stepper_set_editable(struct md3_stepper *stepper, int step_index,
 /* Scaffold Implementation                                                   */
 /* ========================================================================= */
 
+/** @brief md3_scaffold_create function. */
 ui_error_t md3_scaffold_create(struct ui_engine *engine,
                                struct md3_scaffold **out_scaffold) {
   struct md3_scaffold *scf;
@@ -941,6 +958,7 @@ ui_error_t md3_scaffold_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_scaffold_destroy function. */
 ui_error_t md3_scaffold_destroy(struct md3_scaffold *scaffold) {
   ui_error_t rc;
 
@@ -959,6 +977,7 @@ ui_error_t md3_scaffold_destroy(struct md3_scaffold *scaffold) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_scaffold_set_top_bar function. */
 ui_error_t md3_scaffold_set_top_bar(struct md3_scaffold *scaffold,
                                     struct ui_component *top_bar) {
   ui_error_t rc;
@@ -983,6 +1002,7 @@ ui_error_t md3_scaffold_set_top_bar(struct md3_scaffold *scaffold,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_scaffold_set_bottom_bar function. */
 ui_error_t md3_scaffold_set_bottom_bar(struct md3_scaffold *scaffold,
                                        struct ui_component *bottom_bar) {
   if (!scaffold || !bottom_bar) {
@@ -993,6 +1013,7 @@ ui_error_t md3_scaffold_set_bottom_bar(struct md3_scaffold *scaffold,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_scaffold_set_side_nav function. */
 ui_error_t md3_scaffold_set_side_nav(struct md3_scaffold *scaffold,
                                      struct ui_component *side_nav) {
   if (!scaffold || !side_nav) {
@@ -1003,6 +1024,7 @@ ui_error_t md3_scaffold_set_side_nav(struct md3_scaffold *scaffold,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_scaffold_set_main_content function. */
 ui_error_t md3_scaffold_set_main_content(struct md3_scaffold *scaffold,
                                          struct ui_component *content) {
   ui_error_t rc;
@@ -1027,6 +1049,7 @@ ui_error_t md3_scaffold_set_main_content(struct md3_scaffold *scaffold,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_scaffold_set_fab function. */
 ui_error_t md3_scaffold_set_fab(struct md3_scaffold *scaffold,
                                 struct ui_component *fab, int cradle_docked) {
   if (!scaffold || !fab) {
@@ -1038,6 +1061,7 @@ ui_error_t md3_scaffold_set_fab(struct md3_scaffold *scaffold,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_scaffold_set_safe_area function. */
 ui_error_t md3_scaffold_set_safe_area(struct md3_scaffold *scaffold, float top,
                                       float bottom, float left, float right) {
   if (!scaffold || top < 0.0f || bottom < 0.0f || left < 0.0f || right < 0.0f) {
@@ -1051,6 +1075,7 @@ ui_error_t md3_scaffold_set_safe_area(struct md3_scaffold *scaffold, float top,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_scaffold_on_scroll function. */
 ui_error_t md3_scaffold_on_scroll(struct md3_scaffold *scaffold,
                                   float scroll_offset_y) {
   if (!scaffold) {
@@ -1073,6 +1098,7 @@ ui_error_t md3_scaffold_on_scroll(struct md3_scaffold *scaffold,
 /* Canonical Layout Implementation                                           */
 /* ========================================================================= */
 
+/** @brief md3_canonical_layout_create function. */
 ui_error_t
 md3_canonical_layout_create(struct ui_engine *engine,
                             enum md3_canonical_layout_type type,
@@ -1125,6 +1151,7 @@ md3_canonical_layout_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_canonical_layout_destroy function. */
 ui_error_t md3_canonical_layout_destroy(struct md3_canonical_layout *layout) {
   ui_error_t rc;
 
@@ -1150,6 +1177,7 @@ ui_error_t md3_canonical_layout_destroy(struct md3_canonical_layout *layout) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_canonical_layout_set_size_class function. */
 ui_error_t
 md3_canonical_layout_set_size_class(struct md3_canonical_layout *layout,
                                     enum ui_window_size_class size_class) {
@@ -1180,6 +1208,7 @@ md3_canonical_layout_set_size_class(struct md3_canonical_layout *layout,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_canonical_layout_get_size_class function. */
 ui_error_t
 md3_canonical_layout_get_size_class(const struct md3_canonical_layout *layout,
                                     enum ui_window_size_class *out_size_class) {
@@ -1191,6 +1220,7 @@ md3_canonical_layout_get_size_class(const struct md3_canonical_layout *layout,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_canonical_layout_set_body function. */
 ui_error_t md3_canonical_layout_set_body(struct md3_canonical_layout *layout,
                                          struct ui_component *body) {
   ui_error_t rc;
@@ -1208,6 +1238,7 @@ ui_error_t md3_canonical_layout_set_body(struct md3_canonical_layout *layout,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_canonical_layout_set_leading_pane function. */
 ui_error_t
 md3_canonical_layout_set_leading_pane(struct md3_canonical_layout *layout,
                                       struct ui_component *leading) {
@@ -1226,6 +1257,7 @@ md3_canonical_layout_set_leading_pane(struct md3_canonical_layout *layout,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_canonical_layout_set_trailing_pane function. */
 ui_error_t
 md3_canonical_layout_set_trailing_pane(struct md3_canonical_layout *layout,
                                        struct ui_component *trailing) {
@@ -1244,6 +1276,7 @@ md3_canonical_layout_set_trailing_pane(struct md3_canonical_layout *layout,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_canonical_layout_set_split_ratio function. */
 ui_error_t
 md3_canonical_layout_set_split_ratio(struct md3_canonical_layout *layout,
                                      float ratio) {
@@ -1259,6 +1292,7 @@ md3_canonical_layout_set_split_ratio(struct md3_canonical_layout *layout,
 /* Breadcrumbs Implementation                                                */
 /* ========================================================================= */
 
+/** @brief md3_breadcrumbs_create function. */
 ui_error_t md3_breadcrumbs_create(struct ui_engine *engine,
                                   struct md3_breadcrumbs **out_breadcrumbs) {
   struct md3_breadcrumbs *bc;
@@ -1296,6 +1330,7 @@ ui_error_t md3_breadcrumbs_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_breadcrumbs_destroy function. */
 ui_error_t md3_breadcrumbs_destroy(struct md3_breadcrumbs *breadcrumbs) {
   ui_error_t rc;
 
@@ -1314,6 +1349,7 @@ ui_error_t md3_breadcrumbs_destroy(struct md3_breadcrumbs *breadcrumbs) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_breadcrumbs_add_item function. */
 ui_error_t md3_breadcrumbs_add_item(struct md3_breadcrumbs *breadcrumbs,
                                     const char *label, const char *href) {
   struct md3_breadcrumb_item *item;
@@ -1365,6 +1401,7 @@ ui_error_t md3_breadcrumbs_add_item(struct md3_breadcrumbs *breadcrumbs,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_breadcrumbs_set_separator function. */
 ui_error_t md3_breadcrumbs_set_separator(struct md3_breadcrumbs *breadcrumbs,
                                          const char *separator) {
   if (!breadcrumbs || !separator) {
@@ -1383,6 +1420,7 @@ ui_error_t md3_breadcrumbs_set_separator(struct md3_breadcrumbs *breadcrumbs,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_breadcrumbs_set_max_items function. */
 ui_error_t md3_breadcrumbs_set_max_items(struct md3_breadcrumbs *breadcrumbs,
                                          size_t max_items) {
   if (!breadcrumbs || max_items < 2) {
@@ -1393,6 +1431,7 @@ ui_error_t md3_breadcrumbs_set_max_items(struct md3_breadcrumbs *breadcrumbs,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_breadcrumbs_simulate_click function. */
 ui_error_t md3_breadcrumbs_simulate_click(struct md3_breadcrumbs *breadcrumbs,
                                           size_t index) {
   ui_error_t rc;
@@ -1414,6 +1453,7 @@ ui_error_t md3_breadcrumbs_simulate_click(struct md3_breadcrumbs *breadcrumbs,
 /* Page Indicator Implementation                                             */
 /* ========================================================================= */
 
+/** @brief md3_page_indicator_create function. */
 ui_error_t
 md3_page_indicator_create(struct ui_engine *engine, int page_count,
                           struct md3_page_indicator **out_indicator) {
@@ -1465,6 +1505,7 @@ md3_page_indicator_create(struct ui_engine *engine, int page_count,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_page_indicator_destroy function. */
 ui_error_t md3_page_indicator_destroy(struct md3_page_indicator *indicator) {
   ui_error_t rc;
 
@@ -1486,6 +1527,7 @@ ui_error_t md3_page_indicator_destroy(struct md3_page_indicator *indicator) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_page_indicator_set_page_count function. */
 ui_error_t
 md3_page_indicator_set_page_count(struct md3_page_indicator *indicator,
                                   int page_count) {
@@ -1508,6 +1550,7 @@ md3_page_indicator_set_page_count(struct md3_page_indicator *indicator,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_page_indicator_set_current_page function. */
 ui_error_t
 md3_page_indicator_set_current_page(struct md3_page_indicator *indicator,
                                     int current_page) {
@@ -1526,6 +1569,7 @@ md3_page_indicator_set_current_page(struct md3_page_indicator *indicator,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_page_indicator_get_current_page function. */
 ui_error_t
 md3_page_indicator_get_current_page(const struct md3_page_indicator *indicator,
                                     int *out_page) {

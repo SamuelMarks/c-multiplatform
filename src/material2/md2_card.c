@@ -13,13 +13,15 @@
 #include <string.h>
 /* clang-format on */
 
+/** @brief md2_card structure. */
 struct md2_card {
-  struct ui_card_base *base;
-  enum md2_card_variant variant;
-  char title[64];
-  char subtitle[64];
+  struct ui_card_base *base;     /**< base field. */
+  enum md2_card_variant variant; /**< variant field. */
+  char title[64];                /**< title[64] field. */
+  char subtitle[64];             /**< subtitle[64] field. */
 };
 
+/** @brief md2_card_create function. */
 ui_error_t md2_card_create(struct ui_engine *engine,
                            enum md2_card_variant variant,
                            struct md2_card **out_card) {
@@ -61,6 +63,7 @@ ui_error_t md2_card_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md2_card_destroy function. */
 ui_error_t md2_card_destroy(struct md2_card *card) {
   ui_error_t rc;
 
@@ -75,6 +78,7 @@ ui_error_t md2_card_destroy(struct md2_card *card) {
   return rc;
 }
 
+/** @brief md2_card_get_base function. */
 ui_error_t md2_card_get_base(struct md2_card *card,
                              struct ui_card_base **out_base) {
   if (card == NULL || out_base == NULL) {
@@ -85,6 +89,7 @@ ui_error_t md2_card_get_base(struct md2_card *card,
   return UI_ERROR_NONE;
 }
 
+/** @brief md2_card_set_title function. */
 ui_error_t md2_card_set_title(struct md2_card *card, const char *title) {
   if (card == NULL || title == NULL) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -100,6 +105,7 @@ ui_error_t md2_card_set_title(struct md2_card *card, const char *title) {
   return ui_card_base_set_title(card->base, title);
 }
 
+/** @brief md2_card_set_subtitle function. */
 ui_error_t md2_card_set_subtitle(struct md2_card *card, const char *subtitle) {
   if (card == NULL || subtitle == NULL) {
     return UI_ERROR_INVALID_ARGUMENT;

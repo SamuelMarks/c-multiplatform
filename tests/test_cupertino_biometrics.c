@@ -10,6 +10,9 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_cupertino_biometrics_mock_dialog_create_fail;
+extern int g_cupertino_biometrics_mock_dialog_destroy_fail;
+
 SUITE(cupertino_biometrics_suite);
 
 TEST test_biometrics_invalid_arguments(void) {
@@ -97,13 +100,15 @@ TEST test_biometrics_invalid_arguments(void) {
   ASSERT_EQ(UI_ERROR_NONE, rc);
 
   /* Destroy with prompt->base == NULL */
-  struct ui_dialog_base *saved_base = prompt->base;
-  prompt->base = NULL;
-  rc = cupertino_biometrics_destroy(prompt);
-  ASSERT_EQ(UI_ERROR_NONE, rc);
-  ui_dialog_base_destroy(saved_base);
+  {
+    struct ui_dialog_base *saved_base = prompt->base;
+    prompt->base = NULL;
+    rc = cupertino_biometrics_destroy(prompt);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+    ui_dialog_base_destroy(saved_base);
 
-  PASS();
+    PASS();
+  }
 }
 
 TEST test_biometrics_lifecycle_and_shake(void) {
@@ -209,8 +214,6 @@ TEST test_biometrics_oom_mock(void) {
   memset(&desc, 0, sizeof(desc));
 
 #ifdef UI_TEST_MOCK_ALLOC
-  extern int g_cupertino_biometrics_mock_dialog_create_fail;
-  extern int g_cupertino_biometrics_mock_dialog_destroy_fail;
 
   g_malloc_fail_countdown = 0;
   rc = cupertino_biometrics_create(dummy_engine, &desc, &prompt);

@@ -12,6 +12,10 @@ extern int g_malloc_fail_countdown;
 #include <assert.h>
 /* clang-format on */
 
+extern int g_malloc_fail_countdown;
+extern int g_menu_mock_fail;
+extern int g_menu_mock_attr_countdown;
+
 #if defined(_MSC_VER)
 /* MSVC Safe CRT */
 #endif
@@ -22,105 +26,121 @@ static void test_menu_missing_coverage(void) {
   struct ui_menu_base *menu = NULL;
   ui_menu_base_create(&menu);
 
-  struct ui_dom_node *root = NULL;
-  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
-  struct ui_overlay_director *director = NULL;
-  ui_overlay_director_create(root, &director);
+  {
+    struct ui_dom_node *root = NULL;
+    ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
+    {
+      struct ui_overlay_director *director = NULL;
+      ui_overlay_director_create(root, &director);
 
-  struct ui_event ev;
-  memset(&ev, 0, sizeof(ev));
-  /* Process event on closed menu */
-  ui_menu_base_process_event(menu, &ev);
+      {
+        struct ui_event ev;
+        memset(&ev, 0, sizeof(ev));
+        /* Process event on closed menu */
+        ui_menu_base_process_event(menu, &ev);
 
-  /* Mock alloc on add item */
-  struct ui_dom_node *node = NULL;
-  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &node);
-  int i;
+        /* Mock alloc on add item */
+        {
+          struct ui_dom_node *node = NULL;
+          ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &node);
+          {
+            int i;
 #ifdef UI_TEST_MOCK_ALLOC
-  extern int g_malloc_fail_countdown;
-  for (i = 0; i < 5; i++) {
-    g_malloc_fail_countdown = i;
-    ui_menu_base_add_item(menu, "test_id", node, NULL);
-    g_malloc_fail_countdown = -1;
-  }
+            for (i = 0; i < 5; i++) {
+              g_malloc_fail_countdown = i;
+              ui_menu_base_add_item(menu, "test_id", node, NULL);
+              g_malloc_fail_countdown = -1;
+            }
 #endif
-  g_malloc_fail_countdown = -1;
-  ui_menu_base_add_item(menu, NULL, node, NULL); /* item_id = NULL */
+            g_malloc_fail_countdown = -1;
+            ui_menu_base_add_item(menu, NULL, node, NULL); /* item_id = NULL */
 
-  /* Bind active index valid */
-  struct ui_signal *sig = NULL;
-  union ui_signal_payload p;
-  memset(&p, 0, sizeof(p));
-  ui_signal_create(NULL, p, UI_SIGNAL_TYPE_INT32, NULL, NULL,
-                   UI_SIGNAL_MODE_SINGLE_THREADED, &sig);
-  ui_menu_base_bind_active_index(menu, sig);
+            /* Bind active index valid */
+            {
+              struct ui_signal *sig = NULL;
+              union ui_signal_payload p;
+              memset(&p, 0, sizeof(p));
+              ui_signal_create(NULL, p, UI_SIGNAL_TYPE_INT32, NULL, NULL,
+                               UI_SIGNAL_MODE_SINGLE_THREADED, &sig);
+              ui_menu_base_bind_active_index(menu, sig);
 
-  /* Open at new coords while already open */
-  ui_menu_base_open_at(menu, director, 10, 10);
-  ev.type = UI_EVENT_MOUSE_DOWN;
-  ev.event_data.mouse.button = 2;
-  ui_menu_base_intercept_context_menu(menu, director, &ev);
+              /* Open at new coords while already open */
+              ui_menu_base_open_at(menu, director, 10, 10);
+              ev.type = UI_EVENT_MOUSE_DOWN;
+              ev.event_data.mouse.button = 2;
+              ui_menu_base_intercept_context_menu(menu, director, &ev);
 
-  /* Deep submenu loop */
-  struct ui_menu_base *sub1 = NULL;
-  struct ui_menu_base *sub2 = NULL;
+              /* Deep submenu loop */
+              {
+                struct ui_menu_base *sub1 = NULL;
+                struct ui_menu_base *sub2 = NULL;
 
-  g_malloc_fail_countdown = -1;
-  {
-    ui_error_t rc_cleanup = ui_signal_destroy(sig);
-    assert(rc_cleanup == UI_ERROR_NONE);
-  }
-  {
-    ui_error_t rc_cleanup = ui_menu_base_destroy(menu);
-    assert(rc_cleanup == UI_ERROR_NONE);
-  }
-  ui_menu_base_create(&menu);
+                g_malloc_fail_countdown = -1;
+                {
+                  ui_error_t rc_cleanup = ui_signal_destroy(sig);
+                  assert(rc_cleanup == UI_ERROR_NONE);
+                }
+                {
+                  ui_error_t rc_cleanup = ui_menu_base_destroy(menu);
+                  assert(rc_cleanup == UI_ERROR_NONE);
+                }
+                ui_menu_base_create(&menu);
 
-  ui_menu_base_create(&sub1);
-  ui_menu_base_create(&sub2);
-  struct ui_dom_node *n1 = NULL, *n2 = NULL, *n3 = NULL;
-  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &n1);
-  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &n2);
-  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &n3);
-  ui_menu_base_add_item(menu, "m_s1", n1, sub1);
-  ui_menu_base_add_item(sub1, "s1_s2", n2, sub2);
-  ui_menu_base_add_item(sub2, "s2_item", n3, NULL);
-  ui_menu_base_open_at(menu, director, 0, 0);
-  /* Fake opening the subs */
-  ev.type = UI_EVENT_KEY_DOWN;
-  ev.event_data.keyboard.key_code = UI_KEY_DOWN;
-  ui_menu_base_process_event(menu, &ev); /* select m_s1 */
-  ev.event_data.keyboard.key_code = UI_KEY_RIGHT;
-  ui_menu_base_process_event(menu, &ev); /* open sub1 */
-  ev.event_data.keyboard.key_code = UI_KEY_DOWN;
-  ui_menu_base_process_event(sub1, &ev); /* select s1_s2 */
-  ev.event_data.keyboard.key_code = UI_KEY_RIGHT;
-  ui_menu_base_process_event(sub1, &ev); /* open sub2 */
-  ev.event_data.keyboard.key_code = UI_KEY_DOWN;
-  ui_menu_base_process_event(sub2, &ev); /* select s2_item */
-  ev.event_data.keyboard.key_code = UI_KEY_ENTER;
-  ui_menu_base_process_event(sub2,
-                             &ev); /* trigger s2_item, should cascade close! */
+                ui_menu_base_create(&sub1);
+                ui_menu_base_create(&sub2);
+                {
+                  struct ui_dom_node *n1 = NULL, *n2 = NULL, *n3 = NULL;
+                  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &n1);
+                  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &n2);
+                  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &n3);
+                  ui_menu_base_add_item(menu, "m_s1", n1, sub1);
+                  ui_menu_base_add_item(sub1, "s1_s2", n2, sub2);
+                  ui_menu_base_add_item(sub2, "s2_item", n3, NULL);
+                  ui_menu_base_open_at(menu, director, 0, 0);
+                  /* Fake opening the subs */
+                  ev.type = UI_EVENT_KEY_DOWN;
+                  ev.event_data.keyboard.key_code = UI_KEY_DOWN;
+                  ui_menu_base_process_event(menu, &ev); /* select m_s1 */
+                  ev.event_data.keyboard.key_code = UI_KEY_RIGHT;
+                  ui_menu_base_process_event(menu, &ev); /* open sub1 */
+                  ev.event_data.keyboard.key_code = UI_KEY_DOWN;
+                  ui_menu_base_process_event(sub1, &ev); /* select s1_s2 */
+                  ev.event_data.keyboard.key_code = UI_KEY_RIGHT;
+                  ui_menu_base_process_event(sub1, &ev); /* open sub2 */
+                  ev.event_data.keyboard.key_code = UI_KEY_DOWN;
+                  ui_menu_base_process_event(sub2, &ev); /* select s2_item */
+                  ev.event_data.keyboard.key_code = UI_KEY_ENTER;
+                  ui_menu_base_process_event(
+                      sub2, &ev); /* trigger s2_item, should cascade close! */
 
-  {
-    ui_error_t rc_cleanup = ui_menu_base_destroy(sub2);
-    assert(rc_cleanup == UI_ERROR_NONE);
-  }
-  {
-    ui_error_t rc_cleanup = ui_menu_base_destroy(sub1);
-    assert(rc_cleanup == UI_ERROR_NONE);
-  }
-  {
-    ui_error_t rc_cleanup = ui_menu_base_destroy(menu);
-    assert(rc_cleanup == UI_ERROR_NONE);
-  }
-  {
-    ui_error_t rc_cleanup = ui_overlay_director_destroy(director);
-    assert(rc_cleanup == UI_ERROR_NONE);
-  }
-  {
-    ui_error_t rc_cleanup = ui_dom_node_destroy(root);
-    assert(rc_cleanup == UI_ERROR_NONE);
+                  {
+                    ui_error_t rc_cleanup = ui_menu_base_destroy(sub2);
+                    assert(rc_cleanup == UI_ERROR_NONE);
+                  }
+                  {
+                    ui_error_t rc_cleanup = ui_menu_base_destroy(sub1);
+                    assert(rc_cleanup == UI_ERROR_NONE);
+                  }
+                  {
+                    ui_error_t rc_cleanup = ui_menu_base_destroy(menu);
+                    assert(rc_cleanup == UI_ERROR_NONE);
+                  }
+                  {
+                    ui_error_t rc_cleanup =
+                        ui_overlay_director_destroy(director);
+                    assert(rc_cleanup == UI_ERROR_NONE);
+                  }
+                  {
+                    ui_error_t rc_cleanup = ui_dom_node_destroy(root);
+                    assert(rc_cleanup == UI_ERROR_NONE);
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   }
 }
 static int g_action_triggered = 0;
@@ -433,133 +453,144 @@ static void test_menu_missing_branches(void) {
   ev.event_data.keyboard.key_code = UI_KEY_LEFT;
   ui_menu_base_process_event(menu, &ev);
 
-  struct ui_menu_base *empty_menu = NULL;
-  ui_menu_base_create(&empty_menu);
-  ui_menu_base_open_at(empty_menu, director, 0, 0);
-  ev.type = UI_EVENT_KEY_DOWN;
-  ev.event_data.keyboard.key_code = UI_KEY_DOWN;
-  ui_menu_base_process_event(empty_menu, &ev);
-  ui_menu_base_destroy(empty_menu);
-
-  /* Trigger SPACE to open submenu (fake a submenu) */
-  struct ui_menu_base *sub = NULL;
-  ui_menu_base_create(&sub);
-
-  ui_menu_base_open_at(menu, director, 0, 0);
-
-  /* Send an event that is NOT a key down */
-  ev.type = UI_EVENT_KEY_UP;
-  ev.event_data.keyboard.key_code = UI_KEY_ENTER;
-  ui_menu_base_process_event(menu, &ev);
-  ev.type = UI_EVENT_KEY_DOWN; /* restore */
-
-  /* Hit UP arrow when active_index >= 1 (e.g. 1) to make prev >= 0 */
-  ev.event_data.keyboard.key_code = UI_KEY_DOWN;
-  ui_menu_base_process_event(menu, &ev); /* index 0 */
-  ev.event_data.keyboard.key_code = UI_KEY_DOWN;
-  ui_menu_base_process_event(menu, &ev); /* index 1 */
-  ev.event_data.keyboard.key_code = UI_KEY_UP;
-  ui_menu_base_process_event(menu, &ev); /* index 0 again */
-
-  /* Close and open to reset active_index to -1 */
-  ui_menu_base_close(menu);
-  ui_menu_base_open_at(menu, director, 0, 0);
-
-  /* Hit RIGHT arrow when active_index == -1 */
-  ev.event_data.keyboard.key_code = UI_KEY_RIGHT;
-  ui_menu_base_process_event(menu, &ev);
-
-  /* Hit ENTER when active_index == -1 */
-  ev.event_data.keyboard.key_code = UI_KEY_ENTER;
-  ui_menu_base_process_event(menu, &ev);
-
-  struct ui_dom_node *item2 = NULL;
-  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &item2);
-  ui_menu_base_add_item(menu, "i2", item2, sub);
-
-  ui_menu_base_open_at(menu, director, 0, 0);
-  ui_menu_base_open_at(menu, director, 0, 0);
-  ev.type = UI_EVENT_KEY_DOWN;
-  ev.event_data.keyboard.key_code = UI_KEY_DOWN;
-  ui_menu_base_process_event(menu, &ev); /* index 0 */
-  ev.event_data.keyboard.key_code = UI_KEY_DOWN;
-  ui_menu_base_process_event(menu, &ev); /* index 1 (i2) */
-  ev.event_data.keyboard.key_code = UI_KEY_ENTER;
-  ui_menu_base_process_event(menu, &ev); /* hit sub != NULL branch for ENTER */
-
-  ui_menu_base_close(menu);
-  ui_menu_base_open_at(menu, director, 0, 0);
-  ev.event_data.keyboard.key_code = UI_KEY_ESCAPE;
-  ui_menu_base_process_event(menu, &ev); /* make sure ESCAPE is hit cleanly */
-
-  /* Trigger an unhandled key when item_count > 0 */
-  ui_menu_base_open_at(menu, director, 0, 0);
-  ev.event_data.keyboard.key_code = 'x';
-  ui_menu_base_process_event(menu, &ev);
-
-  /* Add more items to trigger capacity doubling */
-  struct ui_dom_node *dummy1 = NULL, *dummy2 = NULL, *dummy3 = NULL;
-  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &dummy1);
-  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &dummy2);
-  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &dummy3);
-  ui_menu_base_add_item(menu, "dummy1", dummy1, NULL);
-  ui_menu_base_add_item(menu, "dummy2", dummy2, NULL);
-  ui_menu_base_add_item(menu, "dummy3", dummy3, NULL);
-
-  ui_menu_base_open_at(menu, director, 0, 0);
-
-  /* Now we have >1 items. Move down then up to hit prev >= 0 */
-  ev.event_data.keyboard.key_code = UI_KEY_DOWN;
-  ui_menu_base_process_event(menu, &ev); /* index 0 */
-  ev.event_data.keyboard.key_code = UI_KEY_DOWN;
-  ui_menu_base_process_event(menu, &ev); /* index 1 */
-  ev.event_data.keyboard.key_code = UI_KEY_UP;
-  ui_menu_base_process_event(menu, &ev); /* prev >= 0 */
-
-  ui_menu_base_close(menu);
-  ui_menu_base_open_at(menu, director, 0, 0);
-
-  ev.event_data.keyboard.key_code = UI_KEY_DOWN;
-  ui_menu_base_process_event(menu, &ev); /* select item 1 (index 1) */
-  ev.event_data.keyboard.key_code = UI_KEY_SPACE;
-  ui_menu_base_process_event(menu, &ev);
-
-  /* Now select index 1 (which has submenu sub) and press SPACE to open it */
-  ev.event_data.keyboard.key_code = UI_KEY_DOWN;
-  ui_menu_base_process_event(menu, &ev);
-  ev.event_data.keyboard.key_code = UI_KEY_SPACE;
-  ui_menu_base_process_event(menu, &ev);
-
-  /* Intercept context menu with open menu */
-  ui_menu_base_open_at(menu, director, 0, 0);
-  ev.type = UI_EVENT_MOUSE_DOWN;
-  ev.event_data.mouse.button = 2;
-  ui_menu_base_intercept_context_menu(menu, director, &ev);
-
-  ui_menu_base_open_at(menu, director, 0, 0);
-
-  /* active_index = -1 on open by default */
-  ev.type = UI_EVENT_KEY_DOWN;
-  ev.event_data.keyboard.key_code = UI_KEY_RIGHT;
-  ui_menu_base_process_event(menu, &ev);
-  ev.event_data.keyboard.key_code = UI_KEY_ENTER;
-  ui_menu_base_process_event(menu, &ev);
-
   {
-    ui_error_t rc_cleanup = ui_menu_base_destroy(menu);
-    assert(rc_cleanup == UI_ERROR_NONE);
-  }
-  {
-    ui_error_t rc_cleanup = ui_menu_base_destroy(sub);
-    assert(rc_cleanup == UI_ERROR_NONE);
-  }
-  {
-    ui_error_t rc_cleanup = ui_overlay_director_destroy(director);
-    assert(rc_cleanup == UI_ERROR_NONE);
-  }
-  {
-    ui_error_t rc_cleanup = ui_dom_node_destroy(root);
-    assert(rc_cleanup == UI_ERROR_NONE);
+    struct ui_menu_base *empty_menu = NULL;
+    ui_menu_base_create(&empty_menu);
+    ui_menu_base_open_at(empty_menu, director, 0, 0);
+    ev.type = UI_EVENT_KEY_DOWN;
+    ev.event_data.keyboard.key_code = UI_KEY_DOWN;
+    ui_menu_base_process_event(empty_menu, &ev);
+    ui_menu_base_destroy(empty_menu);
+
+    /* Trigger SPACE to open submenu (fake a submenu) */
+    {
+      struct ui_menu_base *sub = NULL;
+      ui_menu_base_create(&sub);
+
+      ui_menu_base_open_at(menu, director, 0, 0);
+
+      /* Send an event that is NOT a key down */
+      ev.type = UI_EVENT_KEY_UP;
+      ev.event_data.keyboard.key_code = UI_KEY_ENTER;
+      ui_menu_base_process_event(menu, &ev);
+      ev.type = UI_EVENT_KEY_DOWN; /* restore */
+
+      /* Hit UP arrow when active_index >= 1 (e.g. 1) to make prev >= 0 */
+      ev.event_data.keyboard.key_code = UI_KEY_DOWN;
+      ui_menu_base_process_event(menu, &ev); /* index 0 */
+      ev.event_data.keyboard.key_code = UI_KEY_DOWN;
+      ui_menu_base_process_event(menu, &ev); /* index 1 */
+      ev.event_data.keyboard.key_code = UI_KEY_UP;
+      ui_menu_base_process_event(menu, &ev); /* index 0 again */
+
+      /* Close and open to reset active_index to -1 */
+      ui_menu_base_close(menu);
+      ui_menu_base_open_at(menu, director, 0, 0);
+
+      /* Hit RIGHT arrow when active_index == -1 */
+      ev.event_data.keyboard.key_code = UI_KEY_RIGHT;
+      ui_menu_base_process_event(menu, &ev);
+
+      /* Hit ENTER when active_index == -1 */
+      ev.event_data.keyboard.key_code = UI_KEY_ENTER;
+      ui_menu_base_process_event(menu, &ev);
+
+      {
+        struct ui_dom_node *item2 = NULL;
+        ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &item2);
+        ui_menu_base_add_item(menu, "i2", item2, sub);
+
+        ui_menu_base_open_at(menu, director, 0, 0);
+        ui_menu_base_open_at(menu, director, 0, 0);
+        ev.type = UI_EVENT_KEY_DOWN;
+        ev.event_data.keyboard.key_code = UI_KEY_DOWN;
+        ui_menu_base_process_event(menu, &ev); /* index 0 */
+        ev.event_data.keyboard.key_code = UI_KEY_DOWN;
+        ui_menu_base_process_event(menu, &ev); /* index 1 (i2) */
+        ev.event_data.keyboard.key_code = UI_KEY_ENTER;
+        ui_menu_base_process_event(menu,
+                                   &ev); /* hit sub != NULL branch for ENTER */
+
+        ui_menu_base_close(menu);
+        ui_menu_base_open_at(menu, director, 0, 0);
+        ev.event_data.keyboard.key_code = UI_KEY_ESCAPE;
+        ui_menu_base_process_event(menu,
+                                   &ev); /* make sure ESCAPE is hit cleanly */
+
+        /* Trigger an unhandled key when item_count > 0 */
+        ui_menu_base_open_at(menu, director, 0, 0);
+        ev.event_data.keyboard.key_code = 'x';
+        ui_menu_base_process_event(menu, &ev);
+
+        /* Add more items to trigger capacity doubling */
+        {
+          struct ui_dom_node *dummy1 = NULL, *dummy2 = NULL, *dummy3 = NULL;
+          ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &dummy1);
+          ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &dummy2);
+          ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &dummy3);
+          ui_menu_base_add_item(menu, "dummy1", dummy1, NULL);
+          ui_menu_base_add_item(menu, "dummy2", dummy2, NULL);
+          ui_menu_base_add_item(menu, "dummy3", dummy3, NULL);
+
+          ui_menu_base_open_at(menu, director, 0, 0);
+
+          /* Now we have >1 items. Move down then up to hit prev >= 0 */
+          ev.event_data.keyboard.key_code = UI_KEY_DOWN;
+          ui_menu_base_process_event(menu, &ev); /* index 0 */
+          ev.event_data.keyboard.key_code = UI_KEY_DOWN;
+          ui_menu_base_process_event(menu, &ev); /* index 1 */
+          ev.event_data.keyboard.key_code = UI_KEY_UP;
+          ui_menu_base_process_event(menu, &ev); /* prev >= 0 */
+
+          ui_menu_base_close(menu);
+          ui_menu_base_open_at(menu, director, 0, 0);
+
+          ev.event_data.keyboard.key_code = UI_KEY_DOWN;
+          ui_menu_base_process_event(menu, &ev); /* select item 1 (index 1) */
+          ev.event_data.keyboard.key_code = UI_KEY_SPACE;
+          ui_menu_base_process_event(menu, &ev);
+
+          /* Now select index 1 (which has submenu sub) and press SPACE to open
+           * it */
+          ev.event_data.keyboard.key_code = UI_KEY_DOWN;
+          ui_menu_base_process_event(menu, &ev);
+          ev.event_data.keyboard.key_code = UI_KEY_SPACE;
+          ui_menu_base_process_event(menu, &ev);
+
+          /* Intercept context menu with open menu */
+          ui_menu_base_open_at(menu, director, 0, 0);
+          ev.type = UI_EVENT_MOUSE_DOWN;
+          ev.event_data.mouse.button = 2;
+          ui_menu_base_intercept_context_menu(menu, director, &ev);
+
+          ui_menu_base_open_at(menu, director, 0, 0);
+
+          /* active_index = -1 on open by default */
+          ev.type = UI_EVENT_KEY_DOWN;
+          ev.event_data.keyboard.key_code = UI_KEY_RIGHT;
+          ui_menu_base_process_event(menu, &ev);
+          ev.event_data.keyboard.key_code = UI_KEY_ENTER;
+          ui_menu_base_process_event(menu, &ev);
+
+          {
+            ui_error_t rc_cleanup = ui_menu_base_destroy(menu);
+            assert(rc_cleanup == UI_ERROR_NONE);
+          }
+          {
+            ui_error_t rc_cleanup = ui_menu_base_destroy(sub);
+            assert(rc_cleanup == UI_ERROR_NONE);
+          }
+          {
+            ui_error_t rc_cleanup = ui_overlay_director_destroy(director);
+            assert(rc_cleanup == UI_ERROR_NONE);
+          }
+          {
+            ui_error_t rc_cleanup = ui_dom_node_destroy(root);
+            assert(rc_cleanup == UI_ERROR_NONE);
+          }
+        }
+      }
+    }
   }
 }
 
@@ -590,70 +621,77 @@ static void test_menu_errors(void) {
   if (ui_menu_base_get_component(menu, NULL) != UI_ERROR_INVALID_ARGUMENT)
     return;
 
-  int is_open;
-  if (ui_menu_base_is_open(NULL, &is_open) != UI_ERROR_INVALID_ARGUMENT)
-    return;
-  if (ui_menu_base_is_open(menu, NULL) != UI_ERROR_INVALID_ARGUMENT)
-    return;
+  {
+    int is_open;
+    if (ui_menu_base_is_open(NULL, &is_open) != UI_ERROR_INVALID_ARGUMENT)
+      return;
+    if (ui_menu_base_is_open(menu, NULL) != UI_ERROR_INVALID_ARGUMENT)
+      return;
 
-  if (ui_menu_base_open_at(NULL, director, 0, 0) != UI_ERROR_INVALID_ARGUMENT)
-    return;
-  if (ui_menu_base_open_at(menu, NULL, 0, 0) != UI_ERROR_INVALID_ARGUMENT)
-    return;
+    if (ui_menu_base_open_at(NULL, director, 0, 0) != UI_ERROR_INVALID_ARGUMENT)
+      return;
+    if (ui_menu_base_open_at(menu, NULL, 0, 0) != UI_ERROR_INVALID_ARGUMENT)
+      return;
 
-  if (ui_menu_base_close(NULL) != UI_ERROR_INVALID_ARGUMENT)
-    return;
-  /* Close when menu exists but isn't open */
-  ui_menu_base_close(menu);
+    if (ui_menu_base_close(NULL) != UI_ERROR_INVALID_ARGUMENT)
+      return;
+    /* Close when menu exists but isn't open */
+    ui_menu_base_close(menu);
 
-  if (ui_menu_base_add_item(NULL, NULL, NULL, NULL) !=
-      UI_ERROR_INVALID_ARGUMENT)
-    return;
-  if (ui_menu_base_add_item(menu, NULL, NULL, NULL) !=
-      UI_ERROR_INVALID_ARGUMENT)
-    return;
-  if (ui_menu_base_add_item(menu, "test", NULL, NULL) !=
-      UI_ERROR_INVALID_ARGUMENT)
-    return;
+    if (ui_menu_base_add_item(NULL, NULL, NULL, NULL) !=
+        UI_ERROR_INVALID_ARGUMENT)
+      return;
+    if (ui_menu_base_add_item(menu, NULL, NULL, NULL) !=
+        UI_ERROR_INVALID_ARGUMENT)
+      return;
+    if (ui_menu_base_add_item(menu, "test", NULL, NULL) !=
+        UI_ERROR_INVALID_ARGUMENT)
+      return;
 
-  if (ui_menu_base_set_on_action(NULL, NULL, NULL) != UI_ERROR_INVALID_ARGUMENT)
-    return;
+    if (ui_menu_base_set_on_action(NULL, NULL, NULL) !=
+        UI_ERROR_INVALID_ARGUMENT)
+      return;
 
-  struct ui_event valid_ev;
-  memset(&valid_ev, 0, sizeof(valid_ev));
+    {
+      struct ui_event valid_ev;
+      memset(&valid_ev, 0, sizeof(valid_ev));
 
-  if (ui_menu_base_intercept_context_menu(NULL, director, &valid_ev) !=
-      UI_ERROR_INVALID_ARGUMENT)
-    return;
-  if (ui_menu_base_intercept_context_menu(menu, NULL, &valid_ev) !=
-      UI_ERROR_INVALID_ARGUMENT)
-    return;
-  if (ui_menu_base_intercept_context_menu(menu, director, NULL) !=
-      UI_ERROR_INVALID_ARGUMENT)
-    return;
+      if (ui_menu_base_intercept_context_menu(NULL, director, &valid_ev) !=
+          UI_ERROR_INVALID_ARGUMENT)
+        return;
+      if (ui_menu_base_intercept_context_menu(menu, NULL, &valid_ev) !=
+          UI_ERROR_INVALID_ARGUMENT)
+        return;
+      if (ui_menu_base_intercept_context_menu(menu, director, NULL) !=
+          UI_ERROR_INVALID_ARGUMENT)
+        return;
 
-  if (ui_menu_base_process_event(NULL, &valid_ev) != UI_ERROR_INVALID_ARGUMENT)
-    return;
-  if (ui_menu_base_process_event(menu, NULL) != UI_ERROR_INVALID_ARGUMENT)
-    return;
+      if (ui_menu_base_process_event(NULL, &valid_ev) !=
+          UI_ERROR_INVALID_ARGUMENT)
+        return;
+      if (ui_menu_base_process_event(menu, NULL) != UI_ERROR_INVALID_ARGUMENT)
+        return;
 
-  ui_menu_base_bind_active_index(NULL, NULL);
+      ui_menu_base_bind_active_index(NULL, NULL);
 
-  ui_menu_base_destroy(menu);
-  ui_overlay_director_destroy(director);
-  ui_dom_node_destroy(root);
+      ui_menu_base_destroy(menu);
+      ui_overlay_director_destroy(director);
+      ui_dom_node_destroy(root);
 
-  /* Removed broken test block */
+      /* Removed broken test block */
 
 #ifdef UI_TEST_MOCK_ALLOC
-  extern int g_malloc_fail_countdown;
-  int i;
-  for (i = 0; i < 5; i++) {
-    g_malloc_fail_countdown = i;
-    ui_menu_base_create(&menu);
-    g_malloc_fail_countdown = -1;
-  }
+      {
+        int i;
+        for (i = 0; i < 5; i++) {
+          g_malloc_fail_countdown = i;
+          ui_menu_base_create(&menu);
+          g_malloc_fail_countdown = -1;
+        }
 #endif
+      }
+    }
+  }
 }
 
 #ifdef UI_TEST_MOCK_ALLOC
@@ -669,7 +707,6 @@ static ui_error_t mock_fail_action(struct ui_menu_base *menu, const char *id,
 }
 
 static void test_menu_mock_coverage(void) {
-  extern int g_menu_mock_fail;
   struct ui_menu_base *menu = NULL, *sub = NULL;
   struct ui_dom_node *root = NULL, *n1 = NULL, *n2 = NULL;
   struct ui_overlay_director *director = NULL;
@@ -702,7 +739,6 @@ static void test_menu_mock_coverage(void) {
   {
     int k;
     for (k = 0; k < 2; k++) {
-      extern int g_menu_mock_attr_countdown;
       g_menu_mock_attr_countdown = k;
       rc = ui_menu_base_create(&menu);
       assert(rc != UI_ERROR_NONE);
@@ -725,7 +761,6 @@ static void test_menu_mock_coverage(void) {
     for (k = 0; k < 7; k++) {
       struct ui_menu_base *empty_m = NULL;
       struct ui_dom_node *tmp_node = NULL;
-      extern int g_menu_mock_attr_countdown;
       ui_menu_base_create(&empty_m);
       ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &tmp_node);
       g_menu_mock_attr_countdown = k;
@@ -806,7 +841,6 @@ static void test_menu_mock_coverage(void) {
   {
     int k;
     for (k = 0; k < 4; k++) {
-      extern int g_menu_mock_attr_countdown;
       g_menu_mock_attr_countdown = k;
       rc = ui_menu_base_process_event(menu, &ev);
       assert(rc != UI_ERROR_NONE);
@@ -818,7 +852,6 @@ static void test_menu_mock_coverage(void) {
   {
     int k;
     for (k = 0; k < 4; k++) {
-      extern int g_menu_mock_attr_countdown;
       g_menu_mock_attr_countdown = k;
       rc = ui_menu_base_process_event(menu, &ev);
       assert(rc != UI_ERROR_NONE);

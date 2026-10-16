@@ -14,6 +14,7 @@
 
 #ifdef UI_TEST_MOCK_ALLOC
 int g_signal_mock_graph_get_node_fail = 0;
+int g_signal_mock_cas_fail = 0;
 
 /**
  * @brief mock_signal_graph_get_current_node.
@@ -30,6 +31,26 @@ mock_signal_graph_get_current_node(struct ui_reactive_node **out_node) {
 #undef ui_reactive_graph_get_current_node
 /** @cond */
 #define ui_reactive_graph_get_current_node mock_signal_graph_get_current_node
+/** @endcond */
+
+/**
+ * @brief mock_signal_atomic_cas.
+ * @param target Target atomic.
+ * @param expected Expected value.
+ * @param new_value New value.
+ * @param out_swapped Output swapped flag.
+ * @return Return value.
+ */
+static ui_error_t mock_signal_atomic_cas(ui_atomic_t *target, long expected,
+                                         long new_value, int *out_swapped) {
+  if (g_signal_mock_cas_fail != 0) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_atomic_cas)(target, expected, new_value, out_swapped);
+}
+#undef ui_atomic_cas
+/** @cond */
+#define ui_atomic_cas mock_signal_atomic_cas
 /** @endcond */
 #endif
 
@@ -92,9 +113,7 @@ static ui_error_t ui_signal_lock(ui_signal_t *sig) {
  */
 static ui_error_t ui_signal_unlock(ui_signal_t *sig) {
   if (sig->mode == UI_SIGNAL_MODE_MULTI_THREADED) {
-    ui_error_t rc = ui_atomic_store(&sig->lock, 0);
-    if (rc != UI_ERROR_NONE)
-      return rc;
+    return ui_atomic_store(&sig->lock, 0);
   }
   return UI_ERROR_NONE;
 }
@@ -217,12 +236,8 @@ ui_error_t ui_signal_get(ui_signal_t *signal,
   /* Dependency tracking for reactive graph */
   rc = ui_reactive_graph_get_current_node(&current_node);
   if (rc != UI_ERROR_NONE) {
-    {
-      ui_error_t _unlock_rc = ui_signal_unlock(signal);
-      if (rc == UI_ERROR_NONE)
-        rc = _unlock_rc;
-    }
-    return rc;
+    ui_error_t unlock_rc = ui_signal_unlock(signal);
+    return (unlock_rc != UI_ERROR_NONE) ? unlock_rc : rc;
   }
 
   if (current_node) {

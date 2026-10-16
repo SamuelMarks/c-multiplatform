@@ -16,7 +16,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 /**
  * @enum ui_floating_toolbar_orientation
@@ -160,6 +160,6 @@ ui_floating_toolbar_base_get_action_count(
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* UI_FLOATING_TOOLBAR_BASE_H */

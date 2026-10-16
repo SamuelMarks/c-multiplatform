@@ -58,6 +58,7 @@ mock_ui_font_get_glyph_metrics(struct ui_font *font, int codepoint,
 #if !defined(__EMSCRIPTEN__) &&                                                \
     (defined(UI_TEST_MOCK_ALLOC) ||                                            \
      (!defined(_WIN32) && !defined(__APPLE__) && !defined(HAVE_OPENGL)))
+/** @brief mock_glViewport function. */
 static void mock_glViewport(int x, int y, int w, int h) {
   int ux = x, uy = y, uw = w, uh = h;
   x = ux;
@@ -65,11 +66,14 @@ static void mock_glViewport(int x, int y, int w, int h) {
   w = uw;
   h = uh;
 }
+/** @brief mock_glMatrixMode function. */
 static void mock_glMatrixMode(int m) {
   int um = m;
   m = um;
 }
+/** @brief mock_glLoadIdentity function. */
 static void mock_glLoadIdentity(void) {}
+/** @brief mock_glOrtho function. */
 static void mock_glOrtho(double l, double r, double b, double t, double n,
                          double f) {
   double ul = l, ur = r, ub = b, ut = t, un = n, uf = f;
@@ -80,6 +84,7 @@ static void mock_glOrtho(double l, double r, double b, double t, double n,
   n = un;
   f = uf;
 }
+/** @brief mock_glClearColor function. */
 static void mock_glClearColor(float r, float g, float b, float a) {
   float ur = r, ug = g, ub = b, ua = a;
   r = ur;
@@ -87,14 +92,17 @@ static void mock_glClearColor(float r, float g, float b, float a) {
   b = ub;
   a = ua;
 }
+/** @brief mock_glClear function. */
 static void mock_glClear(unsigned int m) {
   unsigned int um = m;
   m = um;
 }
+/** @brief mock_glBegin function. */
 static void mock_glBegin(int m) {
   int um = m;
   m = um;
 }
+/** @brief mock_glColor4f function. */
 static void mock_glColor4f(float r, float g, float b, float a) {
   float ur = r, ug = g, ub = b, ua = a;
   r = ur;
@@ -102,12 +110,15 @@ static void mock_glColor4f(float r, float g, float b, float a) {
   b = ub;
   a = ua;
 }
+/** @brief mock_glVertex2f function. */
 static void mock_glVertex2f(float x, float y) {
   float ux = x, uy = y;
   x = ux;
   y = uy;
 }
+/** @brief mock_glEnd function. */
 static void mock_glEnd(void) {}
+/** @brief mock_glReadPixels function. */
 static void mock_glReadPixels(int x, int y, int w, int h, unsigned int f,
                               unsigned int t, void *d) {
   int ux = x, uy = y, uw = w, uh = h;
@@ -122,26 +133,37 @@ static void mock_glReadPixels(int x, int y, int w, int h, unsigned int f,
   d = ud;
 }
 #undef glViewport
+/** @brief glViewport macro definition. */
 #define glViewport mock_glViewport
 #undef glMatrixMode
+/** @brief glMatrixMode macro definition. */
 #define glMatrixMode mock_glMatrixMode
 #undef glLoadIdentity
+/** @brief glLoadIdentity macro definition. */
 #define glLoadIdentity mock_glLoadIdentity
 #undef glOrtho
+/** @brief glOrtho macro definition. */
 #define glOrtho mock_glOrtho
 #undef glClearColor
+/** @brief glClearColor macro definition. */
 #define glClearColor mock_glClearColor
 #undef glClear
+/** @brief glClear macro definition. */
 #define glClear mock_glClear
 #undef glBegin
+/** @brief glBegin macro definition. */
 #define glBegin mock_glBegin
 #undef glColor4f
+/** @brief glColor4f macro definition. */
 #define glColor4f mock_glColor4f
 #undef glVertex2f
+/** @brief glVertex2f macro definition. */
 #define glVertex2f mock_glVertex2f
 #undef glEnd
+/** @brief glEnd macro definition. */
 #define glEnd mock_glEnd
 #undef glReadPixels
+/** @brief glReadPixels macro definition. */
 #define glReadPixels mock_glReadPixels
 #endif
 
@@ -192,26 +214,31 @@ ui_error_t ui_renderer_gl1_destroy(struct ui_renderer_backend *backend) {
 
 #ifndef GL_RGBA
 /* \brief Fallback GL_RGBA */
+/** @brief GL_RGBA macro definition. */
 #define GL_RGBA 0x1908
 #endif
 
 #ifndef GL_UNSIGNED_BYTE
 /* \brief Fallback GL_UNSIGNED_BYTE */
+/** @brief GL_UNSIGNED_BYTE macro definition. */
 #define GL_UNSIGNED_BYTE 0x1401
 #endif
 
 #ifndef GL_PROJECTION
 /* \brief Fallback GL_PROJECTION */
+/** @brief GL_PROJECTION macro definition. */
 #define GL_PROJECTION 0x1701
 #endif
 
 #ifndef GL_MODELVIEW
 /* \brief Fallback GL_MODELVIEW */
+/** @brief GL_MODELVIEW macro definition. */
 #define GL_MODELVIEW 0x1700
 #endif
 
 #ifndef GL_TRIANGLES
 /* \brief Fallback GL_TRIANGLES */
+/** @brief GL_TRIANGLES macro definition. */
 #define GL_TRIANGLES 0x0004
 #endif
 
@@ -739,6 +766,7 @@ static ui_error_t gl1_draw_texture(struct ui_renderer_backend *backend,
   return gl1_draw_rect(backend, x, y, width, height, color);
 }
 
+/** @brief gl1_draw_text function. */
 static ui_error_t gl1_draw_text(struct ui_renderer_backend *backend,
                                 const char *text, const struct ui_font *f,
                                 float x, float y, float font_size,

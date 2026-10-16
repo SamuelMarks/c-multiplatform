@@ -19,7 +19,9 @@ struct ui_design_system_entry {
   struct ui_design_system_entry *next;          /**< Next node in linked list */
 };
 
+/** @brief g_design_systems_head variable. */
 static struct ui_design_system_entry *g_design_systems_head = NULL;
+/** @brief g_active_design_system_name variable. */
 static const char *g_active_design_system_name = NULL;
 
 /**

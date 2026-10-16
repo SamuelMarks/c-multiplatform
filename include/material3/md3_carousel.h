@@ -15,7 +15,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
@@ -38,10 +38,10 @@ enum md3_carousel_layout_type {
  * @brief Material 3 Carousel skin wrapping ui_carousel_base.
  */
 struct md3_carousel {
-  struct ui_carousel_base *base;
-  enum md3_carousel_layout_type layout_type;
-  float corner_radius;
-  int dynamic_mask_morphing;
+  struct ui_carousel_base *base;             /**< base field. */
+  enum md3_carousel_layout_type layout_type; /**< layout_type field. */
+  float corner_radius;                       /**< corner_radius field. */
+  int dynamic_mask_morphing; /**< dynamic_mask_morphing field. */
 };
 
 /**

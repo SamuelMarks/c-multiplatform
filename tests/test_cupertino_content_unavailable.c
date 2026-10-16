@@ -11,6 +11,11 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_content_unavailable_mock_create_fail;
+extern int g_content_unavailable_mock_set_title_fail;
+extern int g_content_unavailable_mock_set_desc_fail;
+extern int g_content_unavailable_mock_destroy_fail;
+
 SUITE(cupertino_content_unavailable_suite);
 
 TEST test_content_unavailable_invalid_arguments(void) {
@@ -254,10 +259,6 @@ TEST test_content_unavailable_defaults(void) {
 
 TEST test_content_unavailable_oom_mock(void) {
 #ifdef UI_TEST_MOCK_ALLOC
-  extern int g_content_unavailable_mock_create_fail;
-  extern int g_content_unavailable_mock_set_title_fail;
-  extern int g_content_unavailable_mock_set_desc_fail;
-  extern int g_content_unavailable_mock_destroy_fail;
 #endif
   struct cupertino_content_unavailable_descriptor desc;
   struct cupertino_content_unavailable_view *view = NULL;

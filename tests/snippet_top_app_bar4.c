@@ -1,4 +1,6 @@
+/* clang-format off */
 #include <string.h>
+/* clang-format on */
 
 static int test_top_app_bar_edge_cases4(void) {
   struct ui_top_app_bar_base *bar = NULL;

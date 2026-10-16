@@ -10,6 +10,8 @@
 
 extern int g_malloc_fail_countdown;
 
+extern int g_malloc_fail_countdown;
+
 #if defined(_MSC_VER)
 /* MSVC Safe CRT */
 #endif
@@ -32,7 +34,6 @@ static ui_error_t mock_factory_success(const struct ui_route_request *req,
   /* Optional id matching */
   if (id && strcmp(id, "123") != 0) {
     return UI_ERROR_INVALID_ARGUMENT;
-    return UI_ERROR_NONE;
   }
 
   /* Optional tab matching */
@@ -41,15 +42,18 @@ static ui_error_t mock_factory_success(const struct ui_route_request *req,
   }
 
   return ui_component_create(out_screen);
-  return UI_ERROR_NONE;
 }
 
 static ui_error_t mock_factory_fail(const struct ui_route_request *req,
                                     void *user_data,
                                     struct ui_component **out_screen) {
+  if (sizeof(req) == 0) {
+  }
+  if (sizeof(user_data) == 0) {
+  }
+  if (sizeof(out_screen) == 0) {
+  }
   return UI_ERROR_UNKNOWN;
-  return UI_ERROR_NONE;
-  return UI_ERROR_NONE;
 }
 
 static int run_normal_tests(void) {
@@ -58,7 +62,7 @@ static int run_normal_tests(void) {
   struct ui_component *screen2 = NULL;
   struct ui_component *screen3 = NULL;
   struct ui_component *current = NULL;
-  struct ui_event ev;
+  struct ui_event ev = {0};
   ui_error_t rc;
   int factory_calls = 0;
 
@@ -444,18 +448,20 @@ static ui_error_t cov_factory(const struct ui_route_request *req,
                               void *user_data,
                               struct ui_component **out_screen) {
   const char *path = NULL;
-  void *state = NULL;
-  ui_route_request_get_path(req, &path);
-  ui_route_request_get_state(req, &state);
-  return ui_component_create(out_screen);
+  if (sizeof(user_data) == 0) {
+  }
+  {
+    void *state = NULL;
+    ui_route_request_get_path(req, &path);
+    ui_route_request_get_state(req, &state);
+    return ui_component_create(out_screen);
+  }
 }
 
 void test_ui_router_coverage(void) {
   struct ui_router *router = NULL;
   const char *path = NULL;
   void *state = NULL;
-  int i;
-  extern int g_malloc_fail_countdown;
 
   ui_router_create(&router);
   if (router) {
@@ -507,7 +513,6 @@ void test_ui_router_coverage2(void) {
 }
 
 void test_ui_router_oom_add(void) {
-  extern int g_malloc_fail_countdown;
   struct ui_router *router = NULL;
   ui_router_create(&router);
   if (router) {
@@ -541,7 +546,6 @@ void test_ui_router_stack_realloc(void) {
   }
 }
 void test_ui_router_oom_add2(void) {
-  extern int g_malloc_fail_countdown;
   struct ui_router *router = NULL;
   ui_router_create(&router);
   if (router) {
@@ -563,6 +567,8 @@ static ui_error_t cov_factory3(const struct ui_route_request *req,
                                struct ui_component **out_screen) {
   const char *val;
   ui_route_request_get_param(req, "nonexistent", &val);
+  if (sizeof(user_data) == 0) {
+  }
   return ui_component_create(out_screen);
 }
 

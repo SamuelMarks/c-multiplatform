@@ -29,6 +29,7 @@ ui_error_t ui_swipe_action_base_init(struct ui_swipe_action_base *swipe_action,
 
 /* \brief ui_error
  */
+/** @brief ui_swipe_action_base_update function. */
 ui_error_t
 ui_swipe_action_base_update(struct ui_swipe_action_base *swipe_action,
                             float delta_x) {
@@ -48,6 +49,7 @@ ui_swipe_action_base_update(struct ui_swipe_action_base *swipe_action,
 
 /* \brief ui_error
  */
+/** @brief ui_swipe_action_base_commit function. */
 ui_error_t
 ui_swipe_action_base_commit(struct ui_swipe_action_base *swipe_action) {
   if (!swipe_action) {
@@ -68,6 +70,7 @@ ui_swipe_action_base_commit(struct ui_swipe_action_base *swipe_action) {
 
 /* \brief ui_error
  */
+/** @brief ui_swipe_action_base_reset function. */
 ui_error_t
 ui_swipe_action_base_reset(struct ui_swipe_action_base *swipe_action) {
   if (!swipe_action)
@@ -80,6 +83,7 @@ ui_swipe_action_base_reset(struct ui_swipe_action_base *swipe_action) {
 
 /* \brief ui_error
  */
+/** @brief ui_swipe_action_base_bind_disabled function. */
 ui_error_t
 ui_swipe_action_base_bind_disabled(struct ui_swipe_action_base *widget,
                                    struct ui_signal *disabled_signal) {
@@ -92,6 +96,7 @@ ui_swipe_action_base_bind_disabled(struct ui_swipe_action_base *widget,
 
 /* \brief ui_error
  */
+/** @brief ui_swipe_action_base_bind_text function. */
 ui_error_t ui_swipe_action_base_bind_text(struct ui_swipe_action_base *widget,
                                           struct ui_signal *text_signal) {
   if (!widget) {

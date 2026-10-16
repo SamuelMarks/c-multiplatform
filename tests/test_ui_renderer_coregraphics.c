@@ -36,11 +36,9 @@ int main(void) {
   struct ui_css_shadow shadow = {0};
   struct ui_path p = {0};
   struct ui_path_cmd cmds[6];
-  unsigned char buf[400];
   unsigned char pixel_buf[20 * 20 * 4];
   struct ui_font_manager *font_mgr = NULL;
   struct ui_font *font = NULL;
-  unsigned char dummy_font_data[64] = {0};
 
   if (ui_renderer_native_init(NULL) != UI_ERROR_INVALID_ARGUMENT) {
     fprintf(stderr, "Expected UI_ERROR_INVALID_ARGUMENT for NULL renderer\n");
@@ -65,13 +63,17 @@ int main(void) {
     FILE *f = fopen("/System/Library/Fonts/Supplemental/Andale Mono.ttf", "rb");
     if (f) {
       fseek(f, 0, SEEK_END);
-      long size = ftell(f);
-      fseek(f, 0, SEEK_SET);
-      unsigned char *font_data = malloc(size);
-      fread(font_data, 1, size, f);
-      fclose(f);
-      ui_font_manager_load_font_memory(font_mgr, font_data, size, &font);
-      /* free(font_data); -- let it leak, might be referenced */
+      {
+        long size = ftell(f);
+        fseek(f, 0, SEEK_SET);
+        {
+          unsigned char *font_data = malloc(size);
+          fread(font_data, 1, size, f);
+          fclose(f);
+          ui_font_manager_load_font_memory(font_mgr, font_data, size, &font);
+          /* free(font_data); -- let it leak, might be referenced */
+        }
+      }
     }
   }
 
@@ -182,123 +184,127 @@ int main(void) {
 
   /* Force context error for read_pixels by removing bitmap backing */
   renderer.vtable->begin_frame(renderer.ctx, 10, 10);
-  struct cg_context {
-    void *context;
-    float current_width;
-    float current_height;
-  } *cgc = (struct cg_context *)renderer.ctx;
-  if (cgc->context) {
-    /* Recreate context with no bitmap to hit the error.
-       We declare what we need locally. */
-    void *CGContextCreate(void *, size_t, size_t, size_t, size_t, void *,
-                          uint32_t);
-    void CGContextRelease(void *);
-
-    CGContextRelease(cgc->context);
-    cgc->context = CGContextCreate(NULL, 10, 10, 8, 40, NULL,
-                                   0); /* not bitmap, colorSpace=NULL */
-    if (cgc->context) {
-      renderer.vtable->read_pixels(renderer.ctx, pixel_buf);
-    }
-  }
-
-  /* Null checks at the end */
   {
-    /* Use a large zeroed buffer to simulate a struct ui_font where all fields
-     * are 0 */
-    void *fake_f = calloc(1, 8192);
-    renderer.vtable->draw_text(renderer.ctx, "test", (struct ui_font *)fake_f,
-                               &rect);
-
-    /* Set data to non-NULL but size to 0 to hit second branch of short-circuit
-     */
-    *(void **)((char *)fake_f + sizeof(void *)) =
-        (void *)1; /* stbtt_fontinfo is unknown size, so we can't easily guess
-                      the offset of data. Wait, actually I can just use a real
-                      font and set size=0 via mock! */
-    free(fake_f);
-  }
-
-  renderer.vtable->begin_frame(NULL, 10, 10);
-  renderer.vtable->end_frame(NULL);
-  renderer.vtable->draw_rect(NULL, &rect, &col);
-  renderer.vtable->draw_rect(renderer.ctx, NULL, &col);
-  renderer.vtable->draw_rect(renderer.ctx, &rect, NULL);
-  renderer.vtable->draw_path(NULL, &p, &col);
-  renderer.vtable->draw_path(renderer.ctx, NULL, &col);
-  renderer.vtable->draw_path(renderer.ctx, &p, NULL);
-  renderer.vtable->push_clip(NULL, &rect);
-  renderer.vtable->push_clip(renderer.ctx, NULL);
-  renderer.vtable->pop_clip(NULL);
-  renderer.vtable->set_blend_mode(NULL, UI_CSS_BLEND_MODE_NORMAL);
-  renderer.vtable->set_shadow(NULL, &shadow);
-  renderer.vtable->read_pixels(NULL, pixel_buf);
-  renderer.vtable->read_pixels(renderer.ctx, NULL);
-  renderer.vtable->draw_text(NULL, "test", font, &rect);
-  renderer.vtable->draw_text(renderer.ctx, NULL, font, &rect);
-  renderer.vtable->draw_text(renderer.ctx, "test", NULL, &rect);
-  renderer.vtable->draw_text(renderer.ctx, "test", font, NULL);
-
-  /* Null context checks */
-  {
-    struct cg_context_mock {
+    struct cg_context {
       void *context;
-      int current_width;
-      int current_height;
-    };
-    struct cg_context_mock *cgc = (struct cg_context_mock *)renderer.ctx;
-    void *tmp = cgc->context;
+      float current_width;
+      float current_height;
+    } *cgc = (struct cg_context *)renderer.ctx;
+    if (cgc->context) {
+      /* Recreate context with no bitmap to hit the error.
+         We declare what we need locally. */
+      void *CGContextCreate(void *, size_t, size_t, size_t, size_t, void *,
+                            uint32_t);
+      void CGContextRelease(void *);
 
-    renderer.vtable->begin_frame(renderer.ctx, 10, 10);
-    cgc->context = NULL;
-    renderer.vtable->end_frame(renderer.ctx);
-    renderer.vtable->draw_rect(renderer.ctx, &rect, &col);
-    renderer.vtable->draw_path(renderer.ctx, &p, &col);
-    renderer.vtable->push_clip(renderer.ctx, &rect);
-    renderer.vtable->pop_clip(renderer.ctx);
-    renderer.vtable->set_blend_mode(renderer.ctx, UI_CSS_BLEND_MODE_NORMAL);
-    renderer.vtable->set_shadow(renderer.ctx, &shadow);
-    renderer.vtable->read_pixels(renderer.ctx, pixel_buf);
-    renderer.vtable->draw_text(renderer.ctx, "test", font, &rect);
-    cgc->context = tmp;
+      CGContextRelease(cgc->context);
+      cgc->context = CGContextCreate(NULL, 10, 10, 8, 40, NULL,
+                                     0); /* not bitmap, colorSpace=NULL */
+      if (cgc->context) {
+        renderer.vtable->read_pixels(renderer.ctx, pixel_buf);
+      }
+    }
 
-    cgc->context = NULL;
-    renderer.vtable->begin_frame(renderer.ctx, 10, 10);
-    cgc->context = tmp;
-  }
+    /* Null checks at the end */
+    {
+      /* Use a large zeroed buffer to simulate a struct ui_font where all fields
+       * are 0 */
+      void *fake_f = calloc(1, 8192);
+      renderer.vtable->draw_text(renderer.ctx, "test", (struct ui_font *)fake_f,
+                                 &rect);
 
-  /* Cleanup */
-  if (renderer.vtable && renderer.vtable->destroy) {
-    renderer.vtable->destroy(NULL);
+      /* Set data to non-NULL but size to 0 to hit second branch of
+       * short-circuit
+       */
+      *(void **)((char *)fake_f + sizeof(void *)) =
+          (void *)1; /* stbtt_fontinfo is unknown size, so we can't easily guess
+                        the offset of data. Wait, actually I can just use a real
+                        font and set size=0 via mock! */
+      free(fake_f);
+    }
 
-    /* Call destroy with cgc->context = NULL to hit the missing branch */
+    renderer.vtable->begin_frame(NULL, 10, 10);
+    renderer.vtable->end_frame(NULL);
+    renderer.vtable->draw_rect(NULL, &rect, &col);
+    renderer.vtable->draw_rect(renderer.ctx, NULL, &col);
+    renderer.vtable->draw_rect(renderer.ctx, &rect, NULL);
+    renderer.vtable->draw_path(NULL, &p, &col);
+    renderer.vtable->draw_path(renderer.ctx, NULL, &col);
+    renderer.vtable->draw_path(renderer.ctx, &p, NULL);
+    renderer.vtable->push_clip(NULL, &rect);
+    renderer.vtable->push_clip(renderer.ctx, NULL);
+    renderer.vtable->pop_clip(NULL);
+    renderer.vtable->set_blend_mode(NULL, UI_CSS_BLEND_MODE_NORMAL);
+    renderer.vtable->set_shadow(NULL, &shadow);
+    renderer.vtable->read_pixels(NULL, pixel_buf);
+    renderer.vtable->read_pixels(renderer.ctx, NULL);
+    renderer.vtable->draw_text(NULL, "test", font, &rect);
+    renderer.vtable->draw_text(renderer.ctx, NULL, font, &rect);
+    renderer.vtable->draw_text(renderer.ctx, "test", NULL, &rect);
+    renderer.vtable->draw_text(renderer.ctx, "test", font, NULL);
+
+    /* Null context checks */
     {
       struct cg_context_mock {
         void *context;
         int current_width;
         int current_height;
       };
-      struct cg_context_mock *cgc = (struct cg_context_mock *)renderer.ctx;
-      if (cgc->context) {
-        void CGContextRelease(void *);
-        CGContextRelease(cgc->context);
-        memset(cgc, 0, sizeof(*cgc));
-        printf("MEMSET EXECUTED\n");
-      }
+      struct cg_context_mock *cgc_mock = (struct cg_context_mock *)renderer.ctx;
+      void *tmp = cgc_mock->context;
+
+      renderer.vtable->begin_frame(renderer.ctx, 10, 10);
+      cgc_mock->context = NULL;
+      renderer.vtable->end_frame(renderer.ctx);
+      renderer.vtable->draw_rect(renderer.ctx, &rect, &col);
+      renderer.vtable->draw_path(renderer.ctx, &p, &col);
+      renderer.vtable->push_clip(renderer.ctx, &rect);
+      renderer.vtable->pop_clip(renderer.ctx);
+      renderer.vtable->set_blend_mode(renderer.ctx, UI_CSS_BLEND_MODE_NORMAL);
+      renderer.vtable->set_shadow(renderer.ctx, &shadow);
+      renderer.vtable->read_pixels(renderer.ctx, pixel_buf);
+      renderer.vtable->draw_text(renderer.ctx, "test", font, &rect);
+      cgc_mock->context = tmp;
+
+      cgc_mock->context = NULL;
+      renderer.vtable->begin_frame(renderer.ctx, 10, 10);
+      cgc_mock->context = tmp;
     }
-    renderer.vtable->destroy(renderer.ctx);
-  }
 
-  /* One more for the non-null destroy */
-  {
-    struct ui_renderer renderer2;
-    ui_renderer_native_init(&renderer2);
-    renderer2.vtable->begin_frame(renderer2.ctx, 10, 10);
-    renderer2.vtable->destroy(renderer2.ctx);
-  }
+    /* Cleanup */
+    if (renderer.vtable && renderer.vtable->destroy) {
+      renderer.vtable->destroy(NULL);
 
-  printf("REACHED END OF TEST!\n");
-  return 0;
+      /* Call destroy with cgc->context = NULL to hit the missing branch */
+      {
+        struct cg_context_mock {
+          void *context;
+          int current_width;
+          int current_height;
+        };
+        struct cg_context_mock *cgc_mock =
+            (struct cg_context_mock *)renderer.ctx;
+        if (cgc_mock->context) {
+          void CGContextRelease(void *);
+          CGContextRelease(cgc_mock->context);
+          memset(cgc_mock, 0, sizeof(*cgc_mock));
+          printf("MEMSET EXECUTED\n");
+        }
+      }
+      renderer.vtable->destroy(renderer.ctx);
+    }
+
+    /* One more for the non-null destroy */
+    {
+      struct ui_renderer renderer2;
+      ui_renderer_native_init(&renderer2);
+      renderer2.vtable->begin_frame(renderer2.ctx, 10, 10);
+      renderer2.vtable->destroy(renderer2.ctx);
+    }
+
+    printf("REACHED END OF TEST!\n");
+    return 0;
+  }
 }
 #else
 int main(void) { return 0; }

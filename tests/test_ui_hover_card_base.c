@@ -5,6 +5,8 @@
 #include <stdlib.h>
 /* clang-format on */
 
+extern int g_hover_card_mock_fail;
+
 struct ui_hover_card_base {
   struct ui_component *component;
   struct ui_signal *open_signal;
@@ -156,7 +158,6 @@ static ui_error_t run_normal_tests(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_hover_card_mock_fail;
     g_hover_card_mock_fail = 1;
     rc = ui_hover_card_base_create(&card);
     if (rc != UI_ERROR_UNKNOWN)

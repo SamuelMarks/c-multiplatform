@@ -43,6 +43,7 @@ void cupertino_typography_mock_reset_token_count(void) {
 #endif
 
 static const struct cupertino_type_metrics
+    /** @brief g_base_metrics[CUPERTINO_TEXT_STYLE_COUNT] variable. */
     g_base_metrics[CUPERTINO_TEXT_STYLE_COUNT] = {
         {34.0f, 41.0f, 0.0f, 400, 1}, /* LARGE_TITLE */
         {28.0f, 34.0f, 0.0f, 400, 1}, /* TITLE1 */
@@ -57,6 +58,7 @@ static const struct cupertino_type_metrics
         {11.0f, 13.0f, 0.0f, 400, 0}  /* CAPTION2 */
 };
 
+/** @brief g_dt_multipliers[CUPERTINO_DYNAMIC_TYPE_SIZE_COUNT] variable. */
 static const float g_dt_multipliers[CUPERTINO_DYNAMIC_TYPE_SIZE_COUNT] = {
     0.8235f, /* XSMALL */
     0.8824f, /* SMALL */
@@ -72,6 +74,7 @@ static const float g_dt_multipliers[CUPERTINO_DYNAMIC_TYPE_SIZE_COUNT] = {
     3.1176f  /* AX5 */
 };
 
+/** @brief g_style_names[CUPERTINO_TEXT_STYLE_COUNT] variable. */
 static const char *const g_style_names[CUPERTINO_TEXT_STYLE_COUNT] = {
     "large-title", "title1",      "title2",   "title3",   "headline", "body",
     "callout",     "subheadline", "footnote", "caption1", "caption2"};
@@ -206,7 +209,7 @@ cupertino_typography_apply_tokens(struct ui_design_token_dict *dict) {
 #if defined(_MSC_VER)
     sprintf_s(buf, sizeof(buf), "--apple-typescale-%s-size", g_style_names[i]);
 #else
-    snprintf(buf, sizeof(buf), "--apple-typescale-%s-size", g_style_names[i]);
+    sprintf(buf, "--apple-typescale-%s-size", g_style_names[i]);
 #endif
     rc = ui_design_token_set_number(dict, buf, metrics.point_size);
     if (rc != UI_ERROR_NONE) {
@@ -217,8 +220,7 @@ cupertino_typography_apply_tokens(struct ui_design_token_dict *dict) {
     sprintf_s(buf, sizeof(buf), "--apple-typescale-%s-leading",
               g_style_names[i]);
 #else
-    snprintf(buf, sizeof(buf), "--apple-typescale-%s-leading",
-             g_style_names[i]);
+    sprintf(buf, "--apple-typescale-%s-leading", g_style_names[i]);
 #endif
     rc = ui_design_token_set_number(dict, buf, metrics.leading);
     if (rc != UI_ERROR_NONE) {
@@ -229,8 +231,7 @@ cupertino_typography_apply_tokens(struct ui_design_token_dict *dict) {
     sprintf_s(buf, sizeof(buf), "--apple-typescale-%s-tracking",
               g_style_names[i]);
 #else
-    snprintf(buf, sizeof(buf), "--apple-typescale-%s-tracking",
-             g_style_names[i]);
+    sprintf(buf, "--apple-typescale-%s-tracking", g_style_names[i]);
 #endif
     rc = ui_design_token_set_number(dict, buf, metrics.tracking);
     if (rc != UI_ERROR_NONE) {
@@ -241,7 +242,7 @@ cupertino_typography_apply_tokens(struct ui_design_token_dict *dict) {
     sprintf_s(buf, sizeof(buf), "--apple-typescale-%s-weight",
               g_style_names[i]);
 #else
-    snprintf(buf, sizeof(buf), "--apple-typescale-%s-weight", g_style_names[i]);
+    sprintf(buf, "--apple-typescale-%s-weight", g_style_names[i]);
 #endif
     rc = ui_design_token_set_number(dict, buf, (float)metrics.weight);
     if (rc != UI_ERROR_NONE) {

@@ -14,12 +14,15 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
+/** @brief CUPERTINO_SHAREPLAY_PILL_HEIGHT constant. */
 #define CUPERTINO_SHAREPLAY_PILL_HEIGHT 36.0f
+/** @brief CUPERTINO_SHAREPLAY_BASE_WIDTH constant. */
 #define CUPERTINO_SHAREPLAY_BASE_WIDTH 120.0f
+/** @brief CUPERTINO_SHAREPLAY_WAVE_COUNT constant. */
 #define CUPERTINO_SHAREPLAY_WAVE_COUNT 3
 
 /**
@@ -48,14 +51,17 @@ struct cupertino_shareplay_descriptor {
  * @brief SharePlay indicator pill instance wrapping ui_avatar_group_base.
  */
 struct cupertino_shareplay_control {
-  struct ui_avatar_group_base *avatar_group;
-  int is_session_active;
-  int participant_count;
-  float wave_time;
-  float wave_heights[CUPERTINO_SHAREPLAY_WAVE_COUNT];
-  enum cupertino_shareplay_action last_action;
-  float width;
-  float height;
+  struct ui_avatar_group_base *avatar_group; /**< avatar_group field. */
+  int is_session_active;                     /**< is_session_active field. */
+  int participant_count;                     /**< participant_count field. */
+  float wave_time;                           /**< wave_time field. */
+  float wave_heights
+      [CUPERTINO_SHAREPLAY_WAVE_COUNT];        /**<
+                                                  wave_heights[CUPERTINO_SHAREPLAY_WAVE_COUNT]
+                                                  field. */
+  enum cupertino_shareplay_action last_action; /**< last_action field. */
+  float width;                                 /**< width field. */
+  float height;                                /**< height field. */
 };
 
 /**

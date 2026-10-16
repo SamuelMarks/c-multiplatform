@@ -176,7 +176,7 @@ int main(void) {
 
   /* Test push_event directly */
   {
-    struct ui_event custom_ev;
+    struct ui_event custom_ev = {0};
     rc = ui_e2e_headless_push_event(NULL, &custom_ev);
     if (rc != UI_ERROR_INVALID_ARGUMENT)
       return 1;

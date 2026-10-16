@@ -174,6 +174,7 @@ typedef ptrdiff_t GLintptr;
 #if defined(UI_TEST_MOCK_ALLOC) ||                                             \
     (!defined(_WIN32) && !defined(__APPLE__) && !defined(__EMSCRIPTEN__) &&    \
      !defined(HAVE_GLES2) && !defined(HAVE_OPENGL))
+/** @brief HAS_GLES2_MOCK macro definition. */
 #define HAS_GLES2_MOCK 1
 
 #ifdef UI_TEST_MOCK_ALLOC
@@ -196,6 +197,7 @@ static void *mock_CGLGetCurrentContext(void) {
 #endif
 #endif
 
+/** @brief mock_glCreateProgram function. */
 static unsigned int mock_glCreateProgram(void) {
 #ifdef UI_TEST_MOCK_ALLOC
   if (g_mock_gles2_create_program_fail) {
@@ -205,6 +207,7 @@ static unsigned int mock_glCreateProgram(void) {
   return 1;
 }
 
+/** @brief mock_glCreateShader function. */
 static unsigned int mock_glCreateShader(unsigned int type) {
   unsigned int unused = type;
   type = unused;
@@ -221,22 +224,26 @@ static unsigned int mock_glCreateShader(unsigned int type) {
   return 1;
 }
 
+/** @brief mock_glAttachShader function. */
 static void mock_glAttachShader(unsigned int p, unsigned int s) {
   unsigned int u1 = p, u2 = s;
   p = u1;
   s = u2;
 }
 
+/** @brief mock_glLinkProgram function. */
 static void mock_glLinkProgram(unsigned int p) {
   unsigned int u = p;
   p = u;
 }
 
+/** @brief mock_glDeleteShader function. */
 static void mock_glDeleteShader(unsigned int s) {
   unsigned int u = s;
   s = u;
 }
 
+/** @brief mock_glGetAttribLocation function. */
 static int mock_glGetAttribLocation(unsigned int p, const char *n) {
   unsigned int u = p;
   const char *un = n;
@@ -245,6 +252,7 @@ static int mock_glGetAttribLocation(unsigned int p, const char *n) {
   return 1;
 }
 
+/** @brief mock_glGetUniformLocation function. */
 static int mock_glGetUniformLocation(unsigned int p, const char *n) {
   unsigned int u = p;
   const char *un = n;
@@ -253,17 +261,20 @@ static int mock_glGetUniformLocation(unsigned int p, const char *n) {
   return 1;
 }
 
+/** @brief mock_glGenBuffers function. */
 static void mock_glGenBuffers(int n, unsigned int *b) {
   int un = n;
   n = un;
   *b = 1;
 }
 
+/** @brief mock_glDeleteProgram function. */
 static void mock_glDeleteProgram(unsigned int p) {
   unsigned int u = p;
   p = u;
 }
 
+/** @brief mock_glDeleteBuffers function. */
 static void mock_glDeleteBuffers(int n, const unsigned int *b) {
   int un = n;
   const unsigned int *ub = b;
@@ -271,11 +282,13 @@ static void mock_glDeleteBuffers(int n, const unsigned int *b) {
   b = ub;
 }
 
+/** @brief mock_glUseProgram function. */
 static void mock_glUseProgram(unsigned int p) {
   unsigned int u = p;
   p = u;
 }
 
+/** @brief mock_glUniform2f function. */
 static void mock_glUniform2f(int l, float v0, float v1) {
   int ul = l;
   float uv0 = v0, uv1 = v1;
@@ -284,12 +297,14 @@ static void mock_glUniform2f(int l, float v0, float v1) {
   v1 = uv1;
 }
 
+/** @brief mock_glBindBuffer function. */
 static void mock_glBindBuffer(unsigned int t, unsigned int b) {
   unsigned int ut = t, ub = b;
   t = ut;
   b = ub;
 }
 
+/** @brief mock_glBufferData function. */
 static void mock_glBufferData(unsigned int t, GLsizeiptr s, const void *d,
                               unsigned int u) {
   unsigned int ut = t, uu = u;
@@ -301,11 +316,13 @@ static void mock_glBufferData(unsigned int t, GLsizeiptr s, const void *d,
   d = ud;
 }
 
+/** @brief mock_glEnableVertexAttribArray function. */
 static void mock_glEnableVertexAttribArray(unsigned int i) {
   unsigned int ui = i;
   i = ui;
 }
 
+/** @brief mock_glVertexAttribPointer function. */
 static void mock_glVertexAttribPointer(unsigned int i, int s, unsigned int t,
                                        unsigned char n, int st,
                                        const void *p) {
@@ -321,6 +338,7 @@ static void mock_glVertexAttribPointer(unsigned int i, int s, unsigned int t,
   p = up;
 }
 
+/** @brief mock_glDrawElements function. */
 static void mock_glDrawElements(unsigned int m, int c, unsigned int t,
                                 const void *p) {
   unsigned int um = m, ut = t;
@@ -332,11 +350,13 @@ static void mock_glDrawElements(unsigned int m, int c, unsigned int t,
   p = up;
 }
 
+/** @brief mock_glDisableVertexAttribArray function. */
 static void mock_glDisableVertexAttribArray(unsigned int i) {
   unsigned int ui = i;
   i = ui;
 }
 
+/** @brief mock_glShaderSource function. */
 static void mock_glShaderSource(unsigned int s, int c,
                                 const char *const *str, const int *l) {
   unsigned int us = s;
@@ -349,11 +369,13 @@ static void mock_glShaderSource(unsigned int s, int c,
   l = ul;
 }
 
+/** @brief mock_glCompileShader function. */
 static void mock_glCompileShader(unsigned int s) {
   unsigned int us = s;
   s = us;
 }
 
+/** @brief mock_glGetShaderiv function. */
 static void mock_glGetShaderiv(unsigned int s, unsigned int p, int *r) {
   unsigned int us = s, up = p;
   s = us;
@@ -367,6 +389,7 @@ static void mock_glGetShaderiv(unsigned int s, unsigned int p, int *r) {
   *r = 1;
 }
 
+/** @brief mock_glViewport function. */
 static void mock_glViewport(int x, int y, int w, int h) {
   int ux = x, uy = y, uw = w, uh = h;
   x = ux;
@@ -375,6 +398,7 @@ static void mock_glViewport(int x, int y, int w, int h) {
   h = uh;
 }
 
+/** @brief mock_glClearColor function. */
 static void mock_glClearColor(float r, float g, float b, float a) {
   float ur = r, ug = g, ub = b, ua = a;
   r = ur;
@@ -383,11 +407,13 @@ static void mock_glClearColor(float r, float g, float b, float a) {
   a = ua;
 }
 
+/** @brief mock_glClear function. */
 static void mock_glClear(unsigned int m) {
   unsigned int um = m;
   m = um;
 }
 
+/** @brief mock_glReadPixels function. */
 static void mock_glReadPixels(int x, int y, int w, int h, unsigned int f,
                               unsigned int t, void *d) {
   int ux = x, uy = y, uw = w, uh = h;
@@ -403,54 +429,79 @@ static void mock_glReadPixels(int x, int y, int w, int h, unsigned int f,
 }
 
 #undef glCreateProgram
+/** @brief glCreateProgram macro definition. */
 #define glCreateProgram mock_glCreateProgram
 #undef glCreateShader
+/** @brief glCreateShader macro definition. */
 #define glCreateShader mock_glCreateShader
 #undef glAttachShader
+/** @brief glAttachShader macro definition. */
 #define glAttachShader mock_glAttachShader
 #undef glLinkProgram
+/** @brief glLinkProgram macro definition. */
 #define glLinkProgram mock_glLinkProgram
 #undef glDeleteShader
+/** @brief glDeleteShader macro definition. */
 #define glDeleteShader mock_glDeleteShader
 #undef glGetAttribLocation
+/** @brief glGetAttribLocation macro definition. */
 #define glGetAttribLocation mock_glGetAttribLocation
 #undef glGetUniformLocation
+/** @brief glGetUniformLocation macro definition. */
 #define glGetUniformLocation mock_glGetUniformLocation
 #undef glGenBuffers
+/** @brief glGenBuffers macro definition. */
 #define glGenBuffers mock_glGenBuffers
 #undef glDeleteProgram
+/** @brief glDeleteProgram macro definition. */
 #define glDeleteProgram mock_glDeleteProgram
 #undef glDeleteBuffers
+/** @brief glDeleteBuffers macro definition. */
 #define glDeleteBuffers mock_glDeleteBuffers
 #undef glUseProgram
+/** @brief glUseProgram macro definition. */
 #define glUseProgram mock_glUseProgram
 #undef glUniform2f
+/** @brief glUniform2f macro definition. */
 #define glUniform2f mock_glUniform2f
 #undef glBindBuffer
+/** @brief glBindBuffer macro definition. */
 #define glBindBuffer mock_glBindBuffer
 #undef glBufferData
+/** @brief glBufferData macro definition. */
 #define glBufferData mock_glBufferData
 #undef glEnableVertexAttribArray
+/** @brief glEnableVertexAttribArray macro definition. */
 #define glEnableVertexAttribArray mock_glEnableVertexAttribArray
 #undef glVertexAttribPointer
+/** @brief glVertexAttribPointer macro definition. */
 #define glVertexAttribPointer mock_glVertexAttribPointer
 #undef glDrawElements
+/** @brief glDrawElements macro definition. */
 #define glDrawElements mock_glDrawElements
 #undef glDisableVertexAttribArray
+/** @brief glDisableVertexAttribArray macro definition. */
 #define glDisableVertexAttribArray mock_glDisableVertexAttribArray
 #undef glShaderSource
+/** @brief glShaderSource macro definition. */
 #define glShaderSource mock_glShaderSource
 #undef glCompileShader
+/** @brief glCompileShader macro definition. */
 #define glCompileShader mock_glCompileShader
 #undef glGetShaderiv
+/** @brief glGetShaderiv macro definition. */
 #define glGetShaderiv mock_glGetShaderiv
 #undef glViewport
+/** @brief glViewport macro definition. */
 #define glViewport mock_glViewport
 #undef glClearColor
+/** @brief glClearColor macro definition. */
 #define glClearColor mock_glClearColor
 #undef glClear
+/** @brief glClear macro definition. */
 #define glClear mock_glClear
 #undef glReadPixels
+/** @brief glReadPixels macro definition. */
 #define glReadPixels mock_glReadPixels
 #endif
 
@@ -1336,6 +1387,7 @@ static ui_error_t gles2_draw_texture(struct ui_renderer_backend *backend,
   return gles2_draw_rect(backend, x, y, width, height, color);
 }
 
+/** @brief gles2_draw_text function. */
 static ui_error_t gles2_draw_text(struct ui_renderer_backend *backend,
                                   const char *text, const struct ui_font *f,
                                   float x, float y, float font_size,

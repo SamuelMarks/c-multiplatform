@@ -400,17 +400,33 @@ TEST test_backend_handle_hook(void) {
   }
 
   /* Create actual window and retrieve native OS handle */
-  if (getenv("WINELOADER") != NULL) {
-    printf("Skipping actual window creation under Wine CI.\n");
-    rc = backend->destroy_window(backend, window);
-#if defined(__APPLE__) && defined(__MACH__)
-    ui_window_backend_macos_destroy(backend);
-#elif defined(_WIN32) || defined(__CYGWIN__)
-    ui_window_backend_win32_destroy(backend);
-#elif defined(__linux__) || defined(__unix__)
-    ui_window_backend_linux_destroy(backend);
+  {
+    int is_wine = 0;
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+    char *wine_env = NULL;
+    size_t wine_len = 0;
+    if (_dupenv_s(&wine_env, &wine_len, "WINELOADER") == 0 &&
+        wine_env != NULL) {
+      is_wine = 1;
+      free(wine_env);
+    }
+#else
+    if (getenv("WINELOADER") != NULL) {
+      is_wine = 1;
+    }
 #endif
-    PASS();
+    if (is_wine) {
+      printf("Skipping actual window creation under Wine CI.\n");
+      rc = backend->destroy_window(backend, window);
+#if defined(__APPLE__) && defined(__MACH__)
+      ui_window_backend_macos_destroy(backend);
+#elif defined(_WIN32) || defined(__CYGWIN__)
+      ui_window_backend_win32_destroy(backend);
+#elif defined(__linux__) || defined(__unix__)
+      ui_window_backend_linux_destroy(backend);
+#endif
+      PASS();
+    }
   }
 
   rc = backend->create_window(backend, "Hook Test Window", 800, 600, &window);

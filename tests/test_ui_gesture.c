@@ -5,6 +5,8 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_gesture_mock_fail;
+
 struct ui_gesture_recognizer {
   int is_tracking;
   int start_x;
@@ -30,7 +32,7 @@ extern int g_malloc_fail_countdown;
 
 static void test_gesture_basic(void) {
   struct ui_gesture_recognizer *r = NULL;
-  struct ui_event ev;
+  struct ui_event ev = {0};
   struct ui_gesture_event gev;
   ui_error_t rc;
 
@@ -226,7 +228,6 @@ static void test_gesture_tap_touch(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_gesture_mock_fail;
     /* Test reset error during touch end */
     ev.type = UI_EVENT_TOUCH_START;
     ev.event_data.touch.num_points = 1;
@@ -666,14 +667,16 @@ static void test_gesture_pan_long_press(void) {
 
   /* Cancel */
   ev.type = UI_EVENT_TOUCH_CANCEL;
-  ui_error_t leave_rc =
-      ui_gesture_recognizer_process_event(r, &ev, 700.0, &gev);
-  printf("Cancel gev.type = %d rc=%d\n", gev.type, leave_rc);
-  assert(gev.type == UI_GESTURE_LONG_PRESS);
-
   {
-    ui_error_t rc_cleanup = ui_gesture_recognizer_destroy(r);
-    assert(rc_cleanup == UI_ERROR_NONE);
+    ui_error_t leave_rc =
+        ui_gesture_recognizer_process_event(r, &ev, 700.0, &gev);
+    printf("Cancel gev.type = %d rc=%d\n", gev.type, leave_rc);
+    assert(gev.type == UI_GESTURE_LONG_PRESS);
+
+    {
+      ui_error_t rc_cleanup = ui_gesture_recognizer_destroy(r);
+      assert(rc_cleanup == UI_ERROR_NONE);
+    }
   }
 }
 

@@ -10,6 +10,10 @@
 #include "ui_form_control.h"
 /* clang-format on */
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 /** @def UI_FORM_MAX_DEPTH
  * @brief Maximum depth for form node
  */
@@ -43,8 +47,11 @@ ui_error_t _ui_form_group_get_status_internal(struct ui_form_group *group,
  * @param depth The current recursion depth.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t _ui_form_array_get_status_internal(struct ui_form_array *array,
-                                              enum ui_form_status *out_status,
-                                              size_t depth);
+extern ui_error_t _ui_form_array_get_status_internal(
+    struct ui_form_array *array, enum ui_form_status *out_status, size_t depth);
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 #endif /* UI_FORM_NODE_INTERNAL_H */

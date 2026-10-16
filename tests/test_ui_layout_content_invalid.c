@@ -188,25 +188,27 @@ static void test_oom_loop(void) {
   ui_css_rule_append_declaration(rule, "width", "10px", 0);
   ui_css_stylesheet_append_rule(sheet, rule);
 
-  int oom_cnt;
-  for (oom_cnt = 0; oom_cnt < 200; oom_cnt++) {
-    struct ui_layout_node *lroot = NULL;
+  {
+    int oom_cnt;
+    for (oom_cnt = 0; oom_cnt < 200; oom_cnt++) {
+      struct ui_layout_node *lroot = NULL;
 
-    ui_error_t rc = ui_layout_tree_generate(root, sheet, &lroot);
-    if (rc == UI_ERROR_NONE && lroot) {
-      g_malloc_fail_countdown = oom_cnt;
-      ui_layout_compute(lroot, 100.0f, 100.0f);
-      ui_layout_sanity_check(lroot);
-      g_malloc_fail_countdown = -1;
-      ui_layout_tree_destroy(lroot);
-    } else if (lroot) {
-      ui_layout_tree_destroy(lroot);
+      ui_error_t rc = ui_layout_tree_generate(root, sheet, &lroot);
+      if (rc == UI_ERROR_NONE && lroot) {
+        g_malloc_fail_countdown = oom_cnt;
+        ui_layout_compute(lroot, 100.0f, 100.0f);
+        ui_layout_sanity_check(lroot);
+        g_malloc_fail_countdown = -1;
+        ui_layout_tree_destroy(lroot);
+      } else if (lroot) {
+        ui_layout_tree_destroy(lroot);
+      }
     }
-  }
-  g_malloc_fail_countdown = -1;
+    g_malloc_fail_countdown = -1;
 
-  ui_css_stylesheet_destroy(sheet);
-  ui_dom_node_destroy(root);
+    ui_css_stylesheet_destroy(sheet);
+    ui_dom_node_destroy(root);
+  }
 }
 
 static void test_clamp_negative_content(void) {

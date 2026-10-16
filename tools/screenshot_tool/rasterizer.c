@@ -439,11 +439,11 @@ static float rounded_box_sdf(float px, float py, float cx, float cy,
   if (r < 0.0f)
     r = 0.0f;
 
-  qx = fabsf(px - cx) - (half_w - r);
-  qy = fabsf(py - cy) - (half_h - r);
+  qx = (float)fabs((double)(px - cx)) - (half_w - r);
+  qy = (float)fabs((double)(py - cy)) - (half_h - r);
 
   if (qx > 0.0f && qy > 0.0f) {
-    return sqrtf(qx * qx + qy * qy) - r;
+    return (float)sqrt((double)(qx * qx + qy * qy)) - r;
   }
   return (qx > qy ? qx : qy) - r;
 }
@@ -476,10 +476,10 @@ ui_error_t draw_rounded_rect(struct canvas *c, float x, float y, float w,
   half_w = w * 0.5f;
   half_h = h * 0.5f;
 
-  min_x = (int)floorf(x - 1.0f);
-  max_x = (int)ceilf(x + w + 1.0f);
-  min_y = (int)floorf(y - 1.0f);
-  max_y = (int)ceilf(y + h + 1.0f);
+  min_x = (int)floor((double)(x - 1.0f));
+  max_x = (int)ceil((double)(x + w + 1.0f));
+  min_y = (int)floor((double)(y - 1.0f));
+  max_y = (int)ceil((double)(y + h + 1.0f));
 
   if (min_x < 0)
     min_x = 0;
@@ -534,10 +534,10 @@ ui_error_t draw_rounded_rect_stroke(struct canvas *c, float x, float y, float w,
   half_w = w * 0.5f;
   half_h = h * 0.5f;
 
-  min_x = (int)floorf(x - stroke_width - 1.0f);
-  max_x = (int)ceilf(x + w + stroke_width + 1.0f);
-  min_y = (int)floorf(y - stroke_width - 1.0f);
-  max_y = (int)ceilf(y + h + stroke_width + 1.0f);
+  min_x = (int)floor((double)(x - stroke_width - 1.0f));
+  max_x = (int)ceil((double)(x + w + stroke_width + 1.0f));
+  min_y = (int)floor((double)(y - stroke_width - 1.0f));
+  max_y = (int)ceil((double)(y + h + stroke_width + 1.0f));
 
   if (min_x < 0)
     min_x = 0;
@@ -552,7 +552,7 @@ ui_error_t draw_rounded_rect_stroke(struct canvas *c, float x, float y, float w,
     for (px = min_x; px < max_x; ++px) {
       float dist = rounded_box_sdf((float)px + 0.5f, (float)py + 0.5f, cx, cy,
                                    half_w, half_h, radius);
-      float d_stroke = fabsf(dist) - stroke_width * 0.5f;
+      float d_stroke = (float)fabs((double)dist) - stroke_width * 0.5f;
       float cov = 0.5f - d_stroke;
       if (cov > 1.0f)
         cov = 1.0f;
@@ -616,10 +616,10 @@ ui_error_t draw_shadow(struct canvas *c, float x, float y, float w, float h,
   half_w = w * 0.5f;
   half_h = h * 0.5f;
 
-  min_x = (int)floorf(x - blur * 2.0f);
-  max_x = (int)ceilf(x + w + blur * 2.0f);
-  min_y = (int)floorf(y + dy - blur * 2.0f);
-  max_y = (int)ceilf(y + h + dy + blur * 2.0f);
+  min_x = (int)floor((double)(x - blur * 2.0f));
+  max_x = (int)ceil((double)(x + w + blur * 2.0f));
+  min_y = (int)floor((double)(y + dy - blur * 2.0f));
+  max_y = (int)ceil((double)(y + h + dy + blur * 2.0f));
 
   if (min_x < 0)
     min_x = 0;
@@ -638,7 +638,7 @@ ui_error_t draw_shadow(struct canvas *c, float x, float y, float w, float h,
       if (dist <= 0.0f) {
         cov = 1.0f;
       } else {
-        cov = expf(-(dist * dist) / two_sigma_sq);
+        cov = (float)exp((double)(-(dist * dist) / two_sigma_sq));
       }
       if (cov > 0.005f) {
         blend_pixel(c, px, py, 0, 0, 0, cov, shadow_alpha);
@@ -670,10 +670,10 @@ ui_error_t draw_circle(struct canvas *c, float cx, float cy, float radius,
   g = (unsigned char)UI_COLOR_GREEN(color);
   b = (unsigned char)UI_COLOR_BLUE(color);
 
-  min_x = (int)floorf(cx - radius - 1.0f);
-  max_x = (int)ceilf(cx + radius + 1.0f);
-  min_y = (int)floorf(cy - radius - 1.0f);
-  max_y = (int)ceilf(cy + radius + 1.0f);
+  min_x = (int)floor((double)(cx - radius - 1.0f));
+  max_x = (int)ceil((double)(cx + radius + 1.0f));
+  min_y = (int)floor((double)(cy - radius - 1.0f));
+  max_y = (int)ceil((double)(cy + radius + 1.0f));
 
   if (min_x < 0)
     min_x = 0;
@@ -688,7 +688,7 @@ ui_error_t draw_circle(struct canvas *c, float cx, float cy, float radius,
     for (px = min_x; px < max_x; ++px) {
       float dx = (float)px + 0.5f - cx;
       float dy = (float)py + 0.5f - cy;
-      float dist = sqrtf(dx * dx + dy * dy) - radius;
+      float dist = (float)sqrt((double)(dx * dx + dy * dy)) - radius;
       float cov = 0.5f - dist;
       if (cov > 1.0f)
         cov = 1.0f;
@@ -723,10 +723,10 @@ ui_error_t draw_circle_stroke(struct canvas *c, float cx, float cy,
   g = (unsigned char)UI_COLOR_GREEN(color);
   b = (unsigned char)UI_COLOR_BLUE(color);
 
-  min_x = (int)floorf(cx - radius - stroke_width - 1.0f);
-  max_x = (int)ceilf(cx + radius + stroke_width + 1.0f);
-  min_y = (int)floorf(cy - radius - stroke_width - 1.0f);
-  max_y = (int)ceilf(cy + radius + stroke_width + 1.0f);
+  min_x = (int)floor((double)(cx - radius - stroke_width - 1.0f));
+  max_x = (int)ceil((double)(cx + radius + stroke_width + 1.0f));
+  min_y = (int)floor((double)(cy - radius - stroke_width - 1.0f));
+  max_y = (int)ceil((double)(cy + radius + stroke_width + 1.0f));
 
   if (min_x < 0)
     min_x = 0;
@@ -742,7 +742,9 @@ ui_error_t draw_circle_stroke(struct canvas *c, float cx, float cy,
       float dx = (float)px + 0.5f - cx;
       float dy = (float)py + 0.5f - cy;
       float dist =
-          fabsf(sqrtf(dx * dx + dy * dy) - radius) - stroke_width * 0.5f;
+          (float)fabs(
+              (double)((float)sqrt((double)(dx * dx + dy * dy)) - radius)) -
+          stroke_width * 0.5f;
       float cov = 0.5f - dist;
       if (cov > 1.0f)
         cov = 1.0f;
@@ -777,10 +779,10 @@ ui_error_t draw_line(struct canvas *c, float x0, float y0, float x1, float y1,
   g = (unsigned char)UI_COLOR_GREEN(color);
   b = (unsigned char)UI_COLOR_BLUE(color);
 
-  min_x = (int)floorf((x0 < x1 ? x0 : x1) - width - 1.0f);
-  max_x = (int)ceilf((x0 > x1 ? x0 : x1) + width + 1.0f);
-  min_y = (int)floorf((y0 < y1 ? y0 : y1) - width - 1.0f);
-  max_y = (int)ceilf((y0 > y1 ? y0 : y1) + width + 1.0f);
+  min_x = (int)floor((double)((x0 < x1 ? x0 : x1) - width - 1.0f));
+  max_x = (int)ceil((double)((x0 > x1 ? x0 : x1) + width + 1.0f));
+  min_y = (int)floor((double)((y0 < y1 ? y0 : y1) - width - 1.0f));
+  max_y = (int)ceil((double)((y0 > y1 ? y0 : y1) + width + 1.0f));
 
   if (min_x < 0)
     min_x = 0;
@@ -815,7 +817,7 @@ ui_error_t draw_line(struct canvas *c, float x0, float y0, float x1, float y1,
         dist_sq = qx * qx + qy * qy;
       }
       {
-        float dist = sqrtf(dist_sq) - width * 0.5f;
+        float dist = (float)sqrt((double)dist_sq) - width * 0.5f;
         float cov = 0.5f - dist;
         if (cov > 1.0f)
           cov = 1.0f;
@@ -971,8 +973,10 @@ ui_error_t draw_text(struct canvas *c, float x, float y, const char *text,
               unsigned char alpha_b = bitmap[row * gw + col];
               if (alpha_b > 0) {
                 float cov = (float)alpha_b / 255.0f;
-                int dst_x = (int)floorf(cur_x + (float)x0 + (float)col);
-                int dst_y = (int)floorf(baseline_y + (float)y0 + (float)row);
+                int dst_x =
+                    (int)floor((double)(cur_x + (float)x0 + (float)col));
+                int dst_y =
+                    (int)floor((double)(baseline_y + (float)y0 + (float)row));
                 blend_pixel(c, dst_x, dst_y, r, g, b, cov, alpha_mult);
               }
             }
@@ -1010,10 +1014,10 @@ ui_error_t draw_text(struct canvas *c, float x, float y, const char *text,
           float py = y + (float)row * scale;
           float px1 = px + scale;
           float py1 = py + scale;
-          int min_px = (int)floorf(px);
-          int max_px = (int)ceilf(px1);
-          int min_py = (int)floorf(py);
-          int max_py = (int)ceilf(py1);
+          int min_px = (int)floor((double)px);
+          int max_px = (int)ceil((double)px1);
+          int min_py = (int)floor((double)py);
+          int max_py = (int)ceil((double)py1);
           int ix, iy;
 
           for (iy = min_py; iy < max_py; ++iy) {
@@ -1224,12 +1228,12 @@ ui_error_t draw_icon(struct canvas *c, float cx, float cy, enum icon_type type,
       float a0 = -1.5707963f + (float)k * 1.256637f;
       float a1 = a0 + 0.6283185f;
       float a2 = a0 + 1.256637f;
-      float x0 = cx + cosf(a0) * r_out;
-      float y0 = cy + sinf(a0) * r_out;
-      float x1 = cx + cosf(a1) * r_in;
-      float y1 = cy + sinf(a1) * r_in;
-      float x2 = cx + cosf(a2) * r_out;
-      float y2 = cy + sinf(a2) * r_out;
+      float x0 = cx + (float)cos((double)a0) * r_out;
+      float y0 = cy + (float)sin((double)a0) * r_out;
+      float x1 = cx + (float)cos((double)a1) * r_in;
+      float y1 = cy + (float)sin((double)a1) * r_in;
+      float x2 = cx + (float)cos((double)a2) * r_out;
+      float y2 = cy + (float)sin((double)a2) * r_out;
       rc = draw_line(c, x0, y0, x1, y1, stroke, color);
       if (rc != UI_ERROR_NONE)
         return rc;

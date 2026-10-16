@@ -49,6 +49,7 @@ static ui_error_t mock_slider_base_destroy(struct ui_slider_base *s) {
 /** @endcond */
 #endif
 
+/** @brief cupertino_slider_cva_write_value function. */
 static ui_error_t
 cupertino_slider_cva_write_value(void *component,
                                  union ui_signal_payload value) {
@@ -62,6 +63,7 @@ cupertino_slider_cva_write_value(void *component,
   return cupertino_slider_set_value(slider, value.float_val);
 }
 
+/** @brief cupertino_slider_cva_set_disabled_state function. */
 static ui_error_t
 cupertino_slider_cva_set_disabled_state(void *component,
                                         ui_bool_t is_disabled) {

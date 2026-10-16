@@ -9,6 +9,8 @@
 #include <math.h>
 /* clang-format on */
 
+extern int g_cupertino_squircle_mock_denom_zero;
+
 SUITE(cupertino_squircle_suite);
 
 TEST test_squircle_point_at(void) {
@@ -77,7 +79,6 @@ TEST test_squircle_point_at(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_cupertino_squircle_mock_denom_zero;
     g_cupertino_squircle_mock_denom_zero = 1;
     rc = cupertino_squircle_point_at(10.0f, 10.0f, 4.0f, 0.78539816f, &x, &y);
     ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);

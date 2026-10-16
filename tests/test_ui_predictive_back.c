@@ -139,7 +139,7 @@ static int test_predictive_back_gesture(void) {
 
 static int test_predictive_back_nulls_and_oom(void) {
   struct ui_predictive_back *t = NULL;
-  struct ui_event ev;
+  struct ui_event ev = {0};
   struct ui_signal *sig = (struct ui_signal *)0x123;
 
   if (ui_predictive_back_create(NULL) != UI_ERROR_INVALID_ARGUMENT)

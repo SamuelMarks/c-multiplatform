@@ -54,7 +54,6 @@ static ui_error_t test_button_group_base(void) {
   if (rc != UI_ERROR_NONE) {
     fprintf(stderr, "ui_button_group_base_create failed\n");
     return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
-    return UI_ERROR_NONE;
   }
 
   rc = ui_button_group_base_set_orientation(group, 1);

@@ -30,7 +30,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
@@ -39,13 +39,13 @@ struct ui_engine;
  * @brief Material 3 Autocomplete component.
  */
 struct md3_autocomplete {
-  struct ui_autocomplete_base *base;
-  enum md3_text_field_variant variant;
-  int is_open;
-  char query[256];
-  float dropdown_elevation;
-  float corner_radius;
-  int expressive_spring_enabled;
+  struct ui_autocomplete_base *base;   /**< base field. */
+  enum md3_text_field_variant variant; /**< variant field. */
+  int is_open;                         /**< is_open field. */
+  char query[256];                     /**< query[256] field. */
+  float dropdown_elevation;            /**< dropdown_elevation field. */
+  float corner_radius;                 /**< corner_radius field. */
+  int expressive_spring_enabled;       /**< expressive_spring_enabled field. */
 };
 
 /**
@@ -98,10 +98,10 @@ md3_autocomplete_get_query(const struct md3_autocomplete *autocomplete,
  * @brief Option item in an md3_select dropdown.
  */
 struct md3_select_option {
-  char label[64];
-  char value[64];
-  int is_selected;
-  int is_disabled;
+  char label[64];  /**< label[64] field. */
+  char value[64];  /**< value[64] field. */
+  int is_selected; /**< is_selected field. */
+  int is_disabled; /**< is_disabled field. */
 };
 
 /**
@@ -109,15 +109,15 @@ struct md3_select_option {
  * @brief Material 3 Select / Dropdown menu component.
  */
 struct md3_select {
-  struct ui_select_base *base;
-  enum md3_text_field_variant variant;
-  int is_multi;
-  int is_open;
-  float arrow_rotation_deg;
-  struct md3_select_option options[64];
-  size_t option_count;
-  int selected_index;
-  char placeholder[64];
+  struct ui_select_base *base;          /**< base field. */
+  enum md3_text_field_variant variant;  /**< variant field. */
+  int is_multi;                         /**< is_multi field. */
+  int is_open;                          /**< is_open field. */
+  float arrow_rotation_deg;             /**< arrow_rotation_deg field. */
+  struct md3_select_option options[64]; /**< options[64] field. */
+  size_t option_count;                  /**< option_count field. */
+  int selected_index;                   /**< selected_index field. */
+  char placeholder[64];                 /**< placeholder[64] field. */
 };
 
 /**
@@ -198,14 +198,14 @@ md3_select_get_selected_index(const struct md3_select *select, int *out_index);
  * @brief Material 3 PIN / One-Time Passcode (OTP) input component.
  */
 struct md3_pin_input {
-  struct ui_pin_input_base *base;
-  int length;
-  int is_masked;
-  int focused_index;
-  char values[16];
-  float cell_width;
-  float cell_height;
-  int is_valid;
+  struct ui_pin_input_base *base; /**< base field. */
+  int length;                     /**< length field. */
+  int is_masked;                  /**< is_masked field. */
+  int focused_index;              /**< focused_index field. */
+  char values[16];                /**< values[16] field. */
+  float cell_width;               /**< cell_width field. */
+  float cell_height;              /**< cell_height field. */
+  int is_valid;                   /**< is_valid field. */
 };
 
 /**
@@ -289,12 +289,12 @@ md3_pin_input_get_value(const struct md3_pin_input *pin_input, char *out_text,
  * @brief Material 3 Rating bar component with whole and fractional stars.
  */
 struct md3_rating {
-  struct ui_rating_base *base;
-  int max_rating;
-  float value;
-  float hover_preview_value;
-  int is_read_only;
-  int allow_half_stars;
+  struct ui_rating_base *base; /**< base field. */
+  int max_rating;              /**< max_rating field. */
+  float value;                 /**< value field. */
+  float hover_preview_value;   /**< hover_preview_value field. */
+  int is_read_only;            /**< is_read_only field. */
+  int allow_half_stars;        /**< allow_half_stars field. */
 };
 
 /**
@@ -364,15 +364,15 @@ md3_rating_set_read_only(struct md3_rating *rating, int is_read_only);
  * @brief Material 3 Spin Button / Numeric Stepper component.
  */
 struct md3_spin_button {
-  struct ui_spin_button_base *base;
-  double min_val;
-  double max_val;
-  double step_val;
-  double current_val;
-  int precision;
-  char prefix[16];
-  char suffix[16];
-  int is_horizontal;
+  struct ui_spin_button_base *base; /**< base field. */
+  double min_val;                   /**< min_val field. */
+  double max_val;                   /**< max_val field. */
+  double step_val;                  /**< step_val field. */
+  double current_val;               /**< current_val field. */
+  int precision;                    /**< precision field. */
+  char prefix[16];                  /**< prefix[16] field. */
+  char suffix[16];                  /**< suffix[16] field. */
+  int is_horizontal;                /**< is_horizontal field. */
 };
 
 /**

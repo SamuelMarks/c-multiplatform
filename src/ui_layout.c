@@ -59,6 +59,7 @@ static ui_error_t mock_layout_block(struct ui_layout_node *node,
 #define layout_block mock_layout_block
 /** @endcond */
 #endif
+/** @brief ui_layout_solve_viewport function. */
 ui_error_t ui_layout_solve_viewport(struct ui_layout_node *root,
                                     float window_width, float window_height) {
   if (!root) {

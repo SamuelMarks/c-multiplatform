@@ -123,7 +123,13 @@ TEST test_rasterizer_png_headers_and_dimensions(void) {
   rc = save_canvas_png(c, test_png);
   ASSERT_EQ(UI_ERROR_NONE, rc);
 
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+  if (fopen_s(&f, test_png, "rb") != 0) {
+    f = NULL;
+  }
+#else
   f = fopen(test_png, "rb");
+#endif
   ASSERT_NEQ(NULL, f);
 
   /* Read 8-byte PNG magic header */

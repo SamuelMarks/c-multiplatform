@@ -16,7 +16,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
@@ -49,12 +49,12 @@ enum md3_fab_variant {
  * @brief Material 3 Floating Action Button skin wrapping ui_fab_base.
  */
 struct md3_fab {
-  struct ui_fab_base *base;
-  enum md3_fab_size size;
-  enum md3_fab_variant variant;
-  unsigned int elevation;
-  char icon_name[32];
-  char label[64];
+  struct ui_fab_base *base;     /**< base field. */
+  enum md3_fab_size size;       /**< size field. */
+  enum md3_fab_variant variant; /**< variant field. */
+  unsigned int elevation;       /**< elevation field. */
+  char icon_name[32];           /**< icon_name[32] field. */
+  char label[64];               /**< label[64] field. */
 };
 
 /**
@@ -156,6 +156,6 @@ md3_fab_get_base(struct md3_fab *fab, struct ui_fab_base **out_base);
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* MATERIAL3_MD3_FAB_H */

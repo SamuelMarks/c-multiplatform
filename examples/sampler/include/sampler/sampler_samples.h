@@ -14,7 +14,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 /* Buttons */
 extern sampler_error_t sample_filled_button(struct ui_engine *engine,
@@ -40,6 +40,6 @@ extern sampler_error_t sample_stub_create(struct ui_engine *engine,
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* SAMPLER_SAMPLES_H */

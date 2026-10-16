@@ -4,6 +4,8 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_mock_strcpy_fail;
+
 extern int g_malloc_fail_countdown;
 
 /* Dummy font struct for testing pointer pass-through */
@@ -105,7 +107,6 @@ static int run_normal_tests(void) {
 
 #if defined(UI_TEST_MOCK_ALLOC)
   {
-    extern int g_mock_strcpy_fail;
     g_mock_strcpy_fail = 1;
     ui_icon_base_set_font_glyph(icon, &dummy_font, "star");
     g_mock_strcpy_fail = 1;

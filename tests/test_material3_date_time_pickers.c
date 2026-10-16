@@ -12,6 +12,8 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_md3_pickers_mock_fail;
+
 #ifdef UI_TEST_MOCK_ALLOC
 extern int g_md3_pickers_mock_fail;
 extern int g_malloc_fail_countdown;
@@ -167,91 +169,93 @@ TEST test_md3_date_time_pickers_oom(void) {
   rc = ui_engine_create(&engine_cfg, &engine);
   ASSERT_EQ(UI_ERROR_NONE, rc);
 
-  int i;
-  for (i = 0; i < 500; i++) {
-    g_malloc_fail_countdown = i;
-    rc = md3_date_picker_create(engine, &dp);
-    if (rc == UI_ERROR_NONE) {
-      md3_date_picker_destroy(dp);
-      break;
+  {
+    int i;
+    for (i = 0; i < 500; i++) {
+      g_malloc_fail_countdown = i;
+      rc = md3_date_picker_create(engine, &dp);
+      if (rc == UI_ERROR_NONE) {
+        md3_date_picker_destroy(dp);
+        break;
+      }
+      ASSERT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
     }
-    ASSERT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
-  }
 
-  for (i = 0; i < 500; i++) {
-    g_malloc_fail_countdown = i;
+    for (i = 0; i < 500; i++) {
+      g_malloc_fail_countdown = i;
+      rc = md3_date_range_picker_create(engine, &drp);
+      if (rc == UI_ERROR_NONE) {
+        md3_date_range_picker_destroy(drp);
+        break;
+      }
+      ASSERT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
+    }
+
+    for (i = 0; i < 500; i++) {
+      g_malloc_fail_countdown = i;
+      rc = md3_time_picker_create(engine, MD3_TIME_PICKER_MODE_DIAL,
+                                  UI_TIMEPICKER_FORMAT_12H, &tp);
+      if (rc == UI_ERROR_NONE) {
+        md3_time_picker_destroy(tp);
+        break;
+      }
+      ASSERT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
+    }
+
+    g_malloc_fail_countdown = -1;
     rc = md3_date_range_picker_create(engine, &drp);
-    if (rc == UI_ERROR_NONE) {
-      md3_date_range_picker_destroy(drp);
-      break;
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+
+    memset(&date, 0, sizeof(date));
+    date.year = 2024;
+    date.month = 1;
+    date.day = 1;
+
+    for (i = 0; i < 500; i++) {
+      g_malloc_fail_countdown = i;
+      rc = md3_date_range_picker_select_date(drp, &date);
+      g_malloc_fail_countdown = -1;
+      if (rc == UI_ERROR_NONE) {
+        break;
+      }
+      ASSERT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
     }
-    ASSERT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
-  }
 
-  for (i = 0; i < 500; i++) {
-    g_malloc_fail_countdown = i;
-    rc = md3_time_picker_create(engine, MD3_TIME_PICKER_MODE_DIAL,
-                                UI_TIMEPICKER_FORMAT_12H, &tp);
-    if (rc == UI_ERROR_NONE) {
-      md3_time_picker_destroy(tp);
-      break;
+    for (i = 0; i < 500; i++) {
+      g_malloc_fail_countdown = i;
+      rc = md3_date_range_picker_set_hover_date(drp, &date);
+      g_malloc_fail_countdown = -1;
+      if (rc == UI_ERROR_NONE) {
+        break;
+      }
+      ASSERT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
     }
-    ASSERT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
-  }
 
-  g_malloc_fail_countdown = -1;
-  rc = md3_date_range_picker_create(engine, &drp);
-  ASSERT_EQ(UI_ERROR_NONE, rc);
+    rc = md3_date_range_picker_get_range(NULL, &range);
+    ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
+    rc = md3_date_range_picker_get_range(drp, NULL);
+    ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
+    rc = md3_date_range_picker_get_range(drp, &range);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
 
-  memset(&date, 0, sizeof(date));
-  date.year = 2024;
-  date.month = 1;
-  date.day = 1;
+    for (i = 0; i < 500; i++) {
+      g_malloc_fail_countdown = i;
+      rc = md3_date_range_picker_clear(drp);
+      g_malloc_fail_countdown = -1;
+      if (rc == UI_ERROR_NONE) {
+        break;
+      }
+    }
 
-  for (i = 0; i < 500; i++) {
-    g_malloc_fail_countdown = i;
-    rc = md3_date_range_picker_select_date(drp, &date);
+    md3_date_range_picker_destroy(drp);
+
     g_malloc_fail_countdown = -1;
-    if (rc == UI_ERROR_NONE) {
-      break;
-    }
-    ASSERT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
+
+    rc = ui_engine_destroy(engine);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+
+    PASS();
   }
-
-  for (i = 0; i < 500; i++) {
-    g_malloc_fail_countdown = i;
-    rc = md3_date_range_picker_set_hover_date(drp, &date);
-    g_malloc_fail_countdown = -1;
-    if (rc == UI_ERROR_NONE) {
-      break;
-    }
-    ASSERT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
-  }
-
-  rc = md3_date_range_picker_get_range(NULL, &range);
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
-  rc = md3_date_range_picker_get_range(drp, NULL);
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
-  rc = md3_date_range_picker_get_range(drp, &range);
-  ASSERT_EQ(UI_ERROR_NONE, rc);
-
-  for (i = 0; i < 500; i++) {
-    g_malloc_fail_countdown = i;
-    rc = md3_date_range_picker_clear(drp);
-    g_malloc_fail_countdown = -1;
-    if (rc == UI_ERROR_NONE) {
-      break;
-    }
-  }
-
-  md3_date_range_picker_destroy(drp);
-
-  g_malloc_fail_countdown = -1;
-
-  rc = ui_engine_destroy(engine);
-  ASSERT_EQ(UI_ERROR_NONE, rc);
-
-  PASS();
 }
 #endif
 
@@ -334,36 +338,40 @@ TEST test_md3_date_time_pickers_destroy_errors(void) {
   rc = md3_date_range_picker_create(engine, &drp);
   ASSERT_EQ(UI_ERROR_NONE, rc);
 
-  struct ui_date test_date;
-  memset(&test_date, 0, sizeof(test_date));
-  test_date.year = 2024;
-  test_date.month = 1;
-  test_date.day = 1;
-  struct ui_date_range test_range;
-  memset(&test_range, 0, sizeof(test_range));
+  {
+    struct ui_date test_date;
+    memset(&test_date, 0, sizeof(test_date));
+    test_date.year = 2024;
+    test_date.month = 1;
+    test_date.day = 1;
+    {
+      struct ui_date_range test_range;
+      memset(&test_range, 0, sizeof(test_range));
 
-  g_md3_pickers_mock_fail = 8;
-  rc = md3_date_range_picker_select_date(drp, &test_date);
-  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+      g_md3_pickers_mock_fail = 8;
+      rc = md3_date_range_picker_select_date(drp, &test_date);
+      ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
 
-  g_md3_pickers_mock_fail = 9;
-  rc = md3_date_range_picker_select_date(drp, &test_date);
-  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+      g_md3_pickers_mock_fail = 9;
+      rc = md3_date_range_picker_select_date(drp, &test_date);
+      ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
 
-  g_md3_pickers_mock_fail = 10;
-  rc = md3_date_range_picker_set_hover_date(drp, &test_date);
-  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+      g_md3_pickers_mock_fail = 10;
+      rc = md3_date_range_picker_set_hover_date(drp, &test_date);
+      ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
 
-  g_md3_pickers_mock_fail = 11;
-  rc = md3_date_range_picker_clear(drp);
-  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+      g_md3_pickers_mock_fail = 11;
+      rc = md3_date_range_picker_clear(drp);
+      ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
 
-  g_md3_pickers_mock_fail = 0;
-  md3_date_range_picker_destroy(drp);
+      g_md3_pickers_mock_fail = 0;
+      md3_date_range_picker_destroy(drp);
 
-  rc = ui_engine_destroy(engine);
-  ASSERT_EQ(UI_ERROR_NONE, rc);
-  PASS();
+      rc = ui_engine_destroy(engine);
+      ASSERT_EQ(UI_ERROR_NONE, rc);
+      PASS();
+    }
+  }
 }
 #endif
 
@@ -372,7 +380,6 @@ SUITE(md3_date_time_pickers_suite) {
   RUN_TEST(test_md3_date_range_picker_lifecycle);
   RUN_TEST(test_md3_time_picker_lifecycle);
 #ifdef UI_TEST_MOCK_ALLOC
-  extern int g_md3_pickers_mock_fail;
   RUN_TEST(test_md3_date_time_pickers_oom);
 #ifdef UI_TEST_MOCK_ALLOC
   RUN_TEST(test_md3_date_time_pickers_destroy_errors);

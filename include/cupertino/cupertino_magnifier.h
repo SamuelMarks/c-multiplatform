@@ -13,14 +13,19 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
+/** @brief CUPERTINO_MAGNIFIER_DEFAULT_WIDTH constant. */
 #define CUPERTINO_MAGNIFIER_DEFAULT_WIDTH 78.0f
+/** @brief CUPERTINO_MAGNIFIER_DEFAULT_HEIGHT constant. */
 #define CUPERTINO_MAGNIFIER_DEFAULT_HEIGHT 38.0f
+/** @brief CUPERTINO_MAGNIFIER_DEFAULT_OFFSET_Y constant. */
 #define CUPERTINO_MAGNIFIER_DEFAULT_OFFSET_Y -48.0f
+/** @brief CUPERTINO_MAGNIFIER_DEFAULT_ZOOM constant. */
 #define CUPERTINO_MAGNIFIER_DEFAULT_ZOOM 1.25f
+/** @brief CUPERTINO_MAGNIFIER_DEFAULT_CORNER_RADIUS constant. */
 #define CUPERTINO_MAGNIFIER_DEFAULT_CORNER_RADIUS 19.0f
 
 /**
@@ -40,17 +45,17 @@ struct cupertino_magnifier_descriptor {
  * @brief Optical text magnifier loupe instance.
  */
 struct cupertino_magnifier {
-  float width;
-  float height;
-  float vertical_offset;
-  float magnification;
-  float corner_radius;
-  float touch_x;
-  float touch_y;
-  float lens_x;
-  float lens_y;
-  float current_scale; /**< Spring animation scale factor [0.0, 1.0]. */
-  int is_active;       /**< 1 if active on screen, 0 if hidden. */
+  float width;           /**< width field. */
+  float height;          /**< height field. */
+  float vertical_offset; /**< vertical_offset field. */
+  float magnification;   /**< magnification field. */
+  float corner_radius;   /**< corner_radius field. */
+  float touch_x;         /**< touch_x field. */
+  float touch_y;         /**< touch_y field. */
+  float lens_x;          /**< lens_x field. */
+  float lens_y;          /**< lens_y field. */
+  float current_scale;   /**< Spring animation scale factor [0.0, 1.0]. */
+  int is_active;         /**< 1 if active on screen, 0 if hidden. */
 };
 
 /**

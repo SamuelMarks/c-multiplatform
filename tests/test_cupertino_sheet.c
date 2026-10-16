@@ -10,6 +10,9 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_cupertino_sheet_mock_base_set_open_fail;
+extern int g_cupertino_sheet_mock_base_destroy_fail;
+
 SUITE(cupertino_sheet_suite);
 
 TEST test_sheet_invalid_args(void) {
@@ -210,8 +213,6 @@ TEST test_sheet_bottom_sheet_mode(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_cupertino_sheet_mock_base_set_open_fail;
-    extern int g_cupertino_sheet_mock_base_destroy_fail;
 
     g_cupertino_sheet_mock_base_set_open_fail = 1;
     rc = cupertino_sheet_set_open(sheet, 1);

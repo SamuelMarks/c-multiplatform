@@ -15,7 +15,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 /**
  * @struct ui_datepicker_base
@@ -57,6 +57,6 @@ ui_error_t ui_datepicker_on_input_change(struct ui_input_base *input,
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* UI_DATEPICKER_BASE_INTERNAL_H */

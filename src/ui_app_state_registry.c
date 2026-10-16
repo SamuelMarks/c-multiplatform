@@ -29,6 +29,7 @@ struct ui_app_state_registry {
   struct ui_app_state_entry *head; /**< Head of entries linked list */
 };
 
+/** @brief g_global_app_state variable. */
 static struct ui_app_state_registry *g_global_app_state = NULL;
 
 /**

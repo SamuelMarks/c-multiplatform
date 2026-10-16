@@ -1355,6 +1355,7 @@ cleanup: {
 
 /* \brief ui_error
  */
+/** @brief ui_css_parse_stylesheet function. */
 ui_error_t ui_css_parse_stylesheet(const char *css_text,
                                    struct ui_css_stylesheet **out_stylesheet) {
   struct ui_css_tokenizer tz;

@@ -193,6 +193,7 @@ ui_error_t ui_preferences_get_string(struct ui_preferences *prefs,
 #endif
 }
 
+/** @brief ui_preferences_save_binary_async function. */
 ui_error_t ui_preferences_save_binary_async(struct ui_preferences *prefs,
                                             const char *key, const void *data,
                                             size_t length,

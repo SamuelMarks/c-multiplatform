@@ -5,20 +5,30 @@
 #include <string.h>
 #include <assert.h>
 
-#if defined(_MSC_VER)
+#if defined(_WIN32)
 __declspec(dllimport) void __stdcall Sleep(unsigned long dwMilliseconds);
 #else
+#include <sys/select.h>
+#include <sys/time.h>
 #include <unistd.h>
 #endif
 /* clang-format on */
 
+extern int g_mock_io_fail;
+extern ui_error_t run_asset_streamer_coverage(void);
+extern int g_asset_streamer_mock_fail;
+
 extern int g_malloc_fail_countdown;
 
 static ui_error_t sleep_ms(int ms) {
-#if defined(_MSC_VER)
-  Sleep(ms);
+#if defined(_WIN32)
+  Sleep((unsigned long)ms);
 #else
-  usleep(ms * 1000);
+  struct timeval tv;
+  tv.tv_sec = (long)(ms / 1000);
+  tv.tv_usec = (long)((ms % 1000) * 1000);
+  if (select(0, NULL, NULL, NULL, &tv) < 0) {
+  }
 #endif
   return UI_ERROR_NONE;
 }
@@ -32,6 +42,39 @@ static void wait_tick(struct ui_execution_context *ctx,
   }
   ui_execution_context_tick(ctx);
   sleep_ms(10);
+}
+
+static ui_error_t sync_barrier_task(void *user_data) {
+  int *done = (int *)user_data;
+  *done = 1;
+  return UI_ERROR_NONE;
+}
+
+static void wait_pool_barrier(struct ui_execution_context *ctx,
+                              struct ui_thread_pool *pool) {
+  int done = 0;
+  if (ui_thread_pool_schedule(pool, sync_barrier_task, &done) ==
+      UI_ERROR_NONE) {
+    while (!done) {
+      wait_tick(ctx, pool);
+    }
+  }
+  if (ctx) {
+    ui_execution_context_tick(ctx);
+  }
+}
+
+static void wait_ctx_scheduled(struct ui_execution_context *ctx,
+                               struct ui_thread_pool *pool) {
+  void *volatile *ctx_ptr = (void *volatile *)ctx;
+  while (ctx_ptr[0] == NULL) {
+    if (pool) {
+#ifdef UI_SINGLE_THREADED
+      ui_thread_pool_tick(pool);
+#endif
+    }
+    sleep_ms(2);
+  }
 }
 
 static int run_test(const char *name, int (*test_fn)(void)) {
@@ -50,6 +93,8 @@ static int run_test(const char *name, int (*test_fn)(void)) {
 static ui_error_t on_resolve(void *result, void *user_data, void **out_result) {
   struct ui_asset *asset = (struct ui_asset *)result;
   int *completed = (int *)user_data;
+  if (sizeof(out_result) == 0) {
+  }
   *completed = 1;
   ui_asset_destroy(asset);
   return UI_ERROR_NONE;
@@ -58,6 +103,8 @@ static ui_error_t on_resolve(void *result, void *user_data, void **out_result) {
 static ui_error_t on_reject(ui_error_t err, void *user_data,
                             void **out_result) {
   int *completed = (int *)user_data;
+  if (sizeof(out_result) == 0) {
+  }
   *completed = -1; /* -1 means rejected */
   if (err != UI_ERROR_NONE) {
     /* Expected rejected error */
@@ -322,23 +369,14 @@ static int test_edge_cases(void) {
                                     UI_ASSET_TYPE_TEXT, &p);
 
     if (err == UI_ERROR_NONE) {
-      /* Wait for background thread to hit OOM (or pass) */
+      /* Wait for background thread to finish asset_task_execute without racing
+       * on g_malloc_fail_countdown from the main thread */
+      wait_ctx_scheduled(ctx, pool);
+      g_malloc_fail_countdown = -1;
       err = ui_promise_then(p, on_resolve, on_reject, &completed, NULL);
-      if (err == UI_ERROR_NONE) {
-        int wait_limit = 0;
-        while (completed == 0 && ++wait_limit < 100) {
-          wait_tick(ctx, pool);
-        }
-      } else {
-        /* Even if promise_then fails, the background task is running.
-           We must wait for it to avoid leaking the task and overwriting
-           ctx->task. We can just tick a few times to let it finish. */
-        int ticks = 0;
-        while (ticks < 10) {
-          wait_tick(ctx, pool);
-          ticks++;
-        }
-      }
+      assert(err == UI_ERROR_NONE);
+      ui_execution_context_tick(ctx);
+      assert(completed != 0);
       {
         ui_error_t rc_cleanup = ui_promise_destroy(p);
         if (rc_cleanup != UI_ERROR_NONE) {
@@ -355,7 +393,6 @@ static int test_edge_cases(void) {
   g_malloc_fail_countdown = -1;
 
   /* Mock IO failure tests */
-  extern int g_mock_io_fail;
   for (i = 1; i <= 5; i++) {
     struct ui_promise *p = NULL;
     int completed = 0;
@@ -368,10 +405,11 @@ static int test_edge_cases(void) {
       err = ui_promise_then(p, on_resolve, on_reject, &completed, NULL);
       if (err == UI_ERROR_NONE) {
         int wait_limit = 0;
-        while (completed == 0 && ++wait_limit < 100) {
+        while (completed == 0 && ++wait_limit < 2000) {
           wait_tick(ctx, pool);
         }
       }
+      wait_pool_barrier(ctx, pool);
       {
         ui_error_t rc_cleanup = ui_promise_destroy(p);
         if (rc_cleanup != UI_ERROR_NONE) {
@@ -392,15 +430,18 @@ static int test_edge_cases(void) {
     err = ui_asset_streamer_request(streamer, ".", UI_ASSET_TYPE_BINARY, &p);
     if (err == UI_ERROR_NONE) {
       ui_promise_then(p, on_resolve, on_reject, &completed, NULL);
-      int wait_limit = 0;
-      while (completed == 0 && ++wait_limit < 100) {
-        ui_execution_context_tick(ctx);
-        sleep_ms(10);
-      }
       {
-        ui_error_t rc_cleanup = ui_promise_destroy(p);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          return 1;
+        int wait_limit = 0;
+        while (completed == 0 && ++wait_limit < 2000) {
+          ui_execution_context_tick(ctx);
+          sleep_ms(10);
+        }
+        wait_pool_barrier(ctx, pool);
+        {
+          ui_error_t rc_cleanup = ui_promise_destroy(p);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            return 1;
+          }
         }
       }
     }
@@ -433,11 +474,7 @@ static int test_edge_cases(void) {
     err = ui_asset_streamer_request(streamer, "test_asset_sched_fail.txt",
                                     UI_ASSET_TYPE_TEXT, &p);
     if (err == UI_ERROR_NONE) {
-#ifdef UI_SINGLE_THREADED
-      ui_thread_pool_tick(pool);
-#else
-      sleep_ms(50);
-#endif
+      wait_pool_barrier(NULL, pool);
       {
         ui_error_t rc_cleanup = ui_promise_destroy(p);
         if (rc_cleanup != UI_ERROR_NONE) {
@@ -451,11 +488,7 @@ static int test_edge_cases(void) {
     err = ui_asset_streamer_request(streamer, "test_asset_sched_fail.txt",
                                     UI_ASSET_TYPE_TEXT, &p);
     if (err == UI_ERROR_NONE) {
-#ifdef UI_SINGLE_THREADED
-      ui_thread_pool_tick(pool);
-#else
-      sleep_ms(50);
-#endif
+      wait_pool_barrier(NULL, pool);
       {
         ui_error_t rc_cleanup = ui_promise_destroy(p);
         if (rc_cleanup != UI_ERROR_NONE) {
@@ -484,7 +517,6 @@ static int test_edge_cases(void) {
   ui_thread_pool_destroy(pool);
 
 #ifdef UI_TEST_MOCK_ALLOC
-  extern ui_error_t run_asset_streamer_coverage(void);
   if (run_asset_streamer_coverage() != UI_ERROR_NONE) {
     return 1;
   }
@@ -500,7 +532,6 @@ static int test_mock_failures(void) {
   struct ui_promise *promise = NULL;
   FILE *f = NULL;
   ui_error_t rc;
-  extern int g_asset_streamer_mock_fail;
 
 #if defined(_MSC_VER)
   fopen_s(&f, "test_mock_asset.txt", "wb");
@@ -559,13 +590,7 @@ static int test_mock_failures(void) {
   if (rc != UI_ERROR_NONE) {
     return 1;
   }
-  {
-    int wait_limit = 0;
-    while (++wait_limit < 100) {
-      wait_tick(ctx, pool);
-      sleep_ms(5);
-    }
-  }
+  wait_pool_barrier(ctx, pool);
   ui_promise_destroy(promise);
   promise = NULL;
   g_asset_streamer_mock_fail = 0;
@@ -578,13 +603,7 @@ static int test_mock_failures(void) {
   if (rc != UI_ERROR_NONE) {
     return 1;
   }
-  {
-    int wait_limit = 0;
-    while (++wait_limit < 100) {
-      wait_tick(ctx, pool);
-      sleep_ms(5);
-    }
-  }
+  wait_pool_barrier(ctx, pool);
   ui_promise_destroy(promise);
   promise = NULL;
   g_asset_streamer_mock_fail = 0;

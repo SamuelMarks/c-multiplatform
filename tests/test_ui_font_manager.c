@@ -6,6 +6,8 @@
 #include "../include/ui_error.h"
 /* clang-format on */
 
+extern ui_error_t ui_test_font_manager_coverage_in_src(void);
+
 extern int g_malloc_fail_countdown;
 
 static const unsigned char tests_tiny_ttf[] = {
@@ -42,7 +44,6 @@ static void run_font_methods_coverage(void) {
   unsigned char bad_ttf2[12] = {0x00, 0x01, 0x00, 0x00, 0x00, 0x00,
                                 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
   struct ui_font *found = NULL;
-  struct ui_font_axis axes[1] = {{0}};
   int cp[] = {'A'};
   unsigned char *atlas = NULL;
   int w, h;
@@ -214,7 +215,6 @@ int main(void) {
   test_oom();
   run_font_methods_coverage();
 
-  extern ui_error_t ui_test_font_manager_coverage_in_src(void);
   ui_test_font_manager_coverage_in_src();
 
   printf("ui_font_manager tests passed\n");

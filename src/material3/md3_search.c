@@ -35,6 +35,7 @@ mock_search_bar_base_init(struct ui_search_bar_base *search_bar,
 /** @endcond */
 #endif
 
+/** @brief md3_search_bar_create function. */
 ui_error_t md3_search_bar_create(struct ui_engine *engine,
                                  const char *placeholder,
                                  struct md3_search_bar **out_search_bar,
@@ -79,6 +80,7 @@ ui_error_t md3_search_bar_create(struct ui_engine *engine,
   return rc;
 }
 
+/** @brief md3_search_bar_destroy function. */
 ui_error_t md3_search_bar_destroy(struct md3_search_bar *search_bar) {
   ui_error_t rc;
 
@@ -92,6 +94,7 @@ ui_error_t md3_search_bar_destroy(struct md3_search_bar *search_bar) {
   return rc;
 }
 
+/** @brief md3_search_bar_set_query function. */
 ui_error_t md3_search_bar_set_query(struct md3_search_bar *search_bar,
                                     const char *query) {
   if (!search_bar) {
@@ -101,6 +104,7 @@ ui_error_t md3_search_bar_set_query(struct md3_search_bar *search_bar,
   return ui_search_bar_base_set_query(&search_bar->base, query);
 }
 
+/** @brief md3_search_bar_get_query function. */
 ui_error_t md3_search_bar_get_query(const struct md3_search_bar *search_bar,
                                     const char **out_query) {
   if (!search_bar || !out_query) {
@@ -111,6 +115,7 @@ ui_error_t md3_search_bar_get_query(const struct md3_search_bar *search_bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_search_bar_set_loading function. */
 ui_error_t md3_search_bar_set_loading(struct md3_search_bar *search_bar,
                                       int is_loading) {
   if (!search_bar) {
@@ -120,6 +125,7 @@ ui_error_t md3_search_bar_set_loading(struct md3_search_bar *search_bar,
   return ui_search_bar_base_set_loading(&search_bar->base, is_loading);
 }
 
+/** @brief md3_search_bar_open_view function. */
 ui_error_t md3_search_bar_open_view(struct md3_search_bar *search_bar,
                                     struct md3_search_view **out_view) {
   if (!search_bar || !out_view) {
@@ -131,6 +137,7 @@ ui_error_t md3_search_bar_open_view(struct md3_search_bar *search_bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_search_view_close function. */
 ui_error_t md3_search_view_close(struct md3_search_view *view) {
   if (!view) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -140,6 +147,7 @@ ui_error_t md3_search_view_close(struct md3_search_view *view) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_search_view_add_history_item function. */
 ui_error_t md3_search_view_add_history_item(struct md3_search_view *view,
                                             const char *item) {
   size_t idx;
@@ -160,6 +168,7 @@ ui_error_t md3_search_view_add_history_item(struct md3_search_view *view,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_search_view_get_history_count function. */
 ui_error_t md3_search_view_get_history_count(const struct md3_search_view *view,
                                              size_t *out_count) {
   if (!view || !out_count) {
@@ -170,6 +179,7 @@ ui_error_t md3_search_view_get_history_count(const struct md3_search_view *view,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_search_view_get_history_item function. */
 ui_error_t md3_search_view_get_history_item(const struct md3_search_view *view,
                                             size_t index,
                                             const char **out_item) {
@@ -185,6 +195,7 @@ ui_error_t md3_search_view_get_history_item(const struct md3_search_view *view,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_search_bar_get_base function. */
 ui_error_t md3_search_bar_get_base(struct md3_search_bar *search_bar,
                                    struct ui_search_bar_base **out_base) {
   if (!search_bar || !out_base) {

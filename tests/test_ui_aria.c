@@ -7,6 +7,9 @@
 #include <string.h>
 /* clang-format on */
 
+extern ui_error_t run_aria_coverage(void);
+extern int g_aria_cleanup_fail;
+
 extern int g_malloc_fail_countdown;
 
 TEST test_ui_aria_role_from_string(void) {
@@ -363,8 +366,6 @@ int main(int argc, char **argv) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern ui_error_t run_aria_coverage(void);
-    extern int g_aria_cleanup_fail;
     ui_error_t rc_aria;
 
     g_aria_cleanup_fail = 1;

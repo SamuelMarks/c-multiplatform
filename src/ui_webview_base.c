@@ -81,6 +81,7 @@ struct ui_webview_base {
   char *current_html;                   /**< current_html */
 };
 
+/** @brief ui_webview_base_create function. */
 ui_error_t ui_webview_base_create(struct ui_webview_base **out_webview) {
   struct ui_webview_base *webview;
   struct ui_dom_node *root_node = NULL;
@@ -133,6 +134,7 @@ cleanup:
   return rc;
 }
 
+/** @brief ui_webview_base_destroy function. */
 ui_error_t ui_webview_base_destroy(struct ui_webview_base *webview) {
   ui_error_t rc = UI_ERROR_NONE;
   if (!webview) {
@@ -154,6 +156,7 @@ ui_error_t ui_webview_base_destroy(struct ui_webview_base *webview) {
   return rc;
 }
 
+/** @brief ui_webview_base_get_component function. */
 ui_error_t ui_webview_base_get_component(struct ui_webview_base *webview,
                                          struct ui_component **out_component) {
   if (!webview || !out_component) {
@@ -183,6 +186,7 @@ static ui_error_t duplicate_string(const char *str, char **out_copy) {
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_webview_base_set_url function. */
 ui_error_t ui_webview_base_set_url(struct ui_webview_base *webview,
                                    const char *url) {
   if (!webview) {
@@ -208,6 +212,7 @@ ui_error_t ui_webview_base_set_url(struct ui_webview_base *webview,
   }
 }
 
+/** @brief ui_webview_base_set_html function. */
 ui_error_t ui_webview_base_set_html(struct ui_webview_base *webview,
                                     const char *html) {
   if (!webview) {
@@ -227,6 +232,7 @@ ui_error_t ui_webview_base_set_html(struct ui_webview_base *webview,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_webview_base_bind_url function. */
 ui_error_t ui_webview_base_bind_url(struct ui_webview_base *webview,
                                     struct ui_signal *signal) {
   if (!webview) {
@@ -236,6 +242,7 @@ ui_error_t ui_webview_base_bind_url(struct ui_webview_base *webview,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_webview_base_evaluate_js function. */
 ui_error_t ui_webview_base_evaluate_js(struct ui_webview_base *webview,
                                        const char *script) {
   if (!webview || !script) {
@@ -245,6 +252,7 @@ ui_error_t ui_webview_base_evaluate_js(struct ui_webview_base *webview,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_webview_base_set_ipc_callback function. */
 ui_error_t ui_webview_base_set_ipc_callback(struct ui_webview_base *webview,
                                             ui_webview_ipc_callback callback,
                                             void *user_data) {
@@ -256,6 +264,7 @@ ui_error_t ui_webview_base_set_ipc_callback(struct ui_webview_base *webview,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_webview_base_dispatch_ipc_message function. */
 ui_error_t ui_webview_base_dispatch_ipc_message(struct ui_webview_base *webview,
                                                 const char *message) {
   if (!webview || !message) {

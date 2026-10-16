@@ -374,7 +374,7 @@ static void test_ptr_cancel(void) {
       assert(rc == UI_ERROR_NONE);
 
       temp_ev.type = UI_EVENT_MOUSE_MOVE;
-      temp_ev.event_data.mouse.y = 50.0;
+      temp_ev.event_data.mouse.y = 50;
       rc = ui_pull_to_refresh_base_process_event(ptr, &temp_ev, 20.0);
       assert(rc == UI_ERROR_NONE);
       /* This hits BEGAN and CHANGED, state is now PULLING */
@@ -383,7 +383,7 @@ static void test_ptr_cancel(void) {
        * UI_PULL_TO_REFRESH_PULLING)` else branch inside CHANGED */
       internal->state = UI_PULL_TO_REFRESH_RESTING;
       temp_ev.type = UI_EVENT_MOUSE_MOVE;
-      temp_ev.event_data.mouse.y = 100.0;
+      temp_ev.event_data.mouse.y = 100;
       rc = ui_pull_to_refresh_base_process_event(ptr, &temp_ev, 30.0);
       assert(rc == UI_ERROR_NONE); /* Hits CHANGED with state=RESTING */
 
@@ -402,7 +402,7 @@ static void test_ptr_cancel(void) {
       rc = ui_pull_to_refresh_base_process_event(ptr, &temp_ev, 45.0);
       assert(rc == UI_ERROR_NONE);
       temp_ev.type = UI_EVENT_MOUSE_MOVE;
-      temp_ev.event_data.mouse.y = 150.0;
+      temp_ev.event_data.mouse.y = 150;
       rc = ui_pull_to_refresh_base_process_event(ptr, &temp_ev, 46.0);
       assert(rc == UI_ERROR_NONE); /* Hits BEGAN with state!=RESTING */
       internal->state = UI_PULL_TO_REFRESH_RESTING; /* Reset for next */
@@ -416,7 +416,7 @@ static void test_ptr_cancel(void) {
       rc = ui_pull_to_refresh_base_process_event(ptr, &temp_ev, 40.0);
       assert(rc == UI_ERROR_NONE);
       temp_ev.type = UI_EVENT_MOUSE_MOVE;
-      temp_ev.event_data.mouse.y = 100.0;
+      temp_ev.event_data.mouse.y = 100;
       rc = ui_pull_to_refresh_base_process_event(ptr, &temp_ev, 50.0);
       assert(rc == UI_ERROR_NONE);                  /* PULLING */
       internal->state = UI_PULL_TO_REFRESH_RESTING; /* NOT PULLING */

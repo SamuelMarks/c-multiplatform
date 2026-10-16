@@ -70,6 +70,7 @@ static ui_error_t mock_input_base_set_type(struct ui_input_base *input,
 /** @endcond */
 #endif
 
+/** @brief copy_string function. */
 static void copy_string(char *dst, size_t sz, const char *src) {
 #if defined(_MSC_VER)
   strcpy_s(dst, sz, src);
@@ -81,6 +82,7 @@ static void copy_string(char *dst, size_t sz, const char *src) {
 
 /* --- CVA Helper Callbacks for Cupertino Text Field --- */
 
+/** @brief cupertino_text_field_cva_write_value function. */
 static ui_error_t
 cupertino_text_field_cva_write_value(void *component,
                                      union ui_signal_payload value) {
@@ -96,6 +98,7 @@ cupertino_text_field_cva_write_value(void *component,
   return cupertino_text_field_set_text(field, str ? str : "");
 }
 
+/** @brief cupertino_text_field_cva_set_disabled_state function. */
 static ui_error_t
 cupertino_text_field_cva_set_disabled_state(void *component,
                                             ui_bool_t is_disabled) {
@@ -111,6 +114,7 @@ cupertino_text_field_cva_set_disabled_state(void *component,
 
 /* --- Internal Construction Helper --- */
 
+/** @brief cupertino_text_field_init_internal function. */
 static ui_error_t
 cupertino_text_field_init_internal(struct ui_engine *engine, int is_multiline,
                                    size_t min_lines, size_t max_lines,
@@ -160,6 +164,7 @@ cupertino_text_field_init_internal(struct ui_engine *engine, int is_multiline,
 
 /* --- Public API --- */
 
+/** @brief cupertino_text_field_create function. */
 ui_error_t
 cupertino_text_field_create(struct ui_engine *engine,
                             struct cupertino_text_field **out_field,
@@ -168,6 +173,7 @@ cupertino_text_field_create(struct ui_engine *engine,
                                             out_cva);
 }
 
+/** @brief cupertino_text_view_create function. */
 ui_error_t
 cupertino_text_view_create(struct ui_engine *engine, size_t min_lines,
                            size_t max_lines,
@@ -177,6 +183,7 @@ cupertino_text_view_create(struct ui_engine *engine, size_t min_lines,
                                             out_view, out_cva);
 }
 
+/** @brief cupertino_text_field_destroy function. */
 ui_error_t cupertino_text_field_destroy(struct cupertino_text_field *field) {
   ui_error_t rc;
 
@@ -196,6 +203,7 @@ ui_error_t cupertino_text_field_destroy(struct cupertino_text_field *field) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_text_field_set_text function. */
 ui_error_t cupertino_text_field_set_text(struct cupertino_text_field *field,
                                          const char *text) {
   if (!field) {
@@ -205,6 +213,7 @@ ui_error_t cupertino_text_field_set_text(struct cupertino_text_field *field,
   return ui_input_base_set_text(field->input, text ? text : "");
 }
 
+/** @brief cupertino_text_field_get_text function. */
 ui_error_t
 cupertino_text_field_get_text(const struct cupertino_text_field *field,
                               const char **out_text) {
@@ -215,6 +224,7 @@ cupertino_text_field_get_text(const struct cupertino_text_field *field,
   return ui_input_base_get_text(field->input, out_text);
 }
 
+/** @brief cupertino_text_field_set_placeholder function. */
 ui_error_t
 cupertino_text_field_set_placeholder(struct cupertino_text_field *field,
                                      const char *placeholder) {
@@ -238,6 +248,7 @@ cupertino_text_field_set_placeholder(struct cupertino_text_field *field,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_text_field_set_clear_button_mode function. */
 ui_error_t cupertino_text_field_set_clear_button_mode(
     struct cupertino_text_field *field,
     enum cupertino_overlay_visibility_mode mode) {
@@ -250,6 +261,7 @@ ui_error_t cupertino_text_field_set_clear_button_mode(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_text_field_is_clear_button_visible function. */
 ui_error_t cupertino_text_field_is_clear_button_visible(
     const struct cupertino_text_field *field, int *out_visible) {
   const char *text = NULL;
@@ -290,6 +302,7 @@ ui_error_t cupertino_text_field_is_clear_button_visible(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_text_field_trigger_clear function. */
 ui_error_t
 cupertino_text_field_trigger_clear(struct cupertino_text_field *field) {
   if (!field) {
@@ -299,6 +312,7 @@ cupertino_text_field_trigger_clear(struct cupertino_text_field *field) {
   return ui_input_base_set_text(field->input, "");
 }
 
+/** @brief cupertino_text_field_set_secure_text_entry function. */
 ui_error_t
 cupertino_text_field_set_secure_text_entry(struct cupertino_text_field *field,
                                            int is_secure) {
@@ -317,6 +331,7 @@ cupertino_text_field_set_secure_text_entry(struct cupertino_text_field *field,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_text_field_set_editing function. */
 ui_error_t cupertino_text_field_set_editing(struct cupertino_text_field *field,
                                             int is_editing) {
   if (!field) {
@@ -327,6 +342,7 @@ ui_error_t cupertino_text_field_set_editing(struct cupertino_text_field *field,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_text_field_set_prefix function. */
 ui_error_t cupertino_text_field_set_prefix(struct cupertino_text_field *field,
                                            const char *prefix) {
   if (!field) {
@@ -342,6 +358,7 @@ ui_error_t cupertino_text_field_set_prefix(struct cupertino_text_field *field,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_text_field_set_suffix function. */
 ui_error_t cupertino_text_field_set_suffix(struct cupertino_text_field *field,
                                            const char *suffix) {
   if (!field) {
@@ -357,6 +374,7 @@ ui_error_t cupertino_text_field_set_suffix(struct cupertino_text_field *field,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_text_field_set_disabled function. */
 ui_error_t cupertino_text_field_set_disabled(struct cupertino_text_field *field,
                                              int disabled) {
   if (!field) {
@@ -366,6 +384,7 @@ ui_error_t cupertino_text_field_set_disabled(struct cupertino_text_field *field,
   return ui_input_base_set_disabled(field->input, disabled ? 1 : 0);
 }
 
+/** @brief cupertino_text_field_get_base function. */
 ui_error_t cupertino_text_field_get_base(struct cupertino_text_field *field,
                                          struct ui_input_base **out_base) {
   if (!field || !out_base) {

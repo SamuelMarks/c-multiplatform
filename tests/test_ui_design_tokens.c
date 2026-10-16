@@ -330,7 +330,11 @@ static int test_ui_design_token_capacity_expansion(void) {
   ui_design_token_dict_init(arena, &dict);
 
   for (i = 0; i < 70; ++i) {
+#if defined(_MSC_VER)
+    sprintf_s(name, sizeof(name), "token-%d", i);
+#else
     sprintf(name, "token-%d", i);
+#endif
     rc = ui_design_token_set_number(&dict, name, (float)i);
     if (rc != UI_ERROR_NONE)
       return 1;
@@ -366,7 +370,11 @@ static int test_ui_design_token_capacity_expansion_fail(void) {
   ui_design_token_dict_init(arena, &dict);
 
   for (i = 0; i < 64; ++i) {
+#if defined(_MSC_VER)
+    sprintf_s(name, sizeof(name), "token-%d", i);
+#else
     sprintf(name, "token-%d", i);
+#endif
     rc = ui_design_token_set_number(&dict, name, (float)i);
     if (rc != UI_ERROR_NONE)
       return 1;

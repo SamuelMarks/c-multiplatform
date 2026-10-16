@@ -41,6 +41,7 @@ static ui_error_t mock_dom_node_set_attribute(struct ui_dom_node *node,
 /** @endcond */
 #endif
 
+/** @brief ui_camera_base_create function. */
 ui_error_t ui_camera_base_create(struct ui_camera_base **out_camera) {
   struct ui_camera_base *camera;
   struct ui_dom_node *root_node = NULL;
@@ -94,6 +95,7 @@ cleanup:
   return rc;
 }
 
+/** @brief ui_camera_base_destroy function. */
 ui_error_t ui_camera_base_destroy(struct ui_camera_base *camera) {
   if (!camera) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -108,6 +110,7 @@ ui_error_t ui_camera_base_destroy(struct ui_camera_base *camera) {
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_camera_base_get_component function. */
 ui_error_t ui_camera_base_get_component(struct ui_camera_base *camera,
                                         struct ui_component **out_component) {
   if (!camera || !out_component) {
@@ -117,6 +120,7 @@ ui_error_t ui_camera_base_get_component(struct ui_camera_base *camera,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_camera_base_request_permission function. */
 ui_error_t ui_camera_base_request_permission(struct ui_camera_base *camera) {
   if (!camera) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -130,6 +134,7 @@ ui_error_t ui_camera_base_request_permission(struct ui_camera_base *camera) {
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_camera_base_start_stream function. */
 ui_error_t ui_camera_base_start_stream(struct ui_camera_base *camera) {
   if (!camera) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -142,6 +147,7 @@ ui_error_t ui_camera_base_start_stream(struct ui_camera_base *camera) {
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_camera_base_stop_stream function. */
 ui_error_t ui_camera_base_stop_stream(struct ui_camera_base *camera) {
   if (!camera) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -152,6 +158,7 @@ ui_error_t ui_camera_base_stop_stream(struct ui_camera_base *camera) {
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_camera_base_get_state function. */
 ui_error_t ui_camera_base_get_state(struct ui_camera_base *camera,
                                     enum ui_camera_state *out_state) {
   if (!camera || !out_state) {
@@ -161,6 +168,7 @@ ui_error_t ui_camera_base_get_state(struct ui_camera_base *camera,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_camera_base_set_frame_callback function. */
 ui_error_t ui_camera_base_set_frame_callback(struct ui_camera_base *camera,
                                              ui_camera_frame_callback callback,
                                              void *user_data) {
@@ -172,6 +180,7 @@ ui_error_t ui_camera_base_set_frame_callback(struct ui_camera_base *camera,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_camera_base_mock_frame function. */
 ui_error_t ui_camera_base_mock_frame(struct ui_camera_base *camera) {
   static const char mock_data[4] = {0, 0, 0, 0};
   if (!camera) {
@@ -190,6 +199,7 @@ ui_error_t ui_camera_base_mock_frame(struct ui_camera_base *camera) {
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_camera_base_mock_permission_response function. */
 ui_error_t
 ui_camera_base_mock_permission_response(struct ui_camera_base *camera,
                                         int granted) {

@@ -5,6 +5,8 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_badge_mock_fail;
+
 static int test_badge_formatting(void) {
   struct ui_badge_base *badge = NULL;
   struct ui_component *comp;
@@ -196,7 +198,6 @@ static int test_badge_nulls_and_errors(void) {
 #ifdef UI_TEST_MOCK_ALLOC
 static ui_error_t run_badge_coverage(void) {
   struct ui_badge_base *badge = NULL;
-  extern int g_badge_mock_fail;
 
   g_badge_mock_fail = 1;
   ui_badge_base_create(&badge);

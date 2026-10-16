@@ -10,6 +10,7 @@
 #include <string.h>
 /* clang-format on */
 
+/** @brief md3_progress_create function. */
 ui_error_t md3_progress_create(struct ui_engine *engine,
                                enum md3_progress_type type,
                                struct md3_progress **out_progress) {
@@ -43,6 +44,7 @@ ui_error_t md3_progress_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_progress_destroy function. */
 ui_error_t md3_progress_destroy(struct md3_progress *progress) {
   ui_error_t rc;
 
@@ -55,6 +57,7 @@ ui_error_t md3_progress_destroy(struct md3_progress *progress) {
   return rc;
 }
 
+/** @brief md3_progress_set_determinate function. */
 ui_error_t md3_progress_set_determinate(struct md3_progress *progress,
                                         float value, float min, float max) {
   if (!progress || min >= max) {
@@ -68,6 +71,7 @@ ui_error_t md3_progress_set_determinate(struct md3_progress *progress,
   return ui_progress_base_set_determinate(progress->base, value, min, max);
 }
 
+/** @brief md3_progress_set_indeterminate function. */
 ui_error_t md3_progress_set_indeterminate(struct md3_progress *progress) {
   if (!progress) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -77,6 +81,7 @@ ui_error_t md3_progress_set_indeterminate(struct md3_progress *progress) {
   return ui_progress_base_set_indeterminate(progress->base);
 }
 
+/** @brief md3_progress_get_percentage function. */
 ui_error_t md3_progress_get_percentage(const struct md3_progress *progress,
                                        float *out_percentage) {
   if (!progress || !out_percentage) {
@@ -87,6 +92,7 @@ ui_error_t md3_progress_get_percentage(const struct md3_progress *progress,
                                                     out_percentage);
 }
 
+/** @brief md3_progress_is_indeterminate function. */
 ui_error_t md3_progress_is_indeterminate(const struct md3_progress *progress,
                                          int *out_is_indeterminate) {
   if (!progress || !out_is_indeterminate) {
@@ -97,6 +103,7 @@ ui_error_t md3_progress_is_indeterminate(const struct md3_progress *progress,
                                            out_is_indeterminate);
 }
 
+/** @brief md3_progress_get_base function. */
 ui_error_t md3_progress_get_base(struct md3_progress *progress,
                                  struct ui_progress_base **out_base) {
   if (!progress || !out_base) {

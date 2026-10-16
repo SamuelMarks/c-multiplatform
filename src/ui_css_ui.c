@@ -256,13 +256,10 @@ ui_error_t ui_css_parse_cursor(const char *str,
           (struct ui_css_cursor_image *)C_MULTIPLATFORM_MALLOC(
               sizeof(struct ui_css_cursor_image));
       if (!img) {
+        ui_error_t rc_dest;
         out_cursor->images = head;
-        {
-          ui_error_t rc_dest = ui_css_cursor_destroy(out_cursor);
-          if (rc_dest != UI_ERROR_NONE)
-            return rc_dest;
-        }
-        return UI_ERROR_OUT_OF_MEMORY;
+        rc_dest = ui_css_cursor_destroy(out_cursor);
+        return (rc_dest != UI_ERROR_NONE) ? rc_dest : UI_ERROR_OUT_OF_MEMORY;
       }
       img->has_hotspot = 0;
       img->hotspot_x = 0.0f;
@@ -386,13 +383,10 @@ ui_error_t ui_css_parse_cursor(const char *str,
       else if (strcmp(p, "zoom-out") == 0)
         out_cursor->keyword = UI_CSS_CURSOR_ZOOM_OUT;
       else {
+        ui_error_t rc_dest;
         out_cursor->images = head;
-        {
-          ui_error_t rc_dest = ui_css_cursor_destroy(out_cursor);
-          if (rc_dest != UI_ERROR_NONE)
-            return rc_dest;
-        }
-        return UI_ERROR_PARSE_FAILED;
+        rc_dest = ui_css_cursor_destroy(out_cursor);
+        return (rc_dest != UI_ERROR_NONE) ? rc_dest : UI_ERROR_PARSE_FAILED;
       }
     }
 
@@ -487,6 +481,7 @@ ui_error_t ui_css_parse_appearance(const char *str,
 
 /* \brief ui_error
  */
+/** @brief ui_css_parse_pointer_events function. */
 ui_error_t ui_css_parse_pointer_events(const char *str,
                                        enum ui_css_pointer_events *out_events) {
   ui_error_t sw_rc;
@@ -523,6 +518,7 @@ ui_error_t ui_css_parse_pointer_events(const char *str,
 
 /* \brief ui_css_parse_overscroll_behavior_axis
  */
+/** @brief ui_css_parse_overscroll_behavior_axis function. */
 ui_error_t ui_css_parse_overscroll_behavior_axis(
     const char *str, enum ui_css_overscroll_behavior *out_behavior) {
   ui_error_t sw_rc;

@@ -15,6 +15,8 @@
 #include <assert.h>
 /* clang-format on */
 
+extern int g_app_load_mock_append_fail;
+
 extern int g_malloc_fail_countdown;
 
 static ui_error_t mock_aot_mount(struct ui_dom_node *parent_node,
@@ -267,7 +269,6 @@ int main(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_app_load_mock_append_fail;
     memset(&cfg, 0, sizeof(cfg));
     cfg.mode = UI_APP_LOAD_MODE_RUNTIME;
     cfg.schema_payload = app_schema;

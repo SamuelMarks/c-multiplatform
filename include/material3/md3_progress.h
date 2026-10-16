@@ -15,7 +15,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
@@ -35,12 +35,12 @@ enum md3_progress_type {
  * @brief Material 3 Progress Indicator skin wrapping ui_progress_base.
  */
 struct md3_progress {
-  struct ui_progress_base *base;
-  enum md3_progress_type type;
-  float value;
-  float min;
-  float max;
-  int is_indeterminate;
+  struct ui_progress_base *base; /**< base field. */
+  enum md3_progress_type type;   /**< type field. */
+  float value;                   /**< value field. */
+  float min;                     /**< min field. */
+  float max;                     /**< max field. */
+  int is_indeterminate;          /**< is_indeterminate field. */
 };
 
 /**
@@ -118,6 +118,6 @@ extern C_MULTIPLATFORM_EXPORT ui_error_t md3_progress_get_base(
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* MATERIAL3_MD3_PROGRESS_H */

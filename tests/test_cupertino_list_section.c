@@ -10,6 +10,13 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_cupertino_list_section_mock_base_create_fail;
+extern int g_cupertino_list_section_mock_set_orientation_fail;
+extern int g_cupertino_list_section_mock_base_destroy_fail;
+extern int g_cupertino_list_section_mock_tile_get_base_fail;
+extern int g_cupertino_list_section_mock_append_item_fail;
+extern struct ui_list_base *g_cupertino_list_section_last_created_base;
+
 SUITE(cupertino_list_section_suite);
 
 TEST test_list_section_invalid_args(void) {
@@ -318,12 +325,6 @@ TEST test_list_section_mock_failures(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_cupertino_list_section_mock_base_create_fail;
-    extern int g_cupertino_list_section_mock_set_orientation_fail;
-    extern int g_cupertino_list_section_mock_base_destroy_fail;
-    extern int g_cupertino_list_section_mock_tile_get_base_fail;
-    extern int g_cupertino_list_section_mock_append_item_fail;
-    extern struct ui_list_base *g_cupertino_list_section_last_created_base;
 
     /* Base create fail */
     g_cupertino_list_section_mock_base_create_fail = 1;

@@ -55,6 +55,7 @@ static ui_error_t mock_context_menu_base_open_at(
 /** @endcond */
 #endif
 
+/** @brief cupertino_context_menu_create function. */
 ui_error_t cupertino_context_menu_create(
     struct ui_engine *engine,
     const struct cupertino_context_menu_descriptor *desc,
@@ -95,6 +96,7 @@ ui_error_t cupertino_context_menu_create(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_context_menu_destroy function. */
 ui_error_t cupertino_context_menu_destroy(struct cupertino_context_menu *menu) {
   ui_error_t rc;
 
@@ -114,6 +116,7 @@ ui_error_t cupertino_context_menu_destroy(struct cupertino_context_menu *menu) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_context_menu_add_action function. */
 ui_error_t cupertino_context_menu_add_action(
     struct cupertino_context_menu *menu,
     const struct cupertino_context_menu_action *action) {
@@ -149,6 +152,7 @@ ui_error_t cupertino_context_menu_add_action(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_context_menu_get_action_count function. */
 ui_error_t cupertino_context_menu_get_action_count(
     const struct cupertino_context_menu *menu, size_t *out_count) {
   if (!menu || !out_count) {
@@ -158,6 +162,7 @@ ui_error_t cupertino_context_menu_get_action_count(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_context_menu_get_action function. */
 ui_error_t cupertino_context_menu_get_action(
     const struct cupertino_context_menu *menu, size_t index,
     struct cupertino_context_menu_action *out_action) {
@@ -173,6 +178,7 @@ ui_error_t cupertino_context_menu_get_action(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_context_menu_open_at function. */
 ui_error_t cupertino_context_menu_open_at(struct cupertino_context_menu *menu,
                                           struct ui_overlay_director *director,
                                           float x, float y, float viewport_w,
@@ -207,6 +213,7 @@ ui_error_t cupertino_context_menu_open_at(struct cupertino_context_menu *menu,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_context_menu_close function. */
 ui_error_t cupertino_context_menu_close(struct cupertino_context_menu *menu) {
   if (!menu) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -220,6 +227,7 @@ ui_error_t cupertino_context_menu_close(struct cupertino_context_menu *menu) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_context_menu_is_open function. */
 ui_error_t
 cupertino_context_menu_is_open(const struct cupertino_context_menu *menu,
                                int *out_is_open) {
@@ -230,6 +238,7 @@ cupertino_context_menu_is_open(const struct cupertino_context_menu *menu,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_context_menu_select_action function. */
 ui_error_t
 cupertino_context_menu_select_action(struct cupertino_context_menu *menu,
                                      size_t index) {
@@ -257,6 +266,7 @@ cupertino_context_menu_select_action(struct cupertino_context_menu *menu,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_context_menu_get_last_selected_index function. */
 ui_error_t cupertino_context_menu_get_last_selected_index(
     const struct cupertino_context_menu *menu, int *out_index) {
   if (!menu || !out_index) {
@@ -266,6 +276,7 @@ ui_error_t cupertino_context_menu_get_last_selected_index(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_context_menu_get_base function. */
 ui_error_t
 cupertino_context_menu_get_base(struct cupertino_context_menu *menu,
                                 struct ui_context_menu_base **out_base) {

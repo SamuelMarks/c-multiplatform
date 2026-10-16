@@ -147,6 +147,7 @@ ui_error_t ui_css_parse_contain(const char *str, unsigned int *out_flags) {
 
 /* \brief ui_css_parse_content_visibility
  */
+/** @brief ui_css_parse_content_visibility function. */
 ui_error_t ui_css_parse_content_visibility(
     const char *str, enum ui_css_content_visibility *out_visibility) {
   ui_error_t rc;
@@ -247,6 +248,7 @@ parse_intrinsic_dim(const char **p_str,
 
 /* \brief ui_css_parse_contain_intrinsic_size
  */
+/** @brief ui_css_parse_contain_intrinsic_size function. */
 ui_error_t ui_css_parse_contain_intrinsic_size(
     const char *str, struct ui_css_contain_intrinsic_size *out_size) {
   ui_error_t rc;

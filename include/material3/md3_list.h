@@ -15,7 +15,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
@@ -34,8 +34,8 @@ enum md3_list_item_lines {
  * @brief Material 3 list container wrapping ui_list_base.
  */
 struct md3_list {
-  struct ui_list_base *base;
-  int is_segmented;
+  struct ui_list_base *base; /**< base field. */
+  int is_segmented;          /**< is_segmented field. */
 };
 
 /**
@@ -43,13 +43,13 @@ struct md3_list {
  * @brief Material 3 list item wrapping ui_list_item_base.
  */
 struct md3_list_item {
-  struct ui_list_item_base *base;
-  enum md3_list_item_lines lines;
-  char headline[128];
-  char supporting_text[256];
-  char trailing_supporting_text[64];
-  int selected;
-  int disabled;
+  struct ui_list_item_base *base;    /**< base field. */
+  enum md3_list_item_lines lines;    /**< lines field. */
+  char headline[128];                /**< headline[128] field. */
+  char supporting_text[256];         /**< supporting_text[256] field. */
+  char trailing_supporting_text[64]; /**< trailing_supporting_text[64] field. */
+  int selected;                      /**< selected field. */
+  int disabled;                      /**< disabled field. */
 };
 
 /**

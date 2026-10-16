@@ -110,6 +110,7 @@ mock_cupertino_spring_evaluate(const struct cupertino_spring_config *config,
 /** @endcond */
 #endif
 
+/** @brief cupertino_alert_create function. */
 ui_error_t cupertino_alert_create(struct ui_engine *engine,
                                   const struct cupertino_alert_descriptor *desc,
                                   struct cupertino_alert **out_alert) {
@@ -182,6 +183,7 @@ ui_error_t cupertino_alert_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_alert_destroy function. */
 ui_error_t cupertino_alert_destroy(struct cupertino_alert *alert) {
   ui_error_t rc;
 
@@ -201,6 +203,7 @@ ui_error_t cupertino_alert_destroy(struct cupertino_alert *alert) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_alert_set_title function. */
 ui_error_t cupertino_alert_set_title(struct cupertino_alert *alert,
                                      const char *title) {
   if (!alert || !title) {
@@ -218,6 +221,7 @@ ui_error_t cupertino_alert_set_title(struct cupertino_alert *alert,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_alert_get_title function. */
 ui_error_t cupertino_alert_get_title(const struct cupertino_alert *alert,
                                      const char **out_title) {
   if (!alert || !out_title) {
@@ -228,6 +232,7 @@ ui_error_t cupertino_alert_get_title(const struct cupertino_alert *alert,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_alert_set_message function. */
 ui_error_t cupertino_alert_set_message(struct cupertino_alert *alert,
                                        const char *message) {
   if (!alert || !message) {
@@ -245,6 +250,7 @@ ui_error_t cupertino_alert_set_message(struct cupertino_alert *alert,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_alert_get_message function. */
 ui_error_t cupertino_alert_get_message(const struct cupertino_alert *alert,
                                        const char **out_message) {
   if (!alert || !out_message) {
@@ -255,6 +261,7 @@ ui_error_t cupertino_alert_get_message(const struct cupertino_alert *alert,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_alert_add_action function. */
 ui_error_t cupertino_alert_add_action(struct cupertino_alert *alert,
                                       const char *title,
                                       enum cupertino_alert_action_style style,
@@ -292,6 +299,7 @@ ui_error_t cupertino_alert_add_action(struct cupertino_alert *alert,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_alert_add_text_field function. */
 ui_error_t cupertino_alert_add_text_field(struct cupertino_alert *alert,
                                           const char *placeholder,
                                           int is_secure, size_t *out_index) {
@@ -329,6 +337,7 @@ ui_error_t cupertino_alert_add_text_field(struct cupertino_alert *alert,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_alert_set_text_field_text function. */
 ui_error_t cupertino_alert_set_text_field_text(struct cupertino_alert *alert,
                                                size_t index, const char *text) {
   if (!alert || index >= alert->text_field_count) {
@@ -353,6 +362,7 @@ ui_error_t cupertino_alert_set_text_field_text(struct cupertino_alert *alert,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_alert_get_text_field_text function. */
 ui_error_t
 cupertino_alert_get_text_field_text(const struct cupertino_alert *alert,
                                     size_t index, const char **out_text) {
@@ -364,6 +374,7 @@ cupertino_alert_get_text_field_text(const struct cupertino_alert *alert,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_alert_set_open function. */
 ui_error_t cupertino_alert_set_open(struct cupertino_alert *alert,
                                     int is_open) {
   ui_error_t rc;
@@ -384,6 +395,7 @@ ui_error_t cupertino_alert_set_open(struct cupertino_alert *alert,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_alert_is_open function. */
 ui_error_t cupertino_alert_is_open(const struct cupertino_alert *alert,
                                    int *out_is_open) {
   if (!alert || !out_is_open) {
@@ -394,6 +406,7 @@ ui_error_t cupertino_alert_is_open(const struct cupertino_alert *alert,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_alert_get_action_count function. */
 ui_error_t cupertino_alert_get_action_count(const struct cupertino_alert *alert,
                                             size_t *out_count) {
   if (!alert || !out_count) {
@@ -404,6 +417,7 @@ ui_error_t cupertino_alert_get_action_count(const struct cupertino_alert *alert,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_alert_get_spring_scale function. */
 ui_error_t cupertino_alert_get_spring_scale(const struct cupertino_alert *alert,
                                             float progress, float *out_scale) {
   struct cupertino_spring_config cfg;
@@ -430,6 +444,7 @@ ui_error_t cupertino_alert_get_spring_scale(const struct cupertino_alert *alert,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_alert_get_base function. */
 ui_error_t cupertino_alert_get_base(struct cupertino_alert *alert,
                                     struct ui_alert_base **out_base) {
   if (!alert || !out_base) {

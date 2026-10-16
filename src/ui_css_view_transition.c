@@ -35,6 +35,7 @@ static ui_error_t skip_whitespace(const char **p_str) {
 
 /* \brief ui_css_parse_view_transition_name
  */
+/** @brief ui_css_parse_view_transition_name function. */
 ui_error_t ui_css_parse_view_transition_name(
     const char *str, struct ui_css_view_transition_name *out_name) {
   if (!str || !out_name)
@@ -60,6 +61,7 @@ ui_error_t ui_css_parse_view_transition_name(
 }
 /* \brief ui_css_view_transition_class_destroy
  */
+/** @brief ui_css_view_transition_class_destroy function. */
 ui_error_t ui_css_view_transition_class_destroy(
     struct ui_css_view_transition_class *vt_class) {
   struct ui_css_view_transition_class_name *current;
@@ -81,6 +83,7 @@ ui_error_t ui_css_view_transition_class_destroy(
 
 /* \brief ui_css_parse_view_transition_class
  */
+/** @brief ui_css_parse_view_transition_class function. */
 ui_error_t ui_css_parse_view_transition_class(
     const char *str, struct ui_css_view_transition_class *out_class) {
   char token_buf[1024];

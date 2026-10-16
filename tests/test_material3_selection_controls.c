@@ -457,9 +457,7 @@ SUITE(md3_selection_controls_suite) {
 GREATEST_MAIN_DEFS();
 
 int main(int argc, char **argv) {
-  int result;
   GREATEST_MAIN_BEGIN();
   RUN_SUITE(md3_selection_controls_suite);
   GREATEST_MAIN_END();
-  return result;
 }

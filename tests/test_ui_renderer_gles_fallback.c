@@ -4,6 +4,8 @@
 #include <stdio.h>
 /* clang-format on */
 
+extern int g_mock_gles2_destroy_fail;
+
 extern ui_error_t ui_renderer_gles_fallback_init(struct ui_renderer *renderer);
 
 struct gles_fallback_context {
@@ -14,16 +16,34 @@ struct gles_fallback_context {
 
 static ui_error_t mock_fail_set_viewport(struct ui_renderer_backend *backend,
                                          int x, int y, int width, int height) {
+  if (sizeof(backend) == 0) {
+  }
+  if (sizeof(height) == 0) {
+  }
+  if (sizeof(width) == 0) {
+  }
+  if (sizeof(y) == 0) {
+  }
+  if (sizeof(x) == 0) {
+  }
   return UI_ERROR_UNKNOWN;
 }
 static ui_error_t mock_fail_clear(struct ui_renderer_backend *backend,
                                   struct ui_color color) {
+  if (sizeof(backend) == 0) {
+  }
+  if (sizeof(color) == 0) {
+  }
   return UI_ERROR_UNKNOWN;
 }
 static ui_error_t mock_fail_flush(struct ui_renderer_backend *backend) {
+  if (sizeof(backend) == 0) {
+  }
   return UI_ERROR_UNKNOWN;
 }
 static ui_error_t mock_fail_destroy(struct ui_renderer_backend *backend) {
+  if (sizeof(backend) == 0) {
+  }
   return UI_ERROR_UNKNOWN;
 }
 
@@ -210,7 +230,6 @@ int main(void) {
 #ifdef UI_TEST_MOCK_ALLOC
   /* Malloc failure in ui_renderer_gles_fallback_init for GLES2 */
   {
-    extern int g_mock_gles2_destroy_fail;
     int i;
     for (i = 0; i < 5; i++) {
       g_malloc_fail_countdown = i;

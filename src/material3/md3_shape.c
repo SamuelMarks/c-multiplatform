@@ -10,6 +10,7 @@
 #include <string.h>
 /* clang-format on */
 
+/** @brief g_shape_radii[MD3_SHAPE_SCALE_COUNT] variable. */
 static const float g_shape_radii[MD3_SHAPE_SCALE_COUNT] = {
     0.0f,   /* NONE */
     4.0f,   /* EXTRA_SMALL */
@@ -20,6 +21,7 @@ static const float g_shape_radii[MD3_SHAPE_SCALE_COUNT] = {
     9999.0f /* FULL */
 };
 
+/** @brief g_shape_scale_names[MD3_SHAPE_SCALE_COUNT] variable. */
 static const char *const g_shape_scale_names[MD3_SHAPE_SCALE_COUNT] = {
     "none",         "corner-extra-small", "corner-small", "corner-medium",
     "corner-large", "corner-extra-large", "corner-full"};
@@ -35,6 +37,7 @@ struct md3_cut_shape_entry {
   float radius;
 };
 
+/** @brief g_cut_shapes[3] variable. */
 static const struct md3_cut_shape_entry g_cut_shapes[3] = {
     {"--md-sys-shape-corner-cut-small", 8.0f},
     {"--md-sys-shape-corner-cut-medium", 16.0f},
@@ -84,7 +87,7 @@ ui_error_t md3_shape_apply_tokens(int is_expressive,
 #if defined(_MSC_VER)
     sprintf_s(buf, sizeof(buf), "--md-sys-shape-%s", g_shape_scale_names[i]);
 #else
-    snprintf(buf, sizeof(buf), "--md-sys-shape-%s", g_shape_scale_names[i]);
+    sprintf(buf, "--md-sys-shape-%s", g_shape_scale_names[i]);
 #endif
     rc = ui_design_token_set_number(dict, buf, g_shape_radii[i]);
     if (rc != UI_ERROR_NONE) {

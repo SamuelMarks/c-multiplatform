@@ -126,7 +126,6 @@ static ui_error_t test_focus_manager_advance(void) {
 
   {
     /* is_focusable error */
-    ui_bool_t focusable;
     ui_dom_node_set_attribute(root, "tabindex", "invalid_tabindex");
     /* We can't really trigger is_focusable error without mocking since
      * ui_dom_node_get_attribute doesn't return error easily here */
@@ -246,7 +245,6 @@ static ui_error_t test_focus_manager_traps(void) {
 
   {
     /* is_focusable error */
-    ui_bool_t focusable;
     ui_dom_node_set_attribute(root, "tabindex", "invalid_tabindex");
     /* We can't really trigger is_focusable error without mocking since
      * ui_dom_node_get_attribute doesn't return error easily here */
@@ -516,7 +514,6 @@ static ui_error_t test_oom(void) {
 
   {
     /* is_focusable error */
-    ui_bool_t focusable;
     ui_dom_node_set_attribute(root, "tabindex", "invalid_tabindex");
     /* We can't really trigger is_focusable error without mocking since
      * ui_dom_node_get_attribute doesn't return error easily here */
@@ -613,7 +610,6 @@ static ui_error_t test_focus_manager_coverage(void) {
 
   {
     /* is_focusable error */
-    ui_bool_t focusable;
     ui_dom_node_set_attribute(root, "tabindex", "invalid_tabindex");
     /* We can't really trigger is_focusable error without mocking since
      * ui_dom_node_get_attribute doesn't return error easily here */
@@ -690,7 +686,6 @@ static int run_coverage_focus(void) {
 
   {
     /* is_focusable error */
-    ui_bool_t focusable;
     ui_dom_node_set_attribute(root, "tabindex", "invalid_tabindex");
     /* We can't really trigger is_focusable error without mocking since
      * ui_dom_node_get_attribute doesn't return error easily here */

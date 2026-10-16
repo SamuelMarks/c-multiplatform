@@ -10,34 +10,29 @@
 #include "ui_error.h"
 #include "ui_types.h"
 #include <stddef.h>
-#if defined(_MSC_VER) && (_MSC_VER < 1600)
-typedef unsigned __int32 uint32_t;
-#else
-#include <stdint.h>
-#endif
 /* clang-format on */
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 /**
  * @struct md2_color_palette
  * @brief Complete Material Design 2 color palette (12 standard roles).
  */
 struct md2_color_palette {
-  ui_uint32 primary;
-  ui_uint32 primary_variant;
-  ui_uint32 secondary;
-  ui_uint32 secondary_variant;
-  ui_uint32 background;
-  ui_uint32 surface;
-  ui_uint32 error;
-  ui_uint32 on_primary;
-  ui_uint32 on_secondary;
-  ui_uint32 on_background;
-  ui_uint32 on_surface;
-  ui_uint32 on_error;
+  ui_uint32 primary;           /**< primary field. */
+  ui_uint32 primary_variant;   /**< primary_variant field. */
+  ui_uint32 secondary;         /**< secondary field. */
+  ui_uint32 secondary_variant; /**< secondary_variant field. */
+  ui_uint32 background;        /**< background field. */
+  ui_uint32 surface;           /**< surface field. */
+  ui_uint32 error;             /**< error field. */
+  ui_uint32 on_primary;        /**< on_primary field. */
+  ui_uint32 on_secondary;      /**< on_secondary field. */
+  ui_uint32 on_background;     /**< on_background field. */
+  ui_uint32 on_surface;        /**< on_surface field. */
+  ui_uint32 on_error;          /**< on_error field. */
 };
 
 /**
@@ -62,6 +57,6 @@ md2_color_palette_init_dark(struct md2_color_palette *out_palette);
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* MATERIAL2_MD2_COLOR_H */

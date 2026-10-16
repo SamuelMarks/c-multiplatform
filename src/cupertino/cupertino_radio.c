@@ -9,6 +9,7 @@
 #include <string.h>
 /* clang-format on */
 
+/** @brief cupertino_radio_cva_write_value function. */
 static ui_error_t
 cupertino_radio_cva_write_value(void *component,
                                 union ui_signal_payload value) {
@@ -22,6 +23,7 @@ cupertino_radio_cva_write_value(void *component,
   return cupertino_radio_set_checked(radio, value.bool_val ? 1 : 0);
 }
 
+/** @brief cupertino_radio_cva_set_disabled_state function. */
 static ui_error_t
 cupertino_radio_cva_set_disabled_state(void *component, ui_bool_t is_disabled) {
   struct cupertino_radio *radio;

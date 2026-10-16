@@ -11,6 +11,7 @@
 /* clang-format on */
 
 #ifndef M_PI
+/** @brief M_PI macro definition. */
 #define M_PI 3.14159265358979323846
 #endif
 

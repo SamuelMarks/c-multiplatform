@@ -71,6 +71,7 @@ mock_ui_page_control_base_set_current_page(struct ui_page_control_base *base,
 
 #endif /* UI_TEST_MOCK_ALLOC */
 
+/** @brief cupertino_page_control_create function. */
 ui_error_t cupertino_page_control_create(
     struct ui_engine *engine,
     const struct cupertino_page_control_descriptor *desc,
@@ -139,6 +140,7 @@ ui_error_t cupertino_page_control_create(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_page_control_destroy function. */
 ui_error_t
 cupertino_page_control_destroy(struct cupertino_page_control *control) {
   ui_error_t rc;
@@ -159,6 +161,7 @@ cupertino_page_control_destroy(struct cupertino_page_control *control) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_page_control_set_number_of_pages function. */
 ui_error_t cupertino_page_control_set_number_of_pages(
     struct cupertino_page_control *control, int count) {
   ui_error_t rc;
@@ -189,6 +192,7 @@ ui_error_t cupertino_page_control_set_number_of_pages(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_page_control_get_number_of_pages function. */
 ui_error_t cupertino_page_control_get_number_of_pages(
     const struct cupertino_page_control *control, int *out_count) {
   if (!control || !out_count) {
@@ -199,6 +203,7 @@ ui_error_t cupertino_page_control_get_number_of_pages(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_page_control_set_current_page function. */
 ui_error_t
 cupertino_page_control_set_current_page(struct cupertino_page_control *control,
                                         int page) {
@@ -222,6 +227,7 @@ cupertino_page_control_set_current_page(struct cupertino_page_control *control,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_page_control_get_current_page function. */
 ui_error_t cupertino_page_control_get_current_page(
     const struct cupertino_page_control *control, int *out_page) {
   if (!control || !out_page) {
@@ -232,6 +238,7 @@ ui_error_t cupertino_page_control_get_current_page(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_page_control_scrub function. */
 ui_error_t cupertino_page_control_scrub(struct cupertino_page_control *control,
                                         float touch_x, int *out_page_changed) {
   float pitch;
@@ -279,6 +286,7 @@ ui_error_t cupertino_page_control_scrub(struct cupertino_page_control *control,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_page_control_end_scrub function. */
 ui_error_t
 cupertino_page_control_end_scrub(struct cupertino_page_control *control) {
   if (!control) {
@@ -289,6 +297,7 @@ cupertino_page_control_end_scrub(struct cupertino_page_control *control) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_page_control_get_dot_scale function. */
 ui_error_t cupertino_page_control_get_dot_scale(
     const struct cupertino_page_control *control, int dot_index,
     float *out_scale) {
@@ -317,6 +326,7 @@ ui_error_t cupertino_page_control_get_dot_scale(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_page_control_get_dimensions function. */
 ui_error_t cupertino_page_control_get_dimensions(
     const struct cupertino_page_control *control, float *out_width,
     float *out_height) {
@@ -348,6 +358,7 @@ ui_error_t cupertino_page_control_get_dimensions(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_page_control_get_base function. */
 ui_error_t
 cupertino_page_control_get_base(struct cupertino_page_control *control,
                                 struct ui_page_control_base **out_base) {

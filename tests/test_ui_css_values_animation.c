@@ -96,40 +96,40 @@ int test_css_values_animation(void) {
     ui_css_animation_destroy(anim);
     anim = NULL;
 
-    char long_name[1024];
-    memset(long_name, 'A', 200);
-    long_name[200] = '\0';
-    if (anim) {
+    {
+      char long_name[1024];
+      memset(long_name, 'A', 200);
+      long_name[200] = '\0';
+      if (anim) {
+        ui_css_animation_destroy(anim);
+        anim = NULL;
+      }
+      rc = ui_css_parse_animation(long_name, &anim);
+      EXPECT_EQ(UI_ERROR_NONE, rc);
       ui_css_animation_destroy(anim);
       anim = NULL;
-    }
-    rc = ui_css_parse_animation(long_name, &anim);
-    EXPECT_EQ(UI_ERROR_NONE, rc);
-    ui_css_animation_destroy(anim);
-    anim = NULL;
 
-    if (anim) {
+      if (anim) {
+        ui_css_animation_destroy(anim);
+        anim = NULL;
+      }
+      rc = ui_css_parse_animation("slidein 3s,", &anim);
+      EXPECT_EQ(UI_ERROR_NONE, rc);
       ui_css_animation_destroy(anim);
       anim = NULL;
-    }
-    rc = ui_css_parse_animation("slidein 3s,", &anim);
-    EXPECT_EQ(UI_ERROR_NONE, rc);
-    ui_css_animation_destroy(anim);
-    anim = NULL;
 
-    g_malloc_fail_countdown = 0;
-    if (anim) {
-      ui_css_animation_destroy(anim);
-      anim = NULL;
+      g_malloc_fail_countdown = 0;
+      if (anim) {
+        ui_css_animation_destroy(anim);
+        anim = NULL;
+      }
+      rc = ui_css_parse_animation("slidein 3s", &anim);
+      EXPECT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
+      g_malloc_fail_countdown = -1;
     }
-    rc = ui_css_parse_animation("slidein 3s", &anim);
-    EXPECT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
-    g_malloc_fail_countdown = -1;
   }
 
   test_missing_branches();
   printf("All css_values tests passed.\n");
-  return 0;
-
   return 0;
 }

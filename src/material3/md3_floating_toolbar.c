@@ -135,6 +135,7 @@ struct md3_floating_toolbar {
   int is_expanded; /**< 1 if expanded, 0 if collapsed. */
 };
 
+/** @brief md3_floating_toolbar_create function. */
 ui_error_t
 md3_floating_toolbar_create(struct ui_engine *engine,
                             enum ui_floating_toolbar_orientation orientation,
@@ -203,6 +204,7 @@ cleanup:
   return rc;
 }
 
+/** @brief md3_floating_toolbar_destroy function. */
 ui_error_t md3_floating_toolbar_destroy(struct md3_floating_toolbar *toolbar) {
   ui_error_t rc = UI_ERROR_NONE;
   ui_error_t rc_cleanup;
@@ -223,6 +225,7 @@ ui_error_t md3_floating_toolbar_destroy(struct md3_floating_toolbar *toolbar) {
   return rc;
 }
 
+/** @brief md3_floating_toolbar_get_base function. */
 ui_error_t
 md3_floating_toolbar_get_base(struct md3_floating_toolbar *toolbar,
                               struct ui_floating_toolbar_base **out_base) {
@@ -234,6 +237,7 @@ md3_floating_toolbar_get_base(struct md3_floating_toolbar *toolbar,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_floating_toolbar_set_fab function. */
 ui_error_t md3_floating_toolbar_set_fab(struct md3_floating_toolbar *toolbar,
                                         struct md3_fab *fab) {
   struct ui_button_base *btn = NULL;
@@ -263,6 +267,7 @@ ui_error_t md3_floating_toolbar_set_fab(struct md3_floating_toolbar *toolbar,
   return ui_floating_toolbar_base_set_fab_slot(toolbar->base, fab_comp);
 }
 
+/** @brief md3_floating_toolbar_toggle_expansion function. */
 ui_error_t
 md3_floating_toolbar_toggle_expansion(struct md3_floating_toolbar *toolbar) {
   ui_error_t rc;
@@ -282,6 +287,7 @@ md3_floating_toolbar_toggle_expansion(struct md3_floating_toolbar *toolbar) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_floating_toolbar_is_expanded function. */
 ui_error_t
 md3_floating_toolbar_is_expanded(const struct md3_floating_toolbar *toolbar,
                                  int *out_expanded) {

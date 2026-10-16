@@ -41,6 +41,9 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_md3_search_mock_fail;
+extern int g_divider_mock_fail;
+
 static const unsigned char tests_tiny_ttf[] = {
     0x00, 0x01, 0x00, 0x00, 0x00, 0x07, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x63, 0x6d, 0x61, 0x70, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x7c,
@@ -239,7 +242,6 @@ TEST test_md3_oom_search(void) {
   ui_error_t rc;
 
 #ifdef UI_TEST_MOCK_ALLOC
-  extern int g_md3_search_mock_fail;
   g_malloc_fail_countdown = 0;
   rc = md3_search_bar_create(dummy_engine, "Search", &sb, NULL);
   ASSERT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
@@ -852,7 +854,6 @@ TEST test_md3_oom_components_batch(void) {
   g_malloc_fail_countdown = -1;
 
   {
-    extern int g_divider_mock_fail;
     g_divider_mock_fail = 4;
     rc = md3_divider_create(dummy_engine, UI_DIVIDER_ORIENTATION_VERTICAL, 0,
                             &divider);

@@ -21,7 +21,7 @@ static ui_error_t mock_hotkey_callback_fail(void *user_data) {
 static void test_hotkey_registry_basic(void) {
   struct ui_hotkey_registry *reg = NULL;
   struct ui_hotkey_chord chord;
-  struct ui_event ev;
+  struct ui_event ev = {0};
   int id1, id2;
   int called = 0;
   int handled = 0;

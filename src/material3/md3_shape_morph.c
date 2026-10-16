@@ -12,6 +12,7 @@
 /* clang-format on */
 
 #ifndef M_PI
+/** @brief M_PI macro definition. */
 #define M_PI 3.14159265358979323846
 #endif
 
@@ -37,12 +38,14 @@ generate_radial_shape(size_t vertex_count,
   }
 }
 
+/** @brief circle_radius function. */
 static float circle_radius(float angle, void *ctx) {
   (void)angle;
   (void)ctx;
   return 1.0f;
 }
 
+/** @brief star_radius function. */
 static float star_radius(float angle, void *ctx) {
   int points;
   float p;
@@ -56,49 +59,58 @@ static float star_radius(float angle, void *ctx) {
   return 0.45f + 0.55f * (1.0f - (mod / p));
 }
 
+/** @brief scallop_radius function. */
 static float scallop_radius(float angle, void *ctx) {
   int lobes;
   lobes = *(int *)ctx;
   return 0.8f + 0.2f * (float)cos(lobes * angle);
 }
 
+/** @brief clover_radius function. */
 static float clover_radius(float angle, void *ctx) {
   int leaves;
   leaves = *(int *)ctx;
   return 0.7f + 0.3f * (float)cos(leaves * angle);
 }
 
+/** @brief flower_radius function. */
 static float flower_radius(float angle, void *ctx) {
   int petals;
   petals = *(int *)ctx;
   return (float)(0.6f + 0.4f * fabs(cos(0.5 * petals * angle)));
 }
 
+/** @brief burst_radius function. */
 static float burst_radius(float angle, void *ctx) {
   (void)ctx;
   return 0.75f + 0.25f * (float)sin(16.0f * angle);
 }
 
+/** @brief sunny_radius function. */
 static float sunny_radius(float angle, void *ctx) {
   (void)ctx;
   return 0.7f + 0.3f * (float)cos(8.0f * angle);
 }
 
+/** @brief cookie_radius function. */
 static float cookie_radius(float angle, void *ctx) {
   (void)ctx;
   return 0.85f + 0.15f * (float)sin(9.0f * angle);
 }
 
+/** @brief puff_radius function. */
 static float puff_radius(float angle, void *ctx) {
   (void)ctx;
   return 0.8f + 0.2f * (float)cos(5.0f * angle);
 }
 
+/** @brief wave_radius function. */
 static float wave_radius(float angle, void *ctx) {
   (void)ctx;
   return 0.85f + 0.15f * (float)sin(3.0f * angle);
 }
 
+/** @brief regular_polygon_radius function. */
 static float regular_polygon_radius(float angle, void *ctx) {
   int sides;
   float alpha;
@@ -429,21 +441,21 @@ ui_error_t md3_shape_to_svg_path(const struct md3_shape *shape, float width,
     float px;
     float py;
     char cmd;
+    char seg[64];
 
     px = half_w + shape->vertices[i].x * half_w;
     py = half_h + shape->vertices[i].y * half_h;
     cmd = (i == 0) ? 'M' : 'L';
 
 #if defined(_MSC_VER)
-    written = _snprintf_s(out_buffer + offset, buffer_capacity - offset,
-                          _TRUNCATE, "%c%.1f,%.1f ", cmd, px, py);
+    written = sprintf_s(seg, sizeof(seg), "%c%.1f,%.1f ", cmd, px, py);
 #else
-    written = snprintf(out_buffer + offset, buffer_capacity - offset,
-                       "%c%.1f,%.1f ", cmd, px, py);
+    written = sprintf(seg, "%c%.1f,%.1f ", cmd, px, py);
 #endif
-    if ((size_t)written >= (buffer_capacity - offset)) {
+    if (written < 0 || (size_t)written >= (buffer_capacity - offset)) {
       return UI_ERROR_OUT_OF_BOUNDS;
     }
+    memcpy(out_buffer + offset, seg, (size_t)written + 1);
     offset += (size_t)written;
   }
 

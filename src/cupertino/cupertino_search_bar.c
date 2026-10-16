@@ -55,6 +55,7 @@ mock_search_bar_base_set_query(struct ui_search_bar_base *base,
 /** @endcond */
 #endif
 
+/** @brief cupertino_search_bar_cva_write_value function. */
 static ui_error_t
 cupertino_search_bar_cva_write_value(void *component,
                                      union ui_signal_payload value) {
@@ -73,6 +74,7 @@ cupertino_search_bar_cva_write_value(void *component,
   return cupertino_search_bar_clear(bar);
 }
 
+/** @brief cupertino_search_bar_cva_set_disabled_state function. */
 static ui_error_t cupertino_search_bar_cva_set_disabled_state(void *component,
                                                               int is_disabled) {
   struct cupertino_search_bar *bar;
@@ -86,6 +88,7 @@ static ui_error_t cupertino_search_bar_cva_set_disabled_state(void *component,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_search_bar_create function. */
 ui_error_t
 cupertino_search_bar_create(struct ui_engine *engine,
                             const struct cupertino_search_bar_descriptor *desc,
@@ -158,6 +161,7 @@ cupertino_search_bar_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_search_bar_destroy function. */
 ui_error_t
 cupertino_search_bar_destroy(struct cupertino_search_bar *search_bar) {
   ui_error_t rc;
@@ -180,6 +184,7 @@ cupertino_search_bar_destroy(struct cupertino_search_bar *search_bar) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_search_bar_set_query function. */
 ui_error_t
 cupertino_search_bar_set_query(struct cupertino_search_bar *search_bar,
                                const char *query) {
@@ -209,6 +214,7 @@ cupertino_search_bar_set_query(struct cupertino_search_bar *search_bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_search_bar_get_query function. */
 ui_error_t
 cupertino_search_bar_get_query(const struct cupertino_search_bar *search_bar,
                                const char **out_query) {
@@ -220,10 +226,12 @@ cupertino_search_bar_get_query(const struct cupertino_search_bar *search_bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_search_bar_clear function. */
 ui_error_t cupertino_search_bar_clear(struct cupertino_search_bar *search_bar) {
   return cupertino_search_bar_set_query(search_bar, "");
 }
 
+/** @brief cupertino_search_bar_set_focused function. */
 ui_error_t
 cupertino_search_bar_set_focused(struct cupertino_search_bar *search_bar,
                                  int focused) {
@@ -236,6 +244,7 @@ cupertino_search_bar_set_focused(struct cupertino_search_bar *search_bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_search_bar_is_focused function. */
 ui_error_t
 cupertino_search_bar_is_focused(const struct cupertino_search_bar *search_bar,
                                 int *out_focused) {
@@ -247,6 +256,7 @@ cupertino_search_bar_is_focused(const struct cupertino_search_bar *search_bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_search_bar_get_cancel_progress function. */
 ui_error_t cupertino_search_bar_get_cancel_progress(
     const struct cupertino_search_bar *search_bar, float *out_progress) {
   if (!search_bar || !out_progress) {
@@ -257,6 +267,7 @@ ui_error_t cupertino_search_bar_get_cancel_progress(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_search_bar_set_scope_selected function. */
 ui_error_t
 cupertino_search_bar_set_scope_selected(struct cupertino_search_bar *search_bar,
                                         size_t index) {
@@ -268,6 +279,7 @@ cupertino_search_bar_set_scope_selected(struct cupertino_search_bar *search_bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_search_bar_get_scope_selected function. */
 ui_error_t cupertino_search_bar_get_scope_selected(
     const struct cupertino_search_bar *search_bar, size_t *out_index) {
   if (!search_bar || !out_index) {
@@ -278,6 +290,7 @@ ui_error_t cupertino_search_bar_get_scope_selected(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_search_bar_add_token function. */
 ui_error_t
 cupertino_search_bar_add_token(struct cupertino_search_bar *search_bar,
                                const char *token, size_t *out_index) {
@@ -308,6 +321,7 @@ cupertino_search_bar_add_token(struct cupertino_search_bar *search_bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_search_bar_get_token_count function. */
 ui_error_t cupertino_search_bar_get_token_count(
     const struct cupertino_search_bar *search_bar, size_t *out_count) {
   if (!search_bar || !out_count) {
@@ -318,6 +332,7 @@ ui_error_t cupertino_search_bar_get_token_count(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_search_bar_get_cva function. */
 ui_error_t
 cupertino_search_bar_get_cva(struct cupertino_search_bar *search_bar,
                              struct ui_control_value_accessor **out_cva) {
@@ -329,6 +344,7 @@ cupertino_search_bar_get_cva(struct cupertino_search_bar *search_bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_search_bar_get_base function. */
 ui_error_t
 cupertino_search_bar_get_base(struct cupertino_search_bar *search_bar,
                               struct ui_search_bar_base **out_base) {

@@ -17,10 +17,11 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
+/** @brief CUPERTINO_CONTROL_CENTER_MAX_GRID_MODULES constant. */
 #define CUPERTINO_CONTROL_CENTER_MAX_GRID_MODULES 32
 
 /**

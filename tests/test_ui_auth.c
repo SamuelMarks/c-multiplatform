@@ -5,6 +5,8 @@
 #include <assert.h>
 /* clang-format on */
 
+extern int g_auth_mock_fail;
+
 extern int g_malloc_fail_countdown;
 
 /* Mock free from standard library for test purposes since mock allocator isn't
@@ -16,6 +18,8 @@ static int g_auth_success = 0;
 static ui_error_t on_auth_resolved(void *result_ptr, void *user_data,
                                    void **out_result) {
   enum ui_auth_result *res = (enum ui_auth_result *)result_ptr;
+  if (sizeof(out_result) == 0) {
+  }
   if (user_data) {
   }
   if (res && *res == UI_AUTH_RESULT_SUCCESS) {
@@ -30,6 +34,8 @@ static ui_error_t on_auth_resolved(void *result_ptr, void *user_data,
 
 static ui_error_t on_auth_rejected(ui_error_t err, void *user_data,
                                    void **out_result) {
+  if (sizeof(out_result) == 0) {
+  }
   if (user_data) {
   }
   if (err != UI_ERROR_NONE) {
@@ -40,7 +46,7 @@ static ui_error_t on_auth_rejected(ui_error_t err, void *user_data,
 
 int main(void) {
   struct ui_promise *promise = NULL;
-  struct ui_auth_request_config config;
+  struct ui_auth_request_config config = {0};
   ui_error_t rc;
   int is_supported = 0;
   int i;
@@ -117,7 +123,6 @@ int main(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_auth_mock_fail;
 
     rc = ui_promise_create(&promise);
     if (rc != UI_ERROR_NONE) {

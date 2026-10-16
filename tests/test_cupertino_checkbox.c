@@ -10,6 +10,9 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_cupertino_checkbox_mock_get_state_fail;
+extern int g_malloc_fail_countdown;
+
 SUITE(cupertino_checkbox_suite);
 
 TEST test_checkbox_lifecycle_and_cva(void) {
@@ -90,7 +93,6 @@ TEST test_checkbox_lifecycle_and_cva(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_cupertino_checkbox_mock_get_state_fail;
     g_cupertino_checkbox_mock_get_state_fail = 1;
     rc = cupertino_checkbox_toggle(cb);
     ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
@@ -264,7 +266,6 @@ TEST test_checkbox_oom_mock(void) {
   ui_error_t rc;
 
 #ifdef UI_TEST_MOCK_ALLOC
-  extern int g_malloc_fail_countdown;
 
   g_malloc_fail_countdown = 0;
   rc = cupertino_checkbox_create(dummy_engine, &cb, NULL);

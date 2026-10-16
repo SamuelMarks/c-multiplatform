@@ -73,6 +73,7 @@ ui_error_t ui_css_parse_overflow(const char *str,
 
 /* \brief ui_error
  */
+/** @brief ui_css_parse_text_overflow function. */
 ui_error_t
 ui_css_parse_text_overflow(const char *str,
                            struct ui_css_text_overflow *out_overflow) {
@@ -113,6 +114,7 @@ ui_css_parse_text_overflow(const char *str,
 
 /* \brief ui_error
  */
+/** @brief ui_css_parse_block_ellipsis function. */
 ui_error_t
 ui_css_parse_block_ellipsis(const char *str,
                             struct ui_css_block_ellipsis *out_ellipsis) {
@@ -227,6 +229,7 @@ ui_error_t ui_css_parse_max_lines(const char *str,
 
 /* \brief ui_error
  */
+/** @brief ui_css_parse_overflow_clip_margin function. */
 ui_error_t ui_css_parse_overflow_clip_margin(const char *str,
                                              struct ui_css_value *out_margin) {
   ui_error_t rc;

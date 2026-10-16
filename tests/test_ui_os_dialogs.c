@@ -9,6 +9,8 @@
 #include <stdio.h>
 /* clang-format on */
 
+extern ui_error_t run_os_dialogs_coverage(void);
+
 extern int g_malloc_fail_countdown;
 
 static int test_os_dialogs(void) {
@@ -43,7 +45,13 @@ static int test_os_dialogs(void) {
 
   /* Dispatch reactor */
   {
-    FILE *fmock = fopen("mock_file.txt", "wb");
+    FILE *fmock = NULL;
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+    if (fopen_s(&fmock, "mock_file.txt", "wb") != 0)
+      fmock = NULL;
+#else
+    fmock = fopen("mock_file.txt", "wb");
+#endif
     if (fmock) {
       fputs("mock", fmock);
       fclose(fmock);
@@ -101,7 +109,13 @@ extern ui_error_t ui_os_file_completion(void *user_data);
 static int test_os_file_completion(void) {
   struct ui_os_file_task *task;
   struct ui_file_uploader_base uploader;
-  FILE *fpath = fopen("mock_path.txt", "wb");
+  FILE *fpath = NULL;
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+  if (fopen_s(&fpath, "mock_path.txt", "wb") != 0)
+    fpath = NULL;
+#else
+  fpath = fopen("mock_path.txt", "wb");
+#endif
   if (fpath) {
     fputs("mock", fpath);
     fclose(fpath);
@@ -199,7 +213,6 @@ int main(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern ui_error_t run_os_dialogs_coverage(void);
     if (run_os_dialogs_coverage() != UI_ERROR_NONE)
       return 1;
   }

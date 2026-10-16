@@ -33,6 +33,7 @@ struct ui_tick_engine {
   struct ui_task_node *tail; /**< tail */
 };
 
+/** @brief ui_tick_engine_create function. */
 ui_error_t ui_tick_engine_create(struct ui_tick_engine **out_engine) {
   ui_error_t rc = UI_ERROR_NONE;
   struct ui_tick_engine *engine = NULL;
@@ -58,6 +59,7 @@ cleanup:
   return rc;
 }
 
+/** @brief ui_tick_engine_destroy function. */
 ui_error_t ui_tick_engine_destroy(struct ui_tick_engine *engine) {
   struct ui_task_node *current = NULL;
   struct ui_task_node *next = NULL;
@@ -77,6 +79,7 @@ ui_error_t ui_tick_engine_destroy(struct ui_tick_engine *engine) {
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_tick_engine_schedule function. */
 ui_error_t ui_tick_engine_schedule(struct ui_tick_engine *engine,
                                    ui_error_t (*callback)(void *),
                                    void *user_data) {
@@ -110,6 +113,7 @@ cleanup:
   return rc;
 }
 
+/** @brief ui_tick_engine_tick function. */
 ui_error_t ui_tick_engine_tick(struct ui_tick_engine *engine) {
   struct ui_task_node *current = NULL;
   struct ui_task_node *next = NULL;

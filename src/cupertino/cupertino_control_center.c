@@ -81,13 +81,20 @@ mock_cupertino_haptic_impact(enum cupertino_haptic_impact_style style,
 /** @endcond */
 #endif
 
+/** @brief CUPERTINO_CC_1X1_SIZE macro definition. */
 #define CUPERTINO_CC_1X1_SIZE 60.0f
+/** @brief CUPERTINO_CC_2X1_WIDTH macro definition. */
 #define CUPERTINO_CC_2X1_WIDTH 128.0f
+/** @brief CUPERTINO_CC_2X1_HEIGHT macro definition. */
 #define CUPERTINO_CC_2X1_HEIGHT 60.0f
+/** @brief CUPERTINO_CC_2X2_SIZE macro definition. */
 #define CUPERTINO_CC_2X2_SIZE 128.0f
+/** @brief CUPERTINO_CC_EXPANDED_SLIDER_WIDTH macro definition. */
 #define CUPERTINO_CC_EXPANDED_SLIDER_WIDTH 60.0f
+/** @brief CUPERTINO_CC_EXPANDED_SLIDER_HEIGHT macro definition. */
 #define CUPERTINO_CC_EXPANDED_SLIDER_HEIGHT 180.0f
 
+/** @brief cupertino_control_center_update_geometry function. */
 static ui_error_t cupertino_control_center_update_geometry(
     struct cupertino_control_center_module *module) {
 #ifdef UI_TEST_MOCK_ALLOC
@@ -130,6 +137,7 @@ static ui_error_t cupertino_control_center_update_geometry(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_control_center_update_appearance function. */
 static ui_error_t cupertino_control_center_update_appearance(
     struct cupertino_control_center_module *module) {
 #ifdef UI_TEST_MOCK_ALLOC
@@ -148,6 +156,7 @@ static ui_error_t cupertino_control_center_update_appearance(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_control_center_module_create function. */
 ui_error_t cupertino_control_center_module_create(
     struct ui_engine *engine,
     const struct cupertino_control_center_module_descriptor *desc,
@@ -239,6 +248,7 @@ ui_error_t cupertino_control_center_module_create(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_control_center_module_destroy function. */
 ui_error_t cupertino_control_center_module_destroy(
     struct cupertino_control_center_module *module) {
   ui_error_t rc;
@@ -267,6 +277,7 @@ ui_error_t cupertino_control_center_module_destroy(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_control_center_module_set_active function. */
 ui_error_t cupertino_control_center_module_set_active(
     struct cupertino_control_center_module *module, int is_active) {
   int new_active;
@@ -292,6 +303,7 @@ ui_error_t cupertino_control_center_module_set_active(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_control_center_module_is_active function. */
 ui_error_t cupertino_control_center_module_is_active(
     const struct cupertino_control_center_module *module, int *out_is_active) {
   if (!module || !out_is_active) {
@@ -302,6 +314,7 @@ ui_error_t cupertino_control_center_module_is_active(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_control_center_module_toggle function. */
 ui_error_t cupertino_control_center_module_toggle(
     struct cupertino_control_center_module *module) {
   if (!module) {
@@ -311,6 +324,7 @@ ui_error_t cupertino_control_center_module_toggle(
   return cupertino_control_center_module_set_active(module, !module->is_active);
 }
 
+/** @brief cupertino_control_center_module_set_expanded function. */
 ui_error_t cupertino_control_center_module_set_expanded(
     struct cupertino_control_center_module *module, int is_expanded) {
   if (!module) {
@@ -321,6 +335,7 @@ ui_error_t cupertino_control_center_module_set_expanded(
   return cupertino_control_center_update_geometry(module);
 }
 
+/** @brief cupertino_control_center_module_is_expanded function. */
 ui_error_t cupertino_control_center_module_is_expanded(
     const struct cupertino_control_center_module *module,
     int *out_is_expanded) {
@@ -332,6 +347,7 @@ ui_error_t cupertino_control_center_module_is_expanded(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_control_center_module_set_slider_value function. */
 ui_error_t cupertino_control_center_module_set_slider_value(
     struct cupertino_control_center_module *module, float value) {
   if (!module || value < 0.0f || value > 1.0f) {
@@ -342,6 +358,7 @@ ui_error_t cupertino_control_center_module_set_slider_value(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_control_center_module_get_slider_value function. */
 ui_error_t cupertino_control_center_module_get_slider_value(
     const struct cupertino_control_center_module *module, float *out_value) {
   if (!module || !out_value) {
@@ -352,6 +369,7 @@ ui_error_t cupertino_control_center_module_get_slider_value(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_control_center_module_set_symbol_morph function. */
 ui_error_t cupertino_control_center_module_set_symbol_morph(
     struct cupertino_control_center_module *module, const char *symbol_from,
     const char *symbol_to, float progress) {
@@ -377,6 +395,7 @@ ui_error_t cupertino_control_center_module_set_symbol_morph(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_control_center_module_get_symbol_morph function. */
 ui_error_t cupertino_control_center_module_get_symbol_morph(
     const struct cupertino_control_center_module *module, const char **out_from,
     const char **out_to, float *out_progress) {
@@ -390,6 +409,7 @@ ui_error_t cupertino_control_center_module_get_symbol_morph(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_control_center_module_get_bounds function. */
 ui_error_t cupertino_control_center_module_get_bounds(
     const struct cupertino_control_center_module *module, float *out_w,
     float *out_h, float *out_radius) {
@@ -403,6 +423,7 @@ ui_error_t cupertino_control_center_module_get_bounds(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_control_center_module_get_button_base function. */
 ui_error_t cupertino_control_center_module_get_button_base(
     const struct cupertino_control_center_module *module,
     struct ui_button_base **out_button) {
@@ -414,6 +435,7 @@ ui_error_t cupertino_control_center_module_get_button_base(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_control_center_module_get_slider_base function. */
 ui_error_t cupertino_control_center_module_get_slider_base(
     const struct cupertino_control_center_module *module,
     struct ui_slider_base **out_slider) {
@@ -425,6 +447,7 @@ ui_error_t cupertino_control_center_module_get_slider_base(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_control_center_grid_create function. */
 ui_error_t cupertino_control_center_grid_create(
     struct ui_engine *engine, struct cupertino_control_center_grid **out_grid) {
   struct cupertino_control_center_grid *grid;
@@ -448,6 +471,7 @@ ui_error_t cupertino_control_center_grid_create(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_control_center_grid_destroy function. */
 ui_error_t cupertino_control_center_grid_destroy(
     struct cupertino_control_center_grid *grid) {
   if (!grid) {
@@ -458,6 +482,7 @@ ui_error_t cupertino_control_center_grid_destroy(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_control_center_grid_add_module function. */
 ui_error_t cupertino_control_center_grid_add_module(
     struct cupertino_control_center_grid *grid,
     struct cupertino_control_center_module *module, int col, int row) {
@@ -480,6 +505,7 @@ ui_error_t cupertino_control_center_grid_add_module(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_control_center_grid_get_module_count function. */
 ui_error_t cupertino_control_center_grid_get_module_count(
     const struct cupertino_control_center_grid *grid, size_t *out_count) {
   if (!grid || !out_count) {
@@ -490,6 +516,7 @@ ui_error_t cupertino_control_center_grid_get_module_count(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_control_center_grid_get_module_at function. */
 ui_error_t cupertino_control_center_grid_get_module_at(
     const struct cupertino_control_center_grid *grid, size_t index,
     struct cupertino_control_center_module **out_module, int *out_col,
@@ -509,6 +536,7 @@ ui_error_t cupertino_control_center_grid_get_module_at(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_control_center_grid_get_bounds function. */
 ui_error_t cupertino_control_center_grid_get_bounds(
     const struct cupertino_control_center_grid *grid, float *out_w,
     float *out_h) {

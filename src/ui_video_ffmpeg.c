@@ -55,9 +55,11 @@ ui_error_t ui_video_ffmpeg_load_api(void) {
 
 #define LOAD_SYM(name)                                                         \
   do {                                                                         \
-    g_ff.name = (void *)dlsym(g_ff_handle, #name);                             \
+    void *sym_ptr = dlsym(g_ff_handle, #name);                                 \
+    memcpy(&g_ff.name, &sym_ptr, sizeof(g_ff.name));                           \
     if (!g_ff.name) {                                                          \
-      dlclose(g_ff_handle);                                                    \
+      if (dlclose(g_ff_handle) != 0) {                                         \
+      }                                                                        \
       g_ff_handle = NULL;                                                      \
       return UI_ERROR_UNSUPPORTED;                                             \
     }                                                                          \
@@ -245,6 +247,7 @@ ui_error_t ui_video_decoder_get_default_backend(
 
 #else
 
+/** @brief ui_video_decoder_ffmpeg_get_backend function. */
 ui_error_t ui_video_decoder_ffmpeg_get_backend(
     struct ui_video_decoder_backend *out_backend) {
   if (!out_backend) {

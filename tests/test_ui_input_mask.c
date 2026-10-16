@@ -8,6 +8,8 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_input_mask_mock_fail;
+
 struct ui_input_mask {
   struct ui_input_base *input;
   char pattern[64];
@@ -201,7 +203,6 @@ static int test_mask_mock_failures(void) {
   struct ui_input_base *input = NULL;
   struct ui_input_mask *mask = NULL;
   ui_error_t rc;
-  extern int g_input_mask_mock_fail;
 
   rc = ui_input_base_create(&input);
   if (rc != UI_ERROR_NONE)

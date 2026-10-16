@@ -8,7 +8,9 @@
 #include "material3/md3_elevation.h"
 /* clang-format on */
 
+/** @brief g_elevation_dp[6] variable. */
 static const float g_elevation_dp[6] = {0.0f, 1.0f, 3.0f, 6.0f, 8.0f, 12.0f};
+/** @brief g_elevation_tint_opacity[6] variable. */
 static const float g_elevation_tint_opacity[6] = {0.00f, 0.05f, 0.08f,
                                                   0.11f, 0.12f, 0.14f};
 

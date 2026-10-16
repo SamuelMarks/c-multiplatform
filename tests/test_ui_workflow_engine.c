@@ -15,6 +15,10 @@
 #include <assert.h>
 /* clang-format on */
 
+extern int g_workflow_mock_signal_fail;
+extern int g_workflow_mock_criteria_fail;
+extern ui_error_t test_ui_workflow_evaluate_success_criteria_null(void);
+
 extern int g_malloc_fail_countdown;
 
 int main(void) {
@@ -232,9 +236,6 @@ int main(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_workflow_mock_signal_fail;
-    extern int g_workflow_mock_criteria_fail;
-    extern ui_error_t test_ui_workflow_evaluate_success_criteria_null(void);
 
     /* Test null out_matches */
     rc = test_ui_workflow_evaluate_success_criteria_null();

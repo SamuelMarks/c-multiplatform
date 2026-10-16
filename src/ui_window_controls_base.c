@@ -54,6 +54,7 @@ static ui_error_t state_equality(union ui_signal_payload a,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_window_controls_base_create function. */
 ui_error_t
 ui_window_controls_base_create(struct ui_arena *arena,
                                struct ui_window_controls_base **out_controls) {
@@ -86,6 +87,7 @@ ui_window_controls_base_create(struct ui_arena *arena,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_window_controls_base_destroy function. */
 ui_error_t
 ui_window_controls_base_destroy(struct ui_window_controls_base *controls) {
   ui_signal_t *sig;
@@ -103,6 +105,7 @@ ui_window_controls_base_destroy(struct ui_window_controls_base *controls) {
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_window_controls_base_set_state function. */
 ui_error_t
 ui_window_controls_base_set_state(struct ui_window_controls_base *controls,
                                   enum ui_window_state state) {
@@ -124,6 +127,7 @@ ui_window_controls_base_set_state(struct ui_window_controls_base *controls,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_window_controls_base_get_state_signal function. */
 ui_error_t ui_window_controls_base_get_state_signal(
     struct ui_window_controls_base *controls, ui_signal_t **out_signal) {
   if (!controls || !out_signal) {
@@ -133,6 +137,7 @@ ui_error_t ui_window_controls_base_get_state_signal(
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_window_controls_base_hit_test function. */
 ui_error_t ui_window_controls_base_hit_test(
     struct ui_window_controls_base *controls, int x, int y,
     enum ui_window_control_hit_region *out_region) {
@@ -155,6 +160,7 @@ ui_error_t ui_window_controls_base_hit_test(
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_window_controls_base_set_region_rect function. */
 ui_error_t ui_window_controls_base_set_region_rect(
     struct ui_window_controls_base *controls,
     enum ui_window_control_hit_region region, int x, int y, int width,
@@ -192,6 +198,7 @@ ui_error_t ui_window_controls_base_set_region_rect(
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_window_controls_base_trigger_hover_intent function. */
 ui_error_t ui_window_controls_base_trigger_hover_intent(
     struct ui_window_controls_base *controls,
     enum ui_window_control_hit_region region) {

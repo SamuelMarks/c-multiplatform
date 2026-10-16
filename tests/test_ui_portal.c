@@ -4,6 +4,8 @@
 #include <stdio.h>
 /* clang-format on */
 
+extern int g_portal_mock_fail;
+
 extern int g_malloc_fail_countdown;
 
 static int test_portal_lifecycle(void) {
@@ -222,7 +224,6 @@ static int test_portal_mock_errors(void) {
   struct ui_dom_node *content1 = NULL;
   struct ui_dom_node *content2 = NULL;
   struct ui_portal *portal = NULL;
-  extern int g_portal_mock_fail;
 
   /* Scenario A: remove_child fail in set_content */
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &target);

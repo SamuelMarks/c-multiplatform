@@ -10,6 +10,11 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_cupertino_refresh_mock_create_fail;
+extern int g_cupertino_refresh_mock_destroy_fail;
+extern int g_cupertino_refresh_mock_set_cb_fail;
+extern int g_cupertino_refresh_mock_complete_fail;
+
 SUITE(cupertino_refresh_suite);
 
 static int g_refresh_invoked = 0;
@@ -17,6 +22,8 @@ static int g_refresh_invoked = 0;
 static ui_error_t mock_on_refresh_cb(struct ui_pull_to_refresh_base *ptr,
                                      void *user_data) {
   int *flag = (int *)user_data;
+  if (sizeof(ptr) == 0) {
+  }
   if (flag) {
     *flag = 1;
   }
@@ -84,15 +91,17 @@ TEST test_refresh_invalid_args(void) {
   ASSERT_EQ(UI_PULL_TO_REFRESH_RESTING, refresh->state);
 
   /* Destroy with refresh->base == NULL */
-  struct ui_pull_to_refresh_base *saved_b = refresh->base;
-  refresh->base = NULL;
-  rc = cupertino_refresh_complete(refresh);
-  ASSERT_EQ(UI_ERROR_NONE, rc);
-  rc = cupertino_refresh_destroy(refresh);
-  ASSERT_EQ(UI_ERROR_NONE, rc);
-  ui_pull_to_refresh_base_destroy(saved_b);
+  {
+    struct ui_pull_to_refresh_base *saved_b = refresh->base;
+    refresh->base = NULL;
+    rc = cupertino_refresh_complete(refresh);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+    rc = cupertino_refresh_destroy(refresh);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+    ui_pull_to_refresh_base_destroy(saved_b);
 
-  PASS();
+    PASS();
+  }
 }
 
 TEST test_refresh_lifecycle_and_gestures(void) {
@@ -198,10 +207,6 @@ TEST test_refresh_oom_mock(void) {
   memset(&desc, 0, sizeof(desc));
 
 #ifdef UI_TEST_MOCK_ALLOC
-  extern int g_cupertino_refresh_mock_create_fail;
-  extern int g_cupertino_refresh_mock_destroy_fail;
-  extern int g_cupertino_refresh_mock_set_cb_fail;
-  extern int g_cupertino_refresh_mock_complete_fail;
 
   /* Fail malloc for struct cupertino_refresh */
   g_malloc_fail_countdown = 0;

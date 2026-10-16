@@ -9,6 +9,8 @@
 #include <assert.h>
 /* clang-format on */
 
+extern int g_banner_mock_fail;
+
 struct ui_banner_base {
   struct ui_component *base;
   int is_open;
@@ -24,7 +26,6 @@ static ui_error_t run_mock_tests(void) {
   union ui_signal_payload p;
   struct ui_signal *sig = NULL;
   ui_error_t rc;
-  extern int g_banner_mock_fail;
 
   g_banner_mock_fail = 10;
   rc = ui_banner_base_create(&banner);

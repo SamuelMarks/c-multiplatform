@@ -10,6 +10,7 @@
 #include <string.h>
 /* clang-format on */
 
+/** @brief md3_carousel_create function. */
 ui_error_t md3_carousel_create(struct ui_engine *engine,
                                enum md3_carousel_layout_type layout_type,
                                const struct ui_carousel_config *config,
@@ -42,6 +43,7 @@ ui_error_t md3_carousel_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_carousel_destroy function. */
 ui_error_t md3_carousel_destroy(struct md3_carousel *carousel) {
   ui_error_t rc;
 
@@ -54,6 +56,7 @@ ui_error_t md3_carousel_destroy(struct md3_carousel *carousel) {
   return rc;
 }
 
+/** @brief md3_carousel_set_mask_morphing function. */
 ui_error_t md3_carousel_set_mask_morphing(struct md3_carousel *carousel,
                                           int enable) {
   if (!carousel) {
@@ -63,6 +66,7 @@ ui_error_t md3_carousel_set_mask_morphing(struct md3_carousel *carousel,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_carousel_set_corner_radius function. */
 ui_error_t md3_carousel_set_corner_radius(struct md3_carousel *carousel,
                                           float radius) {
   if (!carousel || radius < 0.0f) {
@@ -72,6 +76,7 @@ ui_error_t md3_carousel_set_corner_radius(struct md3_carousel *carousel,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_carousel_scroll_to function. */
 ui_error_t md3_carousel_scroll_to(struct md3_carousel *carousel, size_t index,
                                   int smooth) {
   if (!carousel || !carousel->base) {
@@ -81,6 +86,7 @@ ui_error_t md3_carousel_scroll_to(struct md3_carousel *carousel, size_t index,
   return ui_carousel_base_scroll_to_index(carousel->base, index, smooth);
 }
 
+/** @brief md3_carousel_get_component function. */
 ui_error_t md3_carousel_get_component(struct md3_carousel *carousel,
                                       struct ui_component **out_component) {
   if (!carousel || !out_component || !carousel->base) {

@@ -13,6 +13,16 @@
 #include <assert.h>
 /* clang-format on */
 
+extern int g_malloc_fail_countdown;
+extern int g_eject_mock_format_fail;
+extern int g_eject_mock_copy_fail;
+#ifdef UI_TEST_MOCK_ALLOC
+struct node_meta;
+extern ui_error_t
+ui_test_eject_init_node_meta(struct node_meta *meta, int id_num,
+                             const struct ui_runtime_node *node);
+#endif
+
 int main(void) {
   struct ui_arena *arena = NULL;
   struct ui_runtime_node *node = NULL;
@@ -21,39 +31,16 @@ int main(void) {
   ui_error_t rc;
 
   const char *test_json =
-      "{\n"
-      "  \"id\": \"survey_card\",\n"
-      "  \"type\": \"ui_card_base\",\n"
-      "  \"props\": {\n"
-      "    \"title\": \"Survey Question 1\"\n"
-      "  },\n"
-      "  \"children\": [\n"
-      "    {\n"
-      "      \"id\": \"user_email\",\n"
-      "      \"type\": \"ui_input_base\",\n"
-      "      \"props\": {\n"
-      "        \"placeholder\": \"name@domain.com\"\n"
-      "      },\n"
-      "      \"bindings\": {\n"
-      "        \"bind_cva\": \"user.email\"\n"
-      "      },\n"
-      "      \"validators\": [\n"
-      "        {\"type\": \"required\"},\n"
-      "        {\"type\": \"pattern\", \"pattern\": \"^.+@.+\\\\..+$\"}\n"
-      "      ]\n"
-      "    },\n"
-      "    {\n"
-      "      \"id\": \"submit_btn\",\n"
-      "      \"type\": \"ui_button_base\",\n"
-      "      \"props\": {\n"
-      "        \"text\": \"Next\"\n"
-      "      },\n"
-      "      \"bindings\": {\n"
-      "        \"bind_disabled\": \"is_loading\"\n"
-      "      }\n"
-      "    }\n"
-      "  ]\n"
-      "}";
+      "{\"id\":\"survey_card\",\"type\":\"ui_card_base\","
+      "\"props\":{\"title\":\"Survey Question 1\"},\"children\":["
+      "{\"id\":\"user_email\",\"type\":\"ui_input_base\","
+      "\"props\":{\"placeholder\":\"name@domain.com\"},"
+      "\"bindings\":{\"bind_cva\":\"user.email\"},"
+      "\"validators\":[{\"type\":\"required\"},{\"type\":\"pattern\","
+      "\"pattern\":\"^.+@.+\\\\..+$\"}]},"
+      "{\"id\":\"submit_btn\",\"type\":\"ui_button_base\","
+      "\"props\":{\"text\":\"Next\"},"
+      "\"bindings\":{\"bind_disabled\":\"is_loading\"}}]}";
 
   rc = ui_arena_create(65536, &arena);
   assert(rc == UI_ERROR_NONE);
@@ -161,96 +148,45 @@ int main(void) {
 
   /* Comprehensive component and truncation tests */
   {
-    const char *comp_json =
-        "{\n"
-        "  \"id\": \"root_box\",\n"
-        "  \"type\": \"box\",\n"
-        "  \"props\": {\n"
-        "    \"data-role\": \"main\"\n"
-        "  },\n"
-        "  \"children\": [\n"
-        "    {\n"
-        "      \"id\": \"btn1\",\n"
-        "      \"type\": \"ui_button_base\",\n"
-        "      \"props\": {\n"
-        "        \"text\": \"Click\",\n"
-        "        \"custom_btn_prop\": \"val\"\n"
-        "      },\n"
-        "      \"bindings\": {\n"
-        "        \"bind_cva\": \"btn.cva\",\n"
-        "        \"bind_text\": \"btn.label\",\n"
-        "        \"bind_disabled\": \"btn.disabled\"\n"
-        "      }\n"
-        "    },\n"
-        "    {\n"
-        "      \"id\": \"inp1\",\n"
-        "      \"type\": \"ui_input_base\",\n"
-        "      \"props\": {\n"
-        "        \"placeholder\": \"Enter name\",\n"
-        "        \"custom_inp_prop\": \"val\"\n"
-        "      },\n"
-        "      \"bindings\": {\n"
-        "        \"bind_cva\": \"user.name\",\n"
-        "        \"bind_text\": \"some.text\",\n"
-        "        \"bind_disabled\": \"some.disabled\"\n"
-        "      },\n"
-        "      \"validators\": [\n"
-        "        {\"type\": \"required\"},\n"
-        "        {\"type\": \"pattern\", \"pattern\": \"^[A-Z]+$\"},\n"
-        "        {\"type\": \"pattern\"},\n"
-        "        {\"type\": \"min_length\", \"value\": 5}\n"
-        "      ]\n"
-        "    },\n"
-        "    {\n"
-        "      \"id\": \"card1\",\n"
-        "      \"type\": \"ui_card_base\",\n"
-        "      \"props\": {\n"
-        "        \"title\": \"Card Title\",\n"
-        "        \"custom_card_prop\": \"val\"\n"
-        "      }\n"
-        "    },\n"
-        "    {\n"
-        "      \"id\": \"chk1\",\n"
-        "      \"type\": \"ui_checkbox_base\",\n"
-        "      \"props\": {\n"
-        "        \"checked\": \"true\"\n"
-        "      },\n"
-        "      \"bindings\": {\n"
-        "        \"bind_visibility\": \"app.visible\"\n"
-        "      }\n"
-        "    },\n"
-        "    {\n"
-        "      \"id\": \"lbl1\",\n"
-        "      \"type\": \"ui_label_base\",\n"
-        "      \"props\": {\n"
-        "        \"text\": \"Label text\"\n"
-        "      }\n"
-        "    },\n"
-        "    {\n"
-        "      \"id\": \"sld1\",\n"
-        "      \"type\": \"ui_slider_base\",\n"
-        "      \"props\": {\n"
-        "        \"min\": \"0\"\n"
-        "      },\n"
-        "      \"validators\": [\n"
-        "        {\"type\": \"pattern\"}\n"
-        "      ]\n"
-        "    },\n"
-        "    {\n"
-        "      \"type\": \"row\"\n"
-        "    },\n"
-        "    {\n"
-        "      \"id\": \"col1\",\n"
-        "      \"type\": \"column\"\n"
-        "    },\n"
-        "    {\n"
-        "      \"id\": \"grid1\",\n"
-        "      \"type\": \"grid\"\n"
-        "    }\n"
-        "  ]\n"
-        "}";
+    char comp_json[1024];
+    const char *comp_p1 =
+        "{\"id\":\"root_box\",\"type\":\"box\",\"props\":{\"data-role\":"
+        "\"main\"},\"children\":["
+        "{\"id\":\"btn1\",\"type\":\"ui_button_base\",\"props\":{\"text\":"
+        "\"Click\",\"custom_btn_prop\":\"val\"},"
+        "\"bindings\":{\"bind_cva\":\"btn.cva\",\"bind_text\":\"btn.label\","
+        "\"bind_disabled\":\"btn.disabled\"}},"
+        "{\"id\":\"inp1\",\"type\":\"ui_input_base\",\"props\":{"
+        "\"placeholder\":\"Enter name\",\"custom_inp_prop\":\"val\"},"
+        "\"bindings\":{\"bind_cva\":\"user.name\",\"bind_text\":\"some.text\","
+        "\"bind_disabled\":\"some.disabled\"},";
+    const char *comp_p2 =
+        "\"validators\":[{\"type\":\"required\"},{\"type\":\"pattern\","
+        "\"pattern\":\"^[A-Z]+$\"},"
+        "{\"type\":\"pattern\"},{\"type\":\"min_length\",\"value\":5}]},"
+        "{\"id\":\"card1\",\"type\":\"ui_card_base\",\"props\":{\"title\":"
+        "\"Card Title\",\"custom_card_prop\":\"val\"}},"
+        "{\"id\":\"chk1\",\"type\":\"ui_checkbox_base\",\"props\":{\"checked\":"
+        "\"true\"},\"bindings\":{\"bind_visibility\":\"app.visible\"}},";
+    const char *comp_p3 =
+        "{\"id\":\"lbl1\",\"type\":\"ui_label_base\",\"props\":{\"text\":"
+        "\"Label text\"}},"
+        "{\"id\":\"sld1\",\"type\":\"ui_slider_base\",\"props\":{\"min\":\"0\"}"
+        ",\"validators\":[{\"type\":\"pattern\"}]},"
+        "{\"type\":\"row\"},{\"id\":\"col1\",\"type\":\"column\"},{\"id\":"
+        "\"grid1\",\"type\":\"grid\"}]}";
     struct ui_runtime_node *comp_node = NULL;
     size_t sz;
+
+#if defined(_MSC_VER)
+    strcpy_s(comp_json, sizeof(comp_json), comp_p1);
+    strcat_s(comp_json, sizeof(comp_json), comp_p2);
+    strcat_s(comp_json, sizeof(comp_json), comp_p3);
+#else
+    strcpy(comp_json, comp_p1);
+    strcat(comp_json, comp_p2);
+    strcat(comp_json, comp_p3);
+#endif
 
     rc = ui_runtime_schema_parse_node(arena, comp_json, &comp_node);
     assert(rc == UI_ERROR_NONE);
@@ -320,7 +256,6 @@ int main(void) {
 
     /* Node eject argument and file error checks */
     {
-      extern int g_malloc_fail_countdown;
 
       rc = ui_runtime_eject_node_to_c(NULL, "f", "c", "h");
       assert(rc == UI_ERROR_INVALID_ARGUMENT);
@@ -370,12 +305,6 @@ int main(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_eject_mock_format_fail;
-    extern int g_eject_mock_copy_fail;
-    struct node_meta;
-    extern ui_error_t ui_test_eject_init_node_meta(
-        struct node_meta * meta, int id_num,
-        const struct ui_runtime_node *node);
     struct ui_runtime_node single_node;
     char meta_buf[512];
     int fail_idx;

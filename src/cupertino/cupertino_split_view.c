@@ -111,6 +111,7 @@ mock_ui_split_pane_base_get_position(struct ui_split_pane_base *base,
 
 #endif /* UI_TEST_MOCK_ALLOC */
 
+/** @brief cupertino_split_view_update_layout function. */
 static void
 cupertino_split_view_update_layout(struct cupertino_split_view *view) {
   if (view->is_collapsed) {
@@ -172,6 +173,7 @@ cupertino_split_view_update_layout(struct cupertino_split_view *view) {
   }
 }
 
+/** @brief cupertino_split_view_create function. */
 ui_error_t
 cupertino_split_view_create(struct ui_engine *engine,
                             const struct cupertino_split_view_descriptor *desc,
@@ -270,6 +272,7 @@ cupertino_split_view_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_split_view_destroy function. */
 ui_error_t cupertino_split_view_destroy(struct cupertino_split_view *view) {
   ui_error_t rc;
 
@@ -289,6 +292,7 @@ ui_error_t cupertino_split_view_destroy(struct cupertino_split_view *view) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_split_view_set_style function. */
 ui_error_t
 cupertino_split_view_set_style(struct cupertino_split_view *view,
                                enum cupertino_split_view_style style) {
@@ -300,6 +304,7 @@ cupertino_split_view_set_style(struct cupertino_split_view *view,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_split_view_get_style function. */
 ui_error_t
 cupertino_split_view_get_style(const struct cupertino_split_view *view,
                                enum cupertino_split_view_style *out_style) {
@@ -310,6 +315,7 @@ cupertino_split_view_get_style(const struct cupertino_split_view *view,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_split_view_set_display_mode function. */
 ui_error_t cupertino_split_view_set_display_mode(
     struct cupertino_split_view *view,
     enum cupertino_split_view_display_mode mode) {
@@ -321,6 +327,7 @@ ui_error_t cupertino_split_view_set_display_mode(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_split_view_get_display_mode function. */
 ui_error_t cupertino_split_view_get_display_mode(
     const struct cupertino_split_view *view,
     enum cupertino_split_view_display_mode *out_mode) {
@@ -331,6 +338,7 @@ ui_error_t cupertino_split_view_get_display_mode(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_split_view_set_sidebar_width function. */
 ui_error_t
 cupertino_split_view_set_sidebar_width(struct cupertino_split_view *view,
                                        float width) {
@@ -350,6 +358,7 @@ cupertino_split_view_set_sidebar_width(struct cupertino_split_view *view,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_split_view_get_sidebar_width function. */
 ui_error_t
 cupertino_split_view_get_sidebar_width(const struct cupertino_split_view *view,
                                        float *out_width) {
@@ -360,6 +369,7 @@ cupertino_split_view_get_sidebar_width(const struct cupertino_split_view *view,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_split_view_set_content_width function. */
 ui_error_t
 cupertino_split_view_set_content_width(struct cupertino_split_view *view,
                                        float width) {
@@ -371,6 +381,7 @@ cupertino_split_view_set_content_width(struct cupertino_split_view *view,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_split_view_get_content_width function. */
 ui_error_t
 cupertino_split_view_get_content_width(const struct cupertino_split_view *view,
                                        float *out_width) {
@@ -381,6 +392,7 @@ cupertino_split_view_get_content_width(const struct cupertino_split_view *view,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_split_view_set_viewport_size function. */
 ui_error_t
 cupertino_split_view_set_viewport_size(struct cupertino_split_view *view,
                                        float width, float height) {
@@ -397,6 +409,7 @@ cupertino_split_view_set_viewport_size(struct cupertino_split_view *view,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_split_view_get_viewport_size function. */
 ui_error_t
 cupertino_split_view_get_viewport_size(const struct cupertino_split_view *view,
                                        float *out_width, float *out_height) {
@@ -408,6 +421,7 @@ cupertino_split_view_get_viewport_size(const struct cupertino_split_view *view,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_split_view_set_collapsed function. */
 ui_error_t cupertino_split_view_set_collapsed(struct cupertino_split_view *view,
                                               int collapsed) {
   if (!view) {
@@ -418,6 +432,7 @@ ui_error_t cupertino_split_view_set_collapsed(struct cupertino_split_view *view,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_split_view_is_collapsed function. */
 ui_error_t
 cupertino_split_view_is_collapsed(const struct cupertino_split_view *view,
                                   int *out_collapsed) {
@@ -428,6 +443,7 @@ cupertino_split_view_is_collapsed(const struct cupertino_split_view *view,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_split_view_get_column_visibility function. */
 ui_error_t cupertino_split_view_get_column_visibility(
     const struct cupertino_split_view *view, int *out_sidebar, int *out_content,
     int *out_detail) {
@@ -440,6 +456,7 @@ ui_error_t cupertino_split_view_get_column_visibility(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_split_view_process_event function. */
 ui_error_t cupertino_split_view_process_event(struct cupertino_split_view *view,
                                               const struct ui_event *event) {
   int pos = 0;
@@ -464,6 +481,7 @@ ui_error_t cupertino_split_view_process_event(struct cupertino_split_view *view,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_split_view_get_base function. */
 ui_error_t cupertino_split_view_get_base(struct cupertino_split_view *view,
                                          struct ui_split_pane_base **out_base) {
   if (!view || !out_base) {

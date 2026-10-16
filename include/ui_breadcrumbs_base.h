@@ -18,7 +18,7 @@ struct ui_signal;
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 /** @brief Opaque handle to a breadcrumbs base component. */
 struct ui_breadcrumbs_base;

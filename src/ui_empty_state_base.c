@@ -118,6 +118,7 @@ ui_error_t ui_empty_state_base_set_title(struct ui_empty_state_base *state,
 
 /* \brief ui_error
  */
+/** @brief ui_empty_state_base_set_description function. */
 ui_error_t
 ui_empty_state_base_set_description(struct ui_empty_state_base *state,
                                     const char *text) {

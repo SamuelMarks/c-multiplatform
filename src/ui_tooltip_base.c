@@ -176,6 +176,7 @@ struct ui_tooltip_base {
   struct ui_computed *animating_signal; /**< animating_signal */
 };
 
+/** @brief ui_tooltip_base_create function. */
 ui_error_t ui_tooltip_base_create(struct ui_tooltip_base **out_tooltip,
                                   const struct ui_tooltip_config *config) {
   struct ui_tooltip_base *tooltip;
@@ -205,6 +206,7 @@ ui_error_t ui_tooltip_base_create(struct ui_tooltip_base **out_tooltip,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_tooltip_base_destroy function. */
 ui_error_t ui_tooltip_base_destroy(struct ui_tooltip_base *tooltip) {
   ui_error_t rc = UI_ERROR_NONE;
   if (!tooltip)
@@ -222,6 +224,7 @@ ui_error_t ui_tooltip_base_destroy(struct ui_tooltip_base *tooltip) {
   return rc;
 }
 
+/** @brief ui_tooltip_base_set_text function. */
 ui_error_t ui_tooltip_base_set_text(struct ui_tooltip_base *tooltip,
                                     const char *text) {
   size_t len;
@@ -267,6 +270,7 @@ static ui_error_t transition_state(struct ui_tooltip_base *tooltip,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_tooltip_base_handle_event function. */
 ui_error_t ui_tooltip_base_handle_event(struct ui_tooltip_base *tooltip,
                                         const struct ui_event *event,
                                         double current_time_secs) {
@@ -344,6 +348,7 @@ ui_error_t ui_tooltip_base_handle_event(struct ui_tooltip_base *tooltip,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_tooltip_base_tick function. */
 ui_error_t ui_tooltip_base_tick(struct ui_tooltip_base *tooltip,
                                 double current_time_secs) {
   double elapsed;
@@ -396,6 +401,7 @@ ui_error_t ui_tooltip_base_tick(struct ui_tooltip_base *tooltip,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_tooltip_base_is_visible function. */
 ui_error_t ui_tooltip_base_is_visible(const struct ui_tooltip_base *tooltip,
                                       int *out_is_visible) {
   if (!tooltip || !out_is_visible)
@@ -405,6 +411,7 @@ ui_error_t ui_tooltip_base_is_visible(const struct ui_tooltip_base *tooltip,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_tooltip_base_hide function. */
 ui_error_t ui_tooltip_base_hide(struct ui_tooltip_base *tooltip) {
   if (!tooltip)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -433,6 +440,7 @@ mock_tooltip_base_is_visible(const struct ui_tooltip_base *tooltip,
 /** @endcond */
 #endif
 
+/** @brief ui_tooltip_base_render function. */
 ui_error_t ui_tooltip_base_render(struct ui_tooltip_base *tooltip,
                                   struct ui_overlay_director *director,
                                   const struct ui_layout_node *trigger_layout,
@@ -556,6 +564,7 @@ ui_error_t ui_tooltip_base_render(struct ui_tooltip_base *tooltip,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_tooltip_base_bind_open function. */
 ui_error_t ui_tooltip_base_bind_open(struct ui_tooltip_base *widget,
                                      struct ui_signal *open_signal) {
   if (!widget) {
@@ -565,6 +574,7 @@ ui_error_t ui_tooltip_base_bind_open(struct ui_tooltip_base *widget,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_tooltip_base_get_animating_signal function. */
 ui_error_t
 ui_tooltip_base_get_animating_signal(struct ui_tooltip_base *widget,
                                      struct ui_computed **out_animating) {

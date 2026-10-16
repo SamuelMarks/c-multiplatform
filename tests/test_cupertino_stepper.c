@@ -11,6 +11,17 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_malloc_fail_countdown;
+extern int g_cupertino_stepper_mock_set_min_fail;
+extern int g_cupertino_stepper_mock_set_max_fail;
+extern int g_cupertino_stepper_mock_set_step_fail;
+extern int g_cupertino_stepper_mock_set_value_fail;
+extern int g_cupertino_stepper_mock_destroy_fail;
+extern int g_cupertino_stepper_mock_increment_fail;
+extern int g_cupertino_stepper_mock_decrement_fail;
+extern int g_cupertino_stepper_mock_set_disabled_fail;
+extern int g_cupertino_stepper_mock_on_tick_fail;
+
 SUITE(cupertino_stepper_suite);
 
 TEST test_stepper_lifecycle_and_cva(void) {
@@ -235,16 +246,6 @@ TEST test_stepper_oom_mock(void) {
   struct cupertino_stepper *stepper = NULL;
   ui_error_t rc;
 #ifdef UI_TEST_MOCK_ALLOC
-  extern int g_malloc_fail_countdown;
-  extern int g_cupertino_stepper_mock_set_min_fail;
-  extern int g_cupertino_stepper_mock_set_max_fail;
-  extern int g_cupertino_stepper_mock_set_step_fail;
-  extern int g_cupertino_stepper_mock_set_value_fail;
-  extern int g_cupertino_stepper_mock_destroy_fail;
-  extern int g_cupertino_stepper_mock_increment_fail;
-  extern int g_cupertino_stepper_mock_decrement_fail;
-  extern int g_cupertino_stepper_mock_set_disabled_fail;
-  extern int g_cupertino_stepper_mock_on_tick_fail;
 
   g_malloc_fail_countdown = 0;
   rc = cupertino_stepper_create(dummy_engine, 0.0, 100.0, 1.0, &stepper, NULL);

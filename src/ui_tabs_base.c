@@ -186,6 +186,7 @@ struct ui_tabs_base {
   struct ui_signal *active_index_signal; /**< active_index_signal */
 };
 
+/** @brief ui_tabs_base_create function. */
 ui_error_t ui_tabs_base_create(struct ui_tabs_base **out_tabs) {
   struct ui_tabs_base *tabs;
   ui_error_t rc;
@@ -317,6 +318,7 @@ cleanup:
   return rc;
 }
 
+/** @brief ui_tabs_base_destroy function. */
 ui_error_t ui_tabs_base_destroy(struct ui_tabs_base *tabs) {
   int i;
   ui_error_t rc = UI_ERROR_NONE;
@@ -397,6 +399,7 @@ static ui_error_t format_id(char *buf, size_t buf_size, const char *prefix,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_tabs_base_add_tab function. */
 ui_error_t ui_tabs_base_add_tab(struct ui_tabs_base *tabs, const char *tab_id,
                                 struct ui_dom_node *title_node,
                                 struct ui_dom_node *panel_node) {
@@ -500,6 +503,7 @@ ui_error_t ui_tabs_base_add_tab(struct ui_tabs_base *tabs, const char *tab_id,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_tabs_base_set_active_index function. */
 ui_error_t ui_tabs_base_set_active_index(struct ui_tabs_base *tabs, int index) {
   int i;
   ui_error_t rc;
@@ -554,6 +558,7 @@ ui_error_t ui_tabs_base_set_active_index(struct ui_tabs_base *tabs, int index) {
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_tabs_base_get_active_index function. */
 ui_error_t ui_tabs_base_get_active_index(const struct ui_tabs_base *tabs,
                                          int *out_index) {
   if (!tabs || !out_index) {
@@ -563,6 +568,7 @@ ui_error_t ui_tabs_base_get_active_index(const struct ui_tabs_base *tabs,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_tabs_base_set_on_change function. */
 ui_error_t ui_tabs_base_set_on_change(struct ui_tabs_base *tabs,
                                       ui_tabs_on_change_t on_change,
                                       void *user_data) {
@@ -574,6 +580,7 @@ ui_error_t ui_tabs_base_set_on_change(struct ui_tabs_base *tabs,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_tabs_base_process_event function. */
 ui_error_t ui_tabs_base_process_event(struct ui_tabs_base *tabs,
                                       const struct ui_event *event,
                                       double timestamp_ms) {
@@ -621,6 +628,7 @@ ui_error_t ui_tabs_base_process_event(struct ui_tabs_base *tabs,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_tabs_base_get_component function. */
 ui_error_t ui_tabs_base_get_component(struct ui_tabs_base *tabs,
                                       struct ui_component **out_component) {
   if (!tabs || !out_component) {
@@ -630,6 +638,7 @@ ui_error_t ui_tabs_base_get_component(struct ui_tabs_base *tabs,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_tabs_base_bind_active_index function. */
 ui_error_t ui_tabs_base_bind_active_index(struct ui_tabs_base *widget,
                                           struct ui_signal *signal) {
   if (!widget) {

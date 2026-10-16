@@ -14,15 +14,21 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
+/** @brief CUPERTINO_DATE_PICKER_COMPACT_WIDTH constant. */
 #define CUPERTINO_DATE_PICKER_COMPACT_WIDTH 130.0f
+/** @brief CUPERTINO_DATE_PICKER_COMPACT_HEIGHT constant. */
 #define CUPERTINO_DATE_PICKER_COMPACT_HEIGHT 36.0f
+/** @brief CUPERTINO_DATE_PICKER_WHEELS_WIDTH constant. */
 #define CUPERTINO_DATE_PICKER_WHEELS_WIDTH 320.0f
+/** @brief CUPERTINO_DATE_PICKER_WHEELS_HEIGHT constant. */
 #define CUPERTINO_DATE_PICKER_WHEELS_HEIGHT 216.0f
+/** @brief CUPERTINO_DATE_PICKER_INLINE_WIDTH constant. */
 #define CUPERTINO_DATE_PICKER_INLINE_WIDTH 320.0f
+/** @brief CUPERTINO_DATE_PICKER_INLINE_HEIGHT constant. */
 #define CUPERTINO_DATE_PICKER_INLINE_HEIGHT 380.0f
 
 /**
@@ -69,20 +75,20 @@ struct cupertino_date_picker_descriptor {
  * @brief Cupertino date/time picker instance.
  */
 struct cupertino_date_picker {
-  enum cupertino_date_picker_mode mode;
-  enum cupertino_date_picker_style style;
-  int year;
-  int month;
-  int day;
-  int hour;
-  int minute;
-  int is_24h;
-  int minute_interval;
-  char formatted_text[64];
-  struct ui_control_value_accessor cva;
-  int is_popover_open;
-  float width;
-  float height;
+  enum cupertino_date_picker_mode mode;   /**< mode field. */
+  enum cupertino_date_picker_style style; /**< style field. */
+  int year;                               /**< year field. */
+  int month;                              /**< month field. */
+  int day;                                /**< day field. */
+  int hour;                               /**< hour field. */
+  int minute;                             /**< minute field. */
+  int is_24h;                             /**< is_24h field. */
+  int minute_interval;                    /**< minute_interval field. */
+  char formatted_text[64];                /**< formatted_text[64] field. */
+  struct ui_control_value_accessor cva;   /**< cva field. */
+  int is_popover_open;                    /**< is_popover_open field. */
+  float width;                            /**< width field. */
+  float height;                           /**< height field. */
 };
 
 /**

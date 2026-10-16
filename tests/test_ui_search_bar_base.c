@@ -7,6 +7,8 @@
 #include "../include/ui_error.h"
 /* clang-format on */
 
+extern int g_mock_strcpy_fail;
+
 extern int g_malloc_fail_countdown;
 
 struct ui_component {
@@ -137,49 +139,50 @@ static int test_search_bar_operations(void) {
     return 1;
 
   /* cleanup with null query */
-  struct ui_search_bar_base sb2;
   {
-    ui_error_t rc_cleanup = ui_search_bar_base_init(&sb2, &comp, NULL);
-    assert(rc_cleanup == UI_ERROR_NONE);
-  }
-  {
-    ui_error_t rc_cleanup = ui_search_bar_base_cleanup(&sb2);
-    assert(rc_cleanup == UI_ERROR_NONE);
-  }
-
-  err = ui_search_bar_base_cleanup(&sb);
-  if (err != UI_ERROR_NONE)
-    return 1;
-  if (sb.query != NULL)
-    return 1;
-
-  /* Test OOM */
-  {
-    ui_error_t rc_cleanup = ui_search_bar_base_init(&sb, &comp, NULL);
-    assert(rc_cleanup == UI_ERROR_NONE);
-  }
-  g_malloc_fail_countdown = 0;
-  err = ui_search_bar_base_set_query(&sb, "oom text");
-  if (err != UI_ERROR_OUT_OF_MEMORY)
-    return 1;
-  g_malloc_fail_countdown = -1;
-
-  extern int g_mock_strcpy_fail;
-  g_mock_strcpy_fail = 1;
-  {
-    ui_error_t rc_err = ui_search_bar_base_set_query(&sb, "strcpy fail");
-    if (rc_err != UI_ERROR_NONE) {
-      /* expected failure */
+    struct ui_search_bar_base sb2;
+    {
+      ui_error_t rc_cleanup = ui_search_bar_base_init(&sb2, &comp, NULL);
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
-  }
-  g_mock_strcpy_fail = 0;
+    {
+      ui_error_t rc_cleanup = ui_search_bar_base_cleanup(&sb2);
+      assert(rc_cleanup == UI_ERROR_NONE);
+    }
 
-  {
-    ui_error_t rc_cleanup = ui_search_bar_base_cleanup(&sb);
-    assert(rc_cleanup == UI_ERROR_NONE);
-  }
+    err = ui_search_bar_base_cleanup(&sb);
+    if (err != UI_ERROR_NONE)
+      return 1;
+    if (sb.query != NULL)
+      return 1;
 
-  return 0;
+    /* Test OOM */
+    {
+      ui_error_t rc_cleanup = ui_search_bar_base_init(&sb, &comp, NULL);
+      assert(rc_cleanup == UI_ERROR_NONE);
+    }
+    g_malloc_fail_countdown = 0;
+    err = ui_search_bar_base_set_query(&sb, "oom text");
+    if (err != UI_ERROR_OUT_OF_MEMORY)
+      return 1;
+    g_malloc_fail_countdown = -1;
+
+    g_mock_strcpy_fail = 1;
+    {
+      ui_error_t rc_err = ui_search_bar_base_set_query(&sb, "strcpy fail");
+      if (rc_err != UI_ERROR_NONE) {
+        /* expected failure */
+      }
+    }
+    g_mock_strcpy_fail = 0;
+
+    {
+      ui_error_t rc_cleanup = ui_search_bar_base_cleanup(&sb);
+      assert(rc_cleanup == UI_ERROR_NONE);
+    }
+
+    return 0;
+  }
 }
 
 static int test_search_bar_cva(void) {

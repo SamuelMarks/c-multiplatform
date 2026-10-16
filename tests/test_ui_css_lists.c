@@ -72,48 +72,54 @@ static int test_parse_list_style_type(void) {
       strcmp(type.string_value, "->") != 0)
     return __LINE__;
 
-  char long_quote_str[1024];
-  long_quote_str[0] = '"';
-  memset(long_quote_str + 1, 'a', 597);
-  long_quote_str[598] = '"';
-  long_quote_str[599] = '\0';
-  if (ui_css_parse_list_style_type(long_quote_str, &type) != UI_ERROR_NONE ||
-      type.type != UI_CSS_LIST_STYLE_TYPE_STRING)
-    return __LINE__;
-
-  if (ui_css_parse_list_style_type("\"unclosed", &type) !=
-      UI_ERROR_PARSE_FAILED)
-    return __LINE__;
-
-  /* Strings */
-  if (ui_css_parse_list_style_type("\"unclosed", &type) !=
-      UI_ERROR_PARSE_FAILED) {
-    printf("fail line %d\n", __LINE__);
-    return 1;
-  }
-
-  /* empty string */
-  if (ui_css_parse_list_style_type("", &type) != UI_ERROR_PARSE_FAILED) {
-    printf("fail line %d\n", __LINE__);
-    return 1;
-  }
-
-  /* huge string */
   {
-    char long_str[1024];
-    char css_str[1000];
-    int i;
-    for (i = 0; i < 550; i++)
-      long_str[i] = 'a';
-    long_str[550] = '\0';
-    sprintf(css_str, "'%s'", long_str);
-    if (ui_css_parse_list_style_type(css_str, &type) != UI_ERROR_NONE) {
+    char long_quote_str[1024];
+    long_quote_str[0] = '"';
+    memset(long_quote_str + 1, 'a', 597);
+    long_quote_str[598] = '"';
+    long_quote_str[599] = '\0';
+    if (ui_css_parse_list_style_type(long_quote_str, &type) != UI_ERROR_NONE ||
+        type.type != UI_CSS_LIST_STYLE_TYPE_STRING)
+      return __LINE__;
+
+    if (ui_css_parse_list_style_type("\"unclosed", &type) !=
+        UI_ERROR_PARSE_FAILED)
+      return __LINE__;
+
+    /* Strings */
+    if (ui_css_parse_list_style_type("\"unclosed", &type) !=
+        UI_ERROR_PARSE_FAILED) {
       printf("fail line %d\n", __LINE__);
       return 1;
     }
-  }
 
-  return 0;
+    /* empty string */
+    if (ui_css_parse_list_style_type("", &type) != UI_ERROR_PARSE_FAILED) {
+      printf("fail line %d\n", __LINE__);
+      return 1;
+    }
+
+    /* huge string */
+    {
+      char long_str[1024];
+      char css_str[1200];
+      int i;
+      for (i = 0; i < 550; i++)
+        long_str[i] = 'a';
+      long_str[550] = '\0';
+#if defined(_MSC_VER)
+      sprintf_s(css_str, sizeof(css_str), "'%s'", long_str);
+#else
+      sprintf(css_str, "'%s'", long_str);
+#endif
+      if (ui_css_parse_list_style_type(css_str, &type) != UI_ERROR_NONE) {
+        printf("fail line %d\n", __LINE__);
+        return 1;
+      }
+    }
+
+    return 0;
+  }
 }
 
 static int test_parse_list_style_position(void) {
@@ -280,37 +286,39 @@ static int test_parse_counter_action(void) {
     return __LINE__;
   ui_css_counter_action_destroy(head);
 
-  char long_str[1024];
-  memset(long_str, 'a', 599);
-  long_str[599] = '\0';
-  if (ui_css_parse_counter_action(long_str, &head) != UI_ERROR_NONE || !head)
-    return __LINE__;
-  ui_css_counter_action_destroy(head);
+  {
+    char long_str[1024];
+    memset(long_str, 'a', 599);
+    long_str[599] = '\0';
+    if (ui_css_parse_counter_action(long_str, &head) != UI_ERROR_NONE || !head)
+      return __LINE__;
+    ui_css_counter_action_destroy(head);
 
-  /* Test empty effectively */
-  if (ui_css_parse_counter_action("   ", &head) != UI_ERROR_PARSE_FAILED) {
-    printf("fail line %d\n", __LINE__);
-    return 1;
+    /* Test empty effectively */
+    if (ui_css_parse_counter_action("   ", &head) != UI_ERROR_PARSE_FAILED) {
+      printf("fail line %d\n", __LINE__);
+      return 1;
+    }
+
+    /* OOM */
+    g_malloc_fail_countdown = 0;
+    if (ui_css_parse_counter_action("chapter section 2 page", &head) !=
+        UI_ERROR_OUT_OF_MEMORY) {
+      printf("fail line %d\n", __LINE__);
+      return 1;
+    }
+    g_malloc_fail_countdown = -1;
+
+    g_malloc_fail_countdown = 1;
+    if (ui_css_parse_counter_action("chapter section 2 page", &head) !=
+        UI_ERROR_OUT_OF_MEMORY) {
+      printf("fail line %d\n", __LINE__);
+      return 1;
+    }
+    g_malloc_fail_countdown = -1;
+
+    return 0;
   }
-
-  /* OOM */
-  g_malloc_fail_countdown = 0;
-  if (ui_css_parse_counter_action("chapter section 2 page", &head) !=
-      UI_ERROR_OUT_OF_MEMORY) {
-    printf("fail line %d\n", __LINE__);
-    return 1;
-  }
-  g_malloc_fail_countdown = -1;
-
-  g_malloc_fail_countdown = 1;
-  if (ui_css_parse_counter_action("chapter section 2 page", &head) !=
-      UI_ERROR_OUT_OF_MEMORY) {
-    printf("fail line %d\n", __LINE__);
-    return 1;
-  }
-  g_malloc_fail_countdown = -1;
-
-  return 0;
 }
 
 #ifdef UI_TEST_MOCK_ALLOC

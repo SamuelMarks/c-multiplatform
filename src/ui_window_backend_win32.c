@@ -457,6 +457,7 @@ ui_window_backend_win32_create(struct ui_window_backend **out_backend) {
 
 /* \brief ui_error
  */
+/** @brief ui_window_backend_win32_destroy function. */
 ui_error_t ui_window_backend_win32_destroy(struct ui_window_backend *backend) {
   if (!backend) {
     return UI_ERROR_INVALID_ARGUMENT;

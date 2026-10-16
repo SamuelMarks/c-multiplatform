@@ -16,6 +16,15 @@ extern int g_mock_macos_zero_scale;
 #endif
 /* clang-format on */
 
+extern int g_mock_macos_event_type;
+extern int g_mock_macos_fail_delegate;
+extern int g_mock_macos_no_view;
+extern int g_mock_macos_no_nsopenglview;
+extern int g_mock_macos_fail_allocate_class;
+extern int g_mock_macos_fail_scale;
+extern int g_mock_macos_no_backing_scale;
+extern int g_mock_macos_no_window;
+
 struct ui_window {
   void *window;
   void *view;
@@ -31,6 +40,13 @@ struct ui_window {
   ui_error_t (*on_dpi_change_callback)(void *, float, float);
   void *on_dpi_change_user_data;
 };
+
+#if defined(__APPLE__) && defined(__MACH__)
+#if TARGET_OS_MAC && !TARGET_OS_IPHONE
+#include <CoreGraphics/CoreGraphics.h>
+#include <objc/message.h>
+#include <objc/objc.h>
+#include <objc/runtime.h>
 
 static int g_test_resize_called = 0;
 static int g_test_resize_w = 0;
@@ -75,13 +91,6 @@ static ui_error_t test_dpi_fail_callback(void *user_data, float old_scale,
   }
   return UI_ERROR_UNKNOWN;
 }
-
-#if defined(__APPLE__) && defined(__MACH__)
-#if TARGET_OS_MAC && !TARGET_OS_IPHONE
-#include <CoreGraphics/CoreGraphics.h>
-#include <objc/message.h>
-#include <objc/objc.h>
-#include <objc/runtime.h>
 
 static CGRect dummy_content_layout_rect(id self, SEL _cmd) {
   if (self) {
@@ -217,11 +226,6 @@ int main(void) {
         ui_error_t rc_create;
 
 #ifdef UI_TEST_MOCK_ALLOC
-        extern int g_mock_macos_event_type;
-        extern int g_mock_macos_fail_delegate;
-        extern int g_mock_macos_no_view;
-        extern int g_mock_macos_no_nsopenglview;
-        extern int g_mock_macos_fail_allocate_class;
         extern void ui_test_macos_on_window_did_resize(id self, SEL _cmd,
                                                        id notif);
         extern void ui_test_macos_on_window_will_close(id self, SEL _cmd,
@@ -358,84 +362,88 @@ int main(void) {
             dummyObj2 = ((id(*)(id, SEL))objc_msgSend)(
                 (id)objc_getClass("UIDummyWindowZeroH"),
                 sel_registerName("new"));
-            id notif_no_w = ((id(*)(id, SEL, id, id))objc_msgSend)(
-                notifCls, sel_registerName("notificationWithName:object:"),
-                notifName, dummyObj);
-            notif_zero_h = ((id(*)(id, SEL, id, id))objc_msgSend)(
-                notifCls, sel_registerName("notificationWithName:object:"),
-                notifName, dummyObj2);
-            id notif_real = ((id(*)(id, SEL, id, id))objc_msgSend)(
-                notifCls, sel_registerName("notificationWithName:object:"),
-                notifName, (id)real_win->window);
-
-            /* Test did_resize notification handler */
-            ui_test_macos_on_window_did_resize(NULL, NULL, NULL);
-            ui_test_macos_on_window_did_resize((id)1, (SEL)1, notif_no_win);
-            ui_test_macos_on_window_did_resize((id)1, (SEL)1, notif_no_w);
-
-            /* Test when cur_w <= 0 using dummyObj returning (0,0) */
-            objc_setAssociatedObject(dummyObj, "ui_window_ptr", (id)real_win,
-                                     OBJC_ASSOCIATION_ASSIGN);
-            ui_test_macos_on_window_did_resize((id)1, (SEL)1, notif_no_w);
-            objc_setAssociatedObject(dummyObj, "ui_window_ptr", NULL,
-                                     OBJC_ASSOCIATION_ASSIGN);
-
-            /* Test when cur_w > 0 but cur_h <= 0 using dummyObj2 returning
-             * (200, 0) */
-            objc_setAssociatedObject(dummyObj2, "ui_window_ptr", (id)real_win,
-                                     OBJC_ASSOCIATION_ASSIGN);
-            ui_test_macos_on_window_did_resize((id)1, (SEL)1, notif_zero_h);
-            objc_setAssociatedObject(dummyObj2, "ui_window_ptr", NULL,
-                                     OBJC_ASSOCIATION_ASSIGN);
-
-            real_win->width = 10;
-            ui_test_macos_on_window_did_resize((id)1, (SEL)1, notif_real);
-            failed |= (real_win->width != 200);
-
-            /* Test cur_h != w->height branch */
-            real_win->width = 200;
-            real_win->height = 10;
-            ui_test_macos_on_window_did_resize((id)1, (SEL)1, notif_real);
-            failed |= (real_win->height != 200);
-
-            /* Call when width already matches */
-            ui_test_macos_on_window_did_resize((id)1, (SEL)1, notif_real);
-
-            /* Test with null view, context, callback */
             {
-              void *saved_v = real_win->view;
-              void *saved_ctx = real_win->context;
-              ui_error_t (*saved_cb)(void *, int, int) =
-                  real_win->on_resize_callback;
-              real_win->view = NULL;
-              real_win->context = NULL;
-              real_win->on_resize_callback = NULL;
-              real_win->width = 10;
-              ui_test_macos_on_window_did_resize((id)1, (SEL)1, notif_real);
-              real_win->view = saved_v;
-              real_win->context = saved_ctx;
-              real_win->on_resize_callback = saved_cb;
-            }
+              id notif_no_w = ((id(*)(id, SEL, id, id))objc_msgSend)(
+                  notifCls, sel_registerName("notificationWithName:object:"),
+                  notifName, dummyObj);
+              notif_zero_h = ((id(*)(id, SEL, id, id))objc_msgSend)(
+                  notifCls, sel_registerName("notificationWithName:object:"),
+                  notifName, dummyObj2);
+              {
+                id notif_real = ((id(*)(id, SEL, id, id))objc_msgSend)(
+                    notifCls, sel_registerName("notificationWithName:object:"),
+                    notifName, (id)real_win->window);
 
-            /* Test with (void*)1 view and context */
-            {
-              void *saved_v = real_win->view;
-              void *saved_ctx = real_win->context;
-              real_win->view = (void *)1;
-              real_win->context = (void *)1;
-              real_win->width = 10;
-              ui_test_macos_on_window_did_resize((id)1, (SEL)1, notif_real);
-              real_win->view = saved_v;
-              real_win->context = saved_ctx;
-            }
+                /* Test did_resize notification handler */
+                ui_test_macos_on_window_did_resize(NULL, NULL, NULL);
+                ui_test_macos_on_window_did_resize((id)1, (SEL)1, notif_no_win);
+                ui_test_macos_on_window_did_resize((id)1, (SEL)1, notif_no_w);
 
-            /* Test will_close notification handler */
-            ui_test_macos_on_window_will_close(NULL, NULL, NULL);
-            ui_test_macos_on_window_will_close((id)1, (SEL)1, notif_no_win);
-            ui_test_macos_on_window_will_close((id)1, (SEL)1, notif_no_w);
-            ui_test_macos_on_window_will_close((id)1, (SEL)1, notif_real);
-            failed |= (real_win->is_closing != 1);
-            real_win->is_closing = 0;
+                /* Test when cur_w <= 0 using dummyObj returning (0,0) */
+                objc_setAssociatedObject(dummyObj, "ui_window_ptr",
+                                         (id)real_win, OBJC_ASSOCIATION_ASSIGN);
+                ui_test_macos_on_window_did_resize((id)1, (SEL)1, notif_no_w);
+                objc_setAssociatedObject(dummyObj, "ui_window_ptr", NULL,
+                                         OBJC_ASSOCIATION_ASSIGN);
+
+                /* Test when cur_w > 0 but cur_h <= 0 using dummyObj2 returning
+                 * (200, 0) */
+                objc_setAssociatedObject(dummyObj2, "ui_window_ptr",
+                                         (id)real_win, OBJC_ASSOCIATION_ASSIGN);
+                ui_test_macos_on_window_did_resize((id)1, (SEL)1, notif_zero_h);
+                objc_setAssociatedObject(dummyObj2, "ui_window_ptr", NULL,
+                                         OBJC_ASSOCIATION_ASSIGN);
+
+                real_win->width = 10;
+                ui_test_macos_on_window_did_resize((id)1, (SEL)1, notif_real);
+                failed |= (real_win->width != 200);
+
+                /* Test cur_h != w->height branch */
+                real_win->width = 200;
+                real_win->height = 10;
+                ui_test_macos_on_window_did_resize((id)1, (SEL)1, notif_real);
+                failed |= (real_win->height != 200);
+
+                /* Call when width already matches */
+                ui_test_macos_on_window_did_resize((id)1, (SEL)1, notif_real);
+
+                /* Test with null view, context, callback */
+                {
+                  void *saved_v = real_win->view;
+                  void *saved_ctx = real_win->context;
+                  ui_error_t (*saved_cb)(void *, int, int) =
+                      real_win->on_resize_callback;
+                  real_win->view = NULL;
+                  real_win->context = NULL;
+                  real_win->on_resize_callback = NULL;
+                  real_win->width = 10;
+                  ui_test_macos_on_window_did_resize((id)1, (SEL)1, notif_real);
+                  real_win->view = saved_v;
+                  real_win->context = saved_ctx;
+                  real_win->on_resize_callback = saved_cb;
+                }
+
+                /* Test with (void*)1 view and context */
+                {
+                  void *saved_v = real_win->view;
+                  void *saved_ctx = real_win->context;
+                  real_win->view = (void *)1;
+                  real_win->context = (void *)1;
+                  real_win->width = 10;
+                  ui_test_macos_on_window_did_resize((id)1, (SEL)1, notif_real);
+                  real_win->view = saved_v;
+                  real_win->context = saved_ctx;
+                }
+
+                /* Test will_close notification handler */
+                ui_test_macos_on_window_will_close(NULL, NULL, NULL);
+                ui_test_macos_on_window_will_close((id)1, (SEL)1, notif_no_win);
+                ui_test_macos_on_window_will_close((id)1, (SEL)1, notif_no_w);
+                ui_test_macos_on_window_will_close((id)1, (SEL)1, notif_real);
+                failed |= (real_win->is_closing != 1);
+                real_win->is_closing = 0;
+              }
+            }
           }
 
           /* Test poll_events when has_resize_event is 1 */
@@ -539,8 +547,6 @@ int main(void) {
           {
             float s = 0.0f;
             int fb_w = 0, fb_h = 0;
-            extern int g_mock_macos_fail_scale;
-            extern int g_mock_macos_no_backing_scale;
 
             failed |= (backend->get_scale_factor(backend, real_win, &s) !=
                        UI_ERROR_NONE);
@@ -617,8 +623,6 @@ int main(void) {
           /* Window creation mock branches */
           {
             struct ui_window *mock_win = NULL;
-            extern int g_mock_macos_no_window;
-            extern int g_mock_macos_no_backing_scale;
 
             g_mock_macos_no_window = 1;
             failed |= (backend->create_window(backend, "Mock", 100, 100,

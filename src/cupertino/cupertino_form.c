@@ -214,6 +214,7 @@ mock_form_field_base_set_control(struct ui_form_field_base *f,
 
 #endif /* UI_TEST_MOCK_ALLOC */
 
+/** @brief copy_string function. */
 static void copy_string(char *dst, size_t sz, const char *src) {
 #if defined(_MSC_VER)
   strcpy_s(dst, sz, src);
@@ -225,6 +226,7 @@ static void copy_string(char *dst, size_t sz, const char *src) {
 
 /* --- CVA Helper Callbacks for Cupertino Text Form Field Row --- */
 
+/** @brief cupertino_text_form_field_cva_write_value function. */
 static ui_error_t
 cupertino_text_form_field_cva_write_value(void *component,
                                           union ui_signal_payload value) {
@@ -240,6 +242,7 @@ cupertino_text_form_field_cva_write_value(void *component,
   return cupertino_text_form_field_row_set_text(field_row, str ? str : "");
 }
 
+/** @brief cupertino_text_form_field_cva_set_disabled_state function. */
 static ui_error_t
 cupertino_text_form_field_cva_set_disabled_state(void *component,
                                                  ui_bool_t is_disabled) {
@@ -259,6 +262,7 @@ cupertino_text_form_field_cva_set_disabled_state(void *component,
 
 /* --- Cupertino Form Section Implementation --- */
 
+/** @brief cupertino_form_section_create function. */
 ui_error_t
 cupertino_form_section_create(struct ui_engine *engine,
                               enum cupertino_form_section_style style,
@@ -300,6 +304,7 @@ cupertino_form_section_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_form_section_destroy function. */
 ui_error_t
 cupertino_form_section_destroy(struct cupertino_form_section *section) {
   ui_error_t rc;
@@ -320,6 +325,7 @@ cupertino_form_section_destroy(struct cupertino_form_section *section) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_form_section_set_header function. */
 ui_error_t
 cupertino_form_section_set_header(struct cupertino_form_section *section,
                                   const char *header) {
@@ -345,6 +351,7 @@ cupertino_form_section_set_header(struct cupertino_form_section *section,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_form_section_set_footer function. */
 ui_error_t
 cupertino_form_section_set_footer(struct cupertino_form_section *section,
                                   const char *footer) {
@@ -370,6 +377,7 @@ cupertino_form_section_set_footer(struct cupertino_form_section *section,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_form_section_set_content function. */
 ui_error_t
 cupertino_form_section_set_content(struct cupertino_form_section *section,
                                    struct ui_component *content) {
@@ -380,6 +388,7 @@ cupertino_form_section_set_content(struct cupertino_form_section *section,
   return ui_card_base_set_content(section->base, content);
 }
 
+/** @brief cupertino_form_section_get_base function. */
 ui_error_t
 cupertino_form_section_get_base(struct cupertino_form_section *section,
                                 struct ui_card_base **out_base) {
@@ -393,6 +402,7 @@ cupertino_form_section_get_base(struct cupertino_form_section *section,
 
 /* --- Cupertino Form Row Implementation --- */
 
+/** @brief cupertino_form_row_create function. */
 ui_error_t cupertino_form_row_create(struct ui_engine *engine,
                                      struct cupertino_form_row **out_row) {
   struct cupertino_form_row *row;
@@ -424,6 +434,7 @@ ui_error_t cupertino_form_row_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_form_row_destroy function. */
 ui_error_t cupertino_form_row_destroy(struct cupertino_form_row *row) {
   ui_error_t rc;
 
@@ -443,6 +454,7 @@ ui_error_t cupertino_form_row_destroy(struct cupertino_form_row *row) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_form_row_set_prefix_label function. */
 ui_error_t cupertino_form_row_set_prefix_label(struct cupertino_form_row *row,
                                                const char *label) {
   ui_error_t rc;
@@ -467,6 +479,7 @@ ui_error_t cupertino_form_row_set_prefix_label(struct cupertino_form_row *row,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_form_row_set_helper_text function. */
 ui_error_t cupertino_form_row_set_helper_text(struct cupertino_form_row *row,
                                               const char *helper) {
   ui_error_t rc;
@@ -491,6 +504,7 @@ ui_error_t cupertino_form_row_set_helper_text(struct cupertino_form_row *row,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_form_row_set_error_text function. */
 ui_error_t cupertino_form_row_set_error_text(struct cupertino_form_row *row,
                                              const char *error_text) {
   ui_error_t rc;
@@ -516,6 +530,7 @@ ui_error_t cupertino_form_row_set_error_text(struct cupertino_form_row *row,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_form_row_set_child function. */
 ui_error_t cupertino_form_row_set_child(struct cupertino_form_row *row,
                                         struct ui_component *child) {
   if (!row) {
@@ -525,6 +540,7 @@ ui_error_t cupertino_form_row_set_child(struct cupertino_form_row *row,
   return ui_form_field_base_set_control(row->field, child);
 }
 
+/** @brief cupertino_form_row_set_disabled function. */
 ui_error_t cupertino_form_row_set_disabled(struct cupertino_form_row *row,
                                            int disabled) {
   if (!row) {
@@ -535,6 +551,7 @@ ui_error_t cupertino_form_row_set_disabled(struct cupertino_form_row *row,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_form_row_get_field function. */
 ui_error_t cupertino_form_row_get_field(struct cupertino_form_row *row,
                                         struct ui_form_field_base **out_field) {
   if (!row || !out_field) {
@@ -547,6 +564,7 @@ ui_error_t cupertino_form_row_get_field(struct cupertino_form_row *row,
 
 /* --- Cupertino Text Form Field Row Implementation --- */
 
+/** @brief cupertino_text_form_field_row_create function. */
 ui_error_t cupertino_text_form_field_row_create(
     struct ui_engine *engine,
     struct cupertino_text_form_field_row **out_field_row,
@@ -622,6 +640,7 @@ ui_error_t cupertino_text_form_field_row_create(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_text_form_field_row_destroy function. */
 ui_error_t cupertino_text_form_field_row_destroy(
     struct cupertino_text_form_field_row *field_row) {
   ui_error_t rc;
@@ -650,6 +669,7 @@ ui_error_t cupertino_text_form_field_row_destroy(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_text_form_field_row_set_text function. */
 ui_error_t cupertino_text_form_field_row_set_text(
     struct cupertino_text_form_field_row *field_row, const char *text) {
   ui_error_t rc;
@@ -682,6 +702,7 @@ ui_error_t cupertino_text_form_field_row_set_text(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_text_form_field_row_get_text function. */
 ui_error_t cupertino_text_form_field_row_get_text(
     const struct cupertino_text_form_field_row *field_row,
     const char **out_text) {
@@ -693,6 +714,7 @@ ui_error_t cupertino_text_form_field_row_get_text(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_text_form_field_row_set_placeholder function. */
 ui_error_t cupertino_text_form_field_row_set_placeholder(
     struct cupertino_text_form_field_row *field_row, const char *placeholder) {
   ui_error_t rc;
@@ -719,6 +741,7 @@ ui_error_t cupertino_text_form_field_row_set_placeholder(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_text_form_field_row_bind_form_control function. */
 ui_error_t cupertino_text_form_field_row_bind_form_control(
     struct cupertino_text_form_field_row *field_row,
     struct ui_form_control *form_control, struct ui_reactor *reactor) {

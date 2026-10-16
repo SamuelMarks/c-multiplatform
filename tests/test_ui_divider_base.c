@@ -7,6 +7,8 @@
 #include <stdlib.h>
 /* clang-format on */
 
+extern int g_divider_mock_fail;
+
 struct ui_divider_base {
   struct ui_component *component;
   struct ui_dom_node *root_node;
@@ -101,7 +103,6 @@ static int run_normal_tests(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_divider_mock_fail;
     g_divider_mock_fail = 1;
     rc = ui_divider_base_create(&divider);
     if (rc != UI_ERROR_UNKNOWN)

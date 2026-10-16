@@ -17,7 +17,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 /**
  * @enum md3_palette_mode
@@ -39,53 +39,53 @@ enum md3_palette_mode {
  */
 struct md3_color_scheme {
   /* Primary roles */
-  ui_color_t primary;
-  ui_color_t on_primary;
-  ui_color_t primary_container;
-  ui_color_t on_primary_container;
-  ui_color_t inverse_primary;
+  ui_color_t primary;              /**< primary field. */
+  ui_color_t on_primary;           /**< on_primary field. */
+  ui_color_t primary_container;    /**< primary_container field. */
+  ui_color_t on_primary_container; /**< on_primary_container field. */
+  ui_color_t inverse_primary;      /**< inverse_primary field. */
 
   /* Secondary roles */
-  ui_color_t secondary;
-  ui_color_t on_secondary;
-  ui_color_t secondary_container;
-  ui_color_t on_secondary_container;
+  ui_color_t secondary;              /**< secondary field. */
+  ui_color_t on_secondary;           /**< on_secondary field. */
+  ui_color_t secondary_container;    /**< secondary_container field. */
+  ui_color_t on_secondary_container; /**< on_secondary_container field. */
 
   /* Tertiary roles */
-  ui_color_t tertiary;
-  ui_color_t on_tertiary;
-  ui_color_t tertiary_container;
-  ui_color_t on_tertiary_container;
+  ui_color_t tertiary;              /**< tertiary field. */
+  ui_color_t on_tertiary;           /**< on_tertiary field. */
+  ui_color_t tertiary_container;    /**< tertiary_container field. */
+  ui_color_t on_tertiary_container; /**< on_tertiary_container field. */
 
   /* Error roles */
-  ui_color_t error;
-  ui_color_t on_error;
-  ui_color_t error_container;
-  ui_color_t on_error_container;
+  ui_color_t error;              /**< error field. */
+  ui_color_t on_error;           /**< on_error field. */
+  ui_color_t error_container;    /**< error_container field. */
+  ui_color_t on_error_container; /**< on_error_container field. */
 
   /* Surface & Background roles */
-  ui_color_t surface;
-  ui_color_t on_surface;
-  ui_color_t surface_variant;
-  ui_color_t on_surface_variant;
-  ui_color_t inverse_surface;
-  ui_color_t inverse_on_surface;
+  ui_color_t surface;            /**< surface field. */
+  ui_color_t on_surface;         /**< on_surface field. */
+  ui_color_t surface_variant;    /**< surface_variant field. */
+  ui_color_t on_surface_variant; /**< on_surface_variant field. */
+  ui_color_t inverse_surface;    /**< inverse_surface field. */
+  ui_color_t inverse_on_surface; /**< inverse_on_surface field. */
 
   /* Expressive Surface Containers */
-  ui_color_t surface_container_lowest;
-  ui_color_t surface_container_low;
-  ui_color_t surface_container;
-  ui_color_t surface_container_high;
-  ui_color_t surface_container_highest;
-  ui_color_t surface_dim;
-  ui_color_t surface_bright;
+  ui_color_t surface_container_lowest;  /**< surface_container_lowest field. */
+  ui_color_t surface_container_low;     /**< surface_container_low field. */
+  ui_color_t surface_container;         /**< surface_container field. */
+  ui_color_t surface_container_high;    /**< surface_container_high field. */
+  ui_color_t surface_container_highest; /**< surface_container_highest field. */
+  ui_color_t surface_dim;               /**< surface_dim field. */
+  ui_color_t surface_bright;            /**< surface_bright field. */
 
   /* Outlines & Utilities */
-  ui_color_t outline;
-  ui_color_t outline_variant;
-  ui_color_t shadow;
-  ui_color_t scrim;
-  ui_color_t surface_tint;
+  ui_color_t outline;         /**< outline field. */
+  ui_color_t outline_variant; /**< outline_variant field. */
+  ui_color_t shadow;          /**< shadow field. */
+  ui_color_t scrim;           /**< scrim field. */
+  ui_color_t surface_tint;    /**< surface_tint field. */
 };
 
 /**

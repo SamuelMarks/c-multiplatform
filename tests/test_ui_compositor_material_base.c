@@ -6,6 +6,8 @@
 #include <stdio.h>
 /* clang-format on */
 
+extern int g_malloc_fail_countdown;
+
 int main(void) {
   struct ui_arena *arena;
   struct ui_compositor_material_base *material = NULL;
@@ -49,7 +51,6 @@ int main(void) {
     return 1;
 
 #ifdef UI_TEST_MOCK_ALLOC
-  extern int g_malloc_fail_countdown;
   {
     int i;
     for (i = 0; i < 10; i++) {
@@ -82,49 +83,52 @@ int main(void) {
 
   /* Test type equality fallback/callback by getting value if possible, else
    * just let it be tested */
-  union ui_signal_payload val;
-  if (ui_signal_get(type_signal, &val) == UI_ERROR_NONE) {
-    /* Trigger the equality callback internally by setting the same value */
-    ui_signal_set(type_signal, val);
-  }
-
-  /* Trigger the type equality callback internally by setting a different value
-   */
-  err = ui_compositor_material_base_set_type(
-      material, UI_COMPOSITOR_MATERIAL_TYPE_ACRYLIC);
-  if (err != UI_ERROR_NONE) {
-    return 1;
-  }
-
-  err = ui_compositor_material_base_set_fallback_mode(
-      material, UI_COMPOSITOR_FALLBACK_MODE_SOLID_COLOR);
-  if (err != UI_ERROR_NONE) {
-    return 1;
-  }
-
-  err = ui_compositor_material_base_set_opacity(material, 0.5f);
-  if (err != UI_ERROR_NONE) {
-    return 1;
-  }
-
-  /* Test opacity clamping */
-  err = ui_compositor_material_base_set_opacity(material, 1.5f);
-  if (err != UI_ERROR_NONE) {
-    return 1;
-  }
-  err = ui_compositor_material_base_set_opacity(material, -0.5f);
-  if (err != UI_ERROR_NONE) {
-    return 1;
-  }
-
-  err = ui_compositor_material_base_destroy(material);
-  if (err != UI_ERROR_NONE) {
-    return 1;
-  }
-
   {
-    ui_error_t rc_cleanup = ui_arena_destroy(arena);
-    assert(rc_cleanup == UI_ERROR_NONE);
+    union ui_signal_payload val;
+    if (ui_signal_get(type_signal, &val) == UI_ERROR_NONE) {
+      /* Trigger the equality callback internally by setting the same value */
+      ui_signal_set(type_signal, val);
+    }
+
+    /* Trigger the type equality callback internally by setting a different
+     * value
+     */
+    err = ui_compositor_material_base_set_type(
+        material, UI_COMPOSITOR_MATERIAL_TYPE_ACRYLIC);
+    if (err != UI_ERROR_NONE) {
+      return 1;
+    }
+
+    err = ui_compositor_material_base_set_fallback_mode(
+        material, UI_COMPOSITOR_FALLBACK_MODE_SOLID_COLOR);
+    if (err != UI_ERROR_NONE) {
+      return 1;
+    }
+
+    err = ui_compositor_material_base_set_opacity(material, 0.5f);
+    if (err != UI_ERROR_NONE) {
+      return 1;
+    }
+
+    /* Test opacity clamping */
+    err = ui_compositor_material_base_set_opacity(material, 1.5f);
+    if (err != UI_ERROR_NONE) {
+      return 1;
+    }
+    err = ui_compositor_material_base_set_opacity(material, -0.5f);
+    if (err != UI_ERROR_NONE) {
+      return 1;
+    }
+
+    err = ui_compositor_material_base_destroy(material);
+    if (err != UI_ERROR_NONE) {
+      return 1;
+    }
+
+    {
+      ui_error_t rc_cleanup = ui_arena_destroy(arena);
+      assert(rc_cleanup == UI_ERROR_NONE);
+    }
+    return 0;
   }
-  return 0;
 }

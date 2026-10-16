@@ -15,21 +15,28 @@ extern int g_malloc_called;
 
 void test_oom(void) {
   int i;
+  char css[1024];
+  const char *css_p1 =
+      "@import \"test.css\"; @import url(; @import url)(; @namespace svg "
+      "url(\"http://www.w3.org/2000/svg\"); div, .class, #id, "
+      "[href^=\"https\"], ::before, :hover { color: red !important; margin: "
+      "10px; font-family: 'Arial', sans-serif; background: url('img.png'); } "
+      "@media screen { div { width: 100px; } } @layer base { p { margin: 0; "
+      "} } @layer single; @layer foo, bar; ";
+  const char *css_p2 =
+      "@property --my-color { syntax: "
+      "\"<color>\"; inherits: false; "
+      "initial-value: #c0ffee; } @property --my-other { syntax: \"<color>\"; "
+      "inherits: true; } "
+      "@property --my-bad { inherits: ; } "
+      ".test2 { color:!important; } div unknown; @keyframes foo invalid { } "
+      "@media { div unknown } div eof";
+
+  UI_STRCPY(css, sizeof(css), css_p1);
+  UI_STRCAT(css, sizeof(css), css_p2);
+
   for (i = 0; i < 4000; i++) {
     struct ui_css_stylesheet *sheet = NULL;
-    const char *css =
-        "@import \"test.css\"; @import url(; @import url)(; @namespace svg "
-        "url(\"http://www.w3.org/2000/svg\"); div, .class, #id, "
-        "[href^=\"https\"], ::before, :hover { color: red !important; margin: "
-        "10px; font-family: 'Arial', sans-serif; background: url('img.png'); } "
-        "@media screen { div { width: 100px; } } @layer base { p { margin: 0; "
-        "} } @layer single; @layer foo, bar; @property --my-color { syntax: "
-        "\"<color>\"; inherits: false; "
-        "initial-value: #c0ffee; } @property --my-other { syntax: \"<color>\"; "
-        "inherits: true; } "
-        "@property --my-bad { inherits: ; } "
-        ".test2 { color:!important; } div unknown; @keyframes foo invalid { } "
-        "@media { div unknown } div eof";
     g_malloc_fail_countdown = i;
     ui_css_parse_stylesheet(css, &sheet);
     g_malloc_fail_countdown = -1;
@@ -798,8 +805,11 @@ int main(void) {
   struct ui_css_computed_style *style = NULL;
   ui_error_t rc;
   const char *val;
+  char css_text[2048];
+  char edge_case_css[2048];
+  size_t k;
 
-  const char *css_text =
+  const char *css_chunks[] = {
       "/* test sheet */\n"
       "div, .container {\n"
       "  display: block;\n"
@@ -812,7 +822,7 @@ int main(void) {
       "[type=\"text\"] { border: 1px solid black; }\n"
       "[disabled] { opacity: 0.5; }\n"
       "[href^=\"https\"] { text-decoration: underline; }\n"
-      ":empty { display: none; }\n"
+      ":empty { display: none; }\n",
       "@layer theme, layout;\n"
       "@layer layout { div { background: blue; } }\n"
       "@layer theme { div { background: green; z-index: 10; } }\n"
@@ -826,7 +836,7 @@ int main(void) {
       "  syntax: \"<color>\";\n"
       "  inherits: 0;\n"
       "  initial-value: #c0ffee;\n"
-      "}\n"
+      "}\n",
       ":is(div, span) { font-weight: bold; }\n"
       ":where(#main, .foo) { line-height: 1.5; }\n"
       ":not(.container) { cursor: pointer; }\n"
@@ -839,7 +849,7 @@ int main(void) {
       "}\n"
       "@supports (display: flex) {\n"
       "  #cond_main { display: flex; }\n"
-      "}\n"
+      "}\n",
       "@supports (display: flex) and (not (display: grid)) {\n"
       "  #cond_main { border-color: red; }\n"
       "}\n"
@@ -850,7 +860,7 @@ int main(void) {
       "  #cond_main { padding: 20px; }\n"
       "}\n"
       "@namespace svg url(http://www.w3.org/2000/svg);\n"
-      "@namespace \"http://www.w3.org/1999/xhtml\";\n"
+      "@namespace \"http://www.w3.org/1999/xhtml\";\n",
       "div::before { content: \"test-before\"; }\n"
       "span:after { content: \"test-after\"; }\n"
       "li::marker { color: red; }\n"
@@ -859,7 +869,94 @@ int main(void) {
       "div ~ span { color: yellow; }\n"
       "div:first-child { color: black; }\n"
       "div:last-child { color: white; }\n"
-      "div:nth-child(even) { color: gray; }\n";
+      "div:nth-child(even) { color: gray; }\n"};
+
+  const char *edge_chunks[] = {
+      "@unknown-rule { a { } } \n"
+      "@unknown-rule2 ;\n"
+      "@layer ;\n"
+      "div[class~=\"foo\"] { }\n"
+      "div[class|=\"foo\"] { }\n"
+      "div[class$=\"foo\"] { }\n"
+      "div[class^=\"foo\"] { }\n"
+      "div[class*=\"foo\"] { }\n"
+      "div[class~] { }\n"
+      "div[class$] { }\n"
+      "div[class|] { }\n"
+      "div[class^] { }\n"
+      "div[class*] { }\n"
+      "div[type=text] { }\n"
+      "div[.x] { }\n"
+      "span.class:is(div) { }\n"
+      "div { @media (min-width: 0) { } }\n"
+      "div { .a { } .b { } .c { } }\n"
+      "div { span { } }\n"
+      "div { color red; } \n"
+      "div { \"prop\" oops ; } \n",
+      "div:unknown-pseudo() { color: red; } \n"
+      "div:unknown-pseudo(abc) { color: red; } \n"
+      "div:unknown-pseudo(a()) { color: red; } \n"
+      "@scope (.start) to (.end) { }\n"
+      "@scope (.start) { }\n"
+      "@scope (.start) { }\n"
+      "@property --bar { inherits: true; initial-value: 0; }\n"
+      "@property --foo { inherits no-colon; unknown-desc: true; \"invalid\": "
+      "true; }\n"
+      "@namespace url(http://test.com);\n"
+      "@namespace prefix url( ' http://test.com ' );\n"
+      "@namespace prefix2 url(  http://test.com  );\n",
+      "@namespace prefix3 something;\n"
+      "@ \n"
+      "div { content: \"str\\n\"; }\n"
+      "div { color:   red  ; } \n"
+      "div { margin: 10px    ; } \n"
+      "div { *= ; $= ; |= ; ^= ; ~= } \n"
+      "div { = ; $ ; | ; ^ ; ~ } \n"
+      "div { 123 } \n"
+      "div { invalid_prop } \n"
+      "div { invalid_prop ; } \n"
+      "div { color: red \n"
+      "*= \n $= \n |= \n ^= \n ~= \n = \n $ \n | \n ^ \n ~ \n"
+      "/* comment at eof \n"
+      "/*\n"
+      "/* hello *\n"
+      "div { color: red } .\n"
+      "div { color: red } #\n"
+      "div { color: red } ::\n"
+      "div { color: red } :\n"
+      "div { color: red } @\n"
+      "div { color: red } [\n",
+      "div { color: red } [attr=\"\n"
+      "div { color: red } [attr=\"\" \n"
+      "div { color: red } :first-letter { }\n"
+      "div { color: red } :host-context { }\n"
+      "--var-name { }\n"
+      "_ident { }\n"
+      "\"unclosed string\n"
+      "123.45\n"
+      "+123\n"
+      "-123\n"
+      "@layer name, name2 ;\n"
+      "@scope to (b) { }\n"
+      "@media { }\n"
+      "@media condition\n"
+      "@layer oom, oom2 ;\n"
+      "@scope (oom) { }\n"
+      "@property --oom { inherits: false; }\n"
+      "@property --oom2 { inherits: true; }\n"
+      "@namespace prefix \"url\";\n"
+      "@media cond { } @media cond2 { } @media cond3 { }\n"
+      "{ a: b !important }\n"
+      "{ { { }\n"};
+
+  css_text[0] = '\0';
+  for (k = 0; k < sizeof(css_chunks) / sizeof(css_chunks[0]); k++) {
+    UI_STRCAT(css_text, sizeof(css_text), css_chunks[k]);
+  }
+  edge_case_css[0] = '\0';
+  for (k = 0; k < sizeof(edge_chunks) / sizeof(edge_chunks[0]); k++) {
+    UI_STRCAT(edge_case_css, sizeof(edge_case_css), edge_chunks[k]);
+  }
 
   printf("Starting test_ui_css_parser...\n");
 
@@ -1229,12 +1326,14 @@ int main(void) {
     }
     if (!found_svg) {
       printf("Failed to find 'svg' @namespace rule. Namespaces:\n");
-      struct ui_css_namespace *n = sheet->namespaces;
-      while (n) {
-        printf("ns: %s uri: %s\n", n->prefix, n->uri);
-        n = n->next;
+      {
+        struct ui_css_namespace *n = sheet->namespaces;
+        while (n) {
+          printf("ns: %s uri: %s\n", n->prefix, n->uri);
+          n = n->next;
+        }
+        return 1;
       }
-      return 1;
     }
     if (!found_default) {
       printf("Failed to find default @namespace rule\n");
@@ -1281,86 +1380,6 @@ int main(void) {
     assert(rc_cleanup == UI_ERROR_NONE);
   }
   ui_css_stylesheet_destroy(sheet);
-
-  /* Parser Recovery and Edge Cases */
-  const char *edge_case_css =
-      "@unknown-rule { a { } } \n"
-      "@unknown-rule2 ;\n"
-      "@layer ;\n" /* just layer without name */
-      "div[class~=\"foo\"] { }\n"
-      "div[class|=\"foo\"] { }\n"
-      "div[class$=\"foo\"] { }\n"
-      "div[class^=\"foo\"] { }\n"
-      "div[class*=\"foo\"] { }\n"
-      "div[class~] { }\n" /* malformed */
-      "div[class$] { }\n"
-      "div[class|] { }\n"
-      "div[class^] { }\n"
-      "div[class*] { }\n"
-      "div[type=text] { }\n"     /* unquoted attr */
-      "div[.x] { }\n"            /* invalid attr */
-      "span.class:is(div) { }\n" /* multiple selectors for dummy_rule */
-      "div { @media (min-width: 0) { } }\n" /* nested @rule */
-      "div { .a { } .b { } .c { } }\n"      /* >=3 nested rules */
-      "div { span { } }\n"                  /* nested rule with ident */
-      "div { color red; } \n"               /* missing colon, token after */
-      "div { \"prop\" oops ; } \n" /* non-ident at start of declaration */
-      "div:unknown-pseudo() { color: red; } \n"
-      "div:unknown-pseudo(abc) { color: red; } \n"
-      "div:unknown-pseudo(a()) { color: red; } \n"
-      "@scope (.start) to (.end) { }\n"
-      "@scope (.start) { }\n"
-      "@scope (.start) { }\n" /* was malformed, now balanced */
-      "@property --bar { inherits: true; initial-value: 0; }\n"
-      "@property --foo { inherits no-colon; unknown-desc: true; \"invalid\": "
-      "true; }\n" /* no colon, unknown desc, string desc */
-      "@namespace url(http://test.com);\n"              /* no prefix */
-      "@namespace prefix url( ' http://test.com ' );\n" /* spaces with quotes */
-      "@namespace prefix2 url(  http://test.com  );\n"  /* spaces */
-      "@namespace prefix3 something;\n"   /* not url, not string */
-      "@ \n"                              /* error token */
-      "div { content: \"str\\n\"; }\n"    /* string escape */
-      "div { color:   red  ; } \n"        /* spaces in property value */
-      "div { margin: 10px    ; } \n"      /* more trailing spaces */
-      "div { *= ; $= ; |= ; ^= ; ~= } \n" /* operators as properties */
-      "div { = ; $ ; | ; ^ ; ~ } \n"      /* single char errors */
-      "div { 123 } \n"                    /* unclosed identifier block */
-      "div { invalid_prop } \n"           /* missing colon for property */
-      "div { invalid_prop ; } \n" /* missing colon for property, has semicolon
-                                   */
-      "div { color: red \n"       /* missing semicolon/brace EOF */
-      "*= \n $= \n |= \n ^= \n ~= \n = \n $ \n | \n ^ \n ~ \n"
-      "/* comment at eof \n"    /* unclosed comment at EOF to hit peek() */
-      "/*\n"                    /* short unclosed comment */
-      "/* hello *\n"            /* star at eof */
-      "div { color: red } .\n"  /* dot at EOF */
-      "div { color: red } #\n"  /* hash at EOF */
-      "div { color: red } ::\n" /* double colon at EOF */
-      "div { color: red } :\n"  /* colon at EOF */
-      "div { color: red } @\n"  /* at at EOF */
-      "div { color: red } [\n"  /* LBRACKET at EOF */
-      "div { color: red } [attr=\"\n"    /* unclosed string at EOF */
-      "div { color: red } [attr=\"\" \n" /* LBRACKET unclosed EOF */
-      "div { color: red } :first-letter { }\n"
-      "div { color: red } :host-context { }\n"
-      "--var-name { }\n"
-      "_ident { }\n"
-      "\"unclosed string\n"
-      "123.45\n"
-      "+123\n"
-      "-123\n"
-      "@layer name, name2 ;\n"
-      "@scope to (b) { }\n"
-      "@media { }\n"
-      "@media condition\n"
-      "@layer oom, oom2 ;\n"
-      "@scope (oom) { }\n"
-      "@property --oom { inherits: false; }\n"
-      "@property --oom2 { inherits: true; }\n"
-      "@namespace prefix \"url\";\n"
-      "@media cond { } @media cond2 { } @media cond3 { }\n"
-      "{ a: b !important }\n"
-      "{ { { }\n";
 
   {
     /* tests where a specific rule is first to hit rule_head = ... */
@@ -1541,7 +1560,6 @@ int main(void) {
   test_parser_branches();
   /* branch coverage */
   {
-    struct ui_css_stylesheet *sheet = NULL;
     ui_css_parse_stylesheet(":hover(", &sheet);
     if (sheet)
       ui_css_stylesheet_destroy(sheet);
@@ -1653,8 +1671,6 @@ int main(void) {
     ui_css_stylesheet_destroy(sheet);
   sheet = NULL;
   {
-    struct ui_css_stylesheet *sheet = NULL;
-
     ui_css_parse_stylesheet("@layer a, b;", &sheet);
     if (sheet)
       ui_css_stylesheet_destroy(sheet);

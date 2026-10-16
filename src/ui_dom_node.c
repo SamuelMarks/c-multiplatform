@@ -14,6 +14,7 @@
 /* Use MSVC Safe CRT internally, string.h is already included. */
 #endif
 
+/** @brief ui_dom_node_create function. */
 ui_error_t ui_dom_node_create(enum ui_dom_node_type type,
                               struct ui_dom_node **out_node) {
   struct ui_dom_node *node;

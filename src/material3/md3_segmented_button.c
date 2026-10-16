@@ -9,6 +9,7 @@
 #include <string.h>
 /* clang-format on */
 
+/** @brief md3_segmented_button_cva_write_value function. */
 static ui_error_t
 md3_segmented_button_cva_write_value(void *component,
                                      union ui_signal_payload payload) {
@@ -20,6 +21,7 @@ md3_segmented_button_cva_write_value(void *component,
   return md3_segmented_button_select_segment(btn, payload.int_val);
 }
 
+/** @brief md3_segmented_button_cva_set_disabled function. */
 static ui_error_t md3_segmented_button_cva_set_disabled(void *component,
                                                         ui_bool_t is_disabled) {
   struct md3_segmented_button *btn;
@@ -31,6 +33,7 @@ static ui_error_t md3_segmented_button_cva_set_disabled(void *component,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_segmented_button_create function. */
 ui_error_t
 md3_segmented_button_create(struct ui_engine *engine,
                             enum ui_segmented_control_mode mode,
@@ -75,6 +78,7 @@ md3_segmented_button_create(struct ui_engine *engine,
   return rc;
 }
 
+/** @brief md3_segmented_button_destroy function. */
 ui_error_t md3_segmented_button_destroy(struct md3_segmented_button *button) {
   size_t i;
   ui_error_t rc = UI_ERROR_NONE;
@@ -95,6 +99,7 @@ ui_error_t md3_segmented_button_destroy(struct md3_segmented_button *button) {
   return rc;
 }
 
+/** @brief md3_segmented_button_add_segment function. */
 ui_error_t md3_segmented_button_add_segment(
     struct md3_segmented_button *button, const char *label, const char *icon,
     int segment_id, struct ui_segmented_button_base **out_segment) {
@@ -150,6 +155,7 @@ ui_error_t md3_segmented_button_add_segment(
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_segmented_button_select_segment function. */
 ui_error_t
 md3_segmented_button_select_segment(struct md3_segmented_button *button,
                                     int segment_id) {
@@ -187,6 +193,7 @@ md3_segmented_button_select_segment(struct md3_segmented_button *button,
   return rc;
 }
 
+/** @brief md3_segmented_button_is_selected function. */
 ui_error_t
 md3_segmented_button_is_selected(const struct md3_segmented_button *button,
                                  int segment_id, int *out_selected) {
@@ -206,6 +213,7 @@ md3_segmented_button_is_selected(const struct md3_segmented_button *button,
   return UI_ERROR_NOT_FOUND;
 }
 
+/** @brief md3_segmented_button_get_base function. */
 ui_error_t
 md3_segmented_button_get_base(struct md3_segmented_button *button,
                               struct ui_segmented_control_base **out_base) {

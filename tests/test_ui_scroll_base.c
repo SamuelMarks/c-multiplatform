@@ -23,7 +23,6 @@ static ui_error_t on_scroll_change(struct ui_scroll_base *scroll, float x,
   g_last_x = x;
   g_last_y = y;
   return UI_ERROR_NONE;
-  return UI_ERROR_NONE;
 }
 
 static ui_error_t on_scroll_change_fail(struct ui_scroll_base *scroll, float x,

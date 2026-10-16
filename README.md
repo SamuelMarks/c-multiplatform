@@ -13,6 +13,7 @@ A high-performance, strictly-compliant **ANSI C (C89 / ISO C90)** multiplatform 
 ## Table of Contents
 
 - [0. Project Overview & Competitor Landscape](#0-project-overview--competitor-landscape)
+  - [`c-multiplatform` vs. `c-multiplatform-native`: Which Should You Choose?](#c-multiplatform-vs-c-multiplatform-native-which-should-you-choose)
   - [Shared C Ecosystem Architecture](#shared-c-ecosystem-architecture)
   - [The Lingua Franca of FFI](#the-lingua-franca-of-ffi)
   - [Competitor Comparison Matrix](#competitor-comparison-matrix)
@@ -53,44 +54,94 @@ The engine provides:
 - An **Inspectable Real DOM** for the Web target, ensuring accessibility and browser integration that canvas-based frameworks destroy.
 - **Runtime-Defined Widgets with AoT Ejection**, enabling applications to load dynamic schemas at runtime and compile them into raw C89 code with zero interpretation overhead.
 
+### `c-multiplatform` vs. `c-multiplatform-native`: Which Should You Choose?
+
+This repository (`c-multiplatform`) is the **immediate-mode / custom-rendered** UI framework with a full W3C CSS layout engine and Headless CDK, whereas **[c-multiplatform-native](https://github.com/SamuelMarks/c-multiplatform-native)** (`cmn`) is its sister **retained-mode native OS widget** framework.
+
+Both are written in strict ANSI C (C89/C90), expose zero-overhead C ABIs for universal FFI, provide reactive `Signals`, forms, routing, and accessibility, and **share the exact same underlying C ecosystem** (`c-orm`, `c-abstract-http`, `c-fs`, `cdd-c`, `c-str-span`, `c89stringutils`, etc.)—which is also shared by **[c-rest-framework](https://github.com/SamuelMarks/c-rest-framework)** on the backend. This means your business logic, data models, networking, and database persistence code are 100% interchangeable across both UI frameworks and your backend services.
+
+#### Architectural Comparison
+
+| Dimension | `c-multiplatform` (This Repo) | [`c-multiplatform-native` (`cmn`)](https://github.com/SamuelMarks/c-multiplatform-native) |
+| :--- | :--- | :--- |
+| **Rendering Paradigm** | **Immediate-Mode / Custom Rendering Engine** | **Retained-Mode Native OS Widgets** |
+| **Under the Hood** | Custom GPU/software render paths (OpenGL ES, Direct3D, GDI+, Metal, Wayland/X11, Web Inspectable DOM) + Headless CDK | Wraps actual OS controls (`HWND` on Win32, `NSView`/`UIView` on Apple, `GtkWidget` on Linux, Android `View`, Web DOM) |
+| **Visual Identity** | **Pixel-Perfect Cross-Platform Consistency** (built-in Material 3, Fluent, Cupertino, and custom design token themes) | **100% Authentic OS Look & Feel** (automatically adapts to OS version, system themes, and platform conventions) |
+| **Layout System** | Full **W3C CSS Layout Engine** (Flexbox, CSS Grid, CSS Selectors, Transitions) | Native platform layout managers & containers |
+| **Binary Footprint** | **Small** (< 2 MB typical static link, bundles layout & rendering engine) | **Ultra-Minimal** (delegates widget drawing, text shaping, and controls to the host OS) |
+| **Memory & CPU Profile** | Immediate-mode / frame-driven pipeline with hierarchical arenas & object pools | Event-driven retained state; zero per-frame redraw overhead when idle |
+| **Accessibility (a11y)** | Synthesized native OS ARIA tree & inspectable DOM | **Inherent via Host OS** (screen readers, IME, and OS assistive tools see standard native controls directly) |
+| **Dynamic UI / Ejection** | Live JSON Schema Interpreter + Ahead-of-Time (AoT) C89 Code Ejection | Programmatic C API with reactive Signals binding |
+| **Embedded / Framebuffer** | Runs anywhere, including bare-metal / RTOS headless framebuffers (DRM/KMS) | Requires a host OS windowing toolkit |
+
+#### Decision Guide
+
+**Choose `c-multiplatform` (this repository) when:**
+- You need **pixel-identical branding and custom styling** across every platform (e.g., Material Design 3, Fluent, Cupertino, or bespoke brand themes).
+- You want a **full W3C CSS layout engine** (Flexbox, Grid, CSS transitions, custom properties) or need custom-drawn animations, shaders, canvases, and high-frequency immediate-mode rendering.
+- You are targeting **headless/embedded framebuffers (RTOS, DRM/KMS)** where no desktop toolkit (Win32/Cocoa/GTK) exists.
+- You need **server-driven / runtime-defined UIs** via JSON schemas with Ahead-of-Time (AoT) C89 code ejection.
+
+**Choose [`c-multiplatform-native`](https://github.com/SamuelMarks/c-multiplatform-native) (`cmn`) when:**
+- You want your application to feel **indistinguishable from a first-party OS utility** on Windows, macOS, Linux, iOS, and Android.
+- You want the **smallest possible binary size** and lowest idle memory/battery consumption by offloading rendering and text shaping to the operating system.
+- You rely heavily on standard OS behaviors out of the box (native context menus, system font rendering, platform-native file pickers, IME input, and OS-level screen readers).
+- You are building desktop/mobile utilities, system tray apps, enterprise forms, configuration tools, or native wrappers.
+
 ### Shared C Ecosystem Architecture
 
-`c-multiplatform` is part of a broader, cohesive ecosystem of strict ANSI C (C89) libraries designed for universal cross-platform software engineering. Rather than operating in isolation, frontend user interfaces built with **`c-multiplatform`** and backend microservices or APIs built with **`c-rest-framework`** share the exact same foundational C libraries. Both frameworks share identical abstractions for networking, relational persistence, filesystem operations, and zero-copy string primitives—allowing complete full-stack development in portable C89 across modern and legacy platforms alike.
+`c-multiplatform` is part of a broader, cohesive full-stack ecosystem of strict ANSI C (C89/C90) libraries designed for universal cross-platform software engineering:
+- **Frontend (Immediate-Mode / W3C CSS):** `c-multiplatform`
+- **Frontend (Native OS Widgets):** [`c-multiplatform-native`](https://github.com/SamuelMarks/c-multiplatform-native) (`cmn`)
+- **Backend (REST API & Services):** [`c-rest-framework`](https://github.com/SamuelMarks/c-rest-framework)
+
+Rather than operating in isolation, all three frameworks share the exact same foundational C libraries—**`c-orm`**, **`c-abstract-http`**, **`c-fs`**, **`cdd-c`**, **`c-str-span`**, and **`c89stringutils`**. Both UI frameworks and your backend services share identical abstractions for networking, relational persistence, schema code generation, filesystem operations, and zero-copy string primitives—allowing you to switch UI paradigms or share domain code across full-stack C89 applications without rewriting a single line of business logic.
 
 ```mermaid
 flowchart TD
     classDef default fill:none,stroke:#888,stroke-width:1px;
 
-    CMP["c-multiplatform"]
-    CRF["c-rest-framework"]
+    CMP["c-multiplatform (Immediate Mode / CSS)"]
+    CMN["c-multiplatform-native (Native Widgets)"]
+    CRF["c-rest-framework (Backend / REST API)"]
 
     HTTP["c-abstract-http"]
     FS["c-fs"]
     ORM["c-orm"]
+    CDD["cdd-c"]
 
     UTILS["c89stringutils"]
     SPAN["c-str-span"]
 
-    CMP ~~~ HTTP
-    CMP ~~~ FS
-    CMP ~~~ ORM
+    CMP --> HTTP
+    CMP --> FS
+    CMP --> ORM
+    CMP --> CDD
 
-    CRF ~~~ HTTP
-    CRF ~~~ FS
-    CRF ~~~ ORM
+    CMN --> HTTP
+    CMN --> FS
+    CMN --> ORM
+    CMN --> CDD
 
-    HTTP ~~~ UTILS
-    FS ~~~ UTILS
-    ORM ~~~ SPAN
+    CRF --> HTTP
+    CRF --> FS
+    CRF --> ORM
+    CRF --> CDD
+
+    HTTP --> UTILS
+    FS --> UTILS
+    ORM --> SPAN
 ```
 
 | Name | Description | CI shield |
 | :--- | :--- | :--- |
 | [c-abstract-http](https://github.com/SamuelMarks/c-abstract-http) | HTTP/HTTPS client interface reusing abstractions for Windows (WinHTTP,WinINet), macOS (CommonCrypto), iOS, Android, GTK+4 (libsoup), with fallback to libcurl | [![CI](https://github.com/SamuelMarks/c-abstract-http/actions/workflows/ci.yml/badge.svg)](https://github.com/SamuelMarks/c-abstract-http/actions/workflows/ci.yml) |
 | [c-fs](https://github.com/SamuelMarks/c-fs) | std::filesystem inspired interface for C89 (MSVC2005, Cygwin, MSVC2026, Linux, macOS, etc.) | [![CI](https://github.com/SamuelMarks/c-fs/actions/workflows/ci.yml/badge.svg)](https://github.com/SamuelMarks/c-fs/actions/workflows/ci.yml) |
-| [c-multiplatform](https://github.com/SamuelMarks/c-multiplatform) | Cross platform GUI framework in ANSI C (C89), native for: Windows (GDI+); Linux (GTK+4); macOS (Cocoa); iOS; Android; web (WASM). Material 3. | [![CI](https://github.com/SamuelMarks/c-multiplatform/actions/workflows/ci.yml/badge.svg)](https://github.com/SamuelMarks/c-multiplatform/actions/workflows/ci.yml) |
+| [c-multiplatform](https://github.com/SamuelMarks/c-multiplatform) | Immediate-mode cross-platform GUI framework in ANSI C (C89) with a full W3C CSS layout engine, Headless CDK, and Material 3 across Windows, Linux, macOS, iOS, Android, and Web (WASM). | [![CI](https://github.com/SamuelMarks/c-multiplatform/actions/workflows/ci.yml/badge.svg)](https://github.com/SamuelMarks/c-multiplatform/actions/workflows/ci.yml) |
+| [c-multiplatform-native](https://github.com/SamuelMarks/c-multiplatform-native) | Retained-mode cross-platform GUI framework in ANSI C (C89/C90) wrapping native OS widgets (Win32, Cocoa, GTK, UIKit, Android, Web DOM). | [![CI](https://github.com/SamuelMarks/c-multiplatform-native/actions/workflows/ci.yml/badge.svg)](https://github.com/SamuelMarks/c-multiplatform-native/actions/workflows/ci.yml) |
 | [c-orm](https://github.com/SamuelMarks/c-orm) | (PostgreSQL, SQLite, MySQL) ORM for C. Alembic/diesel style schema migration support. VERY portable. | [![CI](https://github.com/SamuelMarks/c-orm/actions/workflows/ci.yml/badge.svg)](https://github.com/SamuelMarks/c-orm/actions/workflows/ci.yml) |
-| [c-rest-framework](https://github.com/SamuelMarks/c-rest-framework) | C REST Framework with builtin ORM (PostgreSQL, SQLite, MySQL) native on DOS, Cygwin, Windows, Linux, macOS, etc. | [![CI](https://github.com/SamuelMarks/c-rest-framework/actions/workflows/ci.yml/badge.svg)](https://github.com/SamuelMarks/c-rest-framework/actions/workflows/ci.yml) |
+| [c-rest-framework](https://github.com/SamuelMarks/c-rest-framework) | Full-featured C REST backend framework that reuses `c-orm`, `c-abstract-http`, `c-fs`, `cdd-c`, etc.—native on DOS, Cygwin, Windows, Linux, macOS, BSD, etc. | [![CI](https://github.com/SamuelMarks/c-rest-framework/actions/workflows/ci.yml/badge.svg)](https://github.com/SamuelMarks/c-rest-framework/actions/workflows/ci.yml) |
+| [cdd-c](https://github.com/SamuelMarks/cdd-c) | Compiler-Driven Development utilities, schema/model code generation, and OpenAPI/C tooling shared across frontend and backend. | [![CI](https://github.com/SamuelMarks/cdd-c/actions/workflows/ci.yml/badge.svg)](https://github.com/SamuelMarks/cdd-c/actions/workflows/ci.yml) |
 | [c-str-span](https://github.com/SamuelMarks/c-str-span) | UTF-8 replacement for C strings, supporting zero-copy use-cases (non-null-terminated). | [![CI](https://github.com/SamuelMarks/c-str-span/actions/workflows/ci.yml/badge.svg)](https://github.com/SamuelMarks/c-str-span/actions/workflows/ci.yml) |
 | [c89stringutils](https://github.com/offscale/c89stringutils) | string functions from newer standards / common non-standards for C89 | [![CI](https://github.com/offscale/c89stringutils/actions/workflows/ci.yml/badge.svg)](https://github.com/offscale/c89stringutils/actions/workflows/ci.yml) |
 

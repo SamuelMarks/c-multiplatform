@@ -9,6 +9,7 @@
 #include <string.h>
 /* clang-format on */
 
+/** @brief md3_chip_create function. */
 ui_error_t md3_chip_create(struct ui_engine *engine, enum md3_chip_type type,
                            struct md3_chip **out_chip,
                            struct ui_control_value_accessor *out_cva) {
@@ -37,6 +38,7 @@ ui_error_t md3_chip_create(struct ui_engine *engine, enum md3_chip_type type,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_chip_destroy function. */
 ui_error_t md3_chip_destroy(struct md3_chip *chip) {
   ui_error_t rc;
 
@@ -49,6 +51,7 @@ ui_error_t md3_chip_destroy(struct md3_chip *chip) {
   return rc;
 }
 
+/** @brief md3_chip_add function. */
 ui_error_t md3_chip_add(struct md3_chip *chip, const char *label) {
   if (!chip || !label) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -57,6 +60,7 @@ ui_error_t md3_chip_add(struct md3_chip *chip, const char *label) {
   return ui_chips_base_add(chip->base, label);
 }
 
+/** @brief md3_chip_remove function. */
 ui_error_t md3_chip_remove(struct md3_chip *chip, size_t index) {
   if (!chip) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -65,6 +69,7 @@ ui_error_t md3_chip_remove(struct md3_chip *chip, size_t index) {
   return ui_chips_base_remove(chip->base, index);
 }
 
+/** @brief md3_chip_get_count function. */
 ui_error_t md3_chip_get_count(const struct md3_chip *chip, size_t *out_count) {
   if (!chip || !out_count) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -73,6 +78,7 @@ ui_error_t md3_chip_get_count(const struct md3_chip *chip, size_t *out_count) {
   return ui_chips_base_get_count(chip->base, out_count);
 }
 
+/** @brief md3_chip_get_label function. */
 ui_error_t md3_chip_get_label(const struct md3_chip *chip, size_t index,
                               const char **out_label) {
   if (!chip || !out_label) {
@@ -82,6 +88,7 @@ ui_error_t md3_chip_get_label(const struct md3_chip *chip, size_t index,
   return ui_chips_base_get_token(chip->base, index, out_label);
 }
 
+/** @brief md3_chip_set_elevated function. */
 ui_error_t md3_chip_set_elevated(struct md3_chip *chip, int elevated) {
   if (!chip) {
     return UI_ERROR_INVALID_ARGUMENT;

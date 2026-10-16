@@ -8,6 +8,8 @@
 #include "../src/ui_internal_mem.h"
 /* clang-format on */
 
+extern int g_input_mock_fail;
+
 struct ui_input_base {
   struct ui_component *component;
   struct ui_gesture_recognizer *gesture_recognizer;
@@ -387,7 +389,6 @@ static int run_mock_tests(void) {
   struct ui_input_base *input = NULL;
   struct ui_event ev;
   ui_error_t rc;
-  extern int g_input_mock_fail;
 
   rc = run_input_base_coverage();
   EXPECT(rc == UI_ERROR_NONE);

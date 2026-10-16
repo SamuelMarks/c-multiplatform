@@ -8,24 +8,18 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 /* clang-format off */
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
-
-#if defined(_MSC_VER) && (_MSC_VER < 1600)
-typedef unsigned __int64 oauth2_uint64_t;
-typedef __int64 oauth2_int64_t;
-#else
-#include <stdint.h>
-typedef uint64_t oauth2_uint64_t;
-typedef int64_t oauth2_int64_t;
-#endif
-
+#include "ui_types.h"
 #include "ui_error.h"
 /* clang-format on */
+
+typedef ui_uint64 oauth2_uint64_t;
+typedef ui_int64 oauth2_int64_t;
 
 #if defined(_MSC_VER)
 #define OAUTH2_FMT_I64 "%I64d"

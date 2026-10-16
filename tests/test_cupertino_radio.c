@@ -11,6 +11,8 @@
 #include <math.h>
 /* clang-format on */
 
+extern int g_malloc_fail_countdown;
+
 SUITE(cupertino_radio_suite);
 
 TEST test_radio_lifecycle_and_cva(void) {
@@ -178,7 +180,6 @@ TEST test_radio_oom_mock(void) {
   ui_error_t rc;
 
 #ifdef UI_TEST_MOCK_ALLOC
-  extern int g_malloc_fail_countdown;
 
   g_malloc_fail_countdown = 0;
   rc = cupertino_radio_create(dummy_engine, &r, NULL);

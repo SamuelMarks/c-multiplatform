@@ -10,6 +10,9 @@
 #include <math.h>
 /* clang-format on */
 
+extern int g_cupertino_haptics_mock_return;
+extern int g_malloc_fail_countdown;
+
 SUITE(cupertino_switch_suite);
 
 TEST test_switch_lifecycle_and_cva(void) {
@@ -23,7 +26,6 @@ TEST test_switch_lifecycle_and_cva(void) {
   union ui_signal_payload payload;
   ui_error_t rc;
 #ifdef UI_TEST_MOCK_ALLOC
-  extern int g_cupertino_haptics_mock_return;
 #endif
 
   memset(&payload, 0, sizeof(payload));
@@ -168,7 +170,6 @@ TEST test_switch_oom_mock(void) {
   ui_error_t rc;
 
 #ifdef UI_TEST_MOCK_ALLOC
-  extern int g_malloc_fail_countdown;
 
   g_malloc_fail_countdown = 0;
   rc = cupertino_switch_create(dummy_engine, &sw, NULL);

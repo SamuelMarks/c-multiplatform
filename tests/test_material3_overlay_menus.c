@@ -572,147 +572,208 @@ TEST test_md3_overlay_menus_null_args(void) {
   rc = ui_engine_create(&engine_cfg, &engine);
   ASSERT_EQ(UI_ERROR_NONE, rc);
 
-  struct ui_dom_node node;
-  memset(&node, 0, sizeof(node));
+  {
+    struct ui_dom_node node;
+    memset(&node, 0, sizeof(node));
 
-  struct md3_popover *pop = NULL;
-  rc = md3_popover_create(engine, &node, &pop);
+    {
+      struct md3_popover *pop = NULL;
+      rc = md3_popover_create(engine, &node, &pop);
 
-  struct md3_banner *banner = NULL;
-  rc = md3_banner_create(engine, &banner);
+      {
+        struct md3_banner *banner = NULL;
+        rc = md3_banner_create(engine, &banner);
 
-  struct md3_inline_alert *alert = NULL;
-  rc = md3_inline_alert_create(engine, MD3_ALERT_SEVERITY_INFO, &alert);
+        {
+          struct md3_inline_alert *alert = NULL;
+          rc = md3_inline_alert_create(engine, MD3_ALERT_SEVERITY_INFO, &alert);
 
-  struct md3_menubar *mb = NULL;
-  rc = md3_menubar_create(engine, &mb);
+          {
+            struct md3_menubar *mb = NULL;
+            rc = md3_menubar_create(engine, &mb);
 
-  struct md3_context_menu *cm = NULL;
-  rc = md3_context_menu_create(engine, &cm);
+            {
+              struct md3_context_menu *cm = NULL;
+              rc = md3_context_menu_create(engine, &cm);
 
-  struct md3_action_sheet *as = NULL;
-  rc = md3_action_sheet_create(engine, &as);
+              {
+                struct md3_action_sheet *as = NULL;
+                rc = md3_action_sheet_create(engine, &as);
 
-  struct md3_coachmark *coachmark = NULL;
-  rc = md3_coachmark_create(engine, &node, &coachmark);
+                {
+                  struct md3_coachmark *coachmark = NULL;
+                  rc = md3_coachmark_create(engine, &node, &coachmark);
 
-  struct md3_color_picker *cp = NULL;
-  struct ui_control_value_accessor *cva_tmp = NULL;
-  rc = md3_color_picker_create(engine, &cp, &cva_tmp);
+                  {
+                    struct md3_color_picker *cp = NULL;
+                    struct ui_control_value_accessor *cva_tmp = NULL;
+                    rc = md3_color_picker_create(engine, &cp, &cva_tmp);
 
-  struct md3_command_palette *palette = NULL;
-  rc = md3_command_palette_create(engine, &palette);
+                    {
+                      struct md3_command_palette *palette = NULL;
+                      rc = md3_command_palette_create(engine, &palette);
 
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
-            md3_hover_card_create(engine, &node, NULL));
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, md3_popover_create(engine, &node, NULL));
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, md3_popover_is_open(pop, NULL));
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, md3_banner_create(engine, NULL));
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, md3_banner_set_text(banner, NULL));
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, md3_banner_set_action(banner, 0, NULL));
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
-            md3_banner_set_action(banner, 2, "Action"));
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, md3_banner_is_open(banner, NULL));
+                      ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+                                md3_hover_card_create(engine, &node, NULL));
+                      ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+                                md3_popover_create(engine, &node, NULL));
+                      ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+                                md3_popover_is_open(pop, NULL));
+                      ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+                                md3_banner_create(engine, NULL));
+                      ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+                                md3_banner_set_text(banner, NULL));
+                      ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+                                md3_banner_set_action(banner, 0, NULL));
+                      ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+                                md3_banner_set_action(banner, 2, "Action"));
+                      ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+                                md3_banner_is_open(banner, NULL));
 
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
-            md3_inline_alert_create(NULL, MD3_ALERT_SEVERITY_INFO, &alert));
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
-            md3_inline_alert_create(engine, MD3_ALERT_SEVERITY_INFO, NULL));
-  ASSERT_EQ(
-      UI_ERROR_INVALID_ARGUMENT,
-      md3_inline_alert_create(engine, (enum md3_alert_severity) - 1, &alert));
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
-            md3_coachmark_create(NULL, &node, &coachmark));
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
-            md3_coachmark_create(engine, NULL, &coachmark));
-  ASSERT_EQ(UI_ERROR_NONE, cva_tmp->set_disabled_state(cp, UI_TRUE));
-  ASSERT_EQ(UI_ERROR_NONE, cva_tmp->set_disabled_state(cp, UI_FALSE));
+                      ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+                                md3_inline_alert_create(
+                                    NULL, MD3_ALERT_SEVERITY_INFO, &alert));
+                      ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+                                md3_inline_alert_create(
+                                    engine, MD3_ALERT_SEVERITY_INFO, NULL));
+                      ASSERT_EQ(
+                          UI_ERROR_INVALID_ARGUMENT,
+                          md3_inline_alert_create(
+                              engine, (enum md3_alert_severity) - 1, &alert));
+                      ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+                                md3_coachmark_create(NULL, &node, &coachmark));
+                      ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+                                md3_coachmark_create(engine, NULL, &coachmark));
+                      ASSERT_EQ(UI_ERROR_NONE,
+                                cva_tmp->set_disabled_state(cp, UI_TRUE));
+                      ASSERT_EQ(UI_ERROR_NONE,
+                                cva_tmp->set_disabled_state(cp, UI_FALSE));
 
-  ASSERT_EQ(
-      UI_ERROR_INVALID_ARGUMENT,
-      md3_inline_alert_create(engine, (enum md3_alert_severity)99, &alert));
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, md3_inline_alert_set_title(alert, NULL));
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
-            md3_inline_alert_set_message(alert, NULL));
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, md3_menubar_create(engine, NULL));
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, md3_menubar_append_item(mb, NULL));
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, md3_context_menu_create(engine, NULL));
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
-            md3_context_menu_open_at(cm, -1, 0, 10, 10));
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
-            md3_context_menu_open_at(cm, 0, -1, 10, 10));
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
-            md3_context_menu_open_at(cm, 0, 0, 0, 10));
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
-            md3_context_menu_open_at(cm, 0, 0, 10, 0));
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, md3_action_sheet_create(engine, NULL));
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
-            md3_action_sheet_add_action(as, NULL, NULL));
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
-            md3_action_sheet_set_cancel_action(as, NULL));
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, md3_action_sheet_is_open(as, NULL));
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
-            md3_coachmark_create(engine, &node, NULL));
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
-            md3_coachmark_set_content(coachmark, NULL, "D", 0, 1));
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
-            md3_coachmark_set_content(coachmark, "T", NULL, 0, 1));
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
-            md3_coachmark_set_content(coachmark, "T", "D", -1, 1));
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
-            md3_coachmark_set_content(coachmark, "T", "D", 0, 0));
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
-            md3_coachmark_set_content(coachmark, "T", "D", 1, 1));
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
-            md3_color_picker_create(engine, NULL, NULL));
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
-            md3_color_picker_set_hsv(cp, -1.0, 0, 0));
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
-            md3_color_picker_set_hsv(cp, 360.0, 0, 0));
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
-            md3_color_picker_set_hsv(cp, 0, -0.1, 0));
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, md3_color_picker_set_hsv(cp, 0, 1.1, 0));
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
-            md3_color_picker_set_hsv(cp, 0, 0, -0.1));
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, md3_color_picker_set_hsv(cp, 0, 0, 1.1));
-  double t_h, t_s, t_v;
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
-            md3_color_picker_get_hsv(cp, NULL, &t_s, &t_v));
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
-            md3_color_picker_get_hsv(cp, &t_h, NULL, &t_v));
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
-            md3_color_picker_get_hsv(cp, &t_h, &t_s, NULL));
-  unsigned char t_r, t_g, t_b;
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
-            md3_color_picker_get_rgb(cp, NULL, &t_g, &t_b));
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
-            md3_color_picker_get_rgb(cp, &t_r, NULL, &t_b));
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
-            md3_color_picker_get_rgb(cp, &t_r, &t_g, NULL));
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, md3_color_picker_set_hex(cp, NULL));
-  char hex_buf[8];
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, md3_color_picker_get_hex(cp, NULL, 8));
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
-            md3_color_picker_get_hex(cp, hex_buf, 7));
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
-            md3_command_palette_create(engine, NULL));
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
-            md3_command_palette_add_action(palette, NULL, NULL, NULL));
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
-            md3_command_palette_is_open(palette, NULL));
+                      ASSERT_EQ(
+                          UI_ERROR_INVALID_ARGUMENT,
+                          md3_inline_alert_create(
+                              engine, (enum md3_alert_severity)99, &alert));
+                      ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+                                md3_inline_alert_set_title(alert, NULL));
+                      ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+                                md3_inline_alert_set_message(alert, NULL));
+                      ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+                                md3_menubar_create(engine, NULL));
+                      ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+                                md3_menubar_append_item(mb, NULL));
+                      ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+                                md3_context_menu_create(engine, NULL));
+                      ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+                                md3_context_menu_open_at(cm, -1, 0, 10, 10));
+                      ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+                                md3_context_menu_open_at(cm, 0, -1, 10, 10));
+                      ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+                                md3_context_menu_open_at(cm, 0, 0, 0, 10));
+                      ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+                                md3_context_menu_open_at(cm, 0, 0, 10, 0));
+                      ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+                                md3_action_sheet_create(engine, NULL));
+                      ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+                                md3_action_sheet_add_action(as, NULL, NULL));
+                      ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+                                md3_action_sheet_set_cancel_action(as, NULL));
+                      ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+                                md3_action_sheet_is_open(as, NULL));
+                      ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+                                md3_coachmark_create(engine, &node, NULL));
+                      ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+                                md3_coachmark_set_content(coachmark, NULL, "D",
+                                                          0, 1));
+                      ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+                                md3_coachmark_set_content(coachmark, "T", NULL,
+                                                          0, 1));
+                      ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+                                md3_coachmark_set_content(coachmark, "T", "D",
+                                                          -1, 1));
+                      ASSERT_EQ(
+                          UI_ERROR_INVALID_ARGUMENT,
+                          md3_coachmark_set_content(coachmark, "T", "D", 0, 0));
+                      ASSERT_EQ(
+                          UI_ERROR_INVALID_ARGUMENT,
+                          md3_coachmark_set_content(coachmark, "T", "D", 1, 1));
+                      ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+                                md3_color_picker_create(engine, NULL, NULL));
+                      ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+                                md3_color_picker_set_hsv(cp, -1.0, 0, 0));
+                      ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+                                md3_color_picker_set_hsv(cp, 360.0, 0, 0));
+                      ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+                                md3_color_picker_set_hsv(cp, 0, -0.1, 0));
+                      ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+                                md3_color_picker_set_hsv(cp, 0, 1.1, 0));
+                      ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+                                md3_color_picker_set_hsv(cp, 0, 0, -0.1));
+                      ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+                                md3_color_picker_set_hsv(cp, 0, 0, 1.1));
+                      {
+                        double t_h, t_s, t_v;
+                        ASSERT_EQ(
+                            UI_ERROR_INVALID_ARGUMENT,
+                            md3_color_picker_get_hsv(cp, NULL, &t_s, &t_v));
+                        ASSERT_EQ(
+                            UI_ERROR_INVALID_ARGUMENT,
+                            md3_color_picker_get_hsv(cp, &t_h, NULL, &t_v));
+                        ASSERT_EQ(
+                            UI_ERROR_INVALID_ARGUMENT,
+                            md3_color_picker_get_hsv(cp, &t_h, &t_s, NULL));
+                        {
+                          unsigned char t_r, t_g, t_b;
+                          ASSERT_EQ(
+                              UI_ERROR_INVALID_ARGUMENT,
+                              md3_color_picker_get_rgb(cp, NULL, &t_g, &t_b));
+                          ASSERT_EQ(
+                              UI_ERROR_INVALID_ARGUMENT,
+                              md3_color_picker_get_rgb(cp, &t_r, NULL, &t_b));
+                          ASSERT_EQ(
+                              UI_ERROR_INVALID_ARGUMENT,
+                              md3_color_picker_get_rgb(cp, &t_r, &t_g, NULL));
+                          ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+                                    md3_color_picker_set_hex(cp, NULL));
+                          {
+                            char hex_buf[8];
+                            ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+                                      md3_color_picker_get_hex(cp, NULL, 8));
+                            ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+                                      md3_color_picker_get_hex(cp, hex_buf, 7));
+                            ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+                                      md3_command_palette_create(engine, NULL));
+                            ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+                                      md3_command_palette_add_action(
+                                          palette, NULL, NULL, NULL));
+                            ASSERT_EQ(
+                                UI_ERROR_INVALID_ARGUMENT,
+                                md3_command_palette_is_open(palette, NULL));
 
-  md3_popover_destroy(pop);
-  md3_banner_destroy(banner);
-  md3_inline_alert_destroy(alert);
-  md3_menubar_destroy(mb);
-  md3_context_menu_destroy(cm);
-  md3_action_sheet_destroy(as);
-  md3_coachmark_destroy(coachmark);
-  md3_color_picker_destroy(cp);
-  md3_command_palette_destroy(palette);
+                            md3_popover_destroy(pop);
+                            md3_banner_destroy(banner);
+                            md3_inline_alert_destroy(alert);
+                            md3_menubar_destroy(mb);
+                            md3_context_menu_destroy(cm);
+                            md3_action_sheet_destroy(as);
+                            md3_coachmark_destroy(coachmark);
+                            md3_color_picker_destroy(cp);
+                            md3_command_palette_destroy(palette);
 
-  ui_engine_destroy(engine);
-  PASS();
+                            ui_engine_destroy(engine);
+                            PASS();
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 }
 
 #ifdef UI_TEST_MOCK_ALLOC
@@ -727,114 +788,137 @@ TEST test_md3_overlay_menus_oom(void) {
   rc = ui_engine_create(&engine_cfg, &engine);
   ASSERT_EQ(UI_ERROR_NONE, rc);
 
-  struct ui_dom_node node;
-  memset(&node, 0, sizeof(node));
-  struct ui_control_value_accessor *cva_tmp = NULL;
+  {
+    struct ui_dom_node node;
+    memset(&node, 0, sizeof(node));
+    {
+      struct ui_control_value_accessor *cva_tmp = NULL;
 
-  int i;
-  struct md3_hover_card *hc = NULL;
-  for (i = 0; i < 500; i++) {
-    g_malloc_fail_countdown = i;
-    rc = md3_hover_card_create(engine, &node, &hc);
-    if (rc == UI_ERROR_NONE) {
-      md3_hover_card_destroy(hc);
-      break;
+      int i;
+      struct md3_hover_card *hc = NULL;
+      for (i = 0; i < 500; i++) {
+        g_malloc_fail_countdown = i;
+        rc = md3_hover_card_create(engine, &node, &hc);
+        if (rc == UI_ERROR_NONE) {
+          md3_hover_card_destroy(hc);
+          break;
+        }
+      }
+
+      {
+        struct md3_popover *pop = NULL;
+        for (i = 0; i < 500; i++) {
+          g_malloc_fail_countdown = i;
+          rc = md3_popover_create(engine, &node, &pop);
+          if (rc == UI_ERROR_NONE) {
+            md3_popover_destroy(pop);
+            break;
+          }
+        }
+
+        {
+          struct md3_banner *banner = NULL;
+          for (i = 0; i < 500; i++) {
+            g_malloc_fail_countdown = i;
+            rc = md3_banner_create(engine, &banner);
+            if (rc == UI_ERROR_NONE) {
+              md3_banner_destroy(banner);
+              break;
+            }
+          }
+
+          {
+            struct md3_inline_alert *alert = NULL;
+            for (i = 0; i < 500; i++) {
+              g_malloc_fail_countdown = i;
+              rc = md3_inline_alert_create(engine, MD3_ALERT_SEVERITY_WARNING,
+                                           &alert);
+              if (rc == UI_ERROR_NONE) {
+                md3_inline_alert_destroy(alert);
+                break;
+              }
+            }
+
+            {
+              struct md3_menubar *mb = NULL;
+              for (i = 0; i < 500; i++) {
+                g_malloc_fail_countdown = i;
+                rc = md3_menubar_create(engine, &mb);
+                if (rc == UI_ERROR_NONE) {
+                  md3_menubar_destroy(mb);
+                  break;
+                }
+              }
+
+              {
+                struct md3_context_menu *cm = NULL;
+                for (i = 0; i < 500; i++) {
+                  g_malloc_fail_countdown = i;
+                  rc = md3_context_menu_create(engine, &cm);
+                  if (rc == UI_ERROR_NONE) {
+                    md3_context_menu_destroy(cm);
+                    break;
+                  }
+                }
+
+                {
+                  struct md3_action_sheet *as = NULL;
+                  for (i = 0; i < 500; i++) {
+                    g_malloc_fail_countdown = i;
+                    rc = md3_action_sheet_create(engine, &as);
+                    if (rc == UI_ERROR_NONE) {
+                      md3_action_sheet_destroy(as);
+                      break;
+                    }
+                  }
+
+                  {
+                    struct md3_coachmark *coachmark = NULL;
+                    for (i = 0; i < 500; i++) {
+                      g_malloc_fail_countdown = i;
+                      rc = md3_coachmark_create(engine, &node, &coachmark);
+                      if (rc == UI_ERROR_NONE) {
+                        md3_coachmark_destroy(coachmark);
+                        break;
+                      }
+                    }
+
+                    {
+                      struct md3_color_picker *cp = NULL;
+                      for (i = 0; i < 500; i++) {
+                        g_malloc_fail_countdown = i;
+                        rc = md3_color_picker_create(engine, &cp, &cva_tmp);
+                        if (rc == UI_ERROR_NONE) {
+                          md3_color_picker_destroy(cp);
+                          break;
+                        }
+                      }
+
+                      {
+                        struct md3_command_palette *palette = NULL;
+                        for (i = 0; i < 500; i++) {
+                          g_malloc_fail_countdown = i;
+                          rc = md3_command_palette_create(engine, &palette);
+                          if (rc == UI_ERROR_NONE) {
+                            md3_command_palette_destroy(palette);
+                            break;
+                          }
+                        }
+
+                        g_malloc_fail_countdown = -1;
+                        ui_engine_destroy(engine);
+                        PASS();
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
-
-  struct md3_popover *pop = NULL;
-  for (i = 0; i < 500; i++) {
-    g_malloc_fail_countdown = i;
-    rc = md3_popover_create(engine, &node, &pop);
-    if (rc == UI_ERROR_NONE) {
-      md3_popover_destroy(pop);
-      break;
-    }
-  }
-
-  struct md3_banner *banner = NULL;
-  for (i = 0; i < 500; i++) {
-    g_malloc_fail_countdown = i;
-    rc = md3_banner_create(engine, &banner);
-    if (rc == UI_ERROR_NONE) {
-      md3_banner_destroy(banner);
-      break;
-    }
-  }
-
-  struct md3_inline_alert *alert = NULL;
-  for (i = 0; i < 500; i++) {
-    g_malloc_fail_countdown = i;
-    rc = md3_inline_alert_create(engine, MD3_ALERT_SEVERITY_WARNING, &alert);
-    if (rc == UI_ERROR_NONE) {
-      md3_inline_alert_destroy(alert);
-      break;
-    }
-  }
-
-  struct md3_menubar *mb = NULL;
-  for (i = 0; i < 500; i++) {
-    g_malloc_fail_countdown = i;
-    rc = md3_menubar_create(engine, &mb);
-    if (rc == UI_ERROR_NONE) {
-      md3_menubar_destroy(mb);
-      break;
-    }
-  }
-
-  struct md3_context_menu *cm = NULL;
-  for (i = 0; i < 500; i++) {
-    g_malloc_fail_countdown = i;
-    rc = md3_context_menu_create(engine, &cm);
-    if (rc == UI_ERROR_NONE) {
-      md3_context_menu_destroy(cm);
-      break;
-    }
-  }
-
-  struct md3_action_sheet *as = NULL;
-  for (i = 0; i < 500; i++) {
-    g_malloc_fail_countdown = i;
-    rc = md3_action_sheet_create(engine, &as);
-    if (rc == UI_ERROR_NONE) {
-      md3_action_sheet_destroy(as);
-      break;
-    }
-  }
-
-  struct md3_coachmark *coachmark = NULL;
-  for (i = 0; i < 500; i++) {
-    g_malloc_fail_countdown = i;
-    rc = md3_coachmark_create(engine, &node, &coachmark);
-    if (rc == UI_ERROR_NONE) {
-      md3_coachmark_destroy(coachmark);
-      break;
-    }
-  }
-
-  struct md3_color_picker *cp = NULL;
-  for (i = 0; i < 500; i++) {
-    g_malloc_fail_countdown = i;
-    rc = md3_color_picker_create(engine, &cp, &cva_tmp);
-    if (rc == UI_ERROR_NONE) {
-      md3_color_picker_destroy(cp);
-      break;
-    }
-  }
-
-  struct md3_command_palette *palette = NULL;
-  for (i = 0; i < 500; i++) {
-    g_malloc_fail_countdown = i;
-    rc = md3_command_palette_create(engine, &palette);
-    if (rc == UI_ERROR_NONE) {
-      md3_command_palette_destroy(palette);
-      break;
-    }
-  }
-
-  g_malloc_fail_countdown = -1;
-  ui_engine_destroy(engine);
-  PASS();
 }
 #endif
 

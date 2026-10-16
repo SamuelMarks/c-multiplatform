@@ -15,12 +15,15 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
+/** @brief CUPERTINO_RINGS_DEFAULT_OUTER_RADIUS constant. */
 #define CUPERTINO_RINGS_DEFAULT_OUTER_RADIUS 80.0f
+/** @brief CUPERTINO_RINGS_DEFAULT_THICKNESS constant. */
 #define CUPERTINO_RINGS_DEFAULT_THICKNESS 18.0f
+/** @brief CUPERTINO_RINGS_DEFAULT_GAP constant. */
 #define CUPERTINO_RINGS_DEFAULT_GAP 4.0f
 
 /**
@@ -50,13 +53,23 @@ struct cupertino_activity_rings_descriptor {
  * @brief Activity rings instance holding geometry and state.
  */
 struct cupertino_activity_rings {
-  float outer_radius;
-  float ring_thickness;
-  float ring_gap;
-  float progress[CUPERTINO_RING_COUNT];
-  ui_color_t ring_colors_start[CUPERTINO_RING_COUNT];
-  ui_color_t ring_colors_end[CUPERTINO_RING_COUNT];
-  ui_color_t background_tracks[CUPERTINO_RING_COUNT];
+  float outer_radius;                   /**< outer_radius field. */
+  float ring_thickness;                 /**< ring_thickness field. */
+  float ring_gap;                       /**< ring_gap field. */
+  float progress[CUPERTINO_RING_COUNT]; /**< progress[CUPERTINO_RING_COUNT]
+                                           field. */
+  ui_color_t ring_colors_start
+      [CUPERTINO_RING_COUNT]; /**<
+                                 ring_colors_start[CUPERTINO_RING_COUNT]
+                                 field. */
+  ui_color_t ring_colors_end
+      [CUPERTINO_RING_COUNT]; /**<
+                                 ring_colors_end[CUPERTINO_RING_COUNT]
+                                 field. */
+  ui_color_t background_tracks
+      [CUPERTINO_RING_COUNT]; /**<
+                                 background_tracks[CUPERTINO_RING_COUNT]
+                                 field. */
 };
 
 /**

@@ -11,6 +11,20 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_cupertino_live_activity_mock_card_create_fail;
+extern int g_cupertino_live_activity_mock_card_set_title_fail;
+extern int g_cupertino_live_activity_mock_card_set_subtitle_fail;
+extern int g_cupertino_live_activity_mock_card_destroy_fail;
+extern int g_cupertino_live_activity_mock_apply_geometry_fail;
+extern int g_cupertino_live_activity_mock_update_palette_fail;
+extern struct ui_card_base *g_cupertino_live_activity_last_created_card;
+#ifdef UI_TEST_MOCK_ALLOC
+extern ui_error_t
+test_cupertino_live_activity_update_palette(struct cupertino_live_activity *a);
+extern ui_error_t
+test_cupertino_live_activity_apply_geometry(struct cupertino_live_activity *a);
+#endif
+
 TEST test_live_activity_lifecycle_and_defaults(void) {
   struct ui_engine *dummy_engine = (struct ui_engine *)0x1234;
   struct cupertino_live_activity_descriptor desc;
@@ -144,11 +158,6 @@ TEST test_live_activity_layout_modes(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern ui_error_t test_cupertino_live_activity_update_palette(
-        struct cupertino_live_activity * a);
-    extern ui_error_t test_cupertino_live_activity_apply_geometry(
-        struct cupertino_live_activity * a);
-
     rc = test_cupertino_live_activity_update_palette(NULL);
     ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
     rc = test_cupertino_live_activity_apply_geometry(NULL);
@@ -310,13 +319,6 @@ TEST test_live_activity_mock_failures(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_cupertino_live_activity_mock_card_create_fail;
-    extern int g_cupertino_live_activity_mock_card_set_title_fail;
-    extern int g_cupertino_live_activity_mock_card_set_subtitle_fail;
-    extern int g_cupertino_live_activity_mock_card_destroy_fail;
-    extern int g_cupertino_live_activity_mock_apply_geometry_fail;
-    extern int g_cupertino_live_activity_mock_update_palette_fail;
-    extern struct ui_card_base *g_cupertino_live_activity_last_created_card;
 
     /* Card create fail */
     g_cupertino_live_activity_mock_card_create_fail = 1;

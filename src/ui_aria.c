@@ -50,6 +50,7 @@ static ui_error_t mock_dom_node_destroy(struct ui_dom_node *node) {
 /** @endcond */
 #endif
 
+/** @brief ui_aria_role_from_string function. */
 ui_error_t ui_aria_role_from_string(const char *role_str,
                                     enum ui_aria_role *out_role) {
   if (!out_role)
@@ -116,6 +117,7 @@ static ui_error_t mock_aria_state_cleanup(struct ui_aria_state *state) {
 #define ui_aria_state_cleanup mock_aria_state_cleanup
 /** @endcond */
 #endif
+/** @brief ui_aria_state_parse function. */
 ui_error_t ui_aria_state_parse(const struct ui_dom_node *node,
                                struct ui_aria_state *out_state) {
   const char *val = NULL;
@@ -323,6 +325,7 @@ ui_error_t ui_aria_state_parse(const struct ui_dom_node *node,
 #undef ui_aria_role_from_string
 #undef ui_aria_state_cleanup
 #endif
+/** @brief ui_aria_state_cleanup function. */
 ui_error_t ui_aria_state_cleanup(struct ui_aria_state *state) {
   if (!state)
     return UI_ERROR_INVALID_ARGUMENT;

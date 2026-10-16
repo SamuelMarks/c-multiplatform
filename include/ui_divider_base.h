@@ -19,7 +19,7 @@ struct ui_signal;
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 /**
  * @brief Divider orientation options.

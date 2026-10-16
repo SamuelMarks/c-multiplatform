@@ -51,6 +51,7 @@ struct ui_tree_grid_base {
   size_t active_col; /**< active_col */
 };
 
+/** @brief ui_tree_grid_base_create function. */
 ui_error_t ui_tree_grid_base_create(struct ui_tree_grid_base **out_tree_grid,
                                     const struct ui_tree_grid_model *model) {
   struct ui_tree_grid_base *tree_grid;
@@ -81,6 +82,7 @@ ui_error_t ui_tree_grid_base_create(struct ui_tree_grid_base **out_tree_grid,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_tree_grid_base_destroy function. */
 ui_error_t ui_tree_grid_base_destroy(struct ui_tree_grid_base *tree_grid) {
   ui_error_t rc = UI_ERROR_NONE;
   if (!tree_grid) {
@@ -93,6 +95,7 @@ ui_error_t ui_tree_grid_base_destroy(struct ui_tree_grid_base *tree_grid) {
   return rc;
 }
 
+/** @brief ui_tree_grid_base_get_component function. */
 ui_error_t
 ui_tree_grid_base_get_component(struct ui_tree_grid_base *tree_grid,
                                 struct ui_component **out_component) {
@@ -103,6 +106,7 @@ ui_tree_grid_base_get_component(struct ui_tree_grid_base *tree_grid,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_tree_grid_base_is_expanded function. */
 ui_error_t
 ui_tree_grid_base_is_expanded(const struct ui_tree_grid_base *tree_grid,
                               void *node_id, int *out_is_expanded) {
@@ -129,6 +133,7 @@ ui_tree_grid_base_is_expanded(const struct ui_tree_grid_base *tree_grid,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_tree_grid_base_set_expanded function. */
 ui_error_t ui_tree_grid_base_set_expanded(struct ui_tree_grid_base *tree_grid,
                                           void *node_id, int expanded) {
   int currently_expanded = 0;
@@ -162,6 +167,7 @@ ui_error_t ui_tree_grid_base_set_expanded(struct ui_tree_grid_base *tree_grid,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_tree_grid_base_toggle_node function. */
 ui_error_t ui_tree_grid_base_toggle_node(struct ui_tree_grid_base *tree_grid,
                                          void *node_id) {
   int expanded = 0;
@@ -175,6 +181,7 @@ ui_error_t ui_tree_grid_base_toggle_node(struct ui_tree_grid_base *tree_grid,
   return ui_tree_grid_base_set_expanded(tree_grid, node_id, !expanded);
 }
 
+/** @brief ui_tree_grid_base_handle_key_event function. */
 ui_error_t
 ui_tree_grid_base_handle_key_event(struct ui_tree_grid_base *tree_grid,
                                    const struct ui_keyboard_event *event) {
@@ -224,6 +231,7 @@ ui_tree_grid_base_handle_key_event(struct ui_tree_grid_base *tree_grid,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_tree_grid_base_render function. */
 ui_error_t ui_tree_grid_base_render(struct ui_tree_grid_base *tree_grid,
                                     struct ui_dom_node *container) {
   if (!tree_grid || !container) {

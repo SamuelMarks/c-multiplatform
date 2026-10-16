@@ -5,6 +5,8 @@
 #include <stdio.h>
 /* clang-format on */
 
+extern int g_malloc_fail_countdown;
+
 static int g_callback_called = 0;
 static float g_last_scroll_x = -1.0f;
 static float g_last_scroll_y = -1.0f;
@@ -255,7 +257,6 @@ cleanup:
   return 0;
 }
 void test_ui_scroll_dispatcher_oom(void) {
-  extern int g_malloc_fail_countdown;
   struct ui_scroll_dispatcher *dispatcher = NULL;
   int i;
   for (i = 0; i < 5; ++i) {
@@ -286,22 +287,26 @@ void test_ui_scroll_dispatcher_oom(void) {
     }
 
     g_malloc_fail_countdown = 0;
-    int r;
-    ui_scroll_dispatcher_register(dispatcher, test_callback, NULL, &r);
-    g_malloc_fail_countdown = -1;
-
-    struct ui_layout_observer *obs = NULL;
-    ui_layout_observer_create(&obs);
-    for (i = 0; i < 5; ++i) {
-      g_malloc_fail_countdown = i;
-      ui_scroll_dispatcher_bind_layout_observer(dispatcher, obs);
-    }
-    g_malloc_fail_countdown = -1;
-    ui_layout_observer_destroy(obs);
-
     {
-      ui_error_t rc_cleanup = ui_scroll_dispatcher_destroy(dispatcher);
-      assert(rc_cleanup == UI_ERROR_NONE);
+      int r;
+      ui_scroll_dispatcher_register(dispatcher, test_callback, NULL, &r);
+      g_malloc_fail_countdown = -1;
+
+      {
+        struct ui_layout_observer *obs = NULL;
+        ui_layout_observer_create(&obs);
+        for (i = 0; i < 5; ++i) {
+          g_malloc_fail_countdown = i;
+          ui_scroll_dispatcher_bind_layout_observer(dispatcher, obs);
+        }
+        g_malloc_fail_countdown = -1;
+        ui_layout_observer_destroy(obs);
+
+        {
+          ui_error_t rc_cleanup = ui_scroll_dispatcher_destroy(dispatcher);
+          assert(rc_cleanup == UI_ERROR_NONE);
+        }
+      }
     }
   }
 

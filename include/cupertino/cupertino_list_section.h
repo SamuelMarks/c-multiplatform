@@ -15,14 +15,19 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
+/** @brief CUPERTINO_LIST_SECTION_MAX_TILES constant. */
 #define CUPERTINO_LIST_SECTION_MAX_TILES 32
+/** @brief CUPERTINO_LIST_SECTION_INSET_MARGIN constant. */
 #define CUPERTINO_LIST_SECTION_INSET_MARGIN 16.0f
+/** @brief CUPERTINO_LIST_SECTION_CORNER_RADIUS constant. */
 #define CUPERTINO_LIST_SECTION_CORNER_RADIUS 10.0f
+/** @brief CUPERTINO_LIST_SECTION_DEFAULT_INSET constant. */
 #define CUPERTINO_LIST_SECTION_DEFAULT_INSET 16.0f
+/** @brief CUPERTINO_LIST_SECTION_ICON_INSET constant. */
 #define CUPERTINO_LIST_SECTION_ICON_INSET 56.0f
 
 /**

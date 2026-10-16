@@ -5,6 +5,8 @@
 #include <stdio.h>
 /* clang-format on */
 
+extern int g_malloc_fail_countdown;
+
 static int g_change_count = 0;
 static struct ui_disclosure_base *g_last_active = NULL;
 
@@ -158,8 +160,6 @@ static int test_accordion_lifecycle(void) {
 }
 
 static int test_accordion_edge_cases(void) {
-  extern int g_malloc_fail_countdown;
-  extern int g_malloc_fail_countdown;
   struct ui_accordion_base *accordion = NULL;
   struct ui_disclosure_base *d1 = NULL;
   struct ui_disclosure_base *d2 = NULL;
@@ -235,7 +235,7 @@ static int test_accordion_edge_cases(void) {
 
   /* 6. OOM in add (realloc) */
   {
-    struct ui_disclosure_base *d3 = NULL, *d4 = NULL, *d5 = NULL;
+    struct ui_disclosure_base *d4 = NULL, *d5 = NULL;
     ui_disclosure_base_create(&d3);
     ui_disclosure_base_create(&d4);
     ui_disclosure_base_create(&d5);

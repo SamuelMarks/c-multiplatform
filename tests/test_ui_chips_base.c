@@ -5,6 +5,8 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_mock_strcpy_fail;
+
 extern int g_malloc_fail_countdown;
 
 static ui_error_t dummy_cva_on_change(union ui_signal_payload new_value,
@@ -129,7 +131,6 @@ static ui_error_t test_chips_basic(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_mock_strcpy_fail;
     g_mock_strcpy_fail = 1;
     rc = ui_chips_base_add(chips, "fail");
     if (rc != UI_ERROR_UNKNOWN)

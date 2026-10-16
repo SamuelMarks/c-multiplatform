@@ -9,6 +9,7 @@
 #include <string.h>
 /* clang-format on */
 
+/** @brief md3_fab_create function. */
 ui_error_t md3_fab_create(struct ui_engine *engine, enum md3_fab_size size,
                           enum md3_fab_variant variant, const char *icon,
                           const char *label, struct md3_fab **out_fab) {
@@ -83,6 +84,7 @@ ui_error_t md3_fab_create(struct ui_engine *engine, enum md3_fab_size size,
   return rc;
 }
 
+/** @brief md3_fab_destroy function. */
 ui_error_t md3_fab_destroy(struct md3_fab *fab) {
   ui_error_t rc;
 
@@ -95,6 +97,7 @@ ui_error_t md3_fab_destroy(struct md3_fab *fab) {
   return rc;
 }
 
+/** @brief md3_fab_set_elevation function. */
 ui_error_t md3_fab_set_elevation(struct md3_fab *fab, unsigned int level) {
   if (!fab || level > 5) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -104,6 +107,7 @@ ui_error_t md3_fab_set_elevation(struct md3_fab *fab, unsigned int level) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_fab_add_speed_dial_action function. */
 ui_error_t md3_fab_add_speed_dial_action(struct md3_fab *fab, const char *icon,
                                          const char *label,
                                          ui_button_on_click_t on_click,
@@ -147,6 +151,7 @@ ui_error_t md3_fab_add_speed_dial_action(struct md3_fab *fab, const char *icon,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_fab_toggle function. */
 ui_error_t md3_fab_toggle(struct md3_fab *fab) {
   if (!fab) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -155,6 +160,7 @@ ui_error_t md3_fab_toggle(struct md3_fab *fab) {
   return ui_fab_base_toggle(fab->base);
 }
 
+/** @brief md3_fab_tick function. */
 ui_error_t md3_fab_tick(struct md3_fab *fab, float dt_ms) {
   if (!fab) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -163,6 +169,7 @@ ui_error_t md3_fab_tick(struct md3_fab *fab, float dt_ms) {
   return ui_fab_base_tick(fab->base, dt_ms);
 }
 
+/** @brief md3_fab_get_speed_dial_state function. */
 ui_error_t md3_fab_get_speed_dial_state(const struct md3_fab *fab,
                                         enum ui_fab_state *out_state) {
   if (!fab || !out_state) {
@@ -172,6 +179,7 @@ ui_error_t md3_fab_get_speed_dial_state(const struct md3_fab *fab,
   return ui_fab_base_get_state(fab->base, out_state);
 }
 
+/** @brief md3_fab_set_on_click function. */
 ui_error_t md3_fab_set_on_click(struct md3_fab *fab,
                                 ui_button_on_click_t on_click,
                                 void *user_data) {
@@ -190,6 +198,7 @@ ui_error_t md3_fab_set_on_click(struct md3_fab *fab,
   return ui_button_base_set_on_click(main_btn, on_click, user_data);
 }
 
+/** @brief md3_fab_get_base function. */
 ui_error_t md3_fab_get_base(struct md3_fab *fab,
                             struct ui_fab_base **out_base) {
   if (!fab || !out_base) {

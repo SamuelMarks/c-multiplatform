@@ -34,6 +34,7 @@ ui_error_t ui_command_palette_base_init(
 
 /* \brief ui_error
  */
+/** @brief ui_command_palette_base_open function. */
 ui_error_t
 ui_command_palette_base_open(struct ui_command_palette_base *palette) {
   if (palette) {
@@ -44,6 +45,7 @@ ui_command_palette_base_open(struct ui_command_palette_base *palette) {
 
 /* \brief ui_error
  */
+/** @brief ui_command_palette_base_close function. */
 ui_error_t
 ui_command_palette_base_close(struct ui_command_palette_base *palette) {
   if (palette) {
@@ -54,6 +56,7 @@ ui_command_palette_base_close(struct ui_command_palette_base *palette) {
 
 /* \brief ui_error
  */
+/** @brief ui_command_palette_base_bind_open function. */
 ui_error_t
 ui_command_palette_base_bind_open(struct ui_command_palette_base *widget,
                                   struct ui_signal *open_signal) {
@@ -66,6 +69,7 @@ ui_command_palette_base_bind_open(struct ui_command_palette_base *widget,
 
 /* \brief ui_command_palette_base_get_animating_signal
  */
+/** @brief ui_command_palette_base_get_animating_signal function. */
 ui_error_t ui_command_palette_base_get_animating_signal(
     struct ui_command_palette_base *widget,
     struct ui_computed **out_animating) {

@@ -8,6 +8,8 @@
 #include "cupertino/cupertino_haptics.h"
 /* clang-format on */
 
+extern int g_cupertino_haptics_mock_return;
+
 SUITE(cupertino_haptics_suite);
 
 TEST test_haptic_impact_styles(void) {
@@ -78,7 +80,6 @@ TEST test_haptic_selection_and_prepare(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
 TEST test_haptic_mock_errors(void) {
-  extern int g_cupertino_haptics_mock_return;
   ui_error_t rc;
 
   g_cupertino_haptics_mock_return = (int)UI_ERROR_INVALID_ARGUMENT;

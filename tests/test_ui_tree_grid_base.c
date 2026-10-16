@@ -11,6 +11,8 @@
 #include <stdlib.h>
 /* clang-format on */
 
+extern int g_tree_grid_mock_fail;
+
 #ifdef UI_TEST_MOCK_ALLOC
 extern int g_malloc_fail_countdown;
 #endif
@@ -167,7 +169,6 @@ static int test_tree_grid_lifecycle(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_tree_grid_mock_fail;
     struct ui_tree_grid_base *fail_tg = NULL;
     rc = ui_tree_grid_base_create(&fail_tg, &model);
     EXPECT_EQ(rc, UI_ERROR_NONE);
@@ -259,7 +260,6 @@ static int test_tree_grid_expansion(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_tree_grid_mock_fail;
     g_tree_grid_mock_fail = 2;
     rc = ui_tree_grid_base_set_expanded(tree_grid, node1, 1);
     EXPECT_EQ(rc, UI_ERROR_UNKNOWN);
@@ -277,7 +277,7 @@ static int test_tree_grid_expansion(void) {
 static int test_tree_grid_key_events(void) {
   struct ui_tree_grid_base *tree_grid = NULL;
   struct ui_tree_grid_model model;
-  struct ui_keyboard_event ev;
+  struct ui_keyboard_event ev = {0};
   ui_error_t rc;
   int expanded = 0;
   void *node1 = (void *)0x1;
@@ -350,7 +350,6 @@ static int test_tree_grid_key_events(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_tree_grid_mock_fail;
     tree_grid->active_node = node1;
     g_tree_grid_mock_fail = 2;
     ev.key_code = UI_KEY_RIGHT;

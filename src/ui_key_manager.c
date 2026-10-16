@@ -136,6 +136,7 @@ cleanup:
 
 /* \brief ui_error
  */
+/** @brief ui_key_manager_process_event function. */
 ui_error_t ui_key_manager_process_event(const struct ui_key_manager *manager,
                                         const struct ui_keyboard_event *event,
                                         int *out_handled) {
@@ -152,7 +153,9 @@ ui_error_t ui_key_manager_process_event(const struct ui_key_manager *manager,
     const struct ui_hotkey *hk = &manager->hotkeys[i];
     if (hk->key_code == event->key_code && hk->modifiers == event->modifiers) {
       if (hk->callback) {
-        hk->callback(hk->user_data);
+        rc = hk->callback(hk->user_data);
+        if (rc != UI_ERROR_NONE)
+          return rc;
       }
       handled = 1;
       break;

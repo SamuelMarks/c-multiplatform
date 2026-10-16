@@ -12,7 +12,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 /**
  * @addtogroup ui_types Standard Types
@@ -110,8 +110,12 @@ typedef unsigned int ui_uint32;
  * @brief Signed 64-bit integer.
  */
 typedef signed __int64 ui_int64;
-#else
-#if defined(__GNUC__) || defined(__clang__)
+#elif defined(__LP64__) || defined(_LP64)
+/**
+ * @brief Signed 64-bit integer.
+ */
+typedef signed long ui_int64;
+#elif defined(__GNUC__) || defined(__clang__)
 /**
  * @brief Signed 64-bit integer.
  */
@@ -122,15 +126,18 @@ __extension__ typedef signed long long ui_int64;
  */
 typedef signed long long ui_int64;
 #endif
-#endif
 
 #if defined(_MSC_VER)
 /**
  * @brief Unsigned 64-bit integer.
  */
 typedef unsigned __int64 ui_uint64;
-#else
-#if defined(__GNUC__) || defined(__clang__)
+#elif defined(__LP64__) || defined(_LP64)
+/**
+ * @brief Unsigned 64-bit integer.
+ */
+typedef unsigned long ui_uint64;
+#elif defined(__GNUC__) || defined(__clang__)
 /**
  * @brief Unsigned 64-bit integer.
  */
@@ -140,7 +147,6 @@ __extension__ typedef unsigned long long ui_uint64;
  * @brief Unsigned 64-bit integer.
  */
 typedef unsigned long long ui_uint64;
-#endif
 #endif
 
 #if defined(_WIN64) || defined(__x86_64__) || defined(__ppc64__) ||            \
@@ -174,6 +180,8 @@ typedef ui_uint32 ui_uintptr;
  */
 #if defined(_MSC_VER) && !defined(__clang__)
 #define UI_PRId64 "I64d"
+#elif defined(__LP64__) || defined(_LP64)
+#define UI_PRId64 "ld"
 #else
 #define UI_PRId64 "lld"
 #endif
@@ -183,6 +191,8 @@ typedef ui_uint32 ui_uintptr;
  */
 #if defined(_MSC_VER) && !defined(__clang__)
 #define UI_PRIu64 "I64u"
+#elif defined(__LP64__) || defined(_LP64)
+#define UI_PRIu64 "lu"
 #else
 #define UI_PRIu64 "llu"
 #endif
@@ -192,6 +202,8 @@ typedef ui_uint32 ui_uintptr;
  */
 #if defined(_MSC_VER) && !defined(__clang__)
 #define UI_PRIx64 "I64x"
+#elif defined(__LP64__) || defined(_LP64)
+#define UI_PRIx64 "lx"
 #else
 #define UI_PRIx64 "llx"
 #endif

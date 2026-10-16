@@ -14,12 +14,15 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
+/** @brief CUPERTINO_DESKTOP_TEXT_TOOLBAR_MAX_ITEMS constant. */
 #define CUPERTINO_DESKTOP_TEXT_TOOLBAR_MAX_ITEMS 8
+/** @brief CUPERTINO_DESKTOP_TEXT_TOOLBAR_WIDTH constant. */
 #define CUPERTINO_DESKTOP_TEXT_TOOLBAR_WIDTH 190.0f
+/** @brief CUPERTINO_DESKTOP_TEXT_TOOLBAR_ROW_HEIGHT constant. */
 #define CUPERTINO_DESKTOP_TEXT_TOOLBAR_ROW_HEIGHT 22.0f
 
 /**

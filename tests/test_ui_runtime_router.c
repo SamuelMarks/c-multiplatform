@@ -37,7 +37,7 @@ int main(void) {
   struct ui_runtime_node extra_node;
   struct ui_runtime_node headless_node;
   struct ui_component_vtable headless_vt;
-  struct ui_runtime_app_manifest manifest;
+  struct ui_runtime_app_manifest manifest = {0};
   struct ui_runtime_route_def route_def1;
   struct ui_runtime_route_def route_def2;
   struct ui_runtime_route_def route_def_incomplete;

@@ -23,7 +23,6 @@ static ui_error_t on_dismiss_handler(struct ui_alert_base *alert,
   }
   dismiss_count++;
   return UI_ERROR_NONE;
-  return UI_ERROR_NONE;
 }
 
 static ui_error_t run_normal_tests(void) {
@@ -118,141 +117,151 @@ static ui_error_t run_normal_tests(void) {
     return rc;
 
   /* Additional coverage: focus return */
-  struct ui_component *focus_comp = NULL;
-  rc = ui_component_create(&focus_comp);
-  if (rc != UI_ERROR_NONE)
-    return rc;
-  rc = ui_alert_base_set_focus_return(alert, focus_comp);
-  if (rc != UI_ERROR_NONE)
-    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
-
-  /* Open/Close states */
-  int is_open = 0;
-  rc = ui_alert_base_is_open(alert, &is_open);
-  if (rc != UI_ERROR_NONE)
-    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
-  assert(is_open == 0); /* dismissed earlier */
-
-  rc = ui_alert_base_set_open(alert, 1);
-
-  if (rc != UI_ERROR_NONE)
-    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
-  rc = ui_alert_base_is_open(alert, &is_open);
-  if (rc != UI_ERROR_NONE)
-    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
-  assert(is_open == 1);
-
-  /* Test signals */
-  struct ui_arena *arena = NULL;
-  rc = ui_arena_create(1024, &arena);
-  if (rc != UI_ERROR_NONE)
-    return rc;
-  ui_signal_t *signal = NULL;
-  union ui_signal_payload init_payload;
-  memset(&init_payload, 0, sizeof(init_payload));
-  rc = ui_signal_create(arena, init_payload, UI_SIGNAL_TYPE_BOOL, NULL, NULL,
-                        UI_SIGNAL_MODE_SINGLE_THREADED, &signal);
-  if (rc != UI_ERROR_NONE)
-    return rc;
-  rc = ui_alert_base_bind_open(alert, signal);
-  if (rc != UI_ERROR_NONE)
-    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
-  rc = ui_alert_base_set_open(alert, 0);
-  if (rc != UI_ERROR_NONE)
-    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN
-                               : rc; /* triggers signal set */
-
-  struct ui_computed *anim_sig = NULL;
-  rc = ui_alert_base_get_animating_signal(alert, &anim_sig);
-  if (rc != UI_ERROR_NONE)
-    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
-
-  printf("Testing invalid arguments...\n");
-  rc = ui_alert_base_set_role(NULL, UI_ALERT_ROLE_STATUS);
-  if (rc != UI_ERROR_INVALID_ARGUMENT)
-    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
-  rc = ui_alert_base_get_role(NULL, &role);
-  if (rc != UI_ERROR_INVALID_ARGUMENT)
-    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
-  rc = ui_alert_base_get_role(alert, NULL);
-  if (rc != UI_ERROR_INVALID_ARGUMENT)
-    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
-  rc = ui_alert_base_set_dismissible(NULL, 1);
-  if (rc != UI_ERROR_INVALID_ARGUMENT)
-    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
-  rc = ui_alert_base_is_dismissible(NULL, &dismissible);
-  if (rc != UI_ERROR_INVALID_ARGUMENT)
-    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
-  rc = ui_alert_base_is_dismissible(alert, NULL);
-  if (rc != UI_ERROR_INVALID_ARGUMENT)
-    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
-  rc = ui_alert_base_set_on_dismiss(NULL, on_dismiss_handler, &my_data);
-  if (rc != UI_ERROR_INVALID_ARGUMENT)
-    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
-  rc = ui_alert_base_dismiss(NULL);
-  if (rc != UI_ERROR_INVALID_ARGUMENT)
-    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
-  rc = ui_alert_base_set_focus_return(NULL, comp);
-  if (rc != UI_ERROR_INVALID_ARGUMENT)
-    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
-
-  rc = ui_alert_base_set_open(NULL, 1);
-
-  if (rc != UI_ERROR_INVALID_ARGUMENT)
-    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
-  rc = ui_alert_base_is_open(NULL, &is_open);
-  if (rc != UI_ERROR_INVALID_ARGUMENT)
-    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
-  rc = ui_alert_base_is_open(alert, NULL);
-  if (rc != UI_ERROR_INVALID_ARGUMENT)
-    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
-  rc = ui_alert_base_bind_open(NULL, signal);
-  if (rc != UI_ERROR_INVALID_ARGUMENT)
-    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
-  rc = ui_alert_base_get_animating_signal(NULL, &anim_sig);
-  if (rc != UI_ERROR_INVALID_ARGUMENT)
-    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
-  rc = ui_alert_base_get_animating_signal(alert, NULL);
-  if (rc != UI_ERROR_INVALID_ARGUMENT)
-    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
-
-  /* Test unsupported dismiss (when not dismissible) */
   {
-    struct ui_alert_base *alert2 = NULL;
-    rc = ui_alert_base_create(&alert2);
+    struct ui_component *focus_comp = NULL;
+    rc = ui_component_create(&focus_comp);
     if (rc != UI_ERROR_NONE)
       return rc;
-    rc = ui_alert_base_set_dismissible(alert2, 0);
+    rc = ui_alert_base_set_focus_return(alert, focus_comp);
     if (rc != UI_ERROR_NONE)
-      return rc;
-    rc = ui_alert_base_dismiss(alert2);
-    if (rc != UI_ERROR_UNSUPPORTED)
       return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
-    rc = ui_alert_base_destroy(alert2);
-    if (rc != UI_ERROR_NONE)
-      return rc;
+
+    /* Open/Close states */
+    {
+      int is_open = 0;
+      rc = ui_alert_base_is_open(alert, &is_open);
+      if (rc != UI_ERROR_NONE)
+        return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+      assert(is_open == 0); /* dismissed earlier */
+
+      rc = ui_alert_base_set_open(alert, 1);
+
+      if (rc != UI_ERROR_NONE)
+        return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+      rc = ui_alert_base_is_open(alert, &is_open);
+      if (rc != UI_ERROR_NONE)
+        return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+      assert(is_open == 1);
+
+      /* Test signals */
+      {
+        struct ui_arena *arena = NULL;
+        rc = ui_arena_create(1024, &arena);
+        if (rc != UI_ERROR_NONE)
+          return rc;
+        {
+          ui_signal_t *signal = NULL;
+          union ui_signal_payload init_payload;
+          memset(&init_payload, 0, sizeof(init_payload));
+          rc = ui_signal_create(arena, init_payload, UI_SIGNAL_TYPE_BOOL, NULL,
+                                NULL, UI_SIGNAL_MODE_SINGLE_THREADED, &signal);
+          if (rc != UI_ERROR_NONE)
+            return rc;
+          rc = ui_alert_base_bind_open(alert, signal);
+          if (rc != UI_ERROR_NONE)
+            return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+          rc = ui_alert_base_set_open(alert, 0);
+          if (rc != UI_ERROR_NONE)
+            return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN
+                                       : rc; /* triggers signal set */
+
+          {
+            struct ui_computed *anim_sig = NULL;
+            rc = ui_alert_base_get_animating_signal(alert, &anim_sig);
+            if (rc != UI_ERROR_NONE)
+              return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+
+            printf("Testing invalid arguments...\n");
+            rc = ui_alert_base_set_role(NULL, UI_ALERT_ROLE_STATUS);
+            if (rc != UI_ERROR_INVALID_ARGUMENT)
+              return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+            rc = ui_alert_base_get_role(NULL, &role);
+            if (rc != UI_ERROR_INVALID_ARGUMENT)
+              return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+            rc = ui_alert_base_get_role(alert, NULL);
+            if (rc != UI_ERROR_INVALID_ARGUMENT)
+              return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+            rc = ui_alert_base_set_dismissible(NULL, 1);
+            if (rc != UI_ERROR_INVALID_ARGUMENT)
+              return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+            rc = ui_alert_base_is_dismissible(NULL, &dismissible);
+            if (rc != UI_ERROR_INVALID_ARGUMENT)
+              return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+            rc = ui_alert_base_is_dismissible(alert, NULL);
+            if (rc != UI_ERROR_INVALID_ARGUMENT)
+              return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+            rc = ui_alert_base_set_on_dismiss(NULL, on_dismiss_handler,
+                                              &my_data);
+            if (rc != UI_ERROR_INVALID_ARGUMENT)
+              return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+            rc = ui_alert_base_dismiss(NULL);
+            if (rc != UI_ERROR_INVALID_ARGUMENT)
+              return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+            rc = ui_alert_base_set_focus_return(NULL, comp);
+            if (rc != UI_ERROR_INVALID_ARGUMENT)
+              return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+
+            rc = ui_alert_base_set_open(NULL, 1);
+
+            if (rc != UI_ERROR_INVALID_ARGUMENT)
+              return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+            rc = ui_alert_base_is_open(NULL, &is_open);
+            if (rc != UI_ERROR_INVALID_ARGUMENT)
+              return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+            rc = ui_alert_base_is_open(alert, NULL);
+            if (rc != UI_ERROR_INVALID_ARGUMENT)
+              return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+            rc = ui_alert_base_bind_open(NULL, signal);
+            if (rc != UI_ERROR_INVALID_ARGUMENT)
+              return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+            rc = ui_alert_base_get_animating_signal(NULL, &anim_sig);
+            if (rc != UI_ERROR_INVALID_ARGUMENT)
+              return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+            rc = ui_alert_base_get_animating_signal(alert, NULL);
+            if (rc != UI_ERROR_INVALID_ARGUMENT)
+              return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+
+            /* Test unsupported dismiss (when not dismissible) */
+            {
+              struct ui_alert_base *alert2 = NULL;
+              rc = ui_alert_base_create(&alert2);
+              if (rc != UI_ERROR_NONE)
+                return rc;
+              rc = ui_alert_base_set_dismissible(alert2, 0);
+              if (rc != UI_ERROR_NONE)
+                return rc;
+              rc = ui_alert_base_dismiss(alert2);
+              if (rc != UI_ERROR_UNSUPPORTED)
+                return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+              rc = ui_alert_base_destroy(alert2);
+              if (rc != UI_ERROR_NONE)
+                return rc;
+            }
+
+            printf("Destroying alert...\n");
+            rc = ui_alert_base_destroy(alert);
+            if (rc != UI_ERROR_NONE)
+              return rc;
+
+            /* Destroy NULL should be safe */
+            rc = ui_alert_base_destroy(NULL);
+            if (rc != UI_ERROR_NONE)
+              return rc;
+
+            rc = ui_component_destroy(focus_comp);
+
+            if (rc != UI_ERROR_NONE)
+              return rc;
+            rc = ui_arena_destroy(arena);
+            if (rc != UI_ERROR_NONE)
+              return rc;
+
+            return UI_ERROR_NONE;
+          }
+        }
+      }
+    }
   }
-
-  printf("Destroying alert...\n");
-  rc = ui_alert_base_destroy(alert);
-  if (rc != UI_ERROR_NONE)
-    return rc;
-
-  /* Destroy NULL should be safe */
-  rc = ui_alert_base_destroy(NULL);
-  if (rc != UI_ERROR_NONE)
-    return rc;
-
-  rc = ui_component_destroy(focus_comp);
-
-  if (rc != UI_ERROR_NONE)
-    return rc;
-  rc = ui_arena_destroy(arena);
-  if (rc != UI_ERROR_NONE)
-    return rc;
-
-  return UI_ERROR_NONE;
-  return UI_ERROR_NONE;
 }
 
 static ui_error_t run_oom_tests(void) {
@@ -280,7 +289,6 @@ static ui_error_t run_oom_tests(void) {
 
   g_malloc_fail_countdown = -1;
 
-  return UI_ERROR_NONE;
   return UI_ERROR_NONE;
 }
 

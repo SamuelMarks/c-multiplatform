@@ -10,6 +10,9 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_cupertino_tab_scaffold_mock_controller_destroy_fail;
+extern int g_cupertino_tab_scaffold_mock_set_selected_fail;
+
 SUITE(cupertino_tab_scaffold_suite);
 
 TEST test_tab_controller_lifecycle(void) {
@@ -350,8 +353,6 @@ TEST test_tab_scaffold_oom_simulation(void) {
   memset(&desc, 0, sizeof(desc));
 
 #ifdef UI_TEST_MOCK_ALLOC
-  extern int g_cupertino_tab_scaffold_mock_controller_destroy_fail;
-  extern int g_cupertino_tab_scaffold_mock_set_selected_fail;
 
   g_malloc_fail_countdown = 0;
   rc = cupertino_tab_controller_create(0, 4, &controller);

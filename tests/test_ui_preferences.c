@@ -11,6 +11,8 @@ __declspec(dllimport) void __stdcall Sleep(unsigned long dwMilliseconds);
 #endif
 /* clang-format on */
 
+extern int g_preferences_mock_fail;
+
 extern int g_malloc_fail_countdown;
 
 static int run_test(const char *name, int (*test_fn)(void)) {
@@ -141,7 +143,6 @@ static int test_preferences_save_binary(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_preferences_mock_fail;
     g_preferences_mock_fail = 1;
     err = ui_preferences_save_binary_async(prefs, "bin_key", data, strlen(data),
                                            &promise);

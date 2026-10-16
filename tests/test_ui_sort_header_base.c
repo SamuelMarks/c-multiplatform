@@ -4,6 +4,8 @@
 #include <stdio.h>
 /* clang-format on */
 
+extern int g_sort_header_mock_fail;
+
 #ifdef UI_TEST_MOCK_ALLOC
 extern int g_malloc_fail_countdown;
 #endif
@@ -138,7 +140,7 @@ static int test_ui_sort_header_base_multi_sort(void) {
 
   ASSERT_SUCCESS(
       ui_sort_header_base_get_active_sorts(header, states, 10, &count));
-  ASSERT_INT_EQ(count, 6);
+  ASSERT_INT_EQ((int)count, 6);
   ASSERT_PTR_EQ(states[0].id, id1);
   ASSERT_INT_EQ(states[0].direction, UI_SORT_ASCENDING);
 
@@ -152,7 +154,7 @@ static int test_ui_sort_header_base_multi_sort(void) {
   ASSERT_SUCCESS(ui_sort_header_base_set_multi_sort(header, 0));
   ASSERT_SUCCESS(
       ui_sort_header_base_get_active_sorts(header, states, 10, &count));
-  ASSERT_INT_EQ(count, 1); /* Keeps only first */
+  ASSERT_INT_EQ((int)count, 1); /* Keeps only first */
 
   ui_sort_header_base_destroy(header);
   return 0;
@@ -174,7 +176,7 @@ static int test_ui_sort_header_base_clear_and_bind(void) {
 
   ASSERT_SUCCESS(
       ui_sort_header_base_get_active_sorts(header, states, 10, &count));
-  ASSERT_INT_EQ(count, 0);
+  ASSERT_INT_EQ((int)count, 0);
 
   ASSERT_EQ(ui_sort_header_base_bind_direction(NULL, NULL),
             UI_ERROR_INVALID_ARGUMENT);
@@ -232,7 +234,7 @@ static int test_ui_sort_header_base_edge_cases(void) {
                                                    UI_SORT_ASCENDING));
   ASSERT_SUCCESS(
       ui_sort_header_base_get_active_sorts(header, states, 1, &count));
-  ASSERT_INT_EQ(count, 1);
+  ASSERT_INT_EQ((int)count, 1);
 
   /* Test remove_state_at out of bounds explicitly if possible.
      Wait, remove_state_at is static. But we can trigger toggling NONE on
@@ -256,11 +258,11 @@ static int test_ui_sort_header_base_edge_cases(void) {
 }
 
 #ifdef UI_TEST_MOCK_ALLOC
+extern ui_error_t
+test_ui_sort_header_find_state_index_null(struct ui_sort_header_base *header);
+
 static int test_ui_sort_header_mock_failures(void) {
   struct ui_sort_header_base *header = NULL;
-  extern int g_sort_header_mock_fail;
-  extern ui_error_t test_ui_sort_header_find_state_index_null(
-      struct ui_sort_header_base * header);
 
   /* Test null out_index in find_state_index */
   ASSERT_EQ(test_ui_sort_header_find_state_index_null(NULL),

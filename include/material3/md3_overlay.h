@@ -31,7 +31,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
@@ -53,11 +53,11 @@ enum md3_dialog_variant {
  * @brief Material 3 Dialog wrapping ui_dialog_base.
  */
 struct md3_dialog {
-  struct ui_dialog_base *base;
-  enum md3_dialog_variant variant;
-  char headline[128];
-  char supporting_text[256];
-  int is_open;
+  struct ui_dialog_base *base;     /**< base field. */
+  enum md3_dialog_variant variant; /**< variant field. */
+  char headline[128];              /**< headline[128] field. */
+  char supporting_text[256];       /**< supporting_text[256] field. */
+  int is_open;                     /**< is_open field. */
 };
 
 /**
@@ -130,9 +130,9 @@ enum md3_bottom_sheet_variant {
  * @brief Material 3 Bottom Sheet wrapping ui_bottom_sheet_base.
  */
 struct md3_bottom_sheet {
-  struct ui_bottom_sheet_base *base;
-  enum md3_bottom_sheet_variant variant;
-  int is_open;
+  struct ui_bottom_sheet_base *base;     /**< base field. */
+  enum md3_bottom_sheet_variant variant; /**< variant field. */
+  int is_open;                           /**< is_open field. */
 };
 
 /**
@@ -175,9 +175,9 @@ md3_bottom_sheet_set_open(struct md3_bottom_sheet *sheet, int is_open);
  * @brief Material 3 Side Sheet wrapping ui_side_sheet_base.
  */
 struct md3_side_sheet {
-  struct ui_side_sheet_base *base;
-  int is_modal;
-  int is_open;
+  struct ui_side_sheet_base *base; /**< base field. */
+  int is_modal;                    /**< is_modal field. */
+  int is_open;                     /**< is_open field. */
 };
 
 /**
@@ -219,8 +219,8 @@ md3_side_sheet_set_open(struct md3_side_sheet *sheet, int is_open);
  * @brief Material 3 Menu wrapping ui_menu_base.
  */
 struct md3_menu {
-  struct ui_menu_base *base;
-  int is_open;
+  struct ui_menu_base *base; /**< base field. */
+  int is_open;               /**< is_open field. */
 };
 
 /**
@@ -260,10 +260,10 @@ enum md3_tooltip_variant {
  * @brief Material 3 Tooltip wrapping ui_tooltip_base.
  */
 struct md3_tooltip {
-  struct ui_tooltip_base *base;
-  enum md3_tooltip_variant variant;
-  char text[128];
-  char subhead[128];
+  struct ui_tooltip_base *base;     /**< base field. */
+  enum md3_tooltip_variant variant; /**< variant field. */
+  char text[128];                   /**< text[128] field. */
+  char subhead[128];                /**< subhead[128] field. */
 };
 
 /**
@@ -307,12 +307,12 @@ enum md3_snackbar_variant {
  * @brief Material 3 Snackbar wrapping ui_snackbar_base.
  */
 struct md3_snackbar {
-  struct ui_snackbar_base *base;
-  struct ui_timer *timer;
-  struct ui_overlay_director *director;
-  enum md3_snackbar_variant variant;
-  char message[256];
-  char action_label[64];
+  struct ui_snackbar_base *base;        /**< base field. */
+  struct ui_timer *timer;               /**< timer field. */
+  struct ui_overlay_director *director; /**< director field. */
+  enum md3_snackbar_variant variant;    /**< variant field. */
+  char message[256];                    /**< message[256] field. */
+  char action_label[64];                /**< action_label[64] field. */
 };
 
 /**
@@ -346,9 +346,9 @@ md3_snackbar_destroy(struct md3_snackbar *snackbar);
  * @brief Material 3 Badge wrapping ui_badge_base.
  */
 struct md3_badge {
-  struct ui_badge_base *base;
-  int count;
-  int has_count;
+  struct ui_badge_base *base; /**< base field. */
+  int count;                  /**< count field. */
+  int has_count;              /**< has_count field. */
 };
 
 /**
@@ -390,14 +390,14 @@ md3_badge_set_count(struct md3_badge *badge, int count);
  * @brief Material 3 Datepicker wrapping ui_datepicker_base.
  */
 struct md3_datepicker {
-  struct ui_datepicker_base *base;
-  struct ui_input_base *input;
-  struct ui_popover_base *popover;
-  struct ui_calendar_base *calendar;
-  struct ui_control_value_accessor cva;
-  int year;
-  int month;
-  int day;
+  struct ui_datepicker_base *base;      /**< base field. */
+  struct ui_input_base *input;          /**< input field. */
+  struct ui_popover_base *popover;      /**< popover field. */
+  struct ui_calendar_base *calendar;    /**< calendar field. */
+  struct ui_control_value_accessor cva; /**< cva field. */
+  int year;                             /**< year field. */
+  int month;                            /**< month field. */
+  int day;                              /**< day field. */
 };
 
 /**
@@ -424,10 +424,10 @@ md3_datepicker_destroy(struct md3_datepicker *picker);
  * @brief Material 3 Timepicker wrapping ui_timepicker_base.
  */
 struct md3_timepicker {
-  struct ui_timepicker_base *base;
-  int hour;
-  int minute;
-  int is_24h;
+  struct ui_timepicker_base *base; /**< base field. */
+  int hour;                        /**< hour field. */
+  int minute;                      /**< minute field. */
+  int is_24h;                      /**< is_24h field. */
 };
 
 /**
@@ -460,8 +460,8 @@ md3_timepicker_destroy(struct md3_timepicker *picker);
  * ui_pull_to_refresh_base.
  */
 struct md3_pull_to_refresh {
-  struct ui_pull_to_refresh_base *base;
-  float spring_resistance;
+  struct ui_pull_to_refresh_base *base; /**< base field. */
+  float spring_resistance;              /**< spring_resistance field. */
 };
 
 /**

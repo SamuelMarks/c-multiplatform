@@ -10,6 +10,8 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_cupertino_dynamic_island_mock_set_state_fail;
+
 SUITE(cupertino_dynamic_island_suite);
 
 TEST test_island_invalid_arguments(void) {
@@ -269,7 +271,6 @@ TEST test_island_morphing_and_templates(void) {
 
 TEST test_island_oom_mock(void) {
 #ifdef UI_TEST_MOCK_ALLOC
-  extern int g_cupertino_dynamic_island_mock_set_state_fail;
 #endif
   struct cupertino_dynamic_island_descriptor desc;
   struct cupertino_dynamic_island *island = NULL;

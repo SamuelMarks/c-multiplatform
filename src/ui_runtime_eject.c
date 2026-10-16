@@ -101,13 +101,13 @@ static ui_error_t emit_printf(struct emit_buffer *eb, const char *format, ...) {
  * @brief Generated variable names and indexing for a single AST node.
  */
 struct node_meta {
-  int id_num;
-  char inst_var[64];
-  char comp_var[64];
-  char dom_var[64];
-  char cva_var[64];
-  char ctrl_var[64];
-  char sig_var[64];
+  int id_num;        /**< id_num field. */
+  char inst_var[64]; /**< inst_var[64] field. */
+  char comp_var[64]; /**< comp_var[64] field. */
+  char dom_var[64];  /**< dom_var[64] field. */
+  char cva_var[64];  /**< cva_var[64] field. */
+  char ctrl_var[64]; /**< ctrl_var[64] field. */
+  char sig_var[64];  /**< sig_var[64] field. */
 };
 
 /**
@@ -738,7 +738,8 @@ ui_error_t ui_runtime_eject_tree_to_c_buffer(const struct ui_runtime_node *node,
   rc = emit_printf(&eb_h, "#ifdef __cplusplus\nextern \"C\" {\n#endif\n\n");
   if (rc != UI_ERROR_NONE)
     return rc;
-  rc = emit_printf(&eb_h, "/* clang-format off */\n");
+  rc = emit_printf(&eb_h, "/* clang-"
+                          "format off */\n");
   if (rc != UI_ERROR_NONE)
     return rc;
   rc = emit_printf(&eb_h, "#include \"ui_error.h\"\n");
@@ -753,7 +754,8 @@ ui_error_t ui_runtime_eject_tree_to_c_buffer(const struct ui_runtime_node *node,
   rc = emit_printf(&eb_h, "#include \"ui_app_state_registry.h\"\n");
   if (rc != UI_ERROR_NONE)
     return rc;
-  rc = emit_printf(&eb_h, "/* clang-format on */\n\n");
+  rc = emit_printf(&eb_h, "/* clang-"
+                          "format on */\n\n");
   if (rc != UI_ERROR_NONE)
     return rc;
 
@@ -815,7 +817,8 @@ ui_error_t ui_runtime_eject_tree_to_c_buffer(const struct ui_runtime_node *node,
                    func_name);
   if (rc != UI_ERROR_NONE)
     return rc;
-  rc = emit_printf(&eb_c, "/* clang-format off */\n");
+  rc = emit_printf(&eb_c, "/* clang-"
+                          "format off */\n");
   if (rc != UI_ERROR_NONE)
     return rc;
   rc = emit_printf(&eb_c, "#include \"%s.h\"\n", func_name);
@@ -848,7 +851,8 @@ ui_error_t ui_runtime_eject_tree_to_c_buffer(const struct ui_runtime_node *node,
   rc = emit_printf(&eb_c, "#include <stddef.h>\n");
   if (rc != UI_ERROR_NONE)
     return rc;
-  rc = emit_printf(&eb_c, "/* clang-format on */\n\n");
+  rc = emit_printf(&eb_c, "/* clang-"
+                          "format on */\n\n");
   if (rc != UI_ERROR_NONE)
     return rc;
 

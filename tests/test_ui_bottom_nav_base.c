@@ -5,6 +5,8 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_bottom_nav_mock_fail;
+
 extern int g_malloc_fail_countdown;
 
 static ui_error_t run_normal_tests(void) {
@@ -110,7 +112,6 @@ static ui_error_t run_normal_tests(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_bottom_nav_mock_fail;
     struct ui_bottom_nav_base *fail_nav = NULL;
     struct ui_bottom_nav_item_base *fail_item = NULL;
 
@@ -178,8 +179,6 @@ static ui_error_t run_oom_tests(void) {
   }
 
   g_malloc_fail_countdown = -1;
-  return UI_ERROR_NONE;
-  return UI_ERROR_NONE;
   return UI_ERROR_NONE;
 }
 

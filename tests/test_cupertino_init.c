@@ -10,6 +10,10 @@
 #include "ui_engine.h"
 /* clang-format on */
 
+extern int g_cupertino_init_mock_register_fail;
+extern int g_cupertino_init_mock_unregister_fail;
+extern int g_cupertino_init_mock_get_color_fail;
+
 SUITE(cupertino_init_suite);
 
 TEST test_cupertino_lifecycle(void) {
@@ -121,9 +125,6 @@ TEST test_cupertino_lifecycle(void) {
 
 TEST test_cupertino_init_mock_errors(void) {
 #ifdef UI_TEST_MOCK_ALLOC
-  extern int g_cupertino_init_mock_register_fail;
-  extern int g_cupertino_init_mock_unregister_fail;
-  extern int g_cupertino_init_mock_get_color_fail;
 #endif
   struct ui_engine *engine = NULL;
   struct ui_engine_config config;

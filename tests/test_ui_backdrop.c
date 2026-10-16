@@ -5,6 +5,8 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_backdrop_mock_fail;
+
 extern int g_malloc_fail_countdown;
 
 static int s_tests_passed = 0;
@@ -323,7 +325,6 @@ static ui_error_t run_backdrop_coverage(void) {
   struct ui_backdrop *backdrop = NULL;
   struct ui_event ev;
   int should_dismiss;
-  extern int g_backdrop_mock_fail;
 
   rc = ui_backdrop_create(&backdrop);
   if (rc != UI_ERROR_NONE) {

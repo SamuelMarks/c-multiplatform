@@ -7,6 +7,8 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_dockable_layout_mock_fail;
+
 extern int g_malloc_fail_countdown;
 
 static int test_dockable_layout_lifecycle(void) {
@@ -60,7 +62,6 @@ static int test_dockable_layout_lifecycle(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_dockable_layout_mock_fail;
     rc = ui_dockable_layout_base_create(&layout);
     if (rc != UI_ERROR_NONE)
       return 1;
@@ -255,7 +256,13 @@ int main(void) {
     struct ui_dockable_layout_base *layout;
     ui_dockable_layout_base_create(&layout);
     for (i = 1; i <= 130; i++) {
+#if defined(_MSC_VER)
+      offset +=
+          sprintf_s(big_buffer + offset, sizeof(big_buffer) - (size_t)offset,
+                    "P:%d,T:%d,E:0;", i, i - 1);
+#else
       offset += sprintf(big_buffer + offset, "P:%d,T:%d,E:0;", i, i - 1);
+#endif
     }
     /* This will fail to dock the 129th panel, hitting line 198! */
     ui_dockable_layout_base_deserialize(layout, big_buffer);

@@ -15,7 +15,6 @@ static ui_error_t test_state_layer(void) {
   if (err != UI_ERROR_NONE) {
     fprintf(stderr, "ui_state_layer_get_color HOVER failed\n");
     exit(1);
-    return UI_ERROR_NONE;
   }
 
   /* 8% black on white -> roughly rgb(235, 235, 235) */

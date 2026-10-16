@@ -43,6 +43,7 @@ mock_cupertino_spring_evaluate(const struct cupertino_spring_config *config,
 /** @endcond */
 #endif /* UI_TEST_MOCK_ALLOC */
 
+/** @brief cupertino_fullscreen_dialog_update_parent_transform function. */
 static ui_error_t cupertino_fullscreen_dialog_update_parent_transform(
     struct cupertino_fullscreen_dialog *dialog) {
   float p;
@@ -85,6 +86,7 @@ mock_update_parent_transform(struct cupertino_fullscreen_dialog *dialog) {
 /** @endcond */
 #endif /* UI_TEST_MOCK_ALLOC */
 
+/** @brief cupertino_fullscreen_dialog_create function. */
 ui_error_t cupertino_fullscreen_dialog_create(
     struct ui_engine *engine,
     const struct cupertino_fullscreen_dialog_descriptor *desc,
@@ -166,6 +168,7 @@ ui_error_t cupertino_fullscreen_dialog_create(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_fullscreen_dialog_destroy function. */
 ui_error_t cupertino_fullscreen_dialog_destroy(
     struct cupertino_fullscreen_dialog *dialog) {
   if (!dialog) {
@@ -176,6 +179,7 @@ ui_error_t cupertino_fullscreen_dialog_destroy(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_fullscreen_dialog_present function. */
 ui_error_t cupertino_fullscreen_dialog_present(
     struct cupertino_fullscreen_dialog *dialog) {
   ui_error_t rc;
@@ -202,6 +206,7 @@ ui_error_t cupertino_fullscreen_dialog_present(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_fullscreen_dialog_dismiss function. */
 ui_error_t cupertino_fullscreen_dialog_dismiss(
     struct cupertino_fullscreen_dialog *dialog) {
   ui_error_t rc;
@@ -228,6 +233,7 @@ ui_error_t cupertino_fullscreen_dialog_dismiss(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_fullscreen_dialog_tick function. */
 ui_error_t
 cupertino_fullscreen_dialog_tick(struct cupertino_fullscreen_dialog *dialog,
                                  float delta_sec, int *out_is_settled) {
@@ -286,6 +292,7 @@ cupertino_fullscreen_dialog_tick(struct cupertino_fullscreen_dialog *dialog,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_fullscreen_dialog_drag_start function. */
 ui_error_t cupertino_fullscreen_dialog_drag_start(
     struct cupertino_fullscreen_dialog *dialog) {
   if (!dialog) {
@@ -302,6 +309,7 @@ ui_error_t cupertino_fullscreen_dialog_drag_start(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_fullscreen_dialog_drag_update function. */
 ui_error_t cupertino_fullscreen_dialog_drag_update(
     struct cupertino_fullscreen_dialog *dialog, float delta_y) {
   float p;
@@ -335,6 +343,7 @@ ui_error_t cupertino_fullscreen_dialog_drag_update(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_fullscreen_dialog_drag_end function. */
 ui_error_t
 cupertino_fullscreen_dialog_drag_end(struct cupertino_fullscreen_dialog *dialog,
                                      float velocity_y, int *out_will_dismiss) {
@@ -375,6 +384,7 @@ cupertino_fullscreen_dialog_drag_end(struct cupertino_fullscreen_dialog *dialog,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_fullscreen_dialog_get_translation_y function. */
 ui_error_t cupertino_fullscreen_dialog_get_translation_y(
     const struct cupertino_fullscreen_dialog *dialog,
     float *out_translation_y) {
@@ -392,6 +402,7 @@ ui_error_t cupertino_fullscreen_dialog_get_translation_y(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_fullscreen_dialog_get_parent_transform function. */
 ui_error_t cupertino_fullscreen_dialog_get_parent_transform(
     const struct cupertino_fullscreen_dialog *dialog, float *out_scale,
     float *out_corner_radius, float *out_dim_alpha) {
@@ -405,6 +416,7 @@ ui_error_t cupertino_fullscreen_dialog_get_parent_transform(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_fullscreen_dialog_get_nav_action_title function. */
 ui_error_t cupertino_fullscreen_dialog_get_nav_action_title(
     const struct cupertino_fullscreen_dialog *dialog, char *out_title,
     size_t title_size) {
@@ -422,6 +434,7 @@ ui_error_t cupertino_fullscreen_dialog_get_nav_action_title(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_fullscreen_dialog_set_views function. */
 ui_error_t cupertino_fullscreen_dialog_set_views(
     struct cupertino_fullscreen_dialog *dialog,
     struct ui_component *dialog_content, struct ui_component *parent_content) {

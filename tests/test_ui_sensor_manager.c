@@ -8,6 +8,8 @@
 #include <stdlib.h>
 /* clang-format on */
 
+extern int g_sensor_manager_mock_fail;
+
 extern int g_malloc_fail_countdown;
 
 /* Forward declare the internal mock tick since it's not exported by the header,
@@ -76,7 +78,6 @@ static int test_sensor_manager_basic(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_sensor_manager_mock_fail;
     g_sensor_manager_mock_fail = 1;
     rc = ui_sensor_manager_tick_mock(manager);
     if (rc != UI_ERROR_UNKNOWN) {

@@ -8,6 +8,7 @@
 #include <string.h>
 /* clang-format on */
 
+/** @brief g_md3_initialized variable. */
 static int g_md3_initialized = 0;
 
 /**
@@ -72,10 +73,12 @@ static ui_error_t md3_vtable_resolve_token(const char *token_name,
   return UI_ERROR_NOT_FOUND;
 }
 
+/** @brief g_md3_vtable variable. */
 static const struct ui_design_system_vtable g_md3_vtable = {
     md3_vtable_init, md3_vtable_shutdown, md3_vtable_apply_theme,
     md3_vtable_resolve_token};
 
+/** @brief g_md3_expressive_vtable variable. */
 static const struct ui_design_system_vtable g_md3_expressive_vtable = {
     md3_vtable_init, md3_vtable_shutdown, md3_vtable_apply_theme,
     md3_vtable_resolve_token};

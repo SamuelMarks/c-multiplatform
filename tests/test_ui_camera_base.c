@@ -5,6 +5,8 @@
 #include <stdio.h>
 /* clang-format on */
 
+extern int g_camera_mock_fail;
+
 extern int g_malloc_fail_countdown;
 
 static int frame_received = 0;
@@ -255,7 +257,6 @@ static void test_camera_coverage(void) {
 
   {
 #ifdef UI_TEST_MOCK_ALLOC
-    extern int g_camera_mock_fail;
     struct ui_camera_base *cam_fail = NULL;
     g_camera_mock_fail = 1;
     assert(ui_camera_base_create(&cam_fail) != UI_ERROR_NONE);
@@ -303,17 +304,19 @@ static void test_camera_coverage(void) {
 }
 int main(void) {
   test_camera_coverage();
-  int failed = 0;
-  printf("Running ui_camera_base tests...\n");
+  {
+    int failed = 0;
+    printf("Running ui_camera_base tests...\n");
 
-  failed |= test_camera_lifecycle();
-  failed |= test_camera_null_args_and_coverage();
+    failed |= test_camera_lifecycle();
+    failed |= test_camera_null_args_and_coverage();
 
-  if (failed) {
-    printf("Tests failed.\n");
-    return 1;
+    if (failed) {
+      printf("Tests failed.\n");
+      return 1;
+    }
+
+    printf("All tests passed.\n");
+    return 0;
   }
-
-  printf("All tests passed.\n");
-  return 0;
 }

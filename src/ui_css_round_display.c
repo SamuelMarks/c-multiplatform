@@ -152,6 +152,7 @@ ui_error_t ui_css_parse_shape_inside(const char *str,
 
 /* \brief ui_error
  */
+/** @brief ui_css_parse_border_boundary function. */
 ui_error_t
 ui_css_parse_border_boundary(const char *str,
                              enum ui_css_border_boundary *out_boundary) {

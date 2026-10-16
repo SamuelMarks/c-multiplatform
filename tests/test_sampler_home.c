@@ -3,9 +3,11 @@
  * @brief Unit tests for sampler home screen.
  */
 
+/* clang-format off */
 #include "greatest.h"
 #include "sampler/sampler_home.h"
 #include "ui_internal_mem.h"
+/* clang-format on */
 
 #ifdef UI_TEST_MOCK_ALLOC
 extern int g_malloc_fail_countdown;

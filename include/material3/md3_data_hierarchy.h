@@ -30,7 +30,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
@@ -54,24 +54,24 @@ enum md3_table_density {
  * ui_datagrid_base.
  */
 struct md3_table {
-  struct ui_table_base *table_base;
-  struct ui_datagrid_base *datagrid_base;
-  enum md3_table_density density;
-  int sticky_header;
-  int sticky_first_column;
-  int sticky_last_column;
-  int is_selectable;
-  int glassmorphism_enabled;
-  int virtual_scroll_enabled;
-  size_t virtual_viewport_height;
-  int horizontal_scroll_enabled;
-  size_t hovered_row;
-  int has_hovered_row;
-  size_t selected_rows[64];
-  size_t selected_count;
-  size_t expanded_rows[64];
-  size_t expanded_count;
-  size_t total_rows;
+  struct ui_table_base *table_base;       /**< table_base field. */
+  struct ui_datagrid_base *datagrid_base; /**< datagrid_base field. */
+  enum md3_table_density density;         /**< density field. */
+  int sticky_header;                      /**< sticky_header field. */
+  int sticky_first_column;                /**< sticky_first_column field. */
+  int sticky_last_column;                 /**< sticky_last_column field. */
+  int is_selectable;                      /**< is_selectable field. */
+  int glassmorphism_enabled;              /**< glassmorphism_enabled field. */
+  int virtual_scroll_enabled;             /**< virtual_scroll_enabled field. */
+  size_t virtual_viewport_height;         /**< virtual_viewport_height field. */
+  int horizontal_scroll_enabled; /**< horizontal_scroll_enabled field. */
+  size_t hovered_row;            /**< hovered_row field. */
+  int has_hovered_row;           /**< has_hovered_row field. */
+  size_t selected_rows[64];      /**< selected_rows[64] field. */
+  size_t selected_count;         /**< selected_count field. */
+  size_t expanded_rows[64];      /**< expanded_rows[64] field. */
+  size_t expanded_count;         /**< expanded_count field. */
+  size_t total_rows;             /**< total_rows field. */
 };
 
 /**
@@ -291,14 +291,14 @@ extern C_MULTIPLATFORM_EXPORT ui_error_t md3_table_resize_column(
  * @brief Material 3 Paginator component wrapping ui_pagination_base.
  */
 struct md3_paginator {
-  struct ui_pagination_base *base;
-  size_t total_items;
-  size_t page_size;
-  size_t current_page;
-  size_t page_size_options[8];
-  size_t page_size_option_count;
-  int is_compact;
-  int is_expressive;
+  struct ui_pagination_base *base; /**< base field. */
+  size_t total_items;              /**< total_items field. */
+  size_t page_size;                /**< page_size field. */
+  size_t current_page;             /**< current_page field. */
+  size_t page_size_options[8];     /**< page_size_options[8] field. */
+  size_t page_size_option_count;   /**< page_size_option_count field. */
+  int is_compact;                  /**< is_compact field. */
+  int is_expressive;               /**< is_expressive field. */
 };
 
 /**
@@ -469,12 +469,12 @@ md3_paginator_set_expressive(struct md3_paginator *paginator, int enabled);
  * @brief Material 3 Sort Header component wrapping ui_sort_header_base.
  */
 struct md3_sort_header {
-  struct ui_sort_header_base *base;
-  char column_id[64];
-  enum ui_sort_direction direction;
-  int allow_none;
-  int priority;
-  int is_expressive;
+  struct ui_sort_header_base *base; /**< base field. */
+  char column_id[64];               /**< column_id[64] field. */
+  enum ui_sort_direction direction; /**< direction field. */
+  int allow_none;                   /**< allow_none field. */
+  int priority;                     /**< priority field. */
+  int is_expressive;                /**< is_expressive field. */
 };
 
 /**
@@ -591,20 +591,20 @@ md3_sort_header_set_expressive(struct md3_sort_header *header, int enabled);
  * @brief Material 3 Hierarchical Tree component wrapping ui_tree_base.
  */
 struct md3_tree {
-  struct ui_tree_base *base;
-  const struct ui_tree_model *model;
-  float indent_px;
-  int guide_lines_enabled;
-  int multi_select;
-  int virtual_scroll_enabled;
-  int is_expressive;
-  void *expanded_nodes[128];
-  size_t expanded_count;
-  void *selected_nodes[128];
-  size_t selected_count;
-  void *checked_nodes[128];
-  int checked_states[128];
-  size_t checked_count;
+  struct ui_tree_base *base;         /**< base field. */
+  const struct ui_tree_model *model; /**< model field. */
+  float indent_px;                   /**< indent_px field. */
+  int guide_lines_enabled;           /**< guide_lines_enabled field. */
+  int multi_select;                  /**< multi_select field. */
+  int virtual_scroll_enabled;        /**< virtual_scroll_enabled field. */
+  int is_expressive;                 /**< is_expressive field. */
+  void *expanded_nodes[128];         /**< expanded_nodes[128] field. */
+  size_t expanded_count;             /**< expanded_count field. */
+  void *selected_nodes[128];         /**< selected_nodes[128] field. */
+  size_t selected_count;             /**< selected_count field. */
+  void *checked_nodes[128];          /**< checked_nodes[128] field. */
+  int checked_states[128];           /**< checked_states[128] field. */
+  size_t checked_count;              /**< checked_count field. */
 };
 
 /**
@@ -777,18 +777,18 @@ md3_tree_set_expressive(struct md3_tree *tree, int enabled);
  * ui_datagrid_base.
  */
 struct md3_tree_grid {
-  struct ui_tree_grid_base *base;
-  struct ui_datagrid_base *datagrid;
-  const struct ui_tree_model *model;
-  size_t column_count;
-  float indent_px;
-  int sticky_headers;
-  int zebra_shading;
-  int is_expressive;
-  void *expanded_nodes[128];
-  size_t expanded_count;
-  void *selected_rows[128];
-  size_t selected_count;
+  struct ui_tree_grid_base *base;    /**< base field. */
+  struct ui_datagrid_base *datagrid; /**< datagrid field. */
+  const struct ui_tree_model *model; /**< model field. */
+  size_t column_count;               /**< column_count field. */
+  float indent_px;                   /**< indent_px field. */
+  int sticky_headers;                /**< sticky_headers field. */
+  int zebra_shading;                 /**< zebra_shading field. */
+  int is_expressive;                 /**< is_expressive field. */
+  void *expanded_nodes[128];         /**< expanded_nodes[128] field. */
+  size_t expanded_count;             /**< expanded_count field. */
+  void *selected_rows[128];          /**< selected_rows[128] field. */
+  size_t selected_count;             /**< selected_count field. */
 };
 
 /**
@@ -915,11 +915,11 @@ md3_tree_grid_set_expressive(struct md3_tree_grid *tg, int enabled);
  * @brief Item entry held within an md3_transfer_list.
  */
 struct md3_transfer_item {
-  int id;
-  char label[64];
-  void *data;
-  int selected;
-  struct md3_transfer_item *next;
+  int id;                         /**< id field. */
+  char label[64];                 /**< label[64] field. */
+  void *data;                     /**< data field. */
+  int selected;                   /**< selected field. */
+  struct md3_transfer_item *next; /**< next field. */
 };
 
 /**
@@ -928,13 +928,13 @@ struct md3_transfer_item {
  * ui_transfer_list_base.
  */
 struct md3_transfer_list {
-  struct ui_transfer_list_base base;
-  struct ui_component comp;
-  struct md3_transfer_item *left_head;
-  struct md3_transfer_item *right_head;
-  char left_filter[64];
-  char right_filter[64];
-  int is_expressive;
+  struct ui_transfer_list_base base;    /**< base field. */
+  struct ui_component comp;             /**< comp field. */
+  struct md3_transfer_item *left_head;  /**< left_head field. */
+  struct md3_transfer_item *right_head; /**< right_head field. */
+  char left_filter[64];                 /**< left_filter[64] field. */
+  char right_filter[64];                /**< right_filter[64] field. */
+  int is_expressive;                    /**< is_expressive field. */
 };
 
 /**

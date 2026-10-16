@@ -141,8 +141,7 @@ int main(int argc, char **argv) {
       sprintf_s(dir_buf, sizeof(dir_buf), "%s/%s", output_base,
                 drivers[i]->name);
 #else
-      snprintf(dir_buf, sizeof(dir_buf), "%s/%s", output_base,
-               drivers[i]->name);
+      sprintf(dir_buf, "%s/%s", output_base, drivers[i]->name);
 #endif
       opts.output_dir = dir_buf;
     }

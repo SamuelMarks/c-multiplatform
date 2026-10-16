@@ -17,7 +17,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
@@ -36,9 +36,13 @@ struct ui_engine;
  * history.
  */
 struct md3_search_view {
-  int is_open;
-  size_t history_count;
-  char history[MD3_SEARCH_MAX_HISTORY][MD3_SEARCH_HISTORY_LEN];
+  int is_open;          /**< is_open field. */
+  size_t history_count; /**< history_count field. */
+  char history
+      [MD3_SEARCH_MAX_HISTORY]
+      [MD3_SEARCH_HISTORY_LEN]; /**<
+                                   history[MD3_SEARCH_MAX_HISTORY][MD3_SEARCH_HISTORY_LEN]
+                                   field. */
 };
 
 /**
@@ -46,12 +50,12 @@ struct md3_search_view {
  * @brief Material 3 Search Bar component wrapping ui_search_bar_base.
  */
 struct md3_search_bar {
-  struct ui_component component;
-  struct ui_search_bar_base base;
-  struct ui_control_value_accessor cva;
-  struct md3_search_view view;
-  char placeholder[64];
-  int elevation;
+  struct ui_component component;        /**< component field. */
+  struct ui_search_bar_base base;       /**< base field. */
+  struct ui_control_value_accessor cva; /**< cva field. */
+  struct md3_search_view view;          /**< view field. */
+  char placeholder[64];                 /**< placeholder[64] field. */
+  int elevation;                        /**< elevation field. */
 };
 
 /**
@@ -169,6 +173,6 @@ extern C_MULTIPLATFORM_EXPORT ui_error_t md3_search_bar_get_base(
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* MATERIAL3_MD3_SEARCH_H */

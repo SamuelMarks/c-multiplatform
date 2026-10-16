@@ -16,7 +16,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 /**
  * @enum ui_adaptive_window_width_class
@@ -195,6 +195,6 @@ ui_adaptive_pane_scaffold_base_is_dialog_levitated(
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* UI_ADAPTIVE_PANE_SCAFFOLD_BASE_H */

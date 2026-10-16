@@ -18,7 +18,7 @@ struct ui_signal;
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 /* clang-format off */
 #include "ui_error.h"

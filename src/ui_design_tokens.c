@@ -352,6 +352,7 @@ ui_error_t ui_design_token_get_color(const struct ui_design_token_dict *dict,
 
 /* \brief ui_error
  */
+/** @brief ui_design_token_get_number function. */
 ui_error_t ui_design_token_get_number(const struct ui_design_token_dict *dict,
                                       const char *name, float *out_number) {
   ui_error_t err;

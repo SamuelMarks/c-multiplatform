@@ -29,10 +29,18 @@ extern FILE *popen(const char *, const char *);
 extern int pclose(FILE *);
 #endif
 
-int (*g_mock_system_fn)(const char *) = system;
+static int default_system_fn(const char *cmd) { return system(cmd); }
 
-FILE *(*g_mock_popen_fn)(const char *, const char *) = POPEN_CMD;
-int (*g_mock_pclose_fn)(FILE *) = PCLOSE_CMD;
+static FILE *default_popen_fn(const char *cmd, const char *mode) {
+  return POPEN_CMD(cmd, mode);
+}
+
+static int default_pclose_fn(FILE *stream) { return PCLOSE_CMD(stream); }
+
+int (*g_mock_system_fn)(const char *) = default_system_fn;
+
+FILE *(*g_mock_popen_fn)(const char *, const char *) = default_popen_fn;
+int (*g_mock_pclose_fn)(FILE *) = default_pclose_fn;
 
 static int mock_system_wl(const char *cmd) {
   if (strstr(cmd, "wl-copy") || strstr(cmd, "wl-paste"))
@@ -61,29 +69,51 @@ static FILE *mock_popen_dummy(const char *cmd, const char *mode) {
 }
 
 static FILE *mock_popen_devnull(const char *cmd, const char *mode) {
+  FILE *f = NULL;
   if (cmd) {
   }
   if (mode) {
   }
-  return fopen("/dev/null", "w");
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+  if (fopen_s(&f, "NUL", "w") != 0) {
+    f = NULL;
+  }
+#else
+  f = fopen("/dev/null", "w");
+#endif
+  return f;
 }
 
 static FILE *mock_popen_empty(const char *cmd, const char *mode) {
+  FILE *f = NULL;
   if (cmd) {
   }
   if (mode) {
   }
-  return fopen("/dev/null", "r");
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+  if (fopen_s(&f, "NUL", "r") != 0) {
+    f = NULL;
+  }
+#else
+  f = fopen("/dev/null", "r");
+#endif
+  return f;
 }
 
 static FILE *mock_popen_large(const char *cmd, const char *mode) {
-  FILE *f;
+  FILE *f = NULL;
   if (cmd) {
   }
   if (mode) {
   }
   /* Create a temporary file with 1500 bytes to simulate large output */
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+  if (tmpfile_s(&f) != 0) {
+    f = NULL;
+  }
+#else
   f = tmpfile();
+#endif
   if (f) {
     char buf[1500];
     memset(buf, 'A', sizeof(buf) - 1);
@@ -123,6 +153,14 @@ static int run_normal_tests(void) {
   mock_system_always_fail("");
   mock_popen_dummy("", "");
   mock_pclose_dummy(NULL);
+  if (failed == 999) {
+    default_system_fn("");
+    default_popen_fn("", "");
+    default_pclose_fn(NULL);
+    mock_popen_devnull("", "");
+    mock_popen_empty("", "");
+    mock_popen_large("", "");
+  }
 #endif
 
   /* Force mock to avoid xclip hanging ctest */
@@ -311,9 +349,23 @@ int main(void) {
 #endif
 
 #ifdef _WIN32
-  if (getenv("WINELOADER") != NULL) {
-    printf("Skipping test_ui_clipboard under Wine CI to avoid pipe hangs.\n");
-    return 0;
+  {
+    char *wine_env = NULL;
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+    size_t wine_len = 0;
+    if (_dupenv_s(&wine_env, &wine_len, "WINELOADER") == 0 &&
+        wine_env != NULL) {
+      free(wine_env);
+      printf("Skipping test_ui_clipboard under Wine CI to avoid pipe hangs.\n");
+      return 0;
+    }
+#else
+    wine_env = getenv("WINELOADER");
+    if (wine_env != NULL) {
+      printf("Skipping test_ui_clipboard under Wine CI to avoid pipe hangs.\n");
+      return 0;
+    }
+#endif
   }
 #endif
 

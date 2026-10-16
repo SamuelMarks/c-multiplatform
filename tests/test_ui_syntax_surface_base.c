@@ -7,6 +7,8 @@
 #include <stdio.h>
 /* clang-format on */
 
+extern int g_malloc_fail_countdown;
+
 extern int g_ssb_mock_signal_destroy_fail;
 extern ui_error_t ui_test_ssb_void_equality(union ui_signal_payload a,
                                             union ui_signal_payload b,
@@ -30,7 +32,7 @@ int run_normal_tests(void) {
   float out_w;
   ui_signal_t *sig;
   int visual_index;
-  struct ui_syntax_bracket_match match;
+  struct ui_syntax_bracket_match match = {0};
   int failed = 0;
 
   ACCUM_ERR(failed, ui_arena_create(64 * 1024, &arena));
@@ -88,169 +90,183 @@ int run_normal_tests(void) {
             ui_syntax_surface_base_set_fold_region(surface, 5, 10, UI_FALSE));
 
   /* Test out of bounds on folds */
-  int i;
-  for (i = 0; i < 256; i++) {
-    ui_error_t err = ui_syntax_surface_base_set_fold_region(
-        surface, i * 100, (i * 100) + 1, UI_TRUE);
-    if (i < 254) {
-      failed |= (err != UI_ERROR_NONE);
-    } else {
-      failed |= (err != UI_ERROR_OUT_OF_BOUNDS);
+  {
+    int i;
+    for (i = 0; i < 256; i++) {
+      ui_error_t err = ui_syntax_surface_base_set_fold_region(
+          surface, i * 100, (i * 100) + 1, UI_TRUE);
+      if (i < 254) {
+        failed |= (err != UI_ERROR_NONE);
+      } else {
+        failed |= (err != UI_ERROR_OUT_OF_BOUNDS);
+      }
     }
-  }
 
-  failed |= (ui_syntax_surface_base_get_fold_changed_signal(surface, NULL) !=
-             UI_ERROR_INVALID_ARGUMENT);
-  ACCUM_ERR(failed,
-            ui_syntax_surface_base_get_fold_changed_signal(surface, &sig));
+    failed |= (ui_syntax_surface_base_get_fold_changed_signal(surface, NULL) !=
+               UI_ERROR_INVALID_ARGUMENT);
+    ACCUM_ERR(failed,
+              ui_syntax_surface_base_get_fold_changed_signal(surface, &sig));
 
-  failed |= (ui_syntax_surface_base_get_visual_line_index(surface, 10, NULL) !=
-             UI_ERROR_INVALID_ARGUMENT);
-  failed |= (ui_syntax_surface_base_get_visual_line_index(
-                 surface, -1, &visual_index) != UI_ERROR_INVALID_ARGUMENT);
+    failed |= (ui_syntax_surface_base_get_visual_line_index(
+                   surface, 10, NULL) != UI_ERROR_INVALID_ARGUMENT);
+    failed |= (ui_syntax_surface_base_get_visual_line_index(
+                   surface, -1, &visual_index) != UI_ERROR_INVALID_ARGUMENT);
 
-  /* Set up specific folds for visual line index test: Let's reset */
-  {
-    ui_error_t rc_cleanup = ui_syntax_surface_base_destroy(surface);
-    assert(rc_cleanup == UI_ERROR_NONE);
-  }
-  ui_syntax_surface_base_create(arena, NULL, &surface);
+    /* Set up specific folds for visual line index test: Let's reset */
+    {
+      ui_error_t rc_cleanup = ui_syntax_surface_base_destroy(surface);
+      assert(rc_cleanup == UI_ERROR_NONE);
+    }
+    ui_syntax_surface_base_create(arena, NULL, &surface);
 
-  ui_syntax_surface_base_set_fold_region(surface, 10, 20, UI_TRUE);
+    ui_syntax_surface_base_set_fold_region(surface, 10, 20, UI_TRUE);
 
-  /* Before fold */
-  ACCUM_ERR(failed, ui_syntax_surface_base_get_visual_line_index(
-                        surface, 5, &visual_index));
-  failed |= (visual_index != 5);
+    /* Before fold */
+    ACCUM_ERR(failed, ui_syntax_surface_base_get_visual_line_index(
+                          surface, 5, &visual_index));
+    failed |= (visual_index != 5);
 
-  /* On fold header */
-  ACCUM_ERR(failed, ui_syntax_surface_base_get_visual_line_index(
-                        surface, 10, &visual_index));
-  failed |= (visual_index != 10);
+    /* On fold header */
+    ACCUM_ERR(failed, ui_syntax_surface_base_get_visual_line_index(
+                          surface, 10, &visual_index));
+    failed |= (visual_index != 10);
 
-  /* Inside fold */
-  ACCUM_ERR(failed, ui_syntax_surface_base_get_visual_line_index(
-                        surface, 15, &visual_index));
-  failed |= (visual_index != -1);
+    /* Inside fold */
+    ACCUM_ERR(failed, ui_syntax_surface_base_get_visual_line_index(
+                          surface, 15, &visual_index));
+    failed |= (visual_index != -1);
 
-  /* Open fold to test the is_collapsed false branch inside visual_line
-   * computation */
-  ACCUM_ERR(failed,
-            ui_syntax_surface_base_set_fold_region(surface, 10, 20, UI_FALSE));
-  ACCUM_ERR(failed, ui_syntax_surface_base_get_visual_line_index(
-                        surface, 25, &visual_index));
-  failed |= (visual_index != 25);
+    /* Open fold to test the is_collapsed false branch inside visual_line
+     * computation */
+    ACCUM_ERR(failed, ui_syntax_surface_base_set_fold_region(surface, 10, 20,
+                                                             UI_FALSE));
+    ACCUM_ERR(failed, ui_syntax_surface_base_get_visual_line_index(
+                          surface, 25, &visual_index));
+    failed |= (visual_index != 25);
 
-  /* After fold (re-collapsed) */
-  ACCUM_ERR(failed,
-            ui_syntax_surface_base_set_fold_region(surface, 10, 20, UI_TRUE));
-  ACCUM_ERR(failed, ui_syntax_surface_base_get_visual_line_index(
-                        surface, 25, &visual_index));
-  failed |= (visual_index != 15);
+    /* After fold (re-collapsed) */
+    ACCUM_ERR(failed,
+              ui_syntax_surface_base_set_fold_region(surface, 10, 20, UI_TRUE));
+    ACCUM_ERR(failed, ui_syntax_surface_base_get_visual_line_index(
+                          surface, 25, &visual_index));
+    failed |= (visual_index != 15);
 
-  ACCUM_ERR(failed, ui_syntax_surface_base_set_active_line(surface, 10));
+    ACCUM_ERR(failed, ui_syntax_surface_base_set_active_line(surface, 10));
 
-  failed |= (ui_syntax_surface_base_get_active_line_signal(surface, NULL) !=
-             UI_ERROR_INVALID_ARGUMENT);
-  ACCUM_ERR(failed,
-            ui_syntax_surface_base_get_active_line_signal(surface, &sig));
+    failed |= (ui_syntax_surface_base_get_active_line_signal(surface, NULL) !=
+               UI_ERROR_INVALID_ARGUMENT);
+    ACCUM_ERR(failed,
+              ui_syntax_surface_base_get_active_line_signal(surface, &sig));
 
-  failed |= (ui_syntax_surface_base_set_bracket_match(surface, NULL) !=
-             UI_ERROR_INVALID_ARGUMENT);
-  match.has_match = UI_TRUE;
-  match.open_line = 1;
-  match.open_col = 2;
-  match.close_line = 5;
-  match.close_col = 10;
-  ACCUM_ERR(failed, ui_syntax_surface_base_set_bracket_match(surface, &match));
+    failed |= (ui_syntax_surface_base_set_bracket_match(surface, NULL) !=
+               UI_ERROR_INVALID_ARGUMENT);
+    match.has_match = UI_TRUE;
+    match.open_line = 1;
+    match.open_col = 2;
+    match.close_line = 5;
+    match.close_col = 10;
+    ACCUM_ERR(failed,
+              ui_syntax_surface_base_set_bracket_match(surface, &match));
 
-  ui_signal_t *f_sig, *a_sig;
-  ui_syntax_surface_base_get_fold_changed_signal(surface, &f_sig);
-  ui_syntax_surface_base_get_active_line_signal(surface, &a_sig);
+    {
+      ui_signal_t *f_sig, *a_sig;
+      ui_syntax_surface_base_get_fold_changed_signal(surface, &f_sig);
+      ui_syntax_surface_base_get_active_line_signal(surface, &a_sig);
 
-  union ui_signal_payload p1, p2;
-  p1.ptr_val = NULL;
-  p2.ptr_val = NULL;
-  ui_signal_set(f_sig, p1);
+      {
+        union ui_signal_payload p1, p2;
+        p1.ptr_val = NULL;
+        p2.ptr_val = NULL;
+        ui_signal_set(f_sig, p1);
 
-  p1.int_val = 10;
-  p2.int_val = 10;
-  ui_signal_set(a_sig, p1);
-  ui_signal_set(a_sig, p1);
+        p1.int_val = 10;
+        p2.int_val = 10;
+        ui_signal_set(a_sig, p1);
+        ui_signal_set(a_sig, p2);
 
-  ACCUM_ERR(failed, ui_syntax_surface_base_destroy(surface));
-  {
-    ui_error_t rc_cleanup = ui_arena_destroy(arena);
-    assert(rc_cleanup == UI_ERROR_NONE);
-  }
-
-  /* Test mock failures and void_equality edge cases */
-  {
-    struct ui_arena *t_arena;
-    struct ui_syntax_surface_base *s_test = NULL;
-    union ui_signal_payload pa, pb;
-    ui_bool_t eq = UI_FALSE;
-
-    /* void_equality NULL out_equal check */
-    pa.ptr_val = NULL;
-    pb.ptr_val = NULL;
-    failed |=
-        (ui_test_ssb_void_equality(pa, pb, NULL) != UI_ERROR_INVALID_ARGUMENT);
-
-    /* void_equality equal and non-equal */
-    failed |= (ui_test_ssb_void_equality(pa, pb, &eq) != UI_ERROR_NONE ||
-               eq != UI_TRUE);
-    pa.ptr_val = (void *)1;
-    failed |= (ui_test_ssb_void_equality(pa, pb, &eq) != UI_ERROR_NONE ||
-               eq != UI_FALSE);
-
-    /* Signal destroy failures during syntax_surface_base_destroy */
-    ACCUM_ERR(failed, ui_arena_create(32768, &t_arena));
-    ACCUM_ERR(failed, ui_syntax_surface_base_create(t_arena, NULL, &s_test));
-
-    /* Fail fold_changed_signal destroy */
-    g_ssb_mock_signal_destroy_fail = 1;
-    failed |= (ui_syntax_surface_base_destroy(s_test) != UI_ERROR_UNKNOWN);
-    g_ssb_mock_signal_destroy_fail = 0;
-
-    ACCUM_ERR(failed, ui_syntax_surface_base_create(t_arena, NULL, &s_test));
-    /* Fail active_line_signal destroy (call #2) */
-    g_ssb_mock_signal_destroy_fail = 2;
-    failed |= (ui_syntax_surface_base_destroy(s_test) != UI_ERROR_UNKNOWN);
-    g_ssb_mock_signal_destroy_fail = 0;
-
-    /* Test surface destroy with NULL signals */
-    failed |= (ui_test_ssb_clear_signals(NULL) != UI_ERROR_INVALID_ARGUMENT);
-    ACCUM_ERR(failed, ui_syntax_surface_base_create(t_arena, NULL, &s_test));
-    ACCUM_ERR(failed, ui_test_ssb_clear_signals(s_test));
-    failed |= (ui_syntax_surface_base_destroy(s_test) != UI_ERROR_NONE);
-
-    ACCUM_ERR(failed, ui_arena_destroy(t_arena));
-  }
-
-  /* Arena OOM tests */
-  extern int g_malloc_fail_countdown;
-  struct ui_arena *small_arena;
-  struct ui_syntax_surface_base *s1;
-  for (i = 0; i < 20; i++) {
-    g_malloc_fail_countdown = i;
-    if (ui_arena_create(64, &small_arena) == UI_ERROR_NONE) {
-      if (ui_syntax_surface_base_create(small_arena, NULL, &s1) ==
-          UI_ERROR_NONE) {
+        ACCUM_ERR(failed, ui_syntax_surface_base_destroy(surface));
         {
-          ui_error_t rc_cleanup = ui_syntax_surface_base_destroy(s1);
+          ui_error_t rc_cleanup = ui_arena_destroy(arena);
           assert(rc_cleanup == UI_ERROR_NONE);
         }
-      }
-      {
-        ui_error_t rc_cleanup = ui_arena_destroy(small_arena);
-        assert(rc_cleanup == UI_ERROR_NONE);
+
+        /* Test mock failures and void_equality edge cases */
+        {
+          struct ui_arena *t_arena;
+          struct ui_syntax_surface_base *s_test = NULL;
+          union ui_signal_payload pa, pb;
+          ui_bool_t eq = UI_FALSE;
+
+          /* void_equality NULL out_equal check */
+          pa.ptr_val = NULL;
+          pb.ptr_val = NULL;
+          failed |= (ui_test_ssb_void_equality(pa, pb, NULL) !=
+                     UI_ERROR_INVALID_ARGUMENT);
+
+          /* void_equality equal and non-equal */
+          failed |= (ui_test_ssb_void_equality(pa, pb, &eq) != UI_ERROR_NONE ||
+                     eq != UI_TRUE);
+          pa.ptr_val = (void *)1;
+          failed |= (ui_test_ssb_void_equality(pa, pb, &eq) != UI_ERROR_NONE ||
+                     eq != UI_FALSE);
+
+          /* Signal destroy failures during syntax_surface_base_destroy */
+          ACCUM_ERR(failed, ui_arena_create(32768, &t_arena));
+          ACCUM_ERR(failed,
+                    ui_syntax_surface_base_create(t_arena, NULL, &s_test));
+
+          /* Fail fold_changed_signal destroy */
+          g_ssb_mock_signal_destroy_fail = 1;
+          failed |=
+              (ui_syntax_surface_base_destroy(s_test) != UI_ERROR_UNKNOWN);
+          g_ssb_mock_signal_destroy_fail = 0;
+
+          ACCUM_ERR(failed,
+                    ui_syntax_surface_base_create(t_arena, NULL, &s_test));
+          /* Fail active_line_signal destroy (call #2) */
+          g_ssb_mock_signal_destroy_fail = 2;
+          failed |=
+              (ui_syntax_surface_base_destroy(s_test) != UI_ERROR_UNKNOWN);
+          g_ssb_mock_signal_destroy_fail = 0;
+
+          /* Test surface destroy with NULL signals */
+          failed |=
+              (ui_test_ssb_clear_signals(NULL) != UI_ERROR_INVALID_ARGUMENT);
+          ACCUM_ERR(failed,
+                    ui_syntax_surface_base_create(t_arena, NULL, &s_test));
+          ACCUM_ERR(failed, ui_test_ssb_clear_signals(s_test));
+          failed |= (ui_syntax_surface_base_destroy(s_test) != UI_ERROR_NONE);
+
+          ACCUM_ERR(failed, ui_arena_destroy(t_arena));
+        }
+
+        /* Arena OOM tests */
+        {
+          struct ui_arena *small_arena;
+          struct ui_syntax_surface_base *s1;
+          for (i = 0; i < 20; i++) {
+            g_malloc_fail_countdown = i;
+            if (ui_arena_create(64, &small_arena) == UI_ERROR_NONE) {
+              if (ui_syntax_surface_base_create(small_arena, NULL, &s1) ==
+                  UI_ERROR_NONE) {
+                {
+                  ui_error_t rc_cleanup = ui_syntax_surface_base_destroy(s1);
+                  assert(rc_cleanup == UI_ERROR_NONE);
+                }
+              }
+              {
+                ui_error_t rc_cleanup = ui_arena_destroy(small_arena);
+                assert(rc_cleanup == UI_ERROR_NONE);
+              }
+            }
+          }
+          g_malloc_fail_countdown = -1;
+
+          return failed;
+        }
       }
     }
   }
-  g_malloc_fail_countdown = -1;
-
-  return failed;
 }
 
 int main(void) {

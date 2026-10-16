@@ -55,6 +55,7 @@ static ui_error_t mock_button_base_destroy(struct ui_button_base *button) {
 /** @endcond */
 #endif
 
+/** @brief get_apple_pay_label function. */
 static const char *get_apple_pay_label(enum cupertino_apple_pay_type type) {
   switch (type) {
   case CUPERTINO_APPLE_PAY_PLAIN:
@@ -84,6 +85,7 @@ static const char *get_apple_pay_label(enum cupertino_apple_pay_type type) {
   }
 }
 
+/** @brief get_apple_id_label function. */
 static const char *
 get_apple_id_label(enum cupertino_apple_id_button_type type) {
   switch (type) {
@@ -110,6 +112,7 @@ test_cupertino_get_apple_id_label(enum cupertino_apple_id_button_type type) {
 }
 #endif
 
+/** @brief apply_style_colors function. */
 static void apply_style_colors(enum cupertino_apple_pay_style style,
                                ui_color_t *out_bg, ui_color_t *out_fg,
                                ui_color_t *out_border) {
@@ -128,6 +131,7 @@ static void apply_style_colors(enum cupertino_apple_pay_style style,
   }
 }
 
+/** @brief cupertino_apple_pay_create function. */
 ui_error_t
 cupertino_apple_pay_create(struct ui_engine *engine,
                            const struct cupertino_apple_pay_descriptor *desc,
@@ -201,6 +205,7 @@ cupertino_apple_pay_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_apple_pay_destroy function. */
 ui_error_t
 cupertino_apple_pay_destroy(struct cupertino_apple_pay_button *button) {
   ui_error_t rc;
@@ -221,6 +226,7 @@ cupertino_apple_pay_destroy(struct cupertino_apple_pay_button *button) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_apple_pay_press_start function. */
 ui_error_t
 cupertino_apple_pay_press_start(struct cupertino_apple_pay_button *button) {
   if (!button) {
@@ -233,6 +239,7 @@ cupertino_apple_pay_press_start(struct cupertino_apple_pay_button *button) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_apple_pay_press_end function. */
 ui_error_t
 cupertino_apple_pay_press_end(struct cupertino_apple_pay_button *button) {
   if (!button) {
@@ -245,6 +252,7 @@ cupertino_apple_pay_press_end(struct cupertino_apple_pay_button *button) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_apple_pay_get_dimensions function. */
 ui_error_t cupertino_apple_pay_get_dimensions(
     const struct cupertino_apple_pay_button *button, float *out_width,
     float *out_height) {
@@ -257,6 +265,7 @@ ui_error_t cupertino_apple_pay_get_dimensions(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_apple_pay_get_label function. */
 ui_error_t
 cupertino_apple_pay_get_label(const struct cupertino_apple_pay_button *button,
                               const char **out_label) {
@@ -268,6 +277,7 @@ cupertino_apple_pay_get_label(const struct cupertino_apple_pay_button *button,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_apple_pay_get_base function. */
 ui_error_t
 cupertino_apple_pay_get_base(struct cupertino_apple_pay_button *button,
                              struct ui_button_base **out_base) {
@@ -281,6 +291,7 @@ cupertino_apple_pay_get_base(struct cupertino_apple_pay_button *button,
 
 /* --- Sign in with Apple implementation --- */
 
+/** @brief cupertino_apple_id_button_create function. */
 ui_error_t cupertino_apple_id_button_create(
     struct ui_engine *engine, const struct cupertino_apple_id_descriptor *desc,
     struct cupertino_apple_id_button **out_button) {
@@ -353,6 +364,7 @@ ui_error_t cupertino_apple_id_button_create(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_apple_id_button_destroy function. */
 ui_error_t
 cupertino_apple_id_button_destroy(struct cupertino_apple_id_button *button) {
   ui_error_t rc;
@@ -373,6 +385,7 @@ cupertino_apple_id_button_destroy(struct cupertino_apple_id_button *button) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_apple_id_button_press_start function. */
 ui_error_t cupertino_apple_id_button_press_start(
     struct cupertino_apple_id_button *button) {
   if (!button) {
@@ -385,6 +398,7 @@ ui_error_t cupertino_apple_id_button_press_start(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_apple_id_button_press_end function. */
 ui_error_t
 cupertino_apple_id_button_press_end(struct cupertino_apple_id_button *button) {
   if (!button) {
@@ -397,6 +411,7 @@ cupertino_apple_id_button_press_end(struct cupertino_apple_id_button *button) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_apple_id_button_get_dimensions function. */
 ui_error_t cupertino_apple_id_button_get_dimensions(
     const struct cupertino_apple_id_button *button, float *out_width,
     float *out_height) {
@@ -409,6 +424,7 @@ ui_error_t cupertino_apple_id_button_get_dimensions(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_apple_id_button_get_label function. */
 ui_error_t cupertino_apple_id_button_get_label(
     const struct cupertino_apple_id_button *button, const char **out_label) {
   if (!button || !out_label) {
@@ -419,6 +435,7 @@ ui_error_t cupertino_apple_id_button_get_label(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_apple_id_button_get_base function. */
 ui_error_t
 cupertino_apple_id_button_get_base(struct cupertino_apple_id_button *button,
                                    struct ui_button_base **out_base) {

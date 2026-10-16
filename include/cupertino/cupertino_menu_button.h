@@ -14,7 +14,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 struct ui_overlay_director;
@@ -45,7 +45,7 @@ struct cupertino_menu_button_item {
   char icon_symbol[64]; /**< Optional SF Symbol name for item. */
   int is_destructive;   /**< Non-zero to style in SystemRed. */
   int is_disabled;      /**< Non-zero to disable interaction and dim. */
-  void (*on_select)(
+  ui_error_t (*on_select)(
       void *user_data); /**< Optional callback when item is selected. */
   void *user_data;      /**< User data passed to on_select callback. */
 };

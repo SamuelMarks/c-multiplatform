@@ -15,12 +15,15 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
+/** @brief CUPERTINO_BIOMETRICS_WIDTH constant. */
 #define CUPERTINO_BIOMETRICS_WIDTH 270.0f
+/** @brief CUPERTINO_BIOMETRICS_MIN_HEIGHT constant. */
 #define CUPERTINO_BIOMETRICS_MIN_HEIGHT 190.0f
+/** @brief CUPERTINO_BIOMETRICS_CORNER_RADIUS constant. */
 #define CUPERTINO_BIOMETRICS_CORNER_RADIUS 14.0f
 
 /**
@@ -64,18 +67,18 @@ struct cupertino_biometrics_descriptor {
  * @brief Biometric authentication prompt instance wrapping ui_dialog_base.
  */
 struct cupertino_biometrics_prompt {
-  struct ui_dialog_base *base;
-  enum cupertino_biometric_type type;
-  enum cupertino_biometric_state state;
-  char reason[128];
-  char passcode_button_title[64];
-  char cancel_button_title[32];
-  int is_presented;
+  struct ui_dialog_base *base;          /**< base field. */
+  enum cupertino_biometric_type type;   /**< type field. */
+  enum cupertino_biometric_state state; /**< state field. */
+  char reason[128];                     /**< reason[128] field. */
+  char passcode_button_title[64];       /**< passcode_button_title[64] field. */
+  char cancel_button_title[32];         /**< cancel_button_title[32] field. */
+  int is_presented;                     /**< is_presented field. */
   float scan_progress;  /**< Normalized [0.0, 1.0] sweep animation. */
   float shake_offset_x; /**< Horizontal shake displacement in points. */
   float shake_time_ms;  /**< Elapsed failure shake animation time. */
-  float width;
-  float height;
+  float width;          /**< width field. */
+  float height;         /**< height field. */
 };
 
 /**

@@ -11,6 +11,7 @@
 #include <string.h>
 /* clang-format on */
 
+/** @brief cupertino_bidi_set_direction function. */
 ui_error_t cupertino_bidi_set_direction(enum ui_bidi_direction direction) {
   if (direction != UI_BIDI_DIR_LTR && direction != UI_BIDI_DIR_RTL) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -18,6 +19,7 @@ ui_error_t cupertino_bidi_set_direction(enum ui_bidi_direction direction) {
   return ui_bidi_set_direction(direction);
 }
 
+/** @brief cupertino_bidi_get_direction function. */
 ui_error_t cupertino_bidi_get_direction(enum ui_bidi_direction *out_dir) {
   if (!out_dir) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -25,6 +27,7 @@ ui_error_t cupertino_bidi_get_direction(enum ui_bidi_direction *out_dir) {
   return ui_bidi_get_direction(out_dir);
 }
 
+/** @brief cupertino_bidi_resolve_logical_margin function. */
 ui_error_t cupertino_bidi_resolve_logical_margin(float start, float end,
                                                  enum ui_bidi_direction dir,
                                                  float *out_left,
@@ -43,6 +46,7 @@ ui_error_t cupertino_bidi_resolve_logical_margin(float start, float end,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_bidi_resolve_logical_padding function. */
 ui_error_t cupertino_bidi_resolve_logical_padding(float start, float end,
                                                   enum ui_bidi_direction dir,
                                                   float *out_left,
@@ -61,6 +65,7 @@ ui_error_t cupertino_bidi_resolve_logical_padding(float start, float end,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_bidi_resolve_logical_inset function. */
 ui_error_t cupertino_bidi_resolve_logical_inset(float start, float end,
                                                 enum ui_bidi_direction dir,
                                                 float *out_left,
@@ -79,6 +84,7 @@ ui_error_t cupertino_bidi_resolve_logical_inset(float start, float end,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_bidi_should_mirror_symbol function. */
 ui_error_t cupertino_bidi_should_mirror_symbol(const char *symbol_name,
                                                enum ui_bidi_direction dir,
                                                int *out_should_mirror) {
@@ -129,6 +135,7 @@ ui_error_t cupertino_bidi_should_mirror_symbol(const char *symbol_name,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_i18n_format_numeral function. */
 ui_error_t cupertino_i18n_format_numeral(int number,
                                          enum cupertino_numeral_system system,
                                          char *out_buf, size_t buf_size) {
@@ -167,7 +174,7 @@ ui_error_t cupertino_i18n_format_numeral(int number,
 #if defined(_MSC_VER)
   sprintf_s(temp, sizeof(temp), "%u", val);
 #else
-  snprintf(temp, sizeof(temp), "%u", val);
+  sprintf(temp, "%u", val);
 #endif
 
   if (system == CUPERTINO_NUMERAL_WESTERN) {
@@ -227,6 +234,7 @@ ui_error_t cupertino_i18n_format_numeral(int number,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_calendar_convert_from_gregorian function. */
 ui_error_t cupertino_calendar_convert_from_gregorian(
     int g_year, int g_month, int g_day,
     enum cupertino_calendar_type target_type,
@@ -345,6 +353,7 @@ ui_error_t cupertino_calendar_convert_from_gregorian(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_i18n_get_first_day_of_week function. */
 ui_error_t cupertino_i18n_get_first_day_of_week(const char *locale,
                                                 int *out_first_day) {
   if (!locale || !out_first_day) {
@@ -371,6 +380,7 @@ ui_error_t cupertino_i18n_get_first_day_of_week(const char *locale,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_i18n_get_plural_category function. */
 ui_error_t cupertino_i18n_get_plural_category(
     int count, const char *locale,
     enum cupertino_plural_category *out_category) {
@@ -423,6 +433,7 @@ ui_error_t cupertino_i18n_get_plural_category(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_i18n_kinsoku_prohibited_start function. */
 ui_error_t cupertino_i18n_kinsoku_prohibited_start(const char *utf8_char,
                                                    int *out_prohibited) {
   if (!utf8_char || !out_prohibited) {
@@ -451,6 +462,7 @@ ui_error_t cupertino_i18n_kinsoku_prohibited_start(const char *utf8_char,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_i18n_kinsoku_prohibited_end function. */
 ui_error_t cupertino_i18n_kinsoku_prohibited_end(const char *utf8_char,
                                                  int *out_prohibited) {
   if (!utf8_char || !out_prohibited) {

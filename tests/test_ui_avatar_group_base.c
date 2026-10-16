@@ -6,6 +6,8 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_avatar_group_mock_fail;
+
 extern int g_malloc_fail_countdown;
 
 static ui_error_t run_normal_tests(void) {
@@ -131,8 +133,6 @@ static ui_error_t run_normal_tests(void) {
     return rc;
 
   return UI_ERROR_NONE;
-  return UI_ERROR_NONE;
-  return UI_ERROR_NONE;
 }
 
 static ui_error_t run_oom_tests(void) {
@@ -162,7 +162,6 @@ static ui_error_t run_oom_tests(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
 static ui_error_t run_mock_fail_tests(void) {
-  extern int g_avatar_group_mock_fail;
   struct ui_avatar_group_base *group_mock = NULL;
   ui_error_t rc;
 

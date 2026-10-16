@@ -257,7 +257,7 @@ static int test_resizable_edges_and_bounds(void) {
 
 static int test_resizable_nulls_and_errors(void) {
   struct ui_resizable_behavior *b = NULL;
-  struct ui_event ev;
+  struct ui_event ev = {0};
 
   if (ui_resizable_behavior_create(NULL) != UI_ERROR_INVALID_ARGUMENT)
     return 1;

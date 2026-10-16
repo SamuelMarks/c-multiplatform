@@ -184,7 +184,6 @@ static void test_pin_input_oom(void) {
   g_malloc_fail_countdown = -1;
 
   if (ui_pin_input_base_create(&pin_input, 4, NULL) == UI_ERROR_NONE) {
-    struct ui_control_value_accessor cva;
     ui_pin_input_base_get_component(pin_input,
                                     NULL); /* Ensure not null internally */
     {

@@ -116,15 +116,17 @@ void test_coverage_layout(void) {
     ui_dom_node_append_child(root, child2);
     ui_dom_node_append_child(root, child3);
 
-    struct ui_css_rule *rule2;
-    ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule2);
-    ui_css_rule_append_selector(rule2, UI_CSS_SELECTOR_TYPE_TAG, "span");
-    ui_css_rule_append_declaration(rule2, "display", "inline", 0);
-    ui_css_stylesheet_append_rule(sheet, rule2);
+    {
+      struct ui_css_rule *rule2;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule2);
+      ui_css_rule_append_selector(rule2, UI_CSS_SELECTOR_TYPE_TAG, "span");
+      ui_css_rule_append_declaration(rule2, "display", "inline", 0);
+      ui_css_stylesheet_append_rule(sheet, rule2);
 
-    ui_layout_tree_generate(root, sheet, &lroot);
-    ui_layout_compute(lroot, 100.0f, 100.0f);
-    ui_layout_tree_destroy(lroot);
+      ui_layout_tree_generate(root, sheet, &lroot);
+      ui_layout_compute(lroot, 100.0f, 100.0f);
+      ui_layout_tree_destroy(lroot);
+    }
   }
 
   {
@@ -297,50 +299,52 @@ void test_sequences_and_overflow(void) {
   }
 
   /* Horizontal Scrollbar Overflow */
-  struct ui_dom_node *oroot, *oc1;
-  struct ui_css_rule *orule, *orc1;
-  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &oroot);
-  ui_dom_node_set_tag_name(oroot, "div");
-  ui_dom_node_set_attribute(oroot, "class", "oroot");
-
-  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &oc1);
-  ui_dom_node_set_tag_name(oc1, "div");
-  ui_dom_node_set_attribute(oc1, "class", "oc1");
-  ui_dom_node_append_child(oroot, oc1);
-
-  ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &orule);
-  ui_css_rule_append_selector(orule, UI_CSS_SELECTOR_TYPE_CLASS, "oroot");
-  ui_css_rule_append_declaration(orule, "display", "block", 0);
-  ui_css_rule_append_declaration(orule, "width", "100px", 0);
-  ui_css_rule_append_declaration(orule, "overflow-x", "scroll", 0);
-  orule->next = sheet->rules;
-  sheet->rules = orule;
-
-  ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &orc1);
-  ui_css_rule_append_selector(orc1, UI_CSS_SELECTOR_TYPE_CLASS, "oc1");
-  ui_css_rule_append_declaration(orc1, "display", "block", 0);
-  ui_css_rule_append_declaration(orc1, "width", "200px",
-                                 0); /* Force overflow */
-  orc1->next = sheet->rules;
-  sheet->rules = orc1;
-
-  ui_layout_tree_generate(oroot, sheet, &lroot);
-  if (lroot) {
-    ui_layout_compute(lroot, 800, 600);
-    ui_layout_tree_destroy(lroot);
-  }
-
-  ui_css_stylesheet_destroy(sheet);
   {
-    ui_error_t rc_cleanup = ui_dom_node_destroy(root);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      return;
+    struct ui_dom_node *oroot, *oc1;
+    struct ui_css_rule *orule, *orc1;
+    ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &oroot);
+    ui_dom_node_set_tag_name(oroot, "div");
+    ui_dom_node_set_attribute(oroot, "class", "oroot");
+
+    ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &oc1);
+    ui_dom_node_set_tag_name(oc1, "div");
+    ui_dom_node_set_attribute(oc1, "class", "oc1");
+    ui_dom_node_append_child(oroot, oc1);
+
+    ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &orule);
+    ui_css_rule_append_selector(orule, UI_CSS_SELECTOR_TYPE_CLASS, "oroot");
+    ui_css_rule_append_declaration(orule, "display", "block", 0);
+    ui_css_rule_append_declaration(orule, "width", "100px", 0);
+    ui_css_rule_append_declaration(orule, "overflow-x", "scroll", 0);
+    orule->next = sheet->rules;
+    sheet->rules = orule;
+
+    ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &orc1);
+    ui_css_rule_append_selector(orc1, UI_CSS_SELECTOR_TYPE_CLASS, "oc1");
+    ui_css_rule_append_declaration(orc1, "display", "block", 0);
+    ui_css_rule_append_declaration(orc1, "width", "200px",
+                                   0); /* Force overflow */
+    orc1->next = sheet->rules;
+    sheet->rules = orc1;
+
+    ui_layout_tree_generate(oroot, sheet, &lroot);
+    if (lroot) {
+      ui_layout_compute(lroot, 800, 600);
+      ui_layout_tree_destroy(lroot);
     }
-  }
-  {
-    ui_error_t rc_cleanup = ui_dom_node_destroy(oroot);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      return;
+
+    ui_css_stylesheet_destroy(sheet);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(root);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        return;
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(oroot);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        return;
+      }
     }
   }
 }

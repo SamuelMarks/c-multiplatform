@@ -10,8 +10,10 @@
 #include <string.h>
 /* clang-format on */
 
+/** @brief CUPERTINO_PI macro definition. */
 #define CUPERTINO_PI 3.14159265358979323846f
 
+/** @brief cupertino_activity_rings_create function. */
 ui_error_t cupertino_activity_rings_create(
     struct ui_engine *engine,
     const struct cupertino_activity_rings_descriptor *desc,
@@ -70,6 +72,7 @@ ui_error_t cupertino_activity_rings_create(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_activity_rings_destroy function. */
 ui_error_t
 cupertino_activity_rings_destroy(struct cupertino_activity_rings *rings) {
   if (!rings) {
@@ -80,6 +83,7 @@ cupertino_activity_rings_destroy(struct cupertino_activity_rings *rings) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_activity_rings_set_progress function. */
 ui_error_t
 cupertino_activity_rings_set_progress(struct cupertino_activity_rings *rings,
                                       enum cupertino_ring_id ring,
@@ -93,6 +97,7 @@ cupertino_activity_rings_set_progress(struct cupertino_activity_rings *rings,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_activity_rings_get_progress function. */
 ui_error_t cupertino_activity_rings_get_progress(
     const struct cupertino_activity_rings *rings, enum cupertino_ring_id ring,
     float *out_progress) {
@@ -105,6 +110,7 @@ ui_error_t cupertino_activity_rings_get_progress(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_activity_rings_get_ring_radius function. */
 ui_error_t cupertino_activity_rings_get_ring_radius(
     const struct cupertino_activity_rings *rings, enum cupertino_ring_id ring,
     float *out_radius) {
@@ -120,6 +126,7 @@ ui_error_t cupertino_activity_rings_get_ring_radius(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_activity_rings_calculate_shadow function. */
 ui_error_t cupertino_activity_rings_calculate_shadow(
     const struct cupertino_activity_rings *rings, enum cupertino_ring_id ring,
     int *out_has_shadow, float *out_shadow_angle) {
@@ -143,6 +150,7 @@ ui_error_t cupertino_activity_rings_calculate_shadow(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_activity_rings_get_cap_center function. */
 ui_error_t cupertino_activity_rings_get_cap_center(
     const struct cupertino_activity_rings *rings, enum cupertino_ring_id ring,
     float *out_x, float *out_y) {
@@ -166,6 +174,7 @@ ui_error_t cupertino_activity_rings_get_cap_center(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_activity_rings_get_colors function. */
 ui_error_t cupertino_activity_rings_get_colors(
     const struct cupertino_activity_rings *rings, enum cupertino_ring_id ring,
     ui_color_t *out_start, ui_color_t *out_end, ui_color_t *out_track) {
@@ -180,6 +189,7 @@ ui_error_t cupertino_activity_rings_get_colors(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_activity_rings_get_dimensions function. */
 ui_error_t cupertino_activity_rings_get_dimensions(
     const struct cupertino_activity_rings *rings, float *out_width,
     float *out_height) {

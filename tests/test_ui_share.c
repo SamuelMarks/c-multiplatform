@@ -11,6 +11,8 @@ static int g_share_success = 0;
 
 static ui_error_t on_share_resolved(void *result_ptr, void *user_data,
                                     void **out_result) {
+  if (sizeof(out_result) == 0) {
+  }
   if (result_ptr) {
   }
   if (user_data) {
@@ -21,6 +23,8 @@ static ui_error_t on_share_resolved(void *result_ptr, void *user_data,
 
 static ui_error_t on_share_rejected(ui_error_t err, void *user_data,
                                     void **out_result) {
+  if (sizeof(out_result) == 0) {
+  }
   if (user_data) {
   }
   if (err != UI_ERROR_NONE) {

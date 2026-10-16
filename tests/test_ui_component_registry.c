@@ -9,6 +9,8 @@
 #include <assert.h>
 /* clang-format on */
 
+extern int g_component_registry_mock_fail;
+
 extern int g_malloc_fail_countdown;
 extern int g_mock_strcpy_fail;
 
@@ -482,7 +484,6 @@ int main(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_component_registry_mock_fail;
     const struct ui_component_vtable *vt = NULL;
     void *mock_inst = NULL;
     struct ui_dom_node *mock_node = NULL;

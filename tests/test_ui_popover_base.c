@@ -252,9 +252,9 @@ static int test_popover_nulls(void) {
   struct ui_dom_node *content = (struct ui_dom_node *)0x123;
   struct ui_overlay_director *director = (struct ui_overlay_director *)0x123;
   struct ui_focus_manager *focus_mgr = (struct ui_focus_manager *)0x123;
-  struct ui_layout_node trigger;
-  struct ui_anchor_config anchor;
-  struct ui_event ev;
+  struct ui_layout_node trigger = {0};
+  struct ui_anchor_config anchor = {0};
+  struct ui_event ev = {0};
   int is_open;
   struct ui_signal *sig = (struct ui_signal *)0x123;
   struct ui_computed *comp = NULL;
@@ -374,13 +374,15 @@ static int test_popover_oom_and_errors(void) {
   /* Fail dom node creation via malloc */
   for (i = 0; i < 20; i++) {
     g_malloc_fail_countdown = i;
-    ui_error_t rc =
-        ui_popover_base_open(popover, content_node, director, focus_mgr,
-                             &trigger, &anchor, 800, 600);
-    g_malloc_fail_countdown = -1;
-    if (rc == UI_ERROR_NONE) {
-      ui_popover_base_close(popover);
-      break;
+    {
+      ui_error_t rc =
+          ui_popover_base_open(popover, content_node, director, focus_mgr,
+                               &trigger, &anchor, 800, 600);
+      g_malloc_fail_countdown = -1;
+      if (rc == UI_ERROR_NONE) {
+        ui_popover_base_close(popover);
+        break;
+      }
     }
   }
 
@@ -431,7 +433,6 @@ static int test_popover_mock_failures(void) {
   struct ui_layout_node trigger;
   struct ui_anchor_config anchor;
   struct ui_focus_manager *focus_mgr = NULL;
-  ui_error_t rc;
 
   trigger.x = 100.0f;
   trigger.y = 100.0f;

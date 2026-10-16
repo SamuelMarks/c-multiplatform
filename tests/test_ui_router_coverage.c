@@ -1,3 +1,4 @@
+extern int g_malloc_fail_countdown;
 static ui_error_t cov_factory(const struct ui_route_request *req,
                               void *user_data,
                               struct ui_component **out_screen) {
@@ -13,7 +14,6 @@ void test_ui_router_coverage(void) {
   const char *path = NULL;
   void *state = NULL;
   int i;
-  extern int g_malloc_fail_countdown;
 
   ui_router_create(&router);
   if (router) {

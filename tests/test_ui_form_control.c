@@ -9,12 +9,29 @@
 #include <string.h>
 #include <assert.h>
 #ifndef _WIN32
+#include <sys/select.h>
+#include <sys/time.h>
 #include <unistd.h>
 #else
 __declspec(dllimport) void __stdcall Sleep(unsigned long dwMilliseconds);
-#define usleep(x) Sleep((x)/1000)
 #endif
 /* clang-format on */
+
+static void test_usleep(unsigned long usec) {
+#ifdef _WIN32
+  Sleep(usec / 1000UL);
+#else
+  struct timeval tv;
+  tv.tv_sec = (long)(usec / 1000000UL);
+  tv.tv_usec = (long)(usec % 1000000UL);
+  if (select(0, NULL, NULL, NULL, &tv) < 0) {
+  }
+#endif
+}
+#define usleep(x) test_usleep((unsigned long)(x))
+
+extern int g_malloc_fail_countdown;
+extern int g_mock_strcpy_fail;
 
 extern int g_malloc_fail_countdown;
 
@@ -24,20 +41,6 @@ static ui_error_t dummy_async_valid(struct ui_form_control *control,
 static ui_error_t dummy_async_err(struct ui_form_control *control,
                                   union ui_signal_payload value,
                                   void *user_data, ui_bool_t *out_is_valid);
-
-static ui_error_t sync_validator_err_true_again(struct ui_form_control *control,
-                                                union ui_signal_payload value,
-                                                void *user_data,
-                                                ui_bool_t *out_is_valid) {
-  if (control) {
-  }
-  if (user_data) {
-  }
-  *out_is_valid = UI_TRUE;
-  if (value.int_val == 999)
-    return UI_ERROR_UNKNOWN;
-  return UI_ERROR_NONE;
-}
 
 static ui_error_t sync_validator_err_true(struct ui_form_control *control,
                                           union ui_signal_payload value,
@@ -53,24 +56,12 @@ static ui_error_t sync_validator_err_true(struct ui_form_control *control,
   return UI_ERROR_NONE;
 }
 
-static ui_error_t
-sync_validator_err_false_again(struct ui_form_control *control,
-                               union ui_signal_payload value, void *user_data,
-                               ui_bool_t *out_is_valid) {
-  if (control) {
-  }
-  if (user_data) {
-  }
-  *out_is_valid = UI_FALSE;
-  if (value.int_val == 996)
-    return UI_ERROR_NONE;
-  return UI_ERROR_NONE;
-}
-
 static ui_error_t sync_validator_err_false(struct ui_form_control *control,
                                            union ui_signal_payload value,
                                            void *user_data,
                                            ui_bool_t *out_is_valid) {
+  if (sizeof(value) == 0) {
+  }
   if (control) {
   }
   if (user_data) {
@@ -180,7 +171,6 @@ static void run_cva_and_edge_tests(void) {
   union ui_signal_payload init_val;
   union ui_signal_payload test_val;
   ui_error_t rc;
-  extern int g_malloc_fail_countdown;
 
   init_val.int_val = 42;
   test_val.int_val = 99;
@@ -292,7 +282,6 @@ static void run_cva_and_edge_tests(void) {
   assert(rc == UI_ERROR_OUT_OF_MEMORY);
   g_malloc_fail_countdown = -1;
   {
-    extern int g_mock_strcpy_fail;
     g_mock_strcpy_fail = 1;
     rc = ui_form_control_set_error(control, "strcpy fail");
     assert(rc == UI_ERROR_UNKNOWN);
@@ -409,65 +398,67 @@ static int run_extra_control(void) {
 
   ui_form_control_add_async_validator(control, dummy_async_err, NULL, pool,
                                       reactor);
-  union ui_signal_payload diff_val = {0};
-  diff_val.int_val = 99;
-  ui_form_control_set_value(control, diff_val);
   {
-    int iter;
-    for (iter = 0; iter < 50; ++iter) {
-      ui_thread_pool_tick(pool);
-      ui_reactor_poll(reactor, 10);
-      usleep(2000);
+    union ui_signal_payload diff_val = {0};
+    diff_val.int_val = 99;
+    ui_form_control_set_value(control, diff_val);
+    {
+      int iter;
+      for (iter = 0; iter < 50; ++iter) {
+        ui_thread_pool_tick(pool);
+        ui_reactor_poll(reactor, 10);
+        usleep(2000);
+      }
     }
-  }
 
-  ui_form_control_add_async_validator(control, dummy_async_valid, NULL, pool,
-                                      NULL);
+    ui_form_control_add_async_validator(control, dummy_async_valid, NULL, pool,
+                                        NULL);
 
-  ui_form_control_create(NULL, dummy, 0, NULL, NULL, 0, NULL);
-  ui_form_control_create(arena, dummy, 0, NULL, NULL, 0, NULL);
-  ui_form_control_create(NULL, dummy, 0, NULL, NULL, 0, &control);
-  ui_form_control_create(arena, dummy, 0, NULL, NULL, 0, NULL);
-  ui_form_control_add_validator(NULL, NULL, NULL);
-  ui_form_control_add_validator(control, NULL, NULL);
-  ui_form_control_add_async_validator(NULL, NULL, NULL, NULL, NULL);
-  ui_form_control_add_async_validator(control, NULL, NULL, pool, reactor);
-  ui_form_control_add_async_validator(control, dummy_async_valid, NULL, NULL,
-                                      reactor);
-  ui_form_control_set_value(NULL, dummy);
-  ui_form_control_mark_as_touched(NULL);
-  ui_form_control_disable(NULL);
-  ui_form_control_enable(NULL);
-  ui_form_control_get_value_signal(NULL, NULL);
-  ui_form_control_get_status_signal(NULL, NULL);
-  ui_form_control_get_touched_signal(NULL, NULL);
-  ui_form_control_get_dirty_signal(NULL, NULL);
-  ui_form_control_get_errors_signal(NULL, NULL);
-  ui_form_control_set_error(NULL, NULL);
-  {
-    ui_error_t rc_cleanup = ui_form_control_destroy(NULL);
-    if (rc_cleanup != UI_ERROR_INVALID_ARGUMENT) {
-      return 1;
+    ui_form_control_create(NULL, dummy, 0, NULL, NULL, 0, NULL);
+    ui_form_control_create(arena, dummy, 0, NULL, NULL, 0, NULL);
+    ui_form_control_create(NULL, dummy, 0, NULL, NULL, 0, &control);
+    ui_form_control_create(arena, dummy, 0, NULL, NULL, 0, NULL);
+    ui_form_control_add_validator(NULL, NULL, NULL);
+    ui_form_control_add_validator(control, NULL, NULL);
+    ui_form_control_add_async_validator(NULL, NULL, NULL, NULL, NULL);
+    ui_form_control_add_async_validator(control, NULL, NULL, pool, reactor);
+    ui_form_control_add_async_validator(control, dummy_async_valid, NULL, NULL,
+                                        reactor);
+    ui_form_control_set_value(NULL, dummy);
+    ui_form_control_mark_as_touched(NULL);
+    ui_form_control_disable(NULL);
+    ui_form_control_enable(NULL);
+    ui_form_control_get_value_signal(NULL, NULL);
+    ui_form_control_get_status_signal(NULL, NULL);
+    ui_form_control_get_touched_signal(NULL, NULL);
+    ui_form_control_get_dirty_signal(NULL, NULL);
+    ui_form_control_get_errors_signal(NULL, NULL);
+    ui_form_control_set_error(NULL, NULL);
+    {
+      ui_error_t rc_cleanup = ui_form_control_destroy(NULL);
+      if (rc_cleanup != UI_ERROR_INVALID_ARGUMENT) {
+        return 1;
+      }
     }
-  }
 
-  ui_thread_pool_destroy(pool);
-  ui_reactor_poll(reactor, 10);
-  {
-    ui_error_t rc_cleanup = ui_form_control_destroy(control);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      return 1;
+    ui_thread_pool_destroy(pool);
+    ui_reactor_poll(reactor, 10);
+    {
+      ui_error_t rc_cleanup = ui_form_control_destroy(control);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        return 1;
+      }
     }
-  }
-  ui_reactor_destroy(reactor);
-  {
-    ui_error_t rc_cleanup = ui_arena_destroy(arena);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      return 1;
+    ui_reactor_destroy(reactor);
+    {
+      ui_error_t rc_cleanup = ui_arena_destroy(arena);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        return 1;
+      }
     }
-  }
 
-  return 0;
+    return 0;
+  }
 }
 
 static int run_extra_control2_all(void) {
@@ -1036,6 +1027,8 @@ int main(void) {
   }
 
   rc = ui_form_control_mark_as_touched(control);
+  if (rc != UI_ERROR_NONE)
+    return 1;
 
   ui_thread_pool_destroy(pool);
   ui_reactor_poll(reactor, 10);
@@ -1087,7 +1080,6 @@ int main(void) {
       ui_form_control_t *control_oom = NULL;
       union ui_signal_payload dummy;
       ui_error_t rc_oom;
-      extern int g_malloc_fail_countdown;
 
       g_malloc_fail_countdown = -1;
       dummy.int_val = 0;

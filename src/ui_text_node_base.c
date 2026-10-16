@@ -238,6 +238,7 @@ struct ui_text_node_base {
   struct ui_signal *text_signal; /**< text_signal */
 };
 
+/** @brief ui_text_node_base_create function. */
 ui_error_t ui_text_node_base_create(struct ui_text_node_base **out_node) {
   ui_error_t rc;
   ui_error_t rc_cleanup;
@@ -307,6 +308,7 @@ ui_error_t ui_text_node_base_create(struct ui_text_node_base **out_node) {
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_text_node_base_destroy function. */
 ui_error_t ui_text_node_base_destroy(struct ui_text_node_base *node) {
   ui_error_t rc = UI_ERROR_NONE;
   ui_error_t rc_cleanup;
@@ -340,6 +342,7 @@ ui_error_t ui_text_node_base_destroy(struct ui_text_node_base *node) {
   return rc;
 }
 
+/** @brief ui_text_node_base_set_text function. */
 ui_error_t ui_text_node_base_set_text(struct ui_text_node_base *node,
                                       const char *text) {
   if (!node)
@@ -354,6 +357,7 @@ ui_error_t ui_text_node_base_set_text(struct ui_text_node_base *node,
   return (node->text ? UI_ERROR_NONE : UI_ERROR_OUT_OF_MEMORY);
 }
 
+/** @brief ui_text_node_base_get_text function. */
 ui_error_t ui_text_node_base_get_text(const struct ui_text_node_base *node,
                                       const char **out_text) {
   if (!node || !out_text)
@@ -362,6 +366,7 @@ ui_error_t ui_text_node_base_get_text(const struct ui_text_node_base *node,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_text_node_base_set_font_manager function. */
 ui_error_t
 ui_text_node_base_set_font_manager(struct ui_text_node_base *node,
                                    struct ui_font_manager *font_manager) {
@@ -371,6 +376,7 @@ ui_text_node_base_set_font_manager(struct ui_text_node_base *node,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_text_node_base_set_font_family function. */
 ui_error_t ui_text_node_base_set_font_family(struct ui_text_node_base *node,
                                              const char *family) {
   if (!node)
@@ -385,6 +391,7 @@ ui_error_t ui_text_node_base_set_font_family(struct ui_text_node_base *node,
   return (node->font_family ? UI_ERROR_NONE : UI_ERROR_OUT_OF_MEMORY);
 }
 
+/** @brief ui_text_node_base_set_font_size function. */
 ui_error_t ui_text_node_base_set_font_size(struct ui_text_node_base *node,
                                            float size) {
   if (!node)
@@ -393,6 +400,7 @@ ui_error_t ui_text_node_base_set_font_size(struct ui_text_node_base *node,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_text_node_base_set_max_width function. */
 ui_error_t ui_text_node_base_set_max_width(struct ui_text_node_base *node,
                                            float max_width) {
   if (!node)
@@ -401,6 +409,7 @@ ui_error_t ui_text_node_base_set_max_width(struct ui_text_node_base *node,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_text_node_base_set_max_lines function. */
 ui_error_t ui_text_node_base_set_max_lines(struct ui_text_node_base *node,
                                            int max_lines) {
   if (!node)
@@ -409,6 +418,7 @@ ui_error_t ui_text_node_base_set_max_lines(struct ui_text_node_base *node,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_text_node_base_set_overflow function. */
 ui_error_t ui_text_node_base_set_overflow(struct ui_text_node_base *node,
                                           enum ui_text_node_overflow overflow) {
   if (!node)
@@ -451,6 +461,7 @@ static ui_error_t update_dom_text(struct ui_text_node_base *node,
   return ui_dom_node_set_text_content(text_node, text);
 }
 
+/** @brief ui_text_node_base_update_layout function. */
 ui_error_t ui_text_node_base_update_layout(struct ui_text_node_base *node) {
   struct ui_font *font = NULL;
   ui_error_t rc = UI_ERROR_NONE;
@@ -543,6 +554,7 @@ ui_error_t ui_text_node_base_update_layout(struct ui_text_node_base *node) {
   return update_dom_text(node, node->text);
 }
 
+/** @brief ui_text_node_base_get_layout function. */
 ui_error_t ui_text_node_base_get_layout(struct ui_text_node_base *node,
                                         struct ui_text_layout **out_layout) {
   if (!node || !out_layout)
@@ -551,6 +563,7 @@ ui_error_t ui_text_node_base_get_layout(struct ui_text_node_base *node,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_text_node_base_get_component function. */
 ui_error_t
 ui_text_node_base_get_component(struct ui_text_node_base *node,
                                 struct ui_component **out_component) {
@@ -561,6 +574,7 @@ ui_text_node_base_get_component(struct ui_text_node_base *node,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_text_node_base_bind_text function. */
 ui_error_t ui_text_node_base_bind_text(struct ui_text_node_base *widget,
                                        struct ui_signal *signal) {
   if (!widget) {

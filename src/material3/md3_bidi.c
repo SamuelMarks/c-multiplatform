@@ -11,6 +11,7 @@
 #include <string.h>
 /* clang-format on */
 
+/** @brief md3_bidi_set_direction function. */
 ui_error_t md3_bidi_set_direction(enum ui_bidi_direction direction) {
   if (direction != UI_BIDI_DIR_LTR && direction != UI_BIDI_DIR_RTL) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -19,6 +20,7 @@ ui_error_t md3_bidi_set_direction(enum ui_bidi_direction direction) {
   return ui_bidi_set_direction(direction);
 }
 
+/** @brief md3_bidi_get_direction function. */
 ui_error_t md3_bidi_get_direction(enum ui_bidi_direction *out_dir) {
   if (!out_dir) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -27,6 +29,7 @@ ui_error_t md3_bidi_get_direction(enum ui_bidi_direction *out_dir) {
   return ui_bidi_get_direction(out_dir);
 }
 
+/** @brief md3_bidi_resolve_logical_margin function. */
 ui_error_t md3_bidi_resolve_logical_margin(float start, float end,
                                            enum ui_bidi_direction dir,
                                            float *out_left, float *out_right) {
@@ -45,6 +48,7 @@ ui_error_t md3_bidi_resolve_logical_margin(float start, float end,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_bidi_resolve_logical_padding function. */
 ui_error_t md3_bidi_resolve_logical_padding(float start, float end,
                                             enum ui_bidi_direction dir,
                                             float *out_left, float *out_right) {
@@ -63,6 +67,7 @@ ui_error_t md3_bidi_resolve_logical_padding(float start, float end,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_bidi_resolve_logical_inset function. */
 ui_error_t md3_bidi_resolve_logical_inset(float start, float end,
                                           enum ui_bidi_direction dir,
                                           float *out_left, float *out_right) {
@@ -81,6 +86,7 @@ ui_error_t md3_bidi_resolve_logical_inset(float start, float end,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_bidi_should_mirror_icon function. */
 ui_error_t md3_bidi_should_mirror_icon(const char *icon_name,
                                        enum ui_bidi_direction dir,
                                        int *out_should_mirror) {
@@ -133,6 +139,7 @@ ui_error_t md3_bidi_should_mirror_icon(const char *icon_name,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_bidi_get_fallback_font_family function. */
 ui_error_t md3_bidi_get_fallback_font_family(const char *script,
                                              const char **out_font_family) {
   if (!script || !out_font_family) {
@@ -154,6 +161,7 @@ ui_error_t md3_bidi_get_fallback_font_family(const char *script,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_bidi_get_script_line_height_multiplier function. */
 ui_error_t md3_bidi_get_script_line_height_multiplier(const char *script,
                                                       float *out_multiplier) {
   if (!script || !out_multiplier) {
@@ -173,6 +181,7 @@ ui_error_t md3_bidi_get_script_line_height_multiplier(const char *script,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_i18n_format_eastern_arabic_numerals function. */
 ui_error_t md3_i18n_format_eastern_arabic_numerals(int number, char *out_buf,
                                                    size_t buf_size) {
   char temp[32];
@@ -194,7 +203,7 @@ ui_error_t md3_i18n_format_eastern_arabic_numerals(int number, char *out_buf,
 #if defined(_MSC_VER)
   sprintf_s(temp, sizeof(temp), "%u", val);
 #else
-  snprintf(temp, sizeof(temp), "%u", val);
+  sprintf(temp, "%u", val);
 #endif
 
   len = strlen(temp);
@@ -218,6 +227,7 @@ ui_error_t md3_i18n_format_eastern_arabic_numerals(int number, char *out_buf,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_i18n_format_localized_decimal function. */
 ui_error_t md3_i18n_format_localized_decimal(double number, int decimals,
                                              const char *locale, char *out_buf,
                                              size_t buf_size) {
@@ -241,7 +251,7 @@ ui_error_t md3_i18n_format_localized_decimal(double number, int decimals,
 #if defined(_MSC_VER)
   sprintf_s(temp, sizeof(temp), "%.*f", decimals, number);
 #else
-  snprintf(temp, sizeof(temp), "%.*f", decimals, number);
+  sprintf(temp, "%.*f", decimals, number);
 #endif
 
   for (i = 0; temp[i] != '\0'; ++i) {
@@ -260,6 +270,7 @@ ui_error_t md3_i18n_format_localized_decimal(double number, int decimals,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_calendar_convert_from_gregorian function. */
 ui_error_t
 md3_calendar_convert_from_gregorian(int g_year, int g_month, int g_day,
                                     enum md3_calendar_type target_type,
@@ -321,6 +332,7 @@ md3_calendar_convert_from_gregorian(int g_year, int g_month, int g_day,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_i18n_get_plural_form function. */
 ui_error_t md3_i18n_get_plural_form(int count, const char *locale,
                                     enum md3_plural_form *out_form) {
   int n;

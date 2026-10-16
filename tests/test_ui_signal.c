@@ -10,6 +10,9 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_signal_mock_graph_get_node_fail;
+extern int g_signal_mock_cas_fail;
+
 static ui_error_t mock_update(union ui_signal_payload cur,
                               union ui_signal_payload *out) {
   out->int_val = cur.int_val + 1;
@@ -118,6 +121,7 @@ static ui_error_t notify_cb(void *user_data) {
   return UI_ERROR_NONE;
 }
 
+#ifndef UI_SINGLE_THREADED
 ui_atomic_t test_sync = 0;
 static ui_error_t unlock_task(void *user_data) {
   ui_signal_t *sig = (ui_signal_t *)user_data;
@@ -131,6 +135,7 @@ static ui_error_t unlock_task(void *user_data) {
   }
   return ui_atomic_store(&sig->lock, 0);
 }
+#endif
 
 static int test_signal(void) {
   ui_signal_t *sig = NULL;
@@ -617,7 +622,6 @@ int main(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_signal_mock_graph_get_node_fail;
     struct ui_signal *g_sig = NULL;
     union ui_signal_payload val;
     union ui_signal_payload out_val;
@@ -632,6 +636,22 @@ int main(void) {
     rc = ui_signal_get(g_sig, &out_val);
     assert(rc == UI_ERROR_UNKNOWN);
     g_signal_mock_graph_get_node_fail = 0;
+
+    rc = ui_signal_destroy(g_sig);
+    assert(rc == UI_ERROR_NONE);
+
+    rc = ui_signal_create(NULL, val, UI_SIGNAL_TYPE_INT32, NULL, NULL,
+                          UI_SIGNAL_MODE_MULTI_THREADED, &g_sig);
+    assert(rc == UI_ERROR_NONE);
+
+    g_signal_mock_cas_fail = 1;
+    rc = ui_signal_get(g_sig, &out_val);
+    assert(rc == UI_ERROR_UNKNOWN);
+    rc = ui_signal_set(g_sig, val);
+    assert(rc == UI_ERROR_UNKNOWN);
+    rc = ui_signal_update(g_sig, upd_fn);
+    assert(rc == UI_ERROR_UNKNOWN);
+    g_signal_mock_cas_fail = 0;
 
     rc = ui_signal_destroy(g_sig);
     assert(rc == UI_ERROR_NONE);

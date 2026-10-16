@@ -208,6 +208,7 @@ static void *ui_worker_thread(void *arg) {
 #endif
 #endif
 
+/** @brief ui_thread_pool_create function. */
 ui_error_t ui_thread_pool_create(int num_threads,
                                  struct ui_thread_pool **out_pool) {
   ui_error_t rc = UI_ERROR_NONE;
@@ -364,6 +365,7 @@ cleanup:
   return rc;
 }
 
+/** @brief ui_thread_pool_destroy function. */
 ui_error_t ui_thread_pool_destroy(struct ui_thread_pool *pool) {
 #ifndef UI_SINGLE_THREADED
   int i;
@@ -414,6 +416,7 @@ ui_error_t ui_thread_pool_destroy(struct ui_thread_pool *pool) {
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_thread_pool_schedule function. */
 ui_error_t ui_thread_pool_schedule(struct ui_thread_pool *pool,
                                    ui_error_t (*callback)(void *),
                                    void *user_data) {
@@ -463,6 +466,7 @@ ui_error_t ui_thread_pool_schedule(struct ui_thread_pool *pool,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_thread_pool_tick function. */
 ui_error_t ui_thread_pool_tick(struct ui_thread_pool *pool) {
   ui_error_t tick_rc = UI_ERROR_NONE;
   if (!pool)

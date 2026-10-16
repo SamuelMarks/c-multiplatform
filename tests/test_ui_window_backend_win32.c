@@ -39,11 +39,27 @@ int main(void) {
     failed |= (backend->swap_buffers(NULL, win) != UI_ERROR_INVALID_ARGUMENT);
 
     printf("Creating window...\n");
-    if (getenv("WINELOADER") != NULL) {
-      printf("Skipping actual window creation under Wine CI.\n");
-      rc = ui_window_backend_win32_destroy(backend);
-      failed |= (rc != UI_ERROR_NONE);
-      return failed;
+    {
+      int is_wine = 0;
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+      char *wine_env = NULL;
+      size_t wine_len = 0;
+      if (_dupenv_s(&wine_env, &wine_len, "WINELOADER") == 0 &&
+          wine_env != NULL) {
+        is_wine = 1;
+        free(wine_env);
+      }
+#else
+      if (getenv("WINELOADER") != NULL) {
+        is_wine = 1;
+      }
+#endif
+      if (is_wine) {
+        printf("Skipping actual window creation under Wine CI.\n");
+        rc = ui_window_backend_win32_destroy(backend);
+        failed |= (rc != UI_ERROR_NONE);
+        return failed;
+      }
     }
     rc = backend->create_window(backend, "Test Window", 800, 600, &win);
     failed |= (rc != UI_ERROR_NONE);

@@ -13,11 +13,13 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
+/** @brief CUPERTINO_SPELL_CHECK_MAX_SUGGESTIONS constant. */
 #define CUPERTINO_SPELL_CHECK_MAX_SUGGESTIONS 5
+/** @brief CUPERTINO_SPELL_CHECK_TOOLBAR_HEIGHT constant. */
 #define CUPERTINO_SPELL_CHECK_TOOLBAR_HEIGHT 44.0f
 
 /**

@@ -15,12 +15,15 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
+/** @brief CUPERTINO_COLLECTION_VIEW_MAX_SECTIONS constant. */
 #define CUPERTINO_COLLECTION_VIEW_MAX_SECTIONS 16
+/** @brief CUPERTINO_COLLECTION_VIEW_MAX_ITEMS_PER_GROUP constant. */
 #define CUPERTINO_COLLECTION_VIEW_MAX_ITEMS_PER_GROUP 16
+/** @brief CUPERTINO_COLLECTION_VIEW_MAX_GROUPS_PER_SECTION constant. */
 #define CUPERTINO_COLLECTION_VIEW_MAX_GROUPS_PER_SECTION 16
 
 /**
@@ -283,6 +286,6 @@ cupertino_collection_view_get_item_layout(
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* CUPERTINO_CUPERTINO_COLLECTION_VIEW_H */

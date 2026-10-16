@@ -15,6 +15,7 @@
 
 /* \brief ui_error
  */
+/** @brief ui_css_stylesheet_create function. */
 ui_error_t ui_css_stylesheet_create(struct ui_css_stylesheet **out_stylesheet) {
   struct ui_css_stylesheet *sheet;
 
@@ -38,6 +39,7 @@ ui_error_t ui_css_stylesheet_create(struct ui_css_stylesheet **out_stylesheet) {
 
 /* \brief ui_error
  */
+/** @brief ui_css_stylesheet_register_namespace function. */
 ui_error_t
 ui_css_stylesheet_register_namespace(struct ui_css_stylesheet *stylesheet,
                                      const char *prefix, const char *uri) {
@@ -114,11 +116,7 @@ ui_error_t ui_css_stylesheet_destroy(struct ui_css_stylesheet *stylesheet) {
   rule = stylesheet->rules;
   while (rule) {
     next_rule = rule->next;
-    {
-      ui_error_t _rc_d = ui_css_rule_destroy(rule);
-      if (_rc_d != UI_ERROR_NONE)
-        return _rc_d;
-    }
+    ui_css_rule_destroy(rule);
     rule = next_rule;
   }
 
@@ -146,6 +144,7 @@ ui_error_t ui_css_stylesheet_destroy(struct ui_css_stylesheet *stylesheet) {
 
 /* \brief ui_error
  */
+/** @brief ui_css_stylesheet_append_rule function. */
 ui_error_t ui_css_stylesheet_append_rule(struct ui_css_stylesheet *stylesheet,
                                          struct ui_css_rule *rule) {
   struct ui_css_rule *curr;
@@ -168,6 +167,7 @@ ui_error_t ui_css_stylesheet_append_rule(struct ui_css_stylesheet *stylesheet,
 
 /* \brief ui_error
  */
+/** @brief ui_css_stylesheet_register_layer function. */
 ui_error_t
 ui_css_stylesheet_register_layer(struct ui_css_stylesheet *stylesheet,
                                  const char *name, int *out_order) {
@@ -285,11 +285,7 @@ ui_error_t ui_css_selector_destroy(struct ui_css_selector *sel) {
       C_MULTIPLATFORM_FREE(sel->attr_value);
     }
     if (sel->nested_selector) {
-      {
-        ui_error_t _rc_d = ui_css_selector_destroy(sel->nested_selector);
-        if (_rc_d != UI_ERROR_NONE)
-          return _rc_d;
-      }
+      ui_css_selector_destroy(sel->nested_selector);
     }
     C_MULTIPLATFORM_FREE(sel);
     sel = next_sel;
@@ -313,11 +309,7 @@ ui_error_t ui_css_rule_destroy(struct ui_css_rule *rule) {
   }
 
   if (rule->type == UI_CSS_RULE_TYPE_STYLE) {
-    {
-      ui_error_t _rc_d = ui_css_selector_destroy(rule->selectors);
-      if (_rc_d != UI_ERROR_NONE)
-        return _rc_d;
-    }
+    ui_css_selector_destroy(rule->selectors);
 
     decl = rule->declarations;
     while (decl) {
@@ -330,11 +322,7 @@ ui_error_t ui_css_rule_destroy(struct ui_css_rule *rule) {
     nested = rule->nested_rules;
     while (nested) {
       next_nested = nested->next;
-      {
-        ui_error_t _rc_d = ui_css_rule_destroy(nested);
-        if (_rc_d != UI_ERROR_NONE)
-          return _rc_d;
-      }
+      ui_css_rule_destroy(nested);
       nested = next_nested;
     }
   } else if (rule->type == UI_CSS_RULE_TYPE_MEDIA) {
@@ -342,11 +330,7 @@ ui_error_t ui_css_rule_destroy(struct ui_css_rule *rule) {
     nested = rule->nested_rules;
     while (nested) {
       next_nested = nested->next;
-      {
-        ui_error_t _rc_d = ui_css_rule_destroy(nested);
-        if (_rc_d != UI_ERROR_NONE)
-          return _rc_d;
-      }
+      ui_css_rule_destroy(nested);
       nested = next_nested;
     }
   } else if (rule->type == UI_CSS_RULE_TYPE_LAYER) {
@@ -354,36 +338,20 @@ ui_error_t ui_css_rule_destroy(struct ui_css_rule *rule) {
     nested = rule->nested_rules;
     while (nested) {
       next_nested = nested->next;
-      {
-        ui_error_t _rc_d = ui_css_rule_destroy(nested);
-        if (_rc_d != UI_ERROR_NONE)
-          return _rc_d;
-      }
+      ui_css_rule_destroy(nested);
       nested = next_nested;
     }
   } else if (rule->type == UI_CSS_RULE_TYPE_SCOPE) {
     if (rule->scope_start) {
-      {
-        ui_error_t _rc_d = ui_css_selector_destroy(rule->scope_start);
-        if (_rc_d != UI_ERROR_NONE)
-          return _rc_d;
-      }
+      ui_css_selector_destroy(rule->scope_start);
     }
     if (rule->scope_end) {
-      {
-        ui_error_t _rc_d = ui_css_selector_destroy(rule->scope_end);
-        if (_rc_d != UI_ERROR_NONE)
-          return _rc_d;
-      }
+      ui_css_selector_destroy(rule->scope_end);
     }
     nested = rule->nested_rules;
     while (nested) {
       next_nested = nested->next;
-      {
-        ui_error_t _rc_d = ui_css_rule_destroy(nested);
-        if (_rc_d != UI_ERROR_NONE)
-          return _rc_d;
-      }
+      ui_css_rule_destroy(nested);
       nested = next_nested;
     }
   } else if (rule->type == UI_CSS_RULE_TYPE_SUPPORTS) {
@@ -391,11 +359,7 @@ ui_error_t ui_css_rule_destroy(struct ui_css_rule *rule) {
     nested = rule->nested_rules;
     while (nested) {
       next_nested = nested->next;
-      {
-        ui_error_t _rc_d = ui_css_rule_destroy(nested);
-        if (_rc_d != UI_ERROR_NONE)
-          return _rc_d;
-      }
+      ui_css_rule_destroy(nested);
       nested = next_nested;
     }
   } else if (rule->type == UI_CSS_RULE_TYPE_CONTAINER) {
@@ -403,11 +367,7 @@ ui_error_t ui_css_rule_destroy(struct ui_css_rule *rule) {
     nested = rule->nested_rules;
     while (nested) {
       next_nested = nested->next;
-      {
-        ui_error_t _rc_d = ui_css_rule_destroy(nested);
-        if (_rc_d != UI_ERROR_NONE)
-          return _rc_d;
-      }
+      ui_css_rule_destroy(nested);
       nested = next_nested;
     }
   } else if (rule->type == UI_CSS_RULE_TYPE_PROPERTY) {
@@ -476,6 +436,7 @@ ui_error_t ui_css_rule_append_selector(struct ui_css_rule *rule,
 
 /* \brief ui_css_rule_append_selector_attr
  */
+/** @brief ui_css_rule_append_selector_attr function. */
 ui_error_t ui_css_rule_append_selector_attr(struct ui_css_rule *rule,
                                             const char *attr_name,
                                             enum ui_css_attr_operator attr_op,
@@ -604,9 +565,8 @@ ui_error_t ui_css_rule_append_declaration(struct ui_css_rule *rule,
  * @param out_matched Parameter out_matched.
  * @return Return value.
  */
-static ui_error_t class_list_contains(const char *class_list,
-                                      const char *class_name,
-                                      int *out_matched) {
+static void class_list_contains(const char *class_list, const char *class_name,
+                                int *out_matched) {
   const char *p;
   size_t len;
 
@@ -621,14 +581,13 @@ static ui_error_t class_list_contains(const char *class_list,
         (p[len] == ' ' || p[len] == '\t' || p[len] == '\r' || p[len] == '\n' ||
          p[len] == '\0')) {
       *out_matched = 1;
-      return UI_ERROR_NONE;
+      return;
     }
     while (*p && *p != ' ' && *p != '\t' && *p != '\r' && *p != '\n') {
       p++;
     }
   }
   *out_matched = 0;
-  return UI_ERROR_NONE;
 }
 
 /**
@@ -720,7 +679,8 @@ static ui_error_t attribute_matches(const struct ui_css_selector *selector,
     *out_matched = (strcmp(attr_val, selector->attr_value) == 0);
     return UI_ERROR_NONE;
   case UI_CSS_ATTR_OP_INCLUDES: {
-    return class_list_contains(attr_val, selector->attr_value, out_matched);
+    class_list_contains(attr_val, selector->attr_value, out_matched);
+    return UI_ERROR_NONE;
   }
   case UI_CSS_ATTR_OP_DASH: {
     return string_dash_match(attr_val, selector->attr_value, out_matched);
@@ -740,36 +700,29 @@ static ui_error_t attribute_matches(const struct ui_css_selector *selector,
   }
 }
 
-static ui_error_t selector_matches(const struct ui_css_selector *selector,
-                                   const struct ui_dom_node *node,
-                                   int *out_matched);
+static void selector_matches(const struct ui_css_selector *selector,
+                             const struct ui_dom_node *node, int *out_matched);
 
 /**
  * @brief any_selector_matches.
  * @param selectors_list Parameter selectors_list.
  * @param node Parameter node.
  * @param out_matched Parameter out_matched.
- * @return Return value.
  */
-static ui_error_t
-any_selector_matches(const struct ui_css_selector *selectors_list,
-                     const struct ui_dom_node *node, int *out_matched) {
+static void any_selector_matches(const struct ui_css_selector *selectors_list,
+                                 const struct ui_dom_node *node,
+                                 int *out_matched) {
   const struct ui_css_selector *curr = selectors_list;
   while (curr) {
     int m = 0;
-    {
-      ui_error_t _rc_p = selector_matches(curr, node, &m);
-      if (_rc_p != UI_ERROR_NONE)
-        return _rc_p;
-    }
+    selector_matches(curr, node, &m);
     if (m) {
       *out_matched = 1;
-      return UI_ERROR_NONE;
+      return;
     }
     curr = curr->next;
   }
   *out_matched = 0;
-  return UI_ERROR_NONE;
 }
 
 /**
@@ -777,38 +730,28 @@ any_selector_matches(const struct ui_css_selector *selectors_list,
  * @param selectors_list Parameter selectors_list.
  * @param node Parameter node.
  * @param out_matched Parameter out_matched.
- * @return Return value.
  */
-static ui_error_t
+static void
 has_matching_descendant(const struct ui_css_selector *selectors_list,
                         const struct ui_dom_node *node, int *out_matched) {
   const struct ui_dom_node *child = node->first_child;
   while (child) {
     if (child->type == UI_DOM_NODE_TYPE_ELEMENT) {
       int m = 0;
-      {
-        ui_error_t _rc_p = any_selector_matches(selectors_list, child, &m);
-        if (_rc_p != UI_ERROR_NONE)
-          return _rc_p;
-      }
+      any_selector_matches(selectors_list, child, &m);
       if (m) {
         *out_matched = 1;
-        return UI_ERROR_NONE;
+        return;
       }
-      {
-        ui_error_t _rc_p = has_matching_descendant(selectors_list, child, &m);
-        if (_rc_p != UI_ERROR_NONE)
-          return _rc_p;
-      }
+      has_matching_descendant(selectors_list, child, &m);
       if (m) {
         *out_matched = 1;
-        return UI_ERROR_NONE;
+        return;
       }
     }
     child = child->next_sibling;
   }
   *out_matched = 0;
-  return UI_ERROR_NONE;
 }
 
 /**
@@ -829,12 +772,10 @@ static ui_error_t cssom_get_attr(const struct ui_dom_node *node,
  * @param scope_end Parameter scope_end.
  * @param node Parameter node.
  * @param out_matched Parameter out_matched.
- * @return Return value.
  */
-static ui_error_t is_in_scope(const struct ui_css_selector *scope_start,
-                              const struct ui_css_selector *scope_end,
-                              const struct ui_dom_node *node,
-                              int *out_matched) {
+static void is_in_scope(const struct ui_css_selector *scope_start,
+                        const struct ui_css_selector *scope_end,
+                        const struct ui_dom_node *node, int *out_matched) {
   const struct ui_dom_node *curr;
   int start_matched = 0;
   int end_matched = 0;
@@ -846,22 +787,14 @@ static ui_error_t is_in_scope(const struct ui_css_selector *scope_start,
     if (1) {
       if (scope_end) {
         int m = 0;
-        {
-          ui_error_t _rc_p = any_selector_matches(scope_end, curr, &m);
-          if (_rc_p != UI_ERROR_NONE)
-            return _rc_p;
-        }
+        any_selector_matches(scope_end, curr, &m);
         if (m) {
           end_matched = 1;
         }
       }
       if (scope_start) {
         int m = 0;
-        {
-          ui_error_t _rc_p = any_selector_matches(scope_start, curr, &m);
-          if (_rc_p != UI_ERROR_NONE)
-            return _rc_p;
-        }
+        any_selector_matches(scope_start, curr, &m);
         if (m) {
           start_matched = 1;
           break; /* Found the scope root */
@@ -880,8 +813,6 @@ static ui_error_t is_in_scope(const struct ui_css_selector *scope_start,
   if (start_matched && !end_matched) {
     *out_matched = 1;
   }
-
-  return UI_ERROR_NONE;
 }
 
 /**
@@ -889,29 +820,21 @@ static ui_error_t is_in_scope(const struct ui_css_selector *scope_start,
  * @param selectors_list Parameter selectors_list.
  * @param node Parameter node.
  * @param out_matched Parameter out_matched.
- * @return Return value.
  */
-static ui_error_t
-has_matching_ancestor(const struct ui_css_selector *selectors_list,
-                      const struct ui_dom_node *node, int *out_matched) {
+static void has_matching_ancestor(const struct ui_css_selector *selectors_list,
+                                  const struct ui_dom_node *node,
+                                  int *out_matched) {
   const struct ui_dom_node *parent = node->parent;
   while (parent) {
-    if (1) {
-      int m = 0;
-      {
-        ui_error_t _rc_p = any_selector_matches(selectors_list, parent, &m);
-        if (_rc_p != UI_ERROR_NONE)
-          return _rc_p;
-      }
-      if (m) {
-        *out_matched = 1;
-        return UI_ERROR_NONE;
-      }
+    int m = 0;
+    any_selector_matches(selectors_list, parent, &m);
+    if (m) {
+      *out_matched = 1;
+      return;
     }
     parent = parent->parent;
   }
   *out_matched = 0;
-  return UI_ERROR_NONE;
 }
 
 /**
@@ -943,7 +866,8 @@ static ui_error_t pseudo_class_matches(const struct ui_css_selector *selector,
     }
   } else if (strcmp(selector->value, "is") == 0 ||
              strcmp(selector->value, "where") == 0) {
-    return any_selector_matches(selector->nested_selector, node, out_matched);
+    any_selector_matches(selector->nested_selector, node, out_matched);
+    return UI_ERROR_NONE;
   } else if (strcmp(selector->value, "not") == 0) {
     {
       int m = 0;
@@ -951,12 +875,7 @@ static ui_error_t pseudo_class_matches(const struct ui_css_selector *selector,
         *out_matched = 1;
         return UI_ERROR_NONE;
       }
-      {
-        ui_error_t _rc_p =
-            any_selector_matches(selector->nested_selector, node, &m);
-        if (_rc_p != UI_ERROR_NONE)
-          return _rc_p;
-      }
+      any_selector_matches(selector->nested_selector, node, &m);
       *out_matched = !m;
       return UI_ERROR_NONE;
     }
@@ -966,8 +885,8 @@ static ui_error_t pseudo_class_matches(const struct ui_css_selector *selector,
         *out_matched = 0;
         return UI_ERROR_NONE;
       }
-      return has_matching_descendant(selector->nested_selector, node,
-                                     out_matched);
+      has_matching_descendant(selector->nested_selector, node, out_matched);
+      return UI_ERROR_NONE;
     }
   } else if (strcmp(selector->value, "hover") == 0) {
     {
@@ -1231,40 +1150,32 @@ static ui_error_t pseudo_class_matches(const struct ui_css_selector *selector,
  * @param out_matched Parameter out_matched.
  * @return Return value.
  */
-static ui_error_t selector_matches(const struct ui_css_selector *selector,
-                                   const struct ui_dom_node *node,
-                                   int *out_matched) {
+static void selector_matches(const struct ui_css_selector *selector,
+                             const struct ui_dom_node *node, int *out_matched) {
   const char *attr_val;
 
   if (node->type != UI_DOM_NODE_TYPE_ELEMENT) {
-    {
-      *out_matched = 0;
-      return UI_ERROR_NONE;
-    } /* Selectors only match elements */
+    *out_matched = 0;
+    return; /* Selectors only match elements */
   }
 
   switch (selector->type) {
   case UI_CSS_SELECTOR_TYPE_UNIVERSAL: {
     *out_matched = 1;
-    return UI_ERROR_NONE;
+    return;
   }
   case UI_CSS_SELECTOR_TYPE_TAG:
     if (node->tag_name && strcmp(node->tag_name, selector->value) == 0) {
-      {
-        *out_matched = 1;
-        return UI_ERROR_NONE;
-      }
+      *out_matched = 1;
+      return;
     }
     break;
   case UI_CSS_SELECTOR_TYPE_ID: {
     ui_error_t attr_rc = ui_dom_node_get_attribute(node, "id", &attr_val);
     if (attr_rc == UI_ERROR_NONE) {
-
       if (strcmp(attr_val, selector->value) == 0) {
-        {
-          *out_matched = 1;
-          return UI_ERROR_NONE;
-        }
+        *out_matched = 1;
+        return;
       }
     }
   } break;
@@ -1272,14 +1183,10 @@ static ui_error_t selector_matches(const struct ui_css_selector *selector,
     ui_error_t attr_rc = ui_dom_node_get_attribute(node, "class", &attr_val);
     if (attr_rc == UI_ERROR_NONE) {
       int m = 0;
-      {
-        ui_error_t _rc_p = class_list_contains(attr_val, selector->value, &m);
-        if (_rc_p != UI_ERROR_NONE)
-          return _rc_p;
-      }
+      class_list_contains(attr_val, selector->value, &m);
       if (m) {
         *out_matched = 1;
-        return UI_ERROR_NONE;
+        return;
       }
     }
   } break;
@@ -1287,23 +1194,22 @@ static ui_error_t selector_matches(const struct ui_css_selector *selector,
     ui_error_t attr_rc =
         ui_dom_node_get_attribute(node, selector->value, &attr_val);
     if (attr_rc == UI_ERROR_NONE) {
-      return attribute_matches(selector, attr_val, out_matched);
+      attribute_matches(selector, attr_val, out_matched);
+      return;
     }
     *out_matched = 0;
-    return UI_ERROR_NONE;
+    return;
   } break;
   case UI_CSS_SELECTOR_TYPE_PSEUDO_CLASS: {
-    return pseudo_class_matches(selector, node, out_matched);
+    pseudo_class_matches(selector, node, out_matched);
+    return;
   }
   case UI_CSS_SELECTOR_TYPE_PSEUDO_ELEMENT: {
     *out_matched = 0;
-    return UI_ERROR_NONE;
+    return;
   } /* Pseudo-elements do not match DOM nodes directly */
   }
-  {
-    *out_matched = 0;
-    return UI_ERROR_NONE;
-  }
+  *out_matched = 0;
 }
 
 /* \brief append_computed_declaration
@@ -1433,8 +1339,8 @@ static ui_error_t append_computed_declaration(
  * @param c Parameter c.
  * @return Return value.
  */
-static ui_error_t get_selector_specificity(const struct ui_css_selector *sel,
-                                           int *a, int *b, int *c) {
+static void get_selector_specificity(const struct ui_css_selector *sel, int *a,
+                                     int *b, int *c) {
   *a = 0;
   *b = 0;
   *c = 0;
@@ -1457,12 +1363,7 @@ static ui_error_t get_selector_specificity(const struct ui_css_selector *sel,
       struct ui_css_selector *nested = sel->nested_selector;
       int max_a = 0, max_b = 0, max_c = 0;
       if (nested) {
-        {
-          ui_error_t _rc_p =
-              get_selector_specificity(nested, &max_a, &max_b, &max_c);
-          if (_rc_p != UI_ERROR_NONE)
-            return _rc_p;
-        }
+        get_selector_specificity(nested, &max_a, &max_b, &max_c);
       }
       *a = max_a;
       *b = max_b;
@@ -1475,19 +1376,16 @@ static ui_error_t get_selector_specificity(const struct ui_css_selector *sel,
              sel->type == UI_CSS_SELECTOR_TYPE_TAG) {
     *c = 1;
   }
-  return UI_ERROR_NONE;
 }
 
 /**
  * @brief cond_skip_ws.
  * @param p Parameter p.
- * @return Return value.
  */
-static ui_error_t cond_skip_ws(const char **p) {
+static void cond_skip_ws(const char **p) {
   while (**p == ' ' || **p == '\t' || **p == '\r' || **p == '\n') {
     (*p)++;
   }
-  return UI_ERROR_NONE;
 }
 
 /**
@@ -1495,21 +1393,18 @@ static ui_error_t cond_skip_ws(const char **p) {
  * @param p Parameter p.
  * @param word Parameter word.
  * @param out_matched Parameter out_matched.
- * @return Return value.
  */
-static ui_error_t cond_is_word(const char *p, const char *word,
-                               int *out_matched) {
+static void cond_is_word(const char *p, const char *word, int *out_matched) {
   size_t len = strlen(word);
   if (strncmp(p, word, len) == 0) {
     char c = p[len];
     if (c == ' ' || c == '\t' || c == '\r' || c == '\n' || c == '(' ||
         c == '\0') {
       *out_matched = 1;
-      return UI_ERROR_NONE;
+      return;
     }
   }
   *out_matched = 0;
-  return UI_ERROR_NONE;
 }
 
 static ui_error_t eval_cond_or(const char **p, int *out_matched);
@@ -1523,25 +1418,13 @@ static ui_error_t eval_cond_or(const char **p, int *out_matched);
 static ui_error_t eval_cond_term(const char **p, int *out_matched) {
   int res = 0;
   int m1 = 0, m2 = 0, m3 = 0;
-  {
-    ui_error_t _rc_p = cond_skip_ws(p);
-    if (_rc_p != UI_ERROR_NONE)
-      return _rc_p;
-  }
+  cond_skip_ws(p);
   if (**p == '\0')
     return UI_ERROR_PARSE_FAILED;
-  {
-    ui_error_t _rc_p = cond_is_word(*p, "not", &m1);
-    if (_rc_p != UI_ERROR_NONE)
-      return _rc_p;
-  }
+  cond_is_word(*p, "not", &m1);
   if (m1) {
     *p += 3;
-    {
-      ui_error_t _rc_p = cond_skip_ws(p);
-      if (_rc_p != UI_ERROR_NONE)
-        return _rc_p;
-    }
+    cond_skip_ws(p);
     {
       ui_error_t rc = eval_cond_term(p, &res);
       if (rc != UI_ERROR_NONE)
@@ -1552,27 +1435,13 @@ static ui_error_t eval_cond_term(const char **p, int *out_matched) {
   }
   if (**p == '(') {
     (*p)++;
-    {
-      ui_error_t _rc_p = cond_skip_ws(p);
-      if (_rc_p != UI_ERROR_NONE)
-        return _rc_p;
-    }
-    {
-      ui_error_t _rc_p = cond_is_word(*p, "not", &m2);
-      if (_rc_p != UI_ERROR_NONE)
-        return _rc_p;
-    }
+    cond_skip_ws(p);
+    cond_is_word(*p, "not", &m2);
     if (m2 || **p == '(') {
       ui_error_t rc = eval_cond_or(p, &res);
       if (rc != UI_ERROR_NONE)
         return rc;
-      {
-        {
-          ui_error_t _rc_p = cond_skip_ws(p);
-          if (_rc_p != UI_ERROR_NONE)
-            return _rc_p;
-        }
-      }
+      cond_skip_ws(p);
       if (**p == ')')
         (*p)++;
       *out_matched = res;
@@ -1604,18 +1473,10 @@ static ui_error_t eval_cond_term(const char **p, int *out_matched) {
       return UI_ERROR_NONE;
     }
   }
-  {
-    ui_error_t _rc_p = cond_is_word(*p, "selector", &m3);
-    if (_rc_p != UI_ERROR_NONE)
-      return _rc_p;
-  }
+  cond_is_word(*p, "selector", &m3);
   if (m3) {
     *p += 8;
-    {
-      ui_error_t _rc_p = cond_skip_ws(p);
-      if (_rc_p != UI_ERROR_NONE)
-        return _rc_p;
-    }
+    cond_skip_ws(p);
     if (**p == '(') {
       const char *start;
       int paren_count = 1;
@@ -1660,16 +1521,8 @@ static ui_error_t eval_cond_and(const char **p, int *out_matched) {
     return rc;
   for (;;) {
     int m = 0;
-    {
-      ui_error_t _rc_p = cond_skip_ws(p);
-      if (_rc_p != UI_ERROR_NONE)
-        return _rc_p;
-    }
-    {
-      ui_error_t _rc_p = cond_is_word(*p, "and", &m);
-      if (_rc_p != UI_ERROR_NONE)
-        return _rc_p;
-    }
+    cond_skip_ws(p);
+    cond_is_word(*p, "and", &m);
 
     if (m) {
       int next_res = 0;
@@ -1700,16 +1553,8 @@ static ui_error_t eval_cond_or(const char **p, int *out_matched) {
     return rc;
   for (;;) {
     int m = 0;
-    {
-      ui_error_t _rc_p = cond_skip_ws(p);
-      if (_rc_p != UI_ERROR_NONE)
-        return _rc_p;
-    }
-    {
-      ui_error_t _rc_p = cond_is_word(*p, "or", &m);
-      if (_rc_p != UI_ERROR_NONE)
-        return _rc_p;
-    }
+    cond_skip_ws(p);
+    cond_is_word(*p, "or", &m);
 
     if (m) {
       int next_res = 0;
@@ -1823,12 +1668,7 @@ static ui_error_t resolve_rules_recursive(
       }
     } else if (rule->type == UI_CSS_RULE_TYPE_SCOPE) {
       int _m = 0;
-      {
-        ui_error_t _rc_p =
-            is_in_scope(rule->scope_start, rule->scope_end, node, &_m);
-        if (_rc_p != UI_ERROR_NONE)
-          return _rc_p;
-      }
+      is_in_scope(rule->scope_start, rule->scope_end, node, &_m);
       if (_m) {
         err =
             resolve_rules_recursive(stylesheet, rule->nested_rules, node, style,
@@ -1845,18 +1685,10 @@ static ui_error_t resolve_rules_recursive(
       sel = rule->selectors;
       while (sel) {
         int _sm = 0;
-        {
-          ui_error_t _rc_p = selector_matches(sel, node, &_sm);
-          if (_rc_p != UI_ERROR_NONE)
-            return _rc_p;
-        }
+        selector_matches(sel, node, &_sm);
         if (_sm) {
           int a, b, c;
-          {
-            ui_error_t _rc_p = get_selector_specificity(sel, &a, &b, &c);
-            if (_rc_p != UI_ERROR_NONE)
-              return _rc_p;
-          }
+          get_selector_specificity(sel, &a, &b, &c);
           if (!matched || a > best_a || (a == best_a && b > best_b) ||
               (a == best_a && b == best_b && c > best_c)) {
             best_a = a;
@@ -1868,12 +1700,7 @@ static ui_error_t resolve_rules_recursive(
         {
           int _hm = 0;
           if (!ancestor_matched) {
-            {
-              ui_error_t _rc_p =
-                  has_matching_ancestor(rule->selectors, node, &_hm);
-              if (_rc_p != UI_ERROR_NONE)
-                return _rc_p;
-            }
+            has_matching_ancestor(rule->selectors, node, &_hm);
           }
           if (!ancestor_matched && _hm) {
             ancestor_matched = 1;
@@ -1941,11 +1768,7 @@ ui_error_t ui_css_resolve_style(const struct ui_css_stylesheet *stylesheet,
   err = resolve_rules_recursive(stylesheet, stylesheet->rules, node, style,
                                 &source_order, 0x7FFFFFFF /* unlayered */);
   if (err != UI_ERROR_NONE) {
-    {
-      ui_error_t _rc_p = ui_css_computed_style_destroy(style);
-      if (_rc_p != UI_ERROR_NONE)
-        return _rc_p;
-    }
+    ui_css_computed_style_destroy(style);
     return err;
   }
 
@@ -1955,6 +1778,7 @@ ui_error_t ui_css_resolve_style(const struct ui_css_stylesheet *stylesheet,
 
 /* \brief ui_error
  */
+/** @brief ui_css_computed_style_get_property function. */
 ui_error_t
 ui_css_computed_style_get_property(const struct ui_css_computed_style *style,
                                    const char *property_name,
@@ -1982,6 +1806,7 @@ ui_css_computed_style_get_property(const struct ui_css_computed_style *style,
 
 /* \brief ui_error
  */
+/** @brief ui_css_computed_style_destroy function. */
 ui_error_t ui_css_computed_style_destroy(struct ui_css_computed_style *style) {
   struct ui_css_computed_property *prop;
   struct ui_css_computed_property *next_prop;
@@ -2005,6 +1830,7 @@ ui_error_t ui_css_computed_style_destroy(struct ui_css_computed_style *style) {
 
 /* \brief ui_error
  */
+/** @brief ui_css_variable_store_create function. */
 ui_error_t
 ui_css_variable_store_create(struct ui_css_variable_store **out_store) {
   struct ui_css_variable_store *store;
@@ -2024,6 +1850,7 @@ ui_css_variable_store_create(struct ui_css_variable_store **out_store) {
 
 /* \brief ui_error
  */
+/** @brief ui_css_variable_store_destroy function. */
 ui_error_t ui_css_variable_store_destroy(struct ui_css_variable_store *store) {
   struct ui_css_variable *curr, *next;
 
@@ -2100,6 +1927,7 @@ ui_error_t ui_css_variable_store_set(struct ui_css_variable_store *store,
 
 /* \brief ui_error
  */
+/** @brief ui_css_resolve_variables function. */
 ui_error_t ui_css_resolve_variables(const struct ui_css_variable_store *store,
                                     const char *property_value,
                                     char **out_resolved) {

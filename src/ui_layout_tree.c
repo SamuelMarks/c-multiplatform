@@ -271,6 +271,7 @@ ui_error_t ui_layout_tree_generate(const struct ui_dom_node *dom_root,
   return build_tree_recursive(dom_root, stylesheet, out_layout_root);
 }
 
+/** @brief ui_layout_tree_destroy function. */
 ui_error_t ui_layout_tree_destroy(struct ui_layout_node *node) {
   struct ui_layout_node *child;
   struct ui_layout_node *next_child;

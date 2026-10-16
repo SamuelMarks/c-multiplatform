@@ -11,6 +11,7 @@
 /* MSVC Safe CRT */
 #endif
 
+/** @brief ui_haptics_trigger function. */
 ui_error_t ui_haptics_trigger(enum ui_haptic_feedback_type type) {
   if ((int)type < (int)UI_HAPTIC_FEEDBACK_LIGHT ||
       (int)type > (int)UI_HAPTIC_FEEDBACK_SELECTION) {

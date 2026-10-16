@@ -141,12 +141,13 @@ static ui_error_t palette_tone(float hue, float chroma, float tone,
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 struct md3_palette_role_def {
-  float hue;
-  float chroma;
-  float tone;
-  size_t offset;
+  float hue;     /**< hue field. */
+  float chroma;  /**< chroma field. */
+  float tone;    /**< tone field. */
+  size_t offset; /**< offset field. */
 };
 
+/** @brief md3_color_scheme_create_contrast function. */
 ui_error_t md3_color_scheme_create_contrast(
     ui_color_t seed_color, int is_dark, enum md3_palette_mode mode,
     enum md3_contrast_level contrast, struct md3_color_scheme *out_scheme) {
@@ -648,10 +649,11 @@ ui_error_t md3_color_scheme_create(ui_color_t seed_color, int is_dark,
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 struct md3_color_token_map {
-  const char *name;
-  size_t offset;
+  const char *name; /**< name field. */
+  size_t offset;    /**< offset field. */
 };
 
+/** @brief md3_color_scheme_apply_tokens function. */
 ui_error_t md3_color_scheme_apply_tokens(const struct md3_color_scheme *scheme,
                                          struct ui_design_token_dict *dict) {
   static const struct md3_color_token_map maps[] = {

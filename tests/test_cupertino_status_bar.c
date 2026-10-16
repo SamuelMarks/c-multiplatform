@@ -12,6 +12,8 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_cupertino_status_bar_mock_get_insets_fail;
+
 extern int g_malloc_fail_countdown;
 
 TEST test_status_bar_lifecycle_and_presets(void) {
@@ -271,7 +273,6 @@ TEST test_status_bar_readouts_and_styles(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
     {
-      extern int g_cupertino_status_bar_mock_get_insets_fail;
       g_cupertino_status_bar_mock_get_insets_fail = 1;
       rc = cupertino_status_bar_set_safe_area_manager(bar, mgr);
       ASSERT_EQ(UI_ERROR_UNKNOWN, rc);

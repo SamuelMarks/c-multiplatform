@@ -6,6 +6,8 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_keyboard_responder_mock_fail;
+
 extern int g_malloc_fail_countdown;
 
 static int g_callback_called = 0;
@@ -22,7 +24,7 @@ static ui_error_t mock_callback(struct ui_dom_node *node, void *user_data) {
 static ui_error_t run_normal_tests(void) {
   struct ui_keyboard_responder *responder = NULL;
   struct ui_dom_node *node = NULL;
-  struct ui_event event;
+  struct ui_event event = {0};
   int handled = 0;
   ui_error_t rc;
 
@@ -59,7 +61,11 @@ static ui_error_t run_normal_tests(void) {
     int i;
     for (i = 0; i < 10; ++i) {
       char buf[32];
+#if defined(_MSC_VER)
+      sprintf_s(buf, sizeof(buf), "tag%d", i);
+#else
       sprintf(buf, "tag%d", i);
+#endif
       rc = ui_keyboard_responder_bind_key(responder, buf, UI_KEY_ENTER,
                                           mock_callback, NULL);
       if (rc != UI_ERROR_NONE)
@@ -219,7 +225,7 @@ static ui_error_t run_oom_tests(void) {
 static ui_error_t run_error_paths(void) {
   struct ui_keyboard_responder *responder = NULL;
   struct ui_dom_node *node = NULL;
-  struct ui_event event;
+  struct ui_event event = {0};
   int handled = 0;
   ui_error_t rc;
 
@@ -238,7 +244,6 @@ static ui_error_t run_error_paths(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_keyboard_responder_mock_fail;
     struct ui_dom_node *elem = NULL;
     rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &elem);
     if (rc != UI_ERROR_NONE)

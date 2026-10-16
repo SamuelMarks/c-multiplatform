@@ -12,6 +12,9 @@
 #include <assert.h>
 /* clang-format on */
 
+extern int g_bottom_sheet_mock_fail;
+extern ui_error_t run_bottom_sheet_coverage(void);
+
 extern int g_malloc_fail_countdown;
 
 struct ui_bottom_sheet_base_internal {
@@ -46,7 +49,6 @@ static ui_error_t on_close_handler(struct ui_bottom_sheet_base *sheet,
   if (g_close_should_fail)
     return UI_ERROR_OUT_OF_MEMORY;
   g_closed_count++;
-  return UI_ERROR_NONE;
   return UI_ERROR_NONE;
 }
 
@@ -557,7 +559,6 @@ static ui_error_t run_normal_tests(void) {
   if (rc != UI_ERROR_NONE)
     return rc;
   return UI_ERROR_NONE;
-  return UI_ERROR_NONE;
 }
 
 static ui_error_t run_oom_tests(void) {
@@ -586,7 +587,6 @@ static ui_error_t run_oom_tests(void) {
   }
   g_malloc_fail_countdown = -1;
 #endif
-  return UI_ERROR_NONE;
   return UI_ERROR_NONE;
 }
 
@@ -702,7 +702,6 @@ static ui_error_t run_mock_fail_tests(void) {
   struct ui_overlay_director *director = NULL;
 #ifdef UI_TEST_MOCK_ALLOC
   int i;
-  extern int g_bottom_sheet_mock_fail;
 
   for (i = 1; i <= 16; i++) {
     struct ui_bottom_sheet_base *sheet = NULL;
@@ -794,7 +793,6 @@ int main(void) {
   ui_error_t rc;
 
 #ifdef UI_TEST_MOCK_ALLOC
-  extern ui_error_t run_bottom_sheet_coverage(void);
   rc = run_bottom_sheet_coverage();
   if (rc != UI_ERROR_NONE)
     return rc;

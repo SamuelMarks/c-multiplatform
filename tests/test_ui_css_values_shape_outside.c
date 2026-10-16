@@ -70,26 +70,30 @@ int test_css_values_shape_outside(void) {
     EXPECT_EQ(UI_ERROR_NONE, rc);
     EXPECT_EQ(UI_CSS_BASIC_SHAPE_INSET, shape.shape.type);
 
-    char long_shape[1024];
-    UI_STRCPY(long_shape, 1024, "circle(");
-    memset(long_shape + 7, '0', 256);
-    UI_STRCPY(long_shape + 263, 1024 - 263, ")");
-    rc = ui_css_parse_shape_outside(long_shape, &shape);
-    EXPECT_EQ(UI_ERROR_NONE, rc);
-    EXPECT_EQ(UI_CSS_BASIC_SHAPE_CIRCLE, shape.shape.type);
+    {
+      char long_shape[1024];
+      UI_STRCPY(long_shape, 1024, "circle(");
+      memset(long_shape + 7, '0', 256);
+      UI_STRCPY(long_shape + 263, 1024 - 263, ")");
+      rc = ui_css_parse_shape_outside(long_shape, &shape);
+      EXPECT_EQ(UI_ERROR_NONE, rc);
+      EXPECT_EQ(UI_CSS_BASIC_SHAPE_CIRCLE, shape.shape.type);
 
-    rc = ui_css_parse_shape_outside("circle(", &shape);
-    EXPECT_EQ(UI_ERROR_NONE, rc);
+      rc = ui_css_parse_shape_outside("circle(", &shape);
+      EXPECT_EQ(UI_ERROR_NONE, rc);
 
-    char long_shape2[1024];
-    UI_STRCPY(long_shape2, 1024, "circle(");
-    memset(long_shape2 + 7, '0', 256);
-    UI_STRCPY(long_shape2 + 263, 1024 - 263, ")");
-    rc = ui_css_parse_shape_outside(long_shape2, &shape);
-    EXPECT_EQ(UI_ERROR_NONE, rc);
+      {
+        char long_shape2[1024];
+        UI_STRCPY(long_shape2, 1024, "circle(");
+        memset(long_shape2 + 7, '0', 256);
+        UI_STRCPY(long_shape2 + 263, 1024 - 263, ")");
+        rc = ui_css_parse_shape_outside(long_shape2, &shape);
+        EXPECT_EQ(UI_ERROR_NONE, rc);
 
-    rc = ui_css_parse_shape_outside("randomtextthatisnotashape", &shape);
-    /* removed check */
+        rc = ui_css_parse_shape_outside("randomtextthatisnotashape", &shape);
+        /* removed check */
+      }
+    }
   }
 
   /* Filter Tests */
@@ -214,46 +218,48 @@ int test_css_values_shape_outside(void) {
     rc = ui_css_parse_filter("blur(invalid)", &filter);
     /* removed check */
 
-    char filter_url[1024];
-    UI_STRCPY(filter_url, 1024, "url(");
-    memset(filter_url + 4, 'C', 600);
-    UI_STRCPY(filter_url + 604, 1024 - 604, ")");
-    if (filter) {
+    {
+      char filter_url[1024];
+      UI_STRCPY(filter_url, 1024, "url(");
+      memset(filter_url + 4, 'C', 600);
+      UI_STRCPY(filter_url + 604, 1024 - 604, ")");
+      if (filter) {
+        ui_css_filter_destroy(filter);
+        filter = NULL;
+      }
+      rc = ui_css_parse_filter(filter_url, &filter);
+      EXPECT_EQ(UI_ERROR_NONE, rc);
       ui_css_filter_destroy(filter);
       filter = NULL;
-    }
-    rc = ui_css_parse_filter(filter_url, &filter);
-    EXPECT_EQ(UI_ERROR_NONE, rc);
-    ui_css_filter_destroy(filter);
-    filter = NULL;
 
-    g_malloc_fail_countdown = 0;
-    if (filter) {
-      ui_css_filter_destroy(filter);
-      filter = NULL;
-    }
-    rc = ui_css_parse_filter("blur(10px)", &filter);
-    EXPECT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
-    g_malloc_fail_countdown = 1;
-    if (filter) {
-      ui_css_filter_destroy(filter);
-      filter = NULL;
-    }
-    rc = ui_css_parse_filter("blur(10px)", &filter);
-    EXPECT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
-    g_malloc_fail_countdown = 2;
-    if (filter) {
-      ui_css_filter_destroy(filter);
-      filter = NULL;
-    }
-    rc = ui_css_parse_filter("blur(10px)", &filter);
-    if (rc == UI_ERROR_NONE) {
-      ui_css_filter_destroy(filter);
-      filter = NULL;
-    } else {
+      g_malloc_fail_countdown = 0;
+      if (filter) {
+        ui_css_filter_destroy(filter);
+        filter = NULL;
+      }
+      rc = ui_css_parse_filter("blur(10px)", &filter);
       EXPECT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
+      g_malloc_fail_countdown = 1;
+      if (filter) {
+        ui_css_filter_destroy(filter);
+        filter = NULL;
+      }
+      rc = ui_css_parse_filter("blur(10px)", &filter);
+      EXPECT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
+      g_malloc_fail_countdown = 2;
+      if (filter) {
+        ui_css_filter_destroy(filter);
+        filter = NULL;
+      }
+      rc = ui_css_parse_filter("blur(10px)", &filter);
+      if (rc == UI_ERROR_NONE) {
+        ui_css_filter_destroy(filter);
+        filter = NULL;
+      } else {
+        EXPECT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
+      }
+      g_malloc_fail_countdown = -1;
     }
-    g_malloc_fail_countdown = -1;
   }
 
   /* Blend Mode Tests */
@@ -565,7 +571,7 @@ int test_css_values_shape_outside(void) {
              "dur=%f delay=%f type=%d x1=%f\n",
              rc, tr ? tr->property_name : "NULL",
              tr ? tr->duration.value : 0.0f, tr ? tr->delay.value : 0.0f,
-             tr ? tr->timing_function.type : -1,
+             tr ? (int)tr->timing_function.type : -1,
              tr && tr->timing_function.type == UI_CSS_EASING_CUBIC_BEZIER
                  ? tr->timing_function.data.cubic_bezier.x1
                  : 0.0f);

@@ -10,19 +10,27 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_cupertino_table_view_mock_list_base_destroy_fail;
+
 #ifdef UI_TEST_MOCK_ALLOC
 extern int g_malloc_fail_countdown;
 #endif
 
 static int g_action_called = 0;
 
-static int dummy_swipe_action(void *user_data) {
+static ui_error_t dummy_swipe_action(void *user_data) {
   int *flag = (int *)user_data;
   if (flag != NULL) {
     *flag = 1;
   }
   g_action_called = 1;
-  return 0;
+  return UI_ERROR_NONE;
+}
+
+static ui_error_t failing_swipe_action(void *user_data) {
+  if (user_data != NULL) {
+  }
+  return UI_ERROR_UNKNOWN;
 }
 
 TEST test_table_view_lifecycle_and_sections(void) {
@@ -139,7 +147,6 @@ TEST test_table_view_lifecycle_and_sections(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_cupertino_table_view_mock_list_base_destroy_fail;
     g_cupertino_table_view_mock_list_base_destroy_fail = 1;
     rc = cupertino_table_view_destroy(table);
     ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
@@ -196,7 +203,11 @@ TEST test_table_view_swipe_actions_and_full_swipe(void) {
   ASSERT_EQ(UI_ERROR_NONE, rc);
 
   memset(&action, 0, sizeof(action));
+#if defined(_MSC_VER)
+  strncpy_s(action.title, sizeof(action.title), "Delete", _TRUNCATE);
+#else
   strncpy(action.title, "Delete", sizeof(action.title) - 1);
+#endif
   action.style = CUPERTINO_SWIPE_ACTION_DESTRUCTIVE;
   action.handler = dummy_swipe_action;
   action.user_data = &user_flag;
@@ -284,7 +295,11 @@ TEST test_table_view_swipe_actions_and_full_swipe(void) {
   /* Leading swipe */
   user_flag = 0;
   action.style = CUPERTINO_SWIPE_ACTION_NORMAL;
+#if defined(_MSC_VER)
+  strncpy_s(action.title, sizeof(action.title), "Unread", _TRUNCATE);
+#else
   strncpy(action.title, "Unread", sizeof(action.title) - 1);
+#endif
   rc = cupertino_table_view_add_leading_swipe_action(table, &action);
   ASSERT_EQ(UI_ERROR_NONE, rc);
 
@@ -323,6 +338,19 @@ TEST test_table_view_swipe_actions_and_full_swipe(void) {
   rc = cupertino_table_view_swipe_release(table, 300.0f, &triggered);
   ASSERT_EQ(UI_ERROR_NONE, rc);
   ASSERT_EQ(1, triggered);
+
+  /* Leading and trailing action with failing handler */
+  table->leading_actions[0].handler = failing_swipe_action;
+  rc = cupertino_table_view_swipe_pan(table, 0, 0, 250.0f, 300.0f);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = cupertino_table_view_swipe_release(table, 300.0f, &triggered);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+
+  table->trailing_actions[0].handler = failing_swipe_action;
+  rc = cupertino_table_view_swipe_pan(table, 0, 0, -200.0f, 300.0f);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = cupertino_table_view_swipe_release(table, 300.0f, &triggered);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
 
   rc = cupertino_table_view_clear_swipe_actions(table);
   ASSERT_EQ(UI_ERROR_NONE, rc);

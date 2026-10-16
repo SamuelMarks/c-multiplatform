@@ -16,7 +16,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 /**
  * @enum md2_navigation_drawer_type
@@ -143,6 +143,6 @@ extern C_MULTIPLATFORM_EXPORT ui_error_t md2_navigation_drawer_get_component(
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* MATERIAL2_MD2_NAVIGATION_DRAWER_H */

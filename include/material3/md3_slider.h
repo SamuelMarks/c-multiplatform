@@ -16,7 +16,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
@@ -37,14 +37,14 @@ enum md3_slider_orientation { MD3_SLIDER_HORIZONTAL = 0, MD3_SLIDER_VERTICAL };
  * @brief Material 3 Slider skin wrapping ui_slider_base.
  */
 struct md3_slider {
-  struct ui_slider_base *base;
-  struct ui_control_value_accessor cva;
-  enum md3_slider_type type;
-  enum md3_slider_orientation orientation;
-  float min;
-  float max;
-  float step;
-  int has_value_indicator;
+  struct ui_slider_base *base;             /**< base field. */
+  struct ui_control_value_accessor cva;    /**< cva field. */
+  enum md3_slider_type type;               /**< type field. */
+  enum md3_slider_orientation orientation; /**< orientation field. */
+  float min;                               /**< min field. */
+  float max;                               /**< max field. */
+  float step;                              /**< step field. */
+  int has_value_indicator;                 /**< has_value_indicator field. */
 };
 
 /**
@@ -52,9 +52,9 @@ struct md3_slider {
  * @brief Material 3 Range Slider skin wrapping ui_range_slider_base.
  */
 struct md3_range_slider {
-  struct ui_range_slider_base *base;
-  float min;
-  float max;
+  struct ui_range_slider_base *base; /**< base field. */
+  float min;                         /**< min field. */
+  float max;                         /**< max field. */
 };
 
 /**
@@ -199,6 +199,6 @@ extern C_MULTIPLATFORM_EXPORT ui_error_t md3_range_slider_get_base(
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* MATERIAL3_MD3_SLIDER_H */

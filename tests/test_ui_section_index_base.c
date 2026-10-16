@@ -6,6 +6,10 @@
 /* clang-format on */
 
 extern int g_malloc_fail_countdown;
+extern int g_section_index_mock_set_style_fail;
+extern int g_section_index_mock_comp_destroy_fail;
+
+extern int g_malloc_fail_countdown;
 
 static int test_ui_section_index_base_init(void) {
   struct ui_section_index_base *index = NULL;
@@ -210,7 +214,6 @@ int main(void) {
 }
 
 void test_ui_section_index_errs(void) {
-  extern int g_malloc_fail_countdown;
   struct ui_section_index_base *index = NULL;
   const char *sections[] = {"A", "B", "C"};
   ui_error_t rc;
@@ -309,8 +312,6 @@ void test_ui_section_index_remove_attr_err(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_section_index_mock_set_style_fail;
-    extern int g_section_index_mock_comp_destroy_fail;
     struct ui_section_index_base *mock_idx = NULL;
     ui_error_t rc;
 

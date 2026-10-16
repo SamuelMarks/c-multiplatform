@@ -519,6 +519,7 @@ TEST test_split_view_coverage_branches(void) {
   rc = cupertino_split_view_get_column_visibility(view, &s, &c, NULL);
   ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
 
+  memset(&evt, 0, sizeof(evt));
   rc = cupertino_split_view_process_event(NULL, &evt);
   ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
   rc = cupertino_split_view_process_event(view, NULL);

@@ -10,6 +10,16 @@ static int run_mock_tests(void);
 #include <string.h>
 /* clang-format on */
 
+extern int g_spin_button_mock_set_attr_fail_target;
+extern int g_spin_button_mock_remove_attr_fail_target;
+extern int g_spin_button_mock_create_comp_fail;
+extern int g_spin_button_mock_create_node_fail;
+extern int g_spin_button_mock_set_tag_fail;
+extern int g_spin_button_mock_stop_cont_fail;
+extern int g_spin_button_set_attr_counter;
+extern int g_spin_button_remove_attr_counter;
+extern ui_error_t ui_test_sb_update_aria(struct ui_spin_button_base *sb);
+
 extern int g_malloc_fail_countdown;
 
 static int g_change_called = 0;
@@ -816,14 +826,6 @@ static ui_error_t mock_cva_on_touched_fail(void *user) {
 }
 
 static int run_mock_tests(void) {
-  extern int g_spin_button_mock_set_attr_fail_target;
-  extern int g_spin_button_mock_remove_attr_fail_target;
-  extern int g_spin_button_mock_create_comp_fail;
-  extern int g_spin_button_mock_create_node_fail;
-  extern int g_spin_button_mock_set_tag_fail;
-  extern int g_spin_button_mock_stop_cont_fail;
-  extern int g_spin_button_set_attr_counter;
-  extern int g_spin_button_remove_attr_counter;
   struct ui_spin_button_base *sb = NULL;
   struct ui_control_value_accessor cva;
   struct ui_event ev;
@@ -952,7 +954,6 @@ static int run_mock_tests(void) {
 
   /* Exercise update_aria NULL checks */
   {
-    extern ui_error_t ui_test_sb_update_aria(struct ui_spin_button_base * sb);
     struct ui_component comp_no_root;
     struct ui_component *orig_comp = sb->component;
     memset(&comp_no_root, 0, sizeof(comp_no_root));

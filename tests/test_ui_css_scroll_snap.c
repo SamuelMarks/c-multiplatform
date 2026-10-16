@@ -6,6 +6,8 @@
 #include <string.h>
 /* clang-format on */
 
+extern ui_error_t run_scroll_snap_coverage(void);
+
 #define TEST_ASSERT(cond)                                                      \
   do {                                                                         \
     if (!(cond)) {                                                             \
@@ -30,40 +32,42 @@ static void test_scroll_snap_cases(void) {
   ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
 
   /* long length truncation */
-  char long_str[1024];
-  memset(long_str, 'a', 190);
-  long_str[190] = '\0';
-  ui_css_rule_append_declaration(rule, "scroll-snap-type", long_str, 0);
-  ui_css_rule_append_declaration(rule, "scroll-snap-align", long_str, 0);
-  ui_css_rule_append_declaration(rule, "scroll-margin", long_str, 0);
+  {
+    char long_str[1024];
+    memset(long_str, 'a', 190);
+    long_str[190] = '\0';
+    ui_css_rule_append_declaration(rule, "scroll-snap-type", long_str, 0);
+    ui_css_rule_append_declaration(rule, "scroll-snap-align", long_str, 0);
+    ui_css_rule_append_declaration(rule, "scroll-margin", long_str, 0);
 
-  ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_TAG, "div");
-  ui_css_stylesheet_append_rule(sheet, rule);
-  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &node);
-  ui_dom_node_set_tag_name(node, "div");
-  ui_css_resolve_style(sheet, node, &style);
+    ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_TAG, "div");
+    ui_css_stylesheet_append_rule(sheet, rule);
+    ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &node);
+    ui_dom_node_set_tag_name(node, "div");
+    ui_css_resolve_style(sheet, node, &style);
 
-  TEST_ASSERT(ui_css_scroll_snap_parse(style, NULL) ==
-              UI_ERROR_INVALID_ARGUMENT);
+    TEST_ASSERT(ui_css_scroll_snap_parse(style, NULL) ==
+                UI_ERROR_INVALID_ARGUMENT);
 
-  /* Empty style -> defaults */
-  ui_error_t rc = ui_css_scroll_snap_parse(style, &props);
-  if (rc != UI_ERROR_NONE) {
-    printf("rc = %d\n", (int)rc);
-  }
-  TEST_ASSERT(rc == UI_ERROR_NONE);
-  TEST_ASSERT(props.type.axis == UI_CSS_SCROLL_SNAP_AXIS_NONE);
-  TEST_ASSERT(props.type.strictness == UI_CSS_SCROLL_SNAP_STRICTNESS_NONE);
-  TEST_ASSERT(props.align.block == UI_CSS_SCROLL_SNAP_ALIGN_NONE);
-  TEST_ASSERT(props.align.inline_axis == UI_CSS_SCROLL_SNAP_ALIGN_NONE);
-  TEST_ASSERT(props.stop == UI_CSS_SCROLL_SNAP_STOP_NORMAL);
-  TEST_ASSERT(props.padding.top.value == 0.0f);
-  TEST_ASSERT(props.margin.top.value == 0.0f);
+    /* Empty style -> defaults */
+    {
+      ui_error_t rc = ui_css_scroll_snap_parse(style, &props);
+      if (rc != UI_ERROR_NONE) {
+        printf("rc = %d\n", (int)rc);
+      }
+      TEST_ASSERT(rc == UI_ERROR_NONE);
+      TEST_ASSERT(props.type.axis == UI_CSS_SCROLL_SNAP_AXIS_NONE);
+      TEST_ASSERT(props.type.strictness == UI_CSS_SCROLL_SNAP_STRICTNESS_NONE);
+      TEST_ASSERT(props.align.block == UI_CSS_SCROLL_SNAP_ALIGN_NONE);
+      TEST_ASSERT(props.align.inline_axis == UI_CSS_SCROLL_SNAP_ALIGN_NONE);
+      TEST_ASSERT(props.stop == UI_CSS_SCROLL_SNAP_STOP_NORMAL);
+      TEST_ASSERT(props.padding.top.value == 0.0f);
+      TEST_ASSERT(props.margin.top.value == 0.0f);
 
-  ui_css_computed_style_destroy(style);
-  ui_css_stylesheet_destroy(sheet);
+      ui_css_computed_style_destroy(style);
+      ui_css_stylesheet_destroy(sheet);
 
-  /* Helper to test values */
+      /* Helper to test values */
 #define TEST_SCROLL_SNAP(decls, chk)                                           \
   do {                                                                         \
     struct ui_css_stylesheet *sh;                                              \
@@ -80,253 +84,281 @@ static void test_scroll_snap_cases(void) {
     ui_css_stylesheet_destroy(sh);                                             \
   } while (0)
 
-  /* snap-type: none */
-  TEST_SCROLL_SNAP(
-      { ui_css_rule_append_declaration(r, "scroll-snap-type", "none", 0); },
-      {
-        TEST_ASSERT(p.type.axis == UI_CSS_SCROLL_SNAP_AXIS_NONE);
-        TEST_ASSERT(p.type.strictness == UI_CSS_SCROLL_SNAP_STRICTNESS_NONE);
-      });
+      /* snap-type: none */
+      TEST_SCROLL_SNAP(
+          { ui_css_rule_append_declaration(r, "scroll-snap-type", "none", 0); },
+          {
+            TEST_ASSERT(p.type.axis == UI_CSS_SCROLL_SNAP_AXIS_NONE);
+            TEST_ASSERT(p.type.strictness ==
+                        UI_CSS_SCROLL_SNAP_STRICTNESS_NONE);
+          });
 
-  /* snap-type: x mandatory */
-  TEST_SCROLL_SNAP(
-      {
-        ui_css_rule_append_declaration(r, "scroll-snap-type", "x mandatory", 0);
-      },
-      {
-        TEST_ASSERT(p.type.axis == UI_CSS_SCROLL_SNAP_AXIS_X);
-        TEST_ASSERT(p.type.strictness ==
-                    UI_CSS_SCROLL_SNAP_STRICTNESS_MANDATORY);
-      });
+      /* snap-type: x mandatory */
+      TEST_SCROLL_SNAP(
+          {
+            ui_css_rule_append_declaration(r, "scroll-snap-type", "x mandatory",
+                                           0);
+          },
+          {
+            TEST_ASSERT(p.type.axis == UI_CSS_SCROLL_SNAP_AXIS_X);
+            TEST_ASSERT(p.type.strictness ==
+                        UI_CSS_SCROLL_SNAP_STRICTNESS_MANDATORY);
+          });
 
-  /* snap-type: y proximity */
-  TEST_SCROLL_SNAP(
-      {
-        ui_css_rule_append_declaration(r, "scroll-snap-type", "y proximity", 0);
-      },
-      {
-        TEST_ASSERT(p.type.axis == UI_CSS_SCROLL_SNAP_AXIS_Y);
-        TEST_ASSERT(p.type.strictness ==
-                    UI_CSS_SCROLL_SNAP_STRICTNESS_PROXIMITY);
-      });
+      /* snap-type: y proximity */
+      TEST_SCROLL_SNAP(
+          {
+            ui_css_rule_append_declaration(r, "scroll-snap-type", "y proximity",
+                                           0);
+          },
+          {
+            TEST_ASSERT(p.type.axis == UI_CSS_SCROLL_SNAP_AXIS_Y);
+            TEST_ASSERT(p.type.strictness ==
+                        UI_CSS_SCROLL_SNAP_STRICTNESS_PROXIMITY);
+          });
 
-  /* snap-type: x invalid */
-  TEST_SCROLL_SNAP(
-      {
-        ui_css_rule_append_declaration(r, "scroll-snap-type", "x invalid", 0);
-      },
-      {
-        TEST_ASSERT(p.type.axis == UI_CSS_SCROLL_SNAP_AXIS_X);
-        TEST_ASSERT(p.type.strictness == UI_CSS_SCROLL_SNAP_STRICTNESS_NONE);
-      });
+      /* snap-type: x invalid */
+      TEST_SCROLL_SNAP(
+          {
+            ui_css_rule_append_declaration(r, "scroll-snap-type", "x invalid",
+                                           0);
+          },
+          {
+            TEST_ASSERT(p.type.axis == UI_CSS_SCROLL_SNAP_AXIS_X);
+            TEST_ASSERT(p.type.strictness ==
+                        UI_CSS_SCROLL_SNAP_STRICTNESS_NONE);
+          });
 
-  /* snap-type: block */
-  TEST_SCROLL_SNAP(
-      { ui_css_rule_append_declaration(r, "scroll-snap-type", "block", 0); },
-      {
-        TEST_ASSERT(p.type.axis == UI_CSS_SCROLL_SNAP_AXIS_BLOCK);
-        TEST_ASSERT(p.type.strictness ==
-                    UI_CSS_SCROLL_SNAP_STRICTNESS_PROXIMITY); /* default */
-      });
+      /* snap-type: block */
+      TEST_SCROLL_SNAP(
+          {
+            ui_css_rule_append_declaration(r, "scroll-snap-type", "block", 0);
+          },
+          {
+            TEST_ASSERT(p.type.axis == UI_CSS_SCROLL_SNAP_AXIS_BLOCK);
+            TEST_ASSERT(p.type.strictness ==
+                        UI_CSS_SCROLL_SNAP_STRICTNESS_PROXIMITY); /* default */
+          });
 
-  /* snap-type: inline */
-  TEST_SCROLL_SNAP(
-      { ui_css_rule_append_declaration(r, "scroll-snap-type", "inline", 0); },
-      { TEST_ASSERT(p.type.axis == UI_CSS_SCROLL_SNAP_AXIS_INLINE); });
+      /* snap-type: inline */
+      TEST_SCROLL_SNAP(
+          {
+            ui_css_rule_append_declaration(r, "scroll-snap-type", "inline", 0);
+          },
+          { TEST_ASSERT(p.type.axis == UI_CSS_SCROLL_SNAP_AXIS_INLINE); });
 
-  /* snap-type: both */
-  TEST_SCROLL_SNAP(
-      { ui_css_rule_append_declaration(r, "scroll-snap-type", "both", 0); },
-      { TEST_ASSERT(p.type.axis == UI_CSS_SCROLL_SNAP_AXIS_BOTH); });
+      /* snap-type: both */
+      TEST_SCROLL_SNAP(
+          { ui_css_rule_append_declaration(r, "scroll-snap-type", "both", 0); },
+          { TEST_ASSERT(p.type.axis == UI_CSS_SCROLL_SNAP_AXIS_BOTH); });
 
-  /* snap-align: none */
-  TEST_SCROLL_SNAP(
-      { ui_css_rule_append_declaration(r, "scroll-snap-align", "none", 0); },
-      {
-        TEST_ASSERT(p.align.block == UI_CSS_SCROLL_SNAP_ALIGN_NONE);
-        TEST_ASSERT(p.align.inline_axis == UI_CSS_SCROLL_SNAP_ALIGN_NONE);
-      });
+      /* snap-align: none */
+      TEST_SCROLL_SNAP(
+          {
+            ui_css_rule_append_declaration(r, "scroll-snap-align", "none", 0);
+          },
+          {
+            TEST_ASSERT(p.align.block == UI_CSS_SCROLL_SNAP_ALIGN_NONE);
+            TEST_ASSERT(p.align.inline_axis == UI_CSS_SCROLL_SNAP_ALIGN_NONE);
+          });
 
-  /* snap-align: start center */
-  TEST_SCROLL_SNAP(
-      {
-        ui_css_rule_append_declaration(r, "scroll-snap-align", "start center",
-                                       0);
-      },
-      {
-        TEST_ASSERT(p.align.block == UI_CSS_SCROLL_SNAP_ALIGN_START);
-        TEST_ASSERT(p.align.inline_axis == UI_CSS_SCROLL_SNAP_ALIGN_CENTER);
-      });
+      /* snap-align: start center */
+      TEST_SCROLL_SNAP(
+          {
+            ui_css_rule_append_declaration(r, "scroll-snap-align",
+                                           "start center", 0);
+          },
+          {
+            TEST_ASSERT(p.align.block == UI_CSS_SCROLL_SNAP_ALIGN_START);
+            TEST_ASSERT(p.align.inline_axis == UI_CSS_SCROLL_SNAP_ALIGN_CENTER);
+          });
 
-  /* snap-align: end */
-  TEST_SCROLL_SNAP(
-      { ui_css_rule_append_declaration(r, "scroll-snap-align", "end", 0); },
-      {
-        TEST_ASSERT(p.align.block == UI_CSS_SCROLL_SNAP_ALIGN_END);
-        TEST_ASSERT(p.align.inline_axis == UI_CSS_SCROLL_SNAP_ALIGN_END);
-      });
+      /* snap-align: end */
+      TEST_SCROLL_SNAP(
+          { ui_css_rule_append_declaration(r, "scroll-snap-align", "end", 0); },
+          {
+            TEST_ASSERT(p.align.block == UI_CSS_SCROLL_SNAP_ALIGN_END);
+            TEST_ASSERT(p.align.inline_axis == UI_CSS_SCROLL_SNAP_ALIGN_END);
+          });
 
-  /* snap-stop: normal */
-  TEST_SCROLL_SNAP(
-      { ui_css_rule_append_declaration(r, "scroll-snap-stop", "normal", 0); },
-      { TEST_ASSERT(p.stop == UI_CSS_SCROLL_SNAP_STOP_NORMAL); });
+      /* snap-stop: normal */
+      TEST_SCROLL_SNAP(
+          {
+            ui_css_rule_append_declaration(r, "scroll-snap-stop", "normal", 0);
+          },
+          { TEST_ASSERT(p.stop == UI_CSS_SCROLL_SNAP_STOP_NORMAL); });
 
-  /* snap-stop: always */
-  TEST_SCROLL_SNAP(
-      { ui_css_rule_append_declaration(r, "scroll-snap-stop", "always", 0); },
-      { TEST_ASSERT(p.stop == UI_CSS_SCROLL_SNAP_STOP_ALWAYS); });
+      /* snap-stop: always */
+      TEST_SCROLL_SNAP(
+          {
+            ui_css_rule_append_declaration(r, "scroll-snap-stop", "always", 0);
+          },
+          { TEST_ASSERT(p.stop == UI_CSS_SCROLL_SNAP_STOP_ALWAYS); });
 
-  /* scroll-padding shorthand: 1 value */
-  TEST_SCROLL_SNAP(
-      { ui_css_rule_append_declaration(r, "scroll-padding", "10px", 0); },
-      {
-        TEST_ASSERT(p.padding.top.value == 10.0f);
-        TEST_ASSERT(p.padding.right.value == 10.0f);
-        TEST_ASSERT(p.padding.bottom.value == 10.0f);
-        TEST_ASSERT(p.padding.left.value == 10.0f);
-      });
+      /* scroll-padding shorthand: 1 value */
+      TEST_SCROLL_SNAP(
+          { ui_css_rule_append_declaration(r, "scroll-padding", "10px", 0); },
+          {
+            TEST_ASSERT(p.padding.top.value == 10.0f);
+            TEST_ASSERT(p.padding.right.value == 10.0f);
+            TEST_ASSERT(p.padding.bottom.value == 10.0f);
+            TEST_ASSERT(p.padding.left.value == 10.0f);
+          });
 
-  /* scroll-padding shorthand: 2 values */
-  TEST_SCROLL_SNAP(
-      { ui_css_rule_append_declaration(r, "scroll-padding", "10px 20px", 0); },
-      {
-        TEST_ASSERT(p.padding.top.value == 10.0f);
-        TEST_ASSERT(p.padding.right.value == 20.0f);
-        TEST_ASSERT(p.padding.bottom.value == 10.0f);
-        TEST_ASSERT(p.padding.left.value == 20.0f);
-      });
+      /* scroll-padding shorthand: 2 values */
+      TEST_SCROLL_SNAP(
+          {
+            ui_css_rule_append_declaration(r, "scroll-padding", "10px 20px", 0);
+          },
+          {
+            TEST_ASSERT(p.padding.top.value == 10.0f);
+            TEST_ASSERT(p.padding.right.value == 20.0f);
+            TEST_ASSERT(p.padding.bottom.value == 10.0f);
+            TEST_ASSERT(p.padding.left.value == 20.0f);
+          });
 
-  /* scroll-padding shorthand: 3 values */
-  TEST_SCROLL_SNAP(
-      {
-        ui_css_rule_append_declaration(r, "scroll-padding", "10px 20px 30px",
-                                       0);
-      },
-      {
-        TEST_ASSERT(p.padding.top.value == 10.0f);
-        TEST_ASSERT(p.padding.right.value == 20.0f);
-        TEST_ASSERT(p.padding.bottom.value == 30.0f);
-        TEST_ASSERT(p.padding.left.value == 20.0f);
-      });
+      /* scroll-padding shorthand: 3 values */
+      TEST_SCROLL_SNAP(
+          {
+            ui_css_rule_append_declaration(r, "scroll-padding",
+                                           "10px 20px 30px", 0);
+          },
+          {
+            TEST_ASSERT(p.padding.top.value == 10.0f);
+            TEST_ASSERT(p.padding.right.value == 20.0f);
+            TEST_ASSERT(p.padding.bottom.value == 30.0f);
+            TEST_ASSERT(p.padding.left.value == 20.0f);
+          });
 
-  /* scroll-padding shorthand: 4 values */
-  TEST_SCROLL_SNAP(
-      {
-        ui_css_rule_append_declaration(r, "scroll-padding",
-                                       "10px 20px 30px 40px", 0);
-      },
-      {
-        TEST_ASSERT(p.padding.top.value == 10.0f);
-        TEST_ASSERT(p.padding.right.value == 20.0f);
-        TEST_ASSERT(p.padding.bottom.value == 30.0f);
-        TEST_ASSERT(p.padding.left.value == 40.0f);
-      });
+      /* scroll-padding shorthand: 4 values */
+      TEST_SCROLL_SNAP(
+          {
+            ui_css_rule_append_declaration(r, "scroll-padding",
+                                           "10px 20px 30px 40px", 0);
+          },
+          {
+            TEST_ASSERT(p.padding.top.value == 10.0f);
+            TEST_ASSERT(p.padding.right.value == 20.0f);
+            TEST_ASSERT(p.padding.bottom.value == 30.0f);
+            TEST_ASSERT(p.padding.left.value == 40.0f);
+          });
 
-  /* scroll-padding shorthand: 5 values (tests count < 4 branch) */
-  TEST_SCROLL_SNAP(
-      {
-        ui_css_rule_append_declaration(r, "scroll-padding",
-                                       "10px 20px 30px 40px 50px", 0);
-      },
-      {
-        TEST_ASSERT(p.padding.top.value == 10.0f);
-        TEST_ASSERT(p.padding.right.value == 20.0f);
-        TEST_ASSERT(p.padding.bottom.value == 30.0f);
-        TEST_ASSERT(p.padding.left.value == 40.0f);
-      });
+      /* scroll-padding shorthand: 5 values (tests count < 4 branch) */
+      TEST_SCROLL_SNAP(
+          {
+            ui_css_rule_append_declaration(r, "scroll-padding",
+                                           "10px 20px 30px 40px 50px", 0);
+          },
+          {
+            TEST_ASSERT(p.padding.top.value == 10.0f);
+            TEST_ASSERT(p.padding.right.value == 20.0f);
+            TEST_ASSERT(p.padding.bottom.value == 30.0f);
+            TEST_ASSERT(p.padding.left.value == 40.0f);
+          });
 
-  /* Invalid scroll-padding */
-  TEST_SCROLL_SNAP(
-      { ui_css_rule_append_declaration(r, "scroll-padding", "invalid", 0); },
-      { TEST_ASSERT(p.padding.top.value == 0.0f); });
+      /* Invalid scroll-padding */
+      TEST_SCROLL_SNAP(
+          {
+            ui_css_rule_append_declaration(r, "scroll-padding", "invalid", 0);
+          },
+          { TEST_ASSERT(p.padding.top.value == 0.0f); });
 
-  /* scroll-margin shorthand: 2 values */
-  TEST_SCROLL_SNAP(
-      { ui_css_rule_append_declaration(r, "scroll-margin", "5px 15px", 0); },
-      {
-        TEST_ASSERT(p.margin.top.value == 5.0f);
-        TEST_ASSERT(p.margin.right.value == 15.0f);
-        TEST_ASSERT(p.margin.bottom.value == 5.0f);
-        TEST_ASSERT(p.margin.left.value == 15.0f);
-      });
+      /* scroll-margin shorthand: 2 values */
+      TEST_SCROLL_SNAP(
+          {
+            ui_css_rule_append_declaration(r, "scroll-margin", "5px 15px", 0);
+          },
+          {
+            TEST_ASSERT(p.margin.top.value == 5.0f);
+            TEST_ASSERT(p.margin.right.value == 15.0f);
+            TEST_ASSERT(p.margin.bottom.value == 5.0f);
+            TEST_ASSERT(p.margin.left.value == 15.0f);
+          });
 
-  /* scroll-margin longhands */
-  TEST_SCROLL_SNAP(
-      {
-        ui_css_rule_append_declaration(r, "scroll-margin-top", "1px", 0);
-        ui_css_rule_append_declaration(r, "scroll-margin-right", "2px", 0);
-        ui_css_rule_append_declaration(r, "scroll-margin-bottom", "3px", 0);
-        ui_css_rule_append_declaration(r, "scroll-margin-left", "4px", 0);
-      },
-      {
-        TEST_ASSERT(p.margin.top.value == 1.0f);
-        TEST_ASSERT(p.margin.right.value == 2.0f);
-        TEST_ASSERT(p.margin.bottom.value == 3.0f);
-        TEST_ASSERT(p.margin.left.value == 4.0f);
-      });
+      /* scroll-margin longhands */
+      TEST_SCROLL_SNAP(
+          {
+            ui_css_rule_append_declaration(r, "scroll-margin-top", "1px", 0);
+            ui_css_rule_append_declaration(r, "scroll-margin-right", "2px", 0);
+            ui_css_rule_append_declaration(r, "scroll-margin-bottom", "3px", 0);
+            ui_css_rule_append_declaration(r, "scroll-margin-left", "4px", 0);
+          },
+          {
+            TEST_ASSERT(p.margin.top.value == 1.0f);
+            TEST_ASSERT(p.margin.right.value == 2.0f);
+            TEST_ASSERT(p.margin.bottom.value == 3.0f);
+            TEST_ASSERT(p.margin.left.value == 4.0f);
+          });
 
-  /* scroll-padding longhands */
-  TEST_SCROLL_SNAP(
-      {
-        ui_css_rule_append_declaration(r, "scroll-padding-top", "5px", 0);
-        ui_css_rule_append_declaration(r, "scroll-padding-right", "6px", 0);
-        ui_css_rule_append_declaration(r, "scroll-padding-bottom", "7px", 0);
-        ui_css_rule_append_declaration(r, "scroll-padding-left", "8px", 0);
-      },
-      {
-        TEST_ASSERT(p.padding.top.value == 5.0f);
-        TEST_ASSERT(p.padding.right.value == 6.0f);
-        TEST_ASSERT(p.padding.bottom.value == 7.0f);
-        TEST_ASSERT(p.padding.left.value == 8.0f);
-      });
+      /* scroll-padding longhands */
+      TEST_SCROLL_SNAP(
+          {
+            ui_css_rule_append_declaration(r, "scroll-padding-top", "5px", 0);
+            ui_css_rule_append_declaration(r, "scroll-padding-right", "6px", 0);
+            ui_css_rule_append_declaration(r, "scroll-padding-bottom", "7px",
+                                           0);
+            ui_css_rule_append_declaration(r, "scroll-padding-left", "8px", 0);
+          },
+          {
+            TEST_ASSERT(p.padding.top.value == 5.0f);
+            TEST_ASSERT(p.padding.right.value == 6.0f);
+            TEST_ASSERT(p.padding.bottom.value == 7.0f);
+            TEST_ASSERT(p.padding.left.value == 8.0f);
+          });
 
-  /* Empty strings to trigger token == NULL on first call */
-  TEST_SCROLL_SNAP(
-      {
-        ui_css_rule_append_declaration(r, "scroll-snap-type", "   ", 0);
-        ui_css_rule_append_declaration(r, "scroll-snap-align", "   ", 0);
-        ui_css_rule_append_declaration(r, "scroll-padding", "   ", 0);
-      },
-      {
-        TEST_ASSERT(p.type.axis == UI_CSS_SCROLL_SNAP_AXIS_NONE);
-        TEST_ASSERT(p.align.block == UI_CSS_SCROLL_SNAP_ALIGN_NONE);
-        TEST_ASSERT(p.padding.top.value == 0.0f);
-      });
+      /* Empty strings to trigger token == NULL on first call */
+      TEST_SCROLL_SNAP(
+          {
+            ui_css_rule_append_declaration(r, "scroll-snap-type", "   ", 0);
+            ui_css_rule_append_declaration(r, "scroll-snap-align", "   ", 0);
+            ui_css_rule_append_declaration(r, "scroll-padding", "   ", 0);
+          },
+          {
+            TEST_ASSERT(p.type.axis == UI_CSS_SCROLL_SNAP_AXIS_NONE);
+            TEST_ASSERT(p.align.block == UI_CSS_SCROLL_SNAP_ALIGN_NONE);
+            TEST_ASSERT(p.padding.top.value == 0.0f);
+          });
 
-  /* Invalid values in longhands to trigger rc_cleanup != UI_ERROR_NONE */
-  TEST_SCROLL_SNAP(
-      {
-        ui_css_rule_append_declaration(r, "scroll-padding-top", "invalid", 0);
-        ui_css_rule_append_declaration(r, "scroll-padding-right", "invalid", 0);
-        ui_css_rule_append_declaration(r, "scroll-padding-bottom", "invalid",
-                                       0);
-        ui_css_rule_append_declaration(r, "scroll-padding-left", "invalid", 0);
-        ui_css_rule_append_declaration(r, "scroll-margin-top", "invalid", 0);
-        ui_css_rule_append_declaration(r, "scroll-margin-right", "invalid", 0);
-        ui_css_rule_append_declaration(r, "scroll-margin-bottom", "invalid", 0);
-        ui_css_rule_append_declaration(r, "scroll-margin-left", "invalid", 0);
-      },
-      {
-        TEST_ASSERT(p.padding.top.value == 0.0f);
-        TEST_ASSERT(p.padding.right.value == 0.0f);
-        TEST_ASSERT(p.padding.bottom.value == 0.0f);
-        TEST_ASSERT(p.padding.left.value == 0.0f);
-        TEST_ASSERT(p.margin.top.value == 0.0f);
-        TEST_ASSERT(p.margin.right.value == 0.0f);
-        TEST_ASSERT(p.margin.bottom.value == 0.0f);
-        TEST_ASSERT(p.margin.left.value == 0.0f);
-      });
+      /* Invalid values in longhands to trigger rc_cleanup != UI_ERROR_NONE */
+      TEST_SCROLL_SNAP(
+          {
+            ui_css_rule_append_declaration(r, "scroll-padding-top", "invalid",
+                                           0);
+            ui_css_rule_append_declaration(r, "scroll-padding-right", "invalid",
+                                           0);
+            ui_css_rule_append_declaration(r, "scroll-padding-bottom",
+                                           "invalid", 0);
+            ui_css_rule_append_declaration(r, "scroll-padding-left", "invalid",
+                                           0);
+            ui_css_rule_append_declaration(r, "scroll-margin-top", "invalid",
+                                           0);
+            ui_css_rule_append_declaration(r, "scroll-margin-right", "invalid",
+                                           0);
+            ui_css_rule_append_declaration(r, "scroll-margin-bottom", "invalid",
+                                           0);
+            ui_css_rule_append_declaration(r, "scroll-margin-left", "invalid",
+                                           0);
+          },
+          {
+            TEST_ASSERT(p.padding.top.value == 0.0f);
+            TEST_ASSERT(p.padding.right.value == 0.0f);
+            TEST_ASSERT(p.padding.bottom.value == 0.0f);
+            TEST_ASSERT(p.padding.left.value == 0.0f);
+            TEST_ASSERT(p.margin.top.value == 0.0f);
+            TEST_ASSERT(p.margin.right.value == 0.0f);
+            TEST_ASSERT(p.margin.bottom.value == 0.0f);
+            TEST_ASSERT(p.margin.left.value == 0.0f);
+          });
 
 #ifdef UI_TEST_MOCK_ALLOC
-  {
-    extern ui_error_t run_scroll_snap_coverage(void);
-    run_scroll_snap_coverage();
-  }
+      { run_scroll_snap_coverage(); }
 #endif
 
-  {
-    ui_error_t rc_cleanup = ui_dom_node_destroy(node);
-    TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+      {
+        ui_error_t rc_cleanup = ui_dom_node_destroy(node);
+        TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
+      }
+    }
   }
 }
 

@@ -9,6 +9,7 @@
 #include <string.h>
 /* clang-format on */
 
+/** @brief cupertino_magnifier_create function. */
 ui_error_t
 cupertino_magnifier_create(struct ui_engine *engine,
                            const struct cupertino_magnifier_descriptor *desc,
@@ -49,6 +50,7 @@ cupertino_magnifier_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_magnifier_destroy function. */
 ui_error_t cupertino_magnifier_destroy(struct cupertino_magnifier *magnifier) {
   if (!magnifier) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -58,6 +60,7 @@ ui_error_t cupertino_magnifier_destroy(struct cupertino_magnifier *magnifier) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_magnifier_show function. */
 ui_error_t cupertino_magnifier_show(struct cupertino_magnifier *magnifier,
                                     float touch_x, float touch_y) {
   if (!magnifier) {
@@ -73,6 +76,7 @@ ui_error_t cupertino_magnifier_show(struct cupertino_magnifier *magnifier,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_magnifier_update_position function. */
 ui_error_t
 cupertino_magnifier_update_position(struct cupertino_magnifier *magnifier,
                                     float touch_x, float touch_y) {
@@ -88,6 +92,7 @@ cupertino_magnifier_update_position(struct cupertino_magnifier *magnifier,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_magnifier_clamp_bounds function. */
 ui_error_t
 cupertino_magnifier_clamp_bounds(struct cupertino_magnifier *magnifier,
                                  float screen_width, float screen_height) {
@@ -115,6 +120,7 @@ cupertino_magnifier_clamp_bounds(struct cupertino_magnifier *magnifier,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_magnifier_hide function. */
 ui_error_t cupertino_magnifier_hide(struct cupertino_magnifier *magnifier) {
   if (!magnifier) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -124,6 +130,7 @@ ui_error_t cupertino_magnifier_hide(struct cupertino_magnifier *magnifier) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_magnifier_tick function. */
 ui_error_t cupertino_magnifier_tick(struct cupertino_magnifier *magnifier,
                                     float delta_ms) {
   float target;
@@ -151,6 +158,7 @@ ui_error_t cupertino_magnifier_tick(struct cupertino_magnifier *magnifier,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_magnifier_get_lens_rect function. */
 ui_error_t
 cupertino_magnifier_get_lens_rect(const struct cupertino_magnifier *magnifier,
                                   float *out_x, float *out_y, float *out_w,
@@ -166,6 +174,7 @@ cupertino_magnifier_get_lens_rect(const struct cupertino_magnifier *magnifier,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_magnifier_get_sample_center function. */
 ui_error_t cupertino_magnifier_get_sample_center(
     const struct cupertino_magnifier *magnifier, float *out_sample_x,
     float *out_sample_y) {
@@ -178,6 +187,7 @@ ui_error_t cupertino_magnifier_get_sample_center(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_magnifier_get_scale function. */
 ui_error_t
 cupertino_magnifier_get_scale(const struct cupertino_magnifier *magnifier,
                               float *out_scale) {

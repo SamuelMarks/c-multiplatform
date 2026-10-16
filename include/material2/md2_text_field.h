@@ -15,7 +15,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
@@ -127,6 +127,6 @@ extern C_MULTIPLATFORM_EXPORT ui_error_t md2_text_field_set_control(
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* MATERIAL2_MD2_TEXT_FIELD_H */

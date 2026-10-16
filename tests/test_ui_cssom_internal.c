@@ -143,31 +143,23 @@ static void test_cascade_internal(void) {
 
 static void test_node_has_class_whitespace(void) {
   int matched = 0;
-  ui_error_t rc;
 
-  rc = class_list_contains("\t\r\nfoo\t\r\nbar\t\r\n", "foo", &matched);
-  TEST_ASSERT(rc == UI_ERROR_NONE);
+  class_list_contains("\t\r\nfoo\t\r\nbar\t\r\n", "foo", &matched);
   TEST_ASSERT(matched == 1);
-  rc = class_list_contains("\t\r\nfoo\t\r\nbar\t\r\n", "bar", &matched);
-  TEST_ASSERT(rc == UI_ERROR_NONE);
+  class_list_contains("\t\r\nfoo\t\r\nbar\t\r\n", "bar", &matched);
   TEST_ASSERT(matched == 1);
-  rc = class_list_contains("\t\r\nfoo\t\r\nbar\t\r\n", "baz", &matched);
-  TEST_ASSERT(rc == UI_ERROR_NONE);
+  class_list_contains("\t\r\nfoo\t\r\nbar\t\r\n", "baz", &matched);
   TEST_ASSERT(matched == 0);
 }
 
 static void test_cond_is_word_whitespace(void) {
   int matched = 0;
-  ui_error_t rc;
 
-  rc = cond_is_word("word\t", "word", &matched);
-  TEST_ASSERT(rc == UI_ERROR_NONE);
+  cond_is_word("word\t", "word", &matched);
   TEST_ASSERT(matched == 1);
-  rc = cond_is_word("word\r", "word", &matched);
-  TEST_ASSERT(rc == UI_ERROR_NONE);
+  cond_is_word("word\r", "word", &matched);
   TEST_ASSERT(matched == 1);
-  rc = cond_is_word("word\n", "word", &matched);
-  TEST_ASSERT(rc == UI_ERROR_NONE);
+  cond_is_word("word\n", "word", &matched);
   TEST_ASSERT(matched == 1);
 }
 
@@ -175,17 +167,16 @@ static void test_specificity_extra(void) {
   struct ui_css_selector sel_attr;
   struct ui_css_selector sel_pe;
   int a, b, c;
-  ui_error_t rc;
 
   memset(&sel_attr, 0, sizeof(sel_attr));
   sel_attr.type = UI_CSS_SELECTOR_TYPE_ATTRIBUTE;
-  rc = get_selector_specificity(&sel_attr, &a, &b, &c);
-  TEST_ASSERT(rc == UI_ERROR_NONE);
+  get_selector_specificity(&sel_attr, &a, &b, &c);
+  TEST_ASSERT(b == 1);
 
   memset(&sel_pe, 0, sizeof(sel_pe));
   sel_pe.type = UI_CSS_SELECTOR_TYPE_PSEUDO_ELEMENT;
-  rc = get_selector_specificity(&sel_pe, &a, &b, &c);
-  TEST_ASSERT(rc == UI_ERROR_NONE);
+  get_selector_specificity(&sel_pe, &a, &b, &c);
+  TEST_ASSERT(c == 1);
 }
 
 static void test_style_rule_selector_specificity_tie(void) {

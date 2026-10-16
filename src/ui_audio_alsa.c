@@ -65,9 +65,11 @@ ui_error_t ui_audio_alsa_load_api(void) {
 
 #define LOAD_SYM(name)                                                         \
   do {                                                                         \
-    g_alsa.name = (void *)dlsym(g_alsa_handle, #name);                         \
+    void *sym_ptr = dlsym(g_alsa_handle, #name);                               \
+    memcpy(&g_alsa.name, &sym_ptr, sizeof(g_alsa.name));                       \
     if (!g_alsa.name) {                                                        \
-      dlclose(g_alsa_handle);                                                  \
+      if (dlclose(g_alsa_handle) != 0) {                                       \
+      }                                                                        \
       g_alsa_handle = NULL;                                                    \
       return UI_ERROR_UNSUPPORTED;                                             \
     }                                                                          \
@@ -326,6 +328,7 @@ ui_audio_sink_get_default_backend(struct ui_audio_sink_backend *out_backend) {
 
 #else
 
+/** @brief ui_audio_sink_alsa_get_backend function. */
 ui_error_t
 ui_audio_sink_alsa_get_backend(struct ui_audio_sink_backend *out_backend) {
   if (!out_backend) {

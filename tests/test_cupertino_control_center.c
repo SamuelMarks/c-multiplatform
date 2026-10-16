@@ -10,6 +10,14 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_cupertino_control_center_mock_button_create_fail;
+extern int g_cupertino_control_center_mock_slider_create_fail;
+extern int g_cupertino_control_center_mock_button_destroy_fail;
+extern int g_cupertino_control_center_mock_slider_destroy_fail;
+extern int g_cupertino_control_center_mock_haptic_fail;
+extern int g_cupertino_control_center_mock_geometry_fail;
+extern int g_cupertino_control_center_mock_appearance_fail;
+
 extern int g_malloc_fail_countdown;
 
 TEST test_control_center_module_lifecycle(void) {
@@ -438,13 +446,6 @@ TEST test_control_center_oom(void) {
   struct cupertino_control_center_grid *grid = NULL;
   ui_error_t rc;
 #ifdef UI_TEST_MOCK_ALLOC
-  extern int g_cupertino_control_center_mock_button_create_fail;
-  extern int g_cupertino_control_center_mock_slider_create_fail;
-  extern int g_cupertino_control_center_mock_button_destroy_fail;
-  extern int g_cupertino_control_center_mock_slider_destroy_fail;
-  extern int g_cupertino_control_center_mock_haptic_fail;
-  extern int g_cupertino_control_center_mock_geometry_fail;
-  extern int g_cupertino_control_center_mock_appearance_fail;
 #endif
 
   memset(&desc, 0, sizeof(desc));

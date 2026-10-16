@@ -63,8 +63,10 @@ static void test_widths(void) {
 
   for (i = 1; i <= 5; i++) {
     g_breakpoint_mock_fail = i;
-    ui_breakpoint_observer_tick(o, 400.0 + i * 10, 1000.0 * i);
-    ui_breakpoint_observer_tick(o, 400.0 + i * 10, 1000.0 * i + 60.0);
+    ui_breakpoint_observer_tick(o, 400.0f + (float)(i * 10),
+                                1000.0f * (float)i);
+    ui_breakpoint_observer_tick(o, 400.0f + (float)(i * 10),
+                                1000.0f * (float)i + 60.0f);
   }
   g_breakpoint_mock_fail = 0;
 

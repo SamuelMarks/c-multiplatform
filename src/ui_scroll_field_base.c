@@ -146,6 +146,7 @@ sampler_update_spinbutton_attributes(struct ui_scroll_field_base *field) {
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_scroll_field_base_create function. */
 ui_error_t
 ui_scroll_field_base_create(struct ui_scroll_field_base **out_field) {
   struct ui_scroll_field_base *field = NULL;
@@ -269,6 +270,7 @@ cleanup:
   return rc;
 }
 
+/** @brief ui_scroll_field_base_destroy function. */
 ui_error_t ui_scroll_field_base_destroy(struct ui_scroll_field_base *field) {
   ui_error_t rc = UI_ERROR_NONE;
   ui_error_t rc_cleanup;
@@ -289,6 +291,7 @@ ui_error_t ui_scroll_field_base_destroy(struct ui_scroll_field_base *field) {
   return rc;
 }
 
+/** @brief ui_scroll_field_base_get_component function. */
 ui_error_t
 ui_scroll_field_base_get_component(struct ui_scroll_field_base *field,
                                    struct ui_component **out_component) {
@@ -300,6 +303,7 @@ ui_scroll_field_base_get_component(struct ui_scroll_field_base *field,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_scroll_field_base_set_range function. */
 ui_error_t ui_scroll_field_base_set_range(struct ui_scroll_field_base *field,
                                           int min_val, int max_val, int step) {
   if (field == NULL || min_val >= max_val || step <= 0) {
@@ -319,6 +323,7 @@ ui_error_t ui_scroll_field_base_set_range(struct ui_scroll_field_base *field,
   return sampler_update_spinbutton_attributes(field);
 }
 
+/** @brief ui_scroll_field_base_get_range function. */
 ui_error_t
 ui_scroll_field_base_get_range(const struct ui_scroll_field_base *field,
                                int *out_min_val, int *out_max_val,
@@ -335,6 +340,7 @@ ui_scroll_field_base_get_range(const struct ui_scroll_field_base *field,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_scroll_field_base_set_value function. */
 ui_error_t ui_scroll_field_base_set_value(struct ui_scroll_field_base *field,
                                           int value) {
   if (field == NULL) {
@@ -361,6 +367,7 @@ ui_error_t ui_scroll_field_base_set_value(struct ui_scroll_field_base *field,
   return sampler_update_spinbutton_attributes(field);
 }
 
+/** @brief ui_scroll_field_base_get_value function. */
 ui_error_t
 ui_scroll_field_base_get_value(const struct ui_scroll_field_base *field,
                                int *out_value) {
@@ -372,6 +379,7 @@ ui_scroll_field_base_get_value(const struct ui_scroll_field_base *field,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_scroll_field_base_step_up function. */
 ui_error_t ui_scroll_field_base_step_up(struct ui_scroll_field_base *field) {
   if (field == NULL) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -381,6 +389,7 @@ ui_error_t ui_scroll_field_base_step_up(struct ui_scroll_field_base *field) {
                                         field->current_value + field->step);
 }
 
+/** @brief ui_scroll_field_base_step_down function. */
 ui_error_t ui_scroll_field_base_step_down(struct ui_scroll_field_base *field) {
   if (field == NULL) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -390,6 +399,7 @@ ui_error_t ui_scroll_field_base_step_down(struct ui_scroll_field_base *field) {
                                         field->current_value - field->step);
 }
 
+/** @brief ui_scroll_field_base_set_looping function. */
 ui_error_t ui_scroll_field_base_set_looping(struct ui_scroll_field_base *field,
                                             int looping) {
   if (field == NULL) {
@@ -400,6 +410,7 @@ ui_error_t ui_scroll_field_base_set_looping(struct ui_scroll_field_base *field,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_scroll_field_base_is_looping function. */
 ui_error_t
 ui_scroll_field_base_is_looping(const struct ui_scroll_field_base *field,
                                 int *out_looping) {

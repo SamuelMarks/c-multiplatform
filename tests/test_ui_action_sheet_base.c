@@ -9,6 +9,8 @@
 #include <assert.h>
 /* clang-format on */
 
+extern ui_bottom_sheet_on_close_t g_action_sheet_close_cb;
+
 extern int g_malloc_fail_countdown;
 
 static int close_count = 0;
@@ -338,7 +340,6 @@ static int test_action_sheet_mock_failures(void) {
 
   /* Test close callback directly with nulls and valid */
   {
-    extern ui_bottom_sheet_on_close_t g_action_sheet_close_cb;
     if (g_action_sheet_close_cb) {
       rc = g_action_sheet_close_cb(NULL, sheet);
       if (rc != UI_ERROR_INVALID_ARGUMENT) {

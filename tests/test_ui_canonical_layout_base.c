@@ -6,6 +6,8 @@
 #include <stdio.h>
 /* clang-format on */
 
+extern int g_canonical_layout_mock_fail;
+
 struct ui_canonical_layout_base {
   struct ui_arena *arena;
   enum ui_window_size_class size_class;
@@ -92,7 +94,6 @@ static void test_canonical_layout_null_args_and_coverage(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_canonical_layout_mock_fail;
     struct ui_canonical_layout_base *layout_mock = NULL;
     ui_error_t rc;
 

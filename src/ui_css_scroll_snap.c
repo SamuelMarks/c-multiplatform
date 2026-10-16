@@ -223,6 +223,7 @@ static ui_error_t parse_quad_shorthand(const char *str,
 
 /* \brief ui_error
  */
+/** @brief ui_css_scroll_snap_parse function. */
 ui_error_t
 ui_css_scroll_snap_parse(const struct ui_css_computed_style *style,
                          struct ui_css_scroll_snap_properties *out_props) {

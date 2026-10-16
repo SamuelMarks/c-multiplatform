@@ -10,6 +10,10 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_cupertino_collection_view_mock_grid_set_columns_fail;
+extern int g_cupertino_collection_view_mock_grid_destroy_fail;
+extern int g_cupertino_collection_view_mock_grid_add_item_fail;
+
 #ifdef UI_TEST_MOCK_ALLOC
 extern int g_malloc_fail_countdown;
 #endif
@@ -286,9 +290,6 @@ TEST test_collection_view_oom_mock(void) {
   float x, y, w, h;
   ui_error_t rc;
 #ifdef UI_TEST_MOCK_ALLOC
-  extern int g_cupertino_collection_view_mock_grid_set_columns_fail;
-  extern int g_cupertino_collection_view_mock_grid_destroy_fail;
-  extern int g_cupertino_collection_view_mock_grid_add_item_fail;
 #endif
 
   memset(&config, 0, sizeof(config));

@@ -22,6 +22,8 @@
 #include <assert.h>
 /* clang-format on */
 
+extern int g_malloc_fail_countdown;
+
 extern int g_rtb_mock_registry_fail;
 extern int g_rtb_mock_format_fail;
 extern int g_rtb_mock_signal_get_fail;
@@ -132,9 +134,17 @@ static ui_error_t mock_set_prop(void *instance, const char *key,
     return UI_ERROR_UNKNOWN;
   }
   if (inst && key && val) {
+#if defined(_MSC_VER)
+    strncpy_s(inst->last_prop_key, sizeof(inst->last_prop_key), key, _TRUNCATE);
+#else
     strncpy(inst->last_prop_key, key, sizeof(inst->last_prop_key) - 1);
+#endif
     inst->last_prop_key[sizeof(inst->last_prop_key) - 1] = '\0';
+#if defined(_MSC_VER)
+    strncpy_s(inst->last_prop_val, sizeof(inst->last_prop_val), val, _TRUNCATE);
+#else
     strncpy(inst->last_prop_val, val, sizeof(inst->last_prop_val) - 1);
+#endif
     inst->last_prop_val[sizeof(inst->last_prop_val) - 1] = '\0';
   }
   return UI_ERROR_NONE;
@@ -211,7 +221,6 @@ static void run_builder_edge_and_mock_tests(void) {
   struct ui_dom_node *test_dom = NULL;
   int w = 0, h = 0;
   ui_error_t rc;
-  extern int g_malloc_fail_countdown;
 
   rc = ui_arena_create(65536, &arena);
   assert(rc == UI_ERROR_NONE);
@@ -882,46 +891,19 @@ int main(void) {
   ui_error_t rc;
 
   const char *node_json =
-      "{\n"
-      "  \"id\": \"card_container\",\n"
-      "  \"type\": \"ui_card_base\",\n"
-      "  \"props\": {\n"
-      "    \"title\": \"User Profile\"\n"
-      "  },\n"
-      "  \"children\": [\n"
-      "    {\n"
-      "      \"id\": \"input_email\",\n"
-      "      \"type\": \"ui_input_base\",\n"
-      "      \"props\": {\n"
-      "        \"placeholder\": \"email@domain.com\"\n"
-      "      },\n"
-      "      \"bindings\": {\n"
-      "        \"bind_cva\": \"user.email\"\n"
-      "      },\n"
-      "      \"validators\": [\n"
-      "        {\"type\": \"required\"}\n"
-      "      ]\n"
-      "    },\n"
-      "    {\n"
-      "      \"id\": \"btn_action\",\n"
-      "      \"type\": \"ui_button_base\",\n"
-      "      \"props\": {\n"
-      "        \"text\": \"Save\"\n"
-      "      },\n"
-      "      \"bindings\": {\n"
-      "        \"bind_disabled\": \"is_saving\"\n"
-      "      },\n"
-      "      \"events\": {\n"
-      "        \"on_click\": {\n"
-      "          \"steps\": [\n"
-      "            {\"stepId\": \"s1\", \"action\": \"mutate_state\", "
-      "\"target\": \"counter\", \"value\": \"increment\"}\n"
-      "          ]\n"
-      "        }\n"
-      "      }\n"
-      "    }\n"
-      "  ]\n"
-      "}";
+      "{\"id\":\"card_container\",\"type\":\"ui_card_base\","
+      "\"props\":{\"title\":\"User Profile\"},\"children\":["
+      "{\"id\":\"input_email\",\"type\":\"ui_input_base\","
+      "\"props\":{\"placeholder\":\"email@domain.com\"},"
+      "\"bindings\":{\"bind_cva\":\"user.email\"},"
+      "\"validators\":[{\"type\":\"required\"}]},"
+      "{\"id\":\"btn_action\",\"type\":\"ui_button_base\","
+      "\"props\":{\"text\":\"Save\"},"
+      "\"bindings\":{\"bind_disabled\":\"is_saving\"},"
+      "\"events\":{\"on_click\":{\"steps\":["
+      "{\"stepId\":\"s1\",\"action\":\"mutate_state\",\"target\":\"counter\","
+      "\"value\":\"increment\"}"
+      "]}}}]}";
 
   struct ui_runtime_node *ast_root = NULL;
 
@@ -1091,11 +1073,10 @@ int main(void) {
            UI_ERROR_NONE);
 
     /* 1. ui_component_registry_get_default failure when registry == NULL */
-    node = (struct ui_runtime_node *)ui_arena_alloc(
-               mock_arena, sizeof(struct ui_runtime_node), 8, (void **)&node) ==
-                   UI_ERROR_NONE
-               ? node
-               : NULL;
+    if (ui_arena_alloc(mock_arena, sizeof(struct ui_runtime_node), 8,
+                       (void **)&node) != UI_ERROR_NONE) {
+      node = NULL;
+    }
     memset(node, 0, sizeof(struct ui_runtime_node));
     node->type = "ui_button_base";
 

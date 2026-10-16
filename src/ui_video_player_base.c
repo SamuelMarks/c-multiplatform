@@ -33,6 +33,7 @@ ui_error_t ui_video_player_base_init(struct ui_video_player_base *player,
 
 /* \brief ui_error
  */
+/** @brief ui_video_player_base_toggle_play function. */
 ui_error_t
 ui_video_player_base_toggle_play(struct ui_video_player_base *player) {
   if (player) {
@@ -62,6 +63,7 @@ ui_error_t ui_video_player_base_seek(struct ui_video_player_base *player,
 
 /* \brief ui_error
  */
+/** @brief ui_video_player_base_set_volume function. */
 ui_error_t ui_video_player_base_set_volume(struct ui_video_player_base *player,
                                            float volume) {
   if (player) {
@@ -77,6 +79,7 @@ ui_error_t ui_video_player_base_set_volume(struct ui_video_player_base *player,
 
 /* \brief ui_error
  */
+/** @brief ui_video_player_base_toggle_fullscreen function. */
 ui_error_t
 ui_video_player_base_toggle_fullscreen(struct ui_video_player_base *player) {
   if (player) {

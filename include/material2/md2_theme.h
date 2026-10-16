@@ -15,16 +15,16 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 /**
  * @struct md2_theme
  * @brief Material Design 2 global theme configuration.
  */
 struct md2_theme {
-  int is_dark;
-  struct md2_color_palette colors;
-  float font_scale;
+  int is_dark;                     /**< is_dark field. */
+  struct md2_color_palette colors; /**< colors field. */
+  float font_scale;                /**< font_scale field. */
 };
 
 /**
@@ -47,6 +47,6 @@ md2_theme_init_dark(struct md2_theme *out_theme);
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* MATERIAL2_MD2_THEME_H */

@@ -420,6 +420,7 @@ static ui_error_t listbox_cva_write_value(void *component,
 
 /* @brief listbox_cva_register_on_change
  */
+/** @brief listbox_cva_register_on_change function. */
 static ui_error_t listbox_cva_register_on_change(
     void *component,
     ui_error_t (*callback)(union ui_signal_payload new_value, void *user_data),

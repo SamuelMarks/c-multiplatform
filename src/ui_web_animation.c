@@ -46,6 +46,7 @@ struct ui_web_animation {
   double playback_rate;                        /**< playback_rate */
 };
 
+/** @brief ui_web_animation_effect_create_keyframe_effect function. */
 ui_error_t ui_web_animation_effect_create_keyframe_effect(
     struct ui_dom_node *target, struct ui_web_animation_keyframe *keyframes,
     const struct ui_web_animation_timing *timing,
@@ -70,6 +71,7 @@ ui_error_t ui_web_animation_effect_create_keyframe_effect(
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_web_animation_effect_destroy function. */
 ui_error_t
 ui_web_animation_effect_destroy(struct ui_web_animation_effect *effect) {
   struct ui_web_animation_keyframe *kf;
@@ -102,6 +104,7 @@ ui_web_animation_effect_destroy(struct ui_web_animation_effect *effect) {
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_web_animation_timeline_create_document_timeline function. */
 ui_error_t ui_web_animation_timeline_create_document_timeline(
     struct ui_web_animation_timeline **out_timeline) {
   struct ui_web_animation_timeline *timeline;
@@ -124,6 +127,7 @@ ui_error_t ui_web_animation_timeline_create_document_timeline(
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_web_animation_timeline_create_scroll_timeline function. */
 ui_error_t ui_web_animation_timeline_create_scroll_timeline(
     struct ui_dom_node *source, enum ui_web_animation_scroll_axis axis,
     struct ui_web_animation_timeline **out_timeline) {
@@ -147,6 +151,7 @@ ui_error_t ui_web_animation_timeline_create_scroll_timeline(
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_web_animation_timeline_create_view_timeline function. */
 ui_error_t ui_web_animation_timeline_create_view_timeline(
     struct ui_dom_node *subject, enum ui_web_animation_scroll_axis axis,
     struct ui_web_animation_timeline **out_timeline) {
@@ -170,6 +175,7 @@ ui_error_t ui_web_animation_timeline_create_view_timeline(
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_web_animation_timeline_create_pointer_timeline function. */
 ui_error_t ui_web_animation_timeline_create_pointer_timeline(
     struct ui_dom_node *target, enum ui_web_animation_pointer_axis axis,
     struct ui_web_animation_timeline **out_timeline) {
@@ -193,6 +199,7 @@ ui_error_t ui_web_animation_timeline_create_pointer_timeline(
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_web_animation_timeline_set_current_time function. */
 ui_error_t ui_web_animation_timeline_set_current_time(
     struct ui_web_animation_timeline *timeline, double time) {
   if (!timeline) {
@@ -202,6 +209,7 @@ ui_error_t ui_web_animation_timeline_set_current_time(
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_web_animation_timeline_destroy function. */
 ui_error_t
 ui_web_animation_timeline_destroy(struct ui_web_animation_timeline *timeline) {
   if (!timeline) {
@@ -211,6 +219,7 @@ ui_web_animation_timeline_destroy(struct ui_web_animation_timeline *timeline) {
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_web_animation_create function. */
 ui_error_t ui_web_animation_create(struct ui_web_animation_effect *effect,
                                    struct ui_web_animation_timeline *timeline,
                                    struct ui_web_animation **out_animation) {
@@ -236,6 +245,7 @@ ui_error_t ui_web_animation_create(struct ui_web_animation_effect *effect,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_web_animation_destroy function. */
 ui_error_t ui_web_animation_destroy(struct ui_web_animation *animation) {
   if (!animation) {
     return UI_ERROR_NONE;
@@ -267,6 +277,7 @@ static double get_active_duration(const struct ui_web_animation *anim) {
   return anim->effect->timing.duration * anim->effect->timing.iterations;
 }
 
+/** @brief ui_web_animation_play function. */
 ui_error_t ui_web_animation_play(struct ui_web_animation *animation) {
   double active_duration;
 
@@ -297,6 +308,7 @@ ui_error_t ui_web_animation_play(struct ui_web_animation *animation) {
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_web_animation_pause function. */
 ui_error_t ui_web_animation_pause(struct ui_web_animation *animation) {
   if (!animation) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -309,6 +321,7 @@ ui_error_t ui_web_animation_pause(struct ui_web_animation *animation) {
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_web_animation_reverse function. */
 ui_error_t ui_web_animation_reverse(struct ui_web_animation *animation) {
   if (!animation) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -318,6 +331,7 @@ ui_error_t ui_web_animation_reverse(struct ui_web_animation *animation) {
   return ui_web_animation_play(animation);
 }
 
+/** @brief ui_web_animation_cancel function. */
 ui_error_t ui_web_animation_cancel(struct ui_web_animation *animation) {
   if (!animation) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -328,6 +342,7 @@ ui_error_t ui_web_animation_cancel(struct ui_web_animation *animation) {
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_web_animation_finish function. */
 ui_error_t ui_web_animation_finish(struct ui_web_animation *animation) {
   double active_duration;
 
@@ -349,6 +364,7 @@ ui_error_t ui_web_animation_finish(struct ui_web_animation *animation) {
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_web_animation_get_play_state function. */
 ui_error_t
 ui_web_animation_get_play_state(const struct ui_web_animation *animation,
                                 enum ui_web_animation_play_state *out_state) {
@@ -360,6 +376,7 @@ ui_web_animation_get_play_state(const struct ui_web_animation *animation,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_web_animation_get_current_time function. */
 ui_error_t
 ui_web_animation_get_current_time(const struct ui_web_animation *animation,
                                   double *out_time) {
@@ -371,6 +388,7 @@ ui_web_animation_get_current_time(const struct ui_web_animation *animation,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_web_animation_set_current_time function. */
 ui_error_t ui_web_animation_set_current_time(struct ui_web_animation *animation,
                                              double time) {
   double active_duration;
@@ -398,6 +416,7 @@ ui_error_t ui_web_animation_set_current_time(struct ui_web_animation *animation,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_web_animation_get_playback_rate function. */
 ui_error_t
 ui_web_animation_get_playback_rate(const struct ui_web_animation *animation,
                                    double *out_rate) {
@@ -409,6 +428,7 @@ ui_web_animation_get_playback_rate(const struct ui_web_animation *animation,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_web_animation_set_playback_rate function. */
 ui_error_t
 ui_web_animation_set_playback_rate(struct ui_web_animation *animation,
                                    double rate) {
@@ -420,6 +440,7 @@ ui_web_animation_set_playback_rate(struct ui_web_animation *animation,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_web_animation_tick function. */
 ui_error_t ui_web_animation_tick(struct ui_web_animation *animation,
                                  double delta_time_ms) {
   double new_time;

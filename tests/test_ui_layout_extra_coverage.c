@@ -1,3 +1,4 @@
+extern int g_layout_compute_mock_fail;
 
 static void test_extra_coverage(void) {
   struct ui_dom_node *root;
@@ -51,7 +52,6 @@ static void test_extra_coverage(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_layout_compute_mock_fail;
     struct ui_layout_node flex_node;
     struct ui_layout_node block_node;
     memset(&flex_node, 0, sizeof(flex_node));
@@ -110,88 +110,92 @@ static void test_extra_coverage(void) {
   ui_dom_node_set_tag_name(b2, "div");
   ui_dom_node_set_attribute(b2, "class", "b2");
 
-  struct ui_dom_node *tb1, *ti1, *tb2;
-  ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &tb1);
-  ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &ti1);
-  ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &tb2);
-  ui_dom_node_append_child(b1, tb1);
-  ui_dom_node_append_child(i1, ti1);
-  ui_dom_node_append_child(b2, tb2);
-
-  ui_dom_node_append_child(mix_root, i1);
-  ui_dom_node_append_child(mix_root, b1);
-  ui_dom_node_append_child(mix_root, b2);
-
   {
-    struct ui_css_stylesheet *mix_sheet;
-    struct ui_css_rule *r_mixroot, *r_b1, *r_i1, *r_b2;
-    ui_css_stylesheet_create(&mix_sheet);
+    struct ui_dom_node *tb1, *ti1, *tb2;
+    ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &tb1);
+    ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &ti1);
+    ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &tb2);
+    ui_dom_node_append_child(b1, tb1);
+    ui_dom_node_append_child(i1, ti1);
+    ui_dom_node_append_child(b2, tb2);
 
-    ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &r_mixroot);
-    ui_css_rule_append_selector(r_mixroot, UI_CSS_SELECTOR_TYPE_TAG, "mixroot");
-    ui_css_rule_append_declaration(r_mixroot, "display", "block", 0);
-    ui_css_stylesheet_append_rule(mix_sheet, r_mixroot);
+    ui_dom_node_append_child(mix_root, i1);
+    ui_dom_node_append_child(mix_root, b1);
+    ui_dom_node_append_child(mix_root, b2);
 
-    ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &r_b1);
-    ui_css_rule_append_selector(r_b1, UI_CSS_SELECTOR_TYPE_TAG, "b1");
-    ui_css_rule_append_declaration(r_b1, "display", "block", 0);
-    ui_css_stylesheet_append_rule(mix_sheet, r_b1);
+    {
+      struct ui_css_stylesheet *mix_sheet;
+      struct ui_css_rule *r_mixroot, *r_b1, *r_i1, *r_b2;
+      ui_css_stylesheet_create(&mix_sheet);
 
-    ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &r_i1);
-    ui_css_rule_append_selector(r_i1, UI_CSS_SELECTOR_TYPE_TAG, "i1");
-    ui_css_rule_append_declaration(r_i1, "display", "inline", 0);
-    ui_css_stylesheet_append_rule(mix_sheet, r_i1);
+      ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &r_mixroot);
+      ui_css_rule_append_selector(r_mixroot, UI_CSS_SELECTOR_TYPE_TAG,
+                                  "mixroot");
+      ui_css_rule_append_declaration(r_mixroot, "display", "block", 0);
+      ui_css_stylesheet_append_rule(mix_sheet, r_mixroot);
 
-    ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &r_b2);
-    ui_css_rule_append_selector(r_b2, UI_CSS_SELECTOR_TYPE_TAG, "b2");
-    ui_css_rule_append_declaration(r_b2, "display", "block", 0);
-    ui_css_stylesheet_append_rule(mix_sheet, r_b2);
+      ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &r_b1);
+      ui_css_rule_append_selector(r_b1, UI_CSS_SELECTOR_TYPE_TAG, "b1");
+      ui_css_rule_append_declaration(r_b1, "display", "block", 0);
+      ui_css_stylesheet_append_rule(mix_sheet, r_b1);
 
-    ui_layout_tree_generate(mix_root, mix_sheet, &lroot);
-    ui_layout_compute(lroot, 100.0f, 100.0f);
-    ui_layout_tree_destroy(lroot);
-    ui_css_stylesheet_destroy(mix_sheet);
+      ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &r_i1);
+      ui_css_rule_append_selector(r_i1, UI_CSS_SELECTOR_TYPE_TAG, "i1");
+      ui_css_rule_append_declaration(r_i1, "display", "inline", 0);
+      ui_css_stylesheet_append_rule(mix_sheet, r_i1);
+
+      ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &r_b2);
+      ui_css_rule_append_selector(r_b2, UI_CSS_SELECTOR_TYPE_TAG, "b2");
+      ui_css_rule_append_declaration(r_b2, "display", "block", 0);
+      ui_css_stylesheet_append_rule(mix_sheet, r_b2);
+
+      ui_layout_tree_generate(mix_root, mix_sheet, &lroot);
+      ui_layout_compute(lroot, 100.0f, 100.0f);
+      ui_layout_tree_destroy(lroot);
+      ui_css_stylesheet_destroy(mix_sheet);
+    }
+
+    for (j = 0; j < 3; ++j) {
+      struct ui_css_stylesheet *mix_sheet;
+      struct ui_css_rule *r_mixroot, *r_i1;
+      ui_css_stylesheet_create(&mix_sheet);
+
+      ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &r_mixroot);
+      ui_css_rule_append_selector(r_mixroot, UI_CSS_SELECTOR_TYPE_TAG,
+                                  "mixroot");
+      ui_css_rule_append_declaration(r_mixroot, "display", "flex", 0);
+      ui_css_rule_append_declaration(r_mixroot, "flex-direction", "column", 0);
+      ui_css_rule_append_declaration(r_mixroot, "justify-content",
+                                     justify_vals[j], 0);
+      ui_css_rule_append_declaration(r_mixroot, "align-items", "center", 0);
+      ui_css_rule_append_declaration(r_mixroot, "wrap-through", "wrap", 0);
+      ui_css_stylesheet_append_rule(mix_sheet, r_mixroot);
+
+      ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &r_i1);
+      ui_css_rule_append_selector(r_i1, UI_CSS_SELECTOR_TYPE_TAG, "i1");
+      ui_css_rule_append_declaration(r_i1, "display", "flex", 0);
+      ui_css_rule_append_declaration(r_i1, "flex-shrink", "1", 0);
+      ui_css_rule_append_declaration(r_i1, "height", "200px", 0);
+      ui_css_stylesheet_append_rule(mix_sheet, r_i1);
+
+      ui_layout_tree_generate(mix_root, mix_sheet, &lroot);
+      ui_layout_compute(lroot, 100.0f, 100.0f);
+      ui_layout_tree_destroy(lroot);
+
+      ui_css_stylesheet_destroy(mix_sheet);
+    }
+
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(mix_root);
+      assert(rc_cleanup == UI_ERROR_NONE);
+    }
+
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(root);
+      assert(rc_cleanup == UI_ERROR_NONE);
+    }
+    ui_css_stylesheet_destroy(sheet);
   }
-
-  for (j = 0; j < 3; ++j) {
-    struct ui_css_stylesheet *mix_sheet;
-    struct ui_css_rule *r_mixroot, *r_i1;
-    ui_css_stylesheet_create(&mix_sheet);
-
-    ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &r_mixroot);
-    ui_css_rule_append_selector(r_mixroot, UI_CSS_SELECTOR_TYPE_TAG, "mixroot");
-    ui_css_rule_append_declaration(r_mixroot, "display", "flex", 0);
-    ui_css_rule_append_declaration(r_mixroot, "flex-direction", "column", 0);
-    ui_css_rule_append_declaration(r_mixroot, "justify-content",
-                                   justify_vals[j], 0);
-    ui_css_rule_append_declaration(r_mixroot, "align-items", "center", 0);
-    ui_css_rule_append_declaration(r_mixroot, "wrap-through", "wrap", 0);
-    ui_css_stylesheet_append_rule(mix_sheet, r_mixroot);
-
-    ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &r_i1);
-    ui_css_rule_append_selector(r_i1, UI_CSS_SELECTOR_TYPE_TAG, "i1");
-    ui_css_rule_append_declaration(r_i1, "display", "flex", 0);
-    ui_css_rule_append_declaration(r_i1, "flex-shrink", "1", 0);
-    ui_css_rule_append_declaration(r_i1, "height", "200px", 0);
-    ui_css_stylesheet_append_rule(mix_sheet, r_i1);
-
-    ui_layout_tree_generate(mix_root, mix_sheet, &lroot);
-    ui_layout_compute(lroot, 100.0f, 100.0f);
-    ui_layout_tree_destroy(lroot);
-
-    ui_css_stylesheet_destroy(mix_sheet);
-  }
-
-  {
-    ui_error_t rc_cleanup = ui_dom_node_destroy(mix_root);
-    assert(rc_cleanup == UI_ERROR_NONE);
-  }
-
-  {
-    ui_error_t rc_cleanup = ui_dom_node_destroy(root);
-    assert(rc_cleanup == UI_ERROR_NONE);
-  }
-  ui_css_stylesheet_destroy(sheet);
 }
 
 void test_more_layout(void);
@@ -247,12 +251,14 @@ static void test_nested_overflow_violation(void) {
   if (lroot) {
     ui_layout_compute(lroot, 100.0f, 100.0f);
 
-    ui_error_t check_rc = ui_layout_sanity_check(lroot);
-    if (check_rc != UI_ERROR_LAYOUT_VIOLATION) {
-      printf("Expected nested layout violation\n");
-    }
+    {
+      ui_error_t check_rc = ui_layout_sanity_check(lroot);
+      if (check_rc != UI_ERROR_LAYOUT_VIOLATION) {
+        printf("Expected nested layout violation\n");
+      }
 
-    ui_layout_tree_destroy(lroot);
+      ui_layout_tree_destroy(lroot);
+    }
   }
 
   ui_css_stylesheet_destroy(sheet);

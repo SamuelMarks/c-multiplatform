@@ -103,6 +103,7 @@ ui_error_t ui_css_gcpm_parse(const struct ui_css_computed_style *style,
 
 /* \brief ui_error
  */
+/** @brief ui_css_gcpm_properties_cleanup function. */
 ui_error_t
 ui_css_gcpm_properties_cleanup(struct ui_css_gcpm_properties *props) {
   if (!props)

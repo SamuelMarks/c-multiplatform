@@ -10,6 +10,11 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_cupertino_indicator_mock_create_fail;
+extern int g_cupertino_indicator_mock_destroy_fail;
+extern int g_cupertino_indicator_mock_set_indet_fail;
+extern int g_cupertino_indicator_mock_set_deter_fail;
+
 SUITE(cupertino_indicator_suite);
 
 TEST test_indicator_invalid_args(void) {
@@ -72,7 +77,7 @@ TEST test_indicator_invalid_args(void) {
   ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
   rc = cupertino_indicator_tick(indicator, -1.0f);
   ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
-  rc = cupertino_indicator_get_spoke_opacity(indicator, -1, &val1);
+  rc = cupertino_indicator_get_spoke_opacity(indicator, (size_t)999, &val1);
   ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
   rc = cupertino_indicator_get_spoke_opacity(indicator, 99, &val1);
   ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
@@ -88,13 +93,15 @@ TEST test_indicator_invalid_args(void) {
   ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
 
   /* Destroy with indicator->base == NULL */
-  struct ui_progress_base *saved_base = indicator->base;
-  indicator->base = NULL;
-  rc = cupertino_indicator_destroy(indicator);
-  ASSERT_EQ(UI_ERROR_NONE, rc);
-  ui_progress_base_destroy(saved_base);
+  {
+    struct ui_progress_base *saved_base = indicator->base;
+    indicator->base = NULL;
+    rc = cupertino_indicator_destroy(indicator);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+    ui_progress_base_destroy(saved_base);
 
-  PASS();
+    PASS();
+  }
 }
 
 TEST test_indicator_activity_spinner(void) {
@@ -253,10 +260,6 @@ TEST test_indicator_oom_mock(void) {
   memset(&desc, 0, sizeof(desc));
 
 #ifdef UI_TEST_MOCK_ALLOC
-  extern int g_cupertino_indicator_mock_create_fail;
-  extern int g_cupertino_indicator_mock_destroy_fail;
-  extern int g_cupertino_indicator_mock_set_indet_fail;
-  extern int g_cupertino_indicator_mock_set_deter_fail;
 
   /* Fail malloc for struct cupertino_indicator */
   g_malloc_fail_countdown = 0;
@@ -326,20 +329,22 @@ TEST test_indicator_oom_mock(void) {
   ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
   g_cupertino_indicator_mock_set_deter_fail = 0;
 
-  struct ui_progress_base *saved_b = ind->base;
-  ind->base = NULL;
-  rc = cupertino_indicator_set_value(ind, 0.5f);
-  ASSERT_EQ(UI_ERROR_NONE, rc);
-  ind->base = saved_b;
+  {
+    struct ui_progress_base *saved_b = ind->base;
+    ind->base = NULL;
+    rc = cupertino_indicator_set_value(ind, 0.5f);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+    ind->base = saved_b;
 
-  rc = cupertino_indicator_destroy(ind);
-  ASSERT_EQ(UI_ERROR_NONE, rc);
+    rc = cupertino_indicator_destroy(ind);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
 #else
   rc = cupertino_indicator_create(NULL, &desc, &ind);
   ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
 #endif
 
-  PASS();
+    PASS();
+  }
 }
 
 SUITE(cupertino_indicator_suite) {

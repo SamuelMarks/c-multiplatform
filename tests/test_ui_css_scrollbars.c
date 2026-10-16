@@ -6,6 +6,8 @@
 #include "ui_css_scrollbars.h"
 /* clang-format on */
 
+extern int g_scrollbars_mock_fail;
+
 #define TEST_ASSERT(cond)                                                      \
   do {                                                                         \
     if (!(cond)) {                                                             \
@@ -105,7 +107,6 @@ int main(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_scrollbars_mock_fail;
     enum ui_css_scrollbar_width width;
     struct ui_css_scrollbar_color color;
 

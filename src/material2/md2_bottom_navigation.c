@@ -10,17 +10,20 @@
 #include <string.h>
 /* clang-format on */
 
+/** @brief md2_bottom_navigation structure. */
 struct md2_bottom_navigation {
-  struct ui_bottom_nav_base *base;
-  enum md2_bottom_navigation_variant variant;
+  struct ui_bottom_nav_base *base;            /**< base field. */
+  enum md2_bottom_navigation_variant variant; /**< variant field. */
 };
 
+/** @brief md2_bottom_navigation_item structure. */
 struct md2_bottom_navigation_item {
-  struct ui_bottom_nav_item_base *base;
-  char *label;
-  char *icon;
+  struct ui_bottom_nav_item_base *base; /**< base field. */
+  char *label;                          /**< label field. */
+  char *icon;                           /**< icon field. */
 };
 
+/** @brief md2_bottom_navigation_create function. */
 ui_error_t
 md2_bottom_navigation_create(struct ui_engine *engine,
                              enum md2_bottom_navigation_variant variant,
@@ -51,6 +54,7 @@ md2_bottom_navigation_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md2_bottom_navigation_destroy function. */
 ui_error_t md2_bottom_navigation_destroy(struct md2_bottom_navigation *nav) {
   ui_error_t rc;
 
@@ -64,6 +68,7 @@ ui_error_t md2_bottom_navigation_destroy(struct md2_bottom_navigation *nav) {
   return rc;
 }
 
+/** @brief md2_bottom_navigation_get_base function. */
 ui_error_t
 md2_bottom_navigation_get_base(struct md2_bottom_navigation *nav,
                                struct ui_bottom_nav_base **out_base) {
@@ -75,6 +80,7 @@ md2_bottom_navigation_get_base(struct md2_bottom_navigation *nav,
   return UI_ERROR_NONE;
 }
 
+/** @brief md2_bottom_navigation_append_item function. */
 ui_error_t
 md2_bottom_navigation_append_item(struct md2_bottom_navigation *nav,
                                   struct md2_bottom_navigation_item *item) {
@@ -85,6 +91,7 @@ md2_bottom_navigation_append_item(struct md2_bottom_navigation *nav,
   return ui_bottom_nav_base_append_item(nav->base, item->base);
 }
 
+/** @brief md2_bottom_navigation_item_create function. */
 ui_error_t md2_bottom_navigation_item_create(
     struct ui_engine *engine, const char *label, const char *icon,
     struct md2_bottom_navigation_item **out_item) {
@@ -155,6 +162,7 @@ ui_error_t md2_bottom_navigation_item_create(
   return UI_ERROR_NONE;
 }
 
+/** @brief md2_bottom_navigation_item_destroy function. */
 ui_error_t
 md2_bottom_navigation_item_destroy(struct md2_bottom_navigation_item *item) {
   ui_error_t rc;
@@ -176,6 +184,7 @@ md2_bottom_navigation_item_destroy(struct md2_bottom_navigation_item *item) {
   return rc;
 }
 
+/** @brief md2_bottom_navigation_item_get_base function. */
 ui_error_t
 md2_bottom_navigation_item_get_base(struct md2_bottom_navigation_item *item,
                                     struct ui_bottom_nav_item_base **out_base) {

@@ -53,6 +53,7 @@ struct ui_bottom_nav_item_base {
   int active;                     /**< Active state flag */
 };
 
+/** @brief ui_bottom_nav_base_create function. */
 ui_error_t ui_bottom_nav_base_create(struct ui_bottom_nav_base **out_nav) {
   struct ui_bottom_nav_base *nav;
   ui_error_t rc;
@@ -79,6 +80,7 @@ ui_error_t ui_bottom_nav_base_create(struct ui_bottom_nav_base **out_nav) {
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_bottom_nav_base_destroy function. */
 ui_error_t ui_bottom_nav_base_destroy(struct ui_bottom_nav_base *nav) {
   ui_error_t rc = UI_ERROR_NONE;
   if (!nav) {
@@ -94,6 +96,7 @@ ui_error_t ui_bottom_nav_base_destroy(struct ui_bottom_nav_base *nav) {
   return rc;
 }
 
+/** @brief ui_bottom_nav_base_get_component function. */
 ui_error_t
 ui_bottom_nav_base_get_component(struct ui_bottom_nav_base *nav,
                                  struct ui_component **out_component) {
@@ -104,6 +107,7 @@ ui_bottom_nav_base_get_component(struct ui_bottom_nav_base *nav,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_bottom_nav_base_append_item function. */
 ui_error_t
 ui_bottom_nav_base_append_item(struct ui_bottom_nav_base *nav,
                                struct ui_bottom_nav_item_base *item) {
@@ -114,6 +118,7 @@ ui_bottom_nav_base_append_item(struct ui_bottom_nav_base *nav,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_bottom_nav_item_base_create function. */
 ui_error_t
 ui_bottom_nav_item_base_create(struct ui_bottom_nav_item_base **out_item) {
   struct ui_bottom_nav_item_base *item;
@@ -140,6 +145,7 @@ ui_bottom_nav_item_base_create(struct ui_bottom_nav_item_base **out_item) {
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_bottom_nav_item_base_destroy function. */
 ui_error_t
 ui_bottom_nav_item_base_destroy(struct ui_bottom_nav_item_base *item) {
   ui_error_t rc = UI_ERROR_NONE;
@@ -156,6 +162,7 @@ ui_bottom_nav_item_base_destroy(struct ui_bottom_nav_item_base *item) {
   return rc;
 }
 
+/** @brief ui_bottom_nav_item_base_get_component function. */
 ui_error_t
 ui_bottom_nav_item_base_get_component(struct ui_bottom_nav_item_base *item,
                                       struct ui_component **out_component) {
@@ -166,6 +173,7 @@ ui_bottom_nav_item_base_get_component(struct ui_bottom_nav_item_base *item,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_bottom_nav_item_base_set_active function. */
 ui_error_t
 ui_bottom_nav_item_base_set_active(struct ui_bottom_nav_item_base *item,
                                    int active) {
@@ -176,6 +184,7 @@ ui_bottom_nav_item_base_set_active(struct ui_bottom_nav_item_base *item,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_bottom_nav_item_base_get_active function. */
 ui_error_t
 ui_bottom_nav_item_base_get_active(struct ui_bottom_nav_item_base *item,
                                    int *out_active) {
@@ -186,6 +195,7 @@ ui_bottom_nav_item_base_get_active(struct ui_bottom_nav_item_base *item,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_bottom_nav_base_bind_active_index function. */
 ui_error_t
 ui_bottom_nav_base_bind_active_index(struct ui_bottom_nav_base *widget,
                                      struct ui_signal *signal) {

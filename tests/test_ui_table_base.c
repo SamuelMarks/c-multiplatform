@@ -103,9 +103,9 @@ TEST test_table_null_args(void) {
   struct ui_table_model model;
   struct ui_table_model bad_model;
   struct ui_selection_model *sel_model;
-  struct ui_table_column_config col_cfg;
-  struct ui_table_sort_config sort_cfg;
-  struct ui_table_pagination_config page_cfg;
+  struct ui_table_column_config col_cfg = {0};
+  struct ui_table_sort_config sort_cfg = {0};
+  struct ui_table_pagination_config page_cfg = {0};
   ui_error_t rc;
 
   model.get_row_count = mock_get_row_count;

@@ -29,6 +29,7 @@ ui_error_t ui_speed_dial_base_init(struct ui_speed_dial_base *speed_dial,
 
 /* \brief ui_error
  */
+/** @brief ui_speed_dial_base_add_action function. */
 ui_error_t ui_speed_dial_base_add_action(struct ui_speed_dial_base *speed_dial,
                                          int id, struct ui_fab_base *fab) {
   struct ui_speed_dial_action *action;
@@ -66,6 +67,7 @@ ui_error_t ui_speed_dial_base_toggle(struct ui_speed_dial_base *speed_dial) {
 
 /* \brief ui_error
  */
+/** @brief ui_speed_dial_base_cleanup function. */
 ui_error_t ui_speed_dial_base_cleanup(struct ui_speed_dial_base *speed_dial) {
   struct ui_speed_dial_action *curr;
   struct ui_speed_dial_action *next_action;
@@ -88,6 +90,7 @@ ui_error_t ui_speed_dial_base_cleanup(struct ui_speed_dial_base *speed_dial) {
 
 /* \brief ui_error
  */
+/** @brief ui_speed_dial_base_bind_disabled function. */
 ui_error_t ui_speed_dial_base_bind_disabled(struct ui_speed_dial_base *widget,
                                             struct ui_signal *disabled_signal) {
   if (!widget) {

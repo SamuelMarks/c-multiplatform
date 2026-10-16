@@ -15,12 +15,15 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
+/** @brief CUPERTINO_SHEET_MAX_ACTIONS constant. */
 #define CUPERTINO_SHEET_MAX_ACTIONS 16
+/** @brief CUPERTINO_SHEET_GRABBER_WIDTH constant. */
 #define CUPERTINO_SHEET_GRABBER_WIDTH 36.0f
+/** @brief CUPERTINO_SHEET_GRABBER_HEIGHT constant. */
 #define CUPERTINO_SHEET_GRABBER_HEIGHT 5.0f
 
 /**

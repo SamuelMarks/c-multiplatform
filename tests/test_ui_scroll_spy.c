@@ -9,7 +9,12 @@
 #include <stdio.h>
 /* clang-format on */
 
+extern int g_scroll_spy_mock_fail;
+
 extern int g_malloc_fail_countdown;
+extern ui_error_t
+test_ui_scroll_spy_call_on_intersection(struct ui_scroll_spy *spy,
+                                        struct ui_intersection_observer *obs);
 
 struct ui_scroll_spy_internal {
   void *obs;
@@ -65,7 +70,6 @@ static int test_scroll_spy_lifecycle(void) {
   rc = ui_scroll_spy_destroy(spy);
   if (rc != UI_ERROR_NONE)
     return 1;
-
   return 0;
 }
 
@@ -349,7 +353,6 @@ static int test_scroll_spy_mock_errors(void) {
   struct ui_signal *sig = NULL;
   union ui_signal_payload init_val;
   ui_error_t rc;
-  extern int g_scroll_spy_mock_fail;
 
   rc = ui_scroll_spy_create(&spy);
   assert(rc == UI_ERROR_NONE);
@@ -408,8 +411,6 @@ static int test_scroll_spy_mock_errors(void) {
 
   /* Test 6: on_intersection with NULL observer */
   {
-    extern ui_error_t test_ui_scroll_spy_call_on_intersection(
-        struct ui_scroll_spy * spy, struct ui_intersection_observer * obs);
     struct ui_scroll_spy_internal {
       void *observer;
     };

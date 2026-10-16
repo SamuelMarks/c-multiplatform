@@ -9,10 +9,12 @@
 #include "ui_internal_mem.h"
 /* clang-format on */
 
+/** @brief md2_checkbox structure. */
 struct md2_checkbox {
-  struct ui_checkbox_base *base;
+  struct ui_checkbox_base *base; /**< base field. */
 };
 
+/** @brief md2_checkbox_create function. */
 ui_error_t md2_checkbox_create(struct md2_checkbox **out_checkbox) {
   struct md2_checkbox *checkbox;
   ui_error_t rc;
@@ -37,6 +39,7 @@ ui_error_t md2_checkbox_create(struct md2_checkbox **out_checkbox) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md2_checkbox_destroy function. */
 ui_error_t md2_checkbox_destroy(struct md2_checkbox *checkbox) {
   if (checkbox == NULL) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -47,6 +50,7 @@ ui_error_t md2_checkbox_destroy(struct md2_checkbox *checkbox) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md2_checkbox_get_component function. */
 ui_error_t md2_checkbox_get_component(struct md2_checkbox *checkbox,
                                       struct ui_component **out_component) {
   if (checkbox == NULL) {
@@ -56,10 +60,12 @@ ui_error_t md2_checkbox_get_component(struct md2_checkbox *checkbox,
   return ui_checkbox_base_get_component(checkbox->base, out_component);
 }
 
+/** @brief md2_radio_button structure. */
 struct md2_radio_button {
-  struct ui_radio_group_base *base;
+  struct ui_radio_group_base *base; /**< base field. */
 };
 
+/** @brief md2_radio_button_create function. */
 ui_error_t md2_radio_button_create(struct md2_radio_button **out_radio) {
   struct md2_radio_button *radio;
   ui_error_t rc;
@@ -84,6 +90,7 @@ ui_error_t md2_radio_button_create(struct md2_radio_button **out_radio) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md2_radio_button_destroy function. */
 ui_error_t md2_radio_button_destroy(struct md2_radio_button *radio) {
   if (radio == NULL) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -94,6 +101,7 @@ ui_error_t md2_radio_button_destroy(struct md2_radio_button *radio) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md2_radio_button_get_base function. */
 ui_error_t md2_radio_button_get_base(struct md2_radio_button *radio,
                                      struct ui_radio_group_base **out_base) {
   if (radio == NULL || out_base == NULL) {
@@ -104,10 +112,12 @@ ui_error_t md2_radio_button_get_base(struct md2_radio_button *radio,
   return UI_ERROR_NONE;
 }
 
+/** @brief md2_switch structure. */
 struct md2_switch {
-  struct ui_slide_toggle_base *base;
+  struct ui_slide_toggle_base *base; /**< base field. */
 };
 
+/** @brief md2_switch_create function. */
 ui_error_t md2_switch_create(struct md2_switch **out_switch) {
   struct md2_switch *sw;
   ui_error_t rc;
@@ -131,6 +141,7 @@ ui_error_t md2_switch_create(struct md2_switch **out_switch) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md2_switch_destroy function. */
 ui_error_t md2_switch_destroy(struct md2_switch *sw) {
   if (sw == NULL) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -141,6 +152,7 @@ ui_error_t md2_switch_destroy(struct md2_switch *sw) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md2_switch_get_base function. */
 ui_error_t md2_switch_get_base(struct md2_switch *sw,
                                struct ui_slide_toggle_base **out_base) {
   if (sw == NULL || out_base == NULL) {
@@ -151,10 +163,12 @@ ui_error_t md2_switch_get_base(struct md2_switch *sw,
   return UI_ERROR_NONE;
 }
 
+/** @brief md2_slider structure. */
 struct md2_slider {
-  struct ui_slider_base *base;
+  struct ui_slider_base *base; /**< base field. */
 };
 
+/** @brief md2_slider_create function. */
 ui_error_t md2_slider_create(struct md2_slider **out_slider) {
   struct md2_slider *slider;
   ui_error_t rc;
@@ -179,6 +193,7 @@ ui_error_t md2_slider_create(struct md2_slider **out_slider) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md2_slider_destroy function. */
 ui_error_t md2_slider_destroy(struct md2_slider *slider) {
   if (slider == NULL) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -189,6 +204,7 @@ ui_error_t md2_slider_destroy(struct md2_slider *slider) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md2_slider_get_base function. */
 ui_error_t md2_slider_get_base(struct md2_slider *slider,
                                struct ui_slider_base **out_base) {
   if (slider == NULL || out_base == NULL) {

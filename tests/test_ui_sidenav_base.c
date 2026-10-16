@@ -27,6 +27,15 @@ struct ui_sidenav_base {
 #include <string.h>
 /* clang-format on */
 
+extern int g_sidenav_mock_set_style_fail;
+extern int g_sidenav_mock_b_set_style_fail;
+extern int g_sidenav_mock_backdrop_destroy_fail;
+extern int g_sidenav_mock_comp_destroy_fail;
+extern int g_sidenav_mock_remove_attr_fail;
+extern int g_sidenav_mock_remove_child_fail;
+extern int g_sidenav_mock_append_child_fail;
+extern int g_sidenav_mock_backdrop_process_fail;
+
 extern int g_malloc_fail_countdown;
 
 static ui_error_t mock_on_close_error(struct ui_sidenav_base *sidenav,
@@ -401,14 +410,6 @@ int main(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_sidenav_mock_set_style_fail;
-    extern int g_sidenav_mock_b_set_style_fail;
-    extern int g_sidenav_mock_backdrop_destroy_fail;
-    extern int g_sidenav_mock_comp_destroy_fail;
-    extern int g_sidenav_mock_remove_attr_fail;
-    extern int g_sidenav_mock_remove_child_fail;
-    extern int g_sidenav_mock_append_child_fail;
-    extern int g_sidenav_mock_backdrop_process_fail;
     struct ui_sidenav_base *mock_sn = NULL;
     ui_error_t m_rc;
 

@@ -65,6 +65,7 @@ static ui_error_t mock_ptr_base_complete(struct ui_pull_to_refresh_base *base) {
 /** @endcond */
 #endif
 
+/** @brief cupertino_refresh_create function. */
 ui_error_t
 cupertino_refresh_create(struct ui_engine *engine,
                          const struct cupertino_refresh_descriptor *desc,
@@ -115,6 +116,7 @@ cupertino_refresh_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_refresh_destroy function. */
 ui_error_t cupertino_refresh_destroy(struct cupertino_refresh *refresh) {
   ui_error_t rc;
 
@@ -134,6 +136,7 @@ ui_error_t cupertino_refresh_destroy(struct cupertino_refresh *refresh) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_refresh_handle_pull function. */
 ui_error_t cupertino_refresh_handle_pull(struct cupertino_refresh *refresh,
                                          float pull_distance) {
   float p;
@@ -171,6 +174,7 @@ ui_error_t cupertino_refresh_handle_pull(struct cupertino_refresh *refresh,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_refresh_release function. */
 ui_error_t cupertino_refresh_release(struct cupertino_refresh *refresh) {
   if (!refresh) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -189,6 +193,7 @@ ui_error_t cupertino_refresh_release(struct cupertino_refresh *refresh) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_refresh_complete function. */
 ui_error_t cupertino_refresh_complete(struct cupertino_refresh *refresh) {
   ui_error_t rc;
 
@@ -211,6 +216,7 @@ ui_error_t cupertino_refresh_complete(struct cupertino_refresh *refresh) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_refresh_get_progress function. */
 ui_error_t
 cupertino_refresh_get_progress(const struct cupertino_refresh *refresh,
                                float *out_progress) {
@@ -222,6 +228,7 @@ cupertino_refresh_get_progress(const struct cupertino_refresh *refresh,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_refresh_get_active_spoke function. */
 ui_error_t
 cupertino_refresh_get_active_spoke(const struct cupertino_refresh *refresh,
                                    int *out_spoke) {
@@ -233,6 +240,7 @@ cupertino_refresh_get_active_spoke(const struct cupertino_refresh *refresh,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_refresh_get_state function. */
 ui_error_t
 cupertino_refresh_get_state(const struct cupertino_refresh *refresh,
                             enum ui_pull_to_refresh_state *out_state) {
@@ -244,6 +252,7 @@ cupertino_refresh_get_state(const struct cupertino_refresh *refresh,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_refresh_get_base function. */
 ui_error_t
 cupertino_refresh_get_base(struct cupertino_refresh *refresh,
                            struct ui_pull_to_refresh_base **out_base) {

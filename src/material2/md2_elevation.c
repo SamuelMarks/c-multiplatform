@@ -7,6 +7,7 @@
 #include "material2/md2_elevation.h"
 /* clang-format on */
 
+/** @brief md2_elevation_get_dp function. */
 ui_error_t md2_elevation_get_dp(enum md2_elevation_level level, float *out_dp) {
   if (out_dp == NULL) {
     return UI_ERROR_INVALID_ARGUMENT;

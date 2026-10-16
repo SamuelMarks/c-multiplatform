@@ -632,17 +632,10 @@ struct input_cva_wrapper {
 
 /**
  * @brief Internal wrapper for CVA on-change events.
- * @param[in,out] input The input base widget.
- * @param[in] value The new string value.
- * @param[in] user_data User data for the callback.
+ * @param input The input base widget.
+ * @param text The new string value.
+ * @param user_data User data for the callback.
  * @return UI_ERROR_NONE on success.
- */
-/**
- * @brief input_cva_on_change_wrapper.
- * @param input Parameter input.
- * @param value Parameter value.
- * @param user_data Parameter user_data.
- * @return Return value.
  */
 static ui_error_t input_cva_on_change_wrapper(struct ui_input_base *input,
                                               const char *text,

@@ -1,5 +1,5 @@
+extern int g_malloc_fail_countdown;
 void test_ui_scroll_dispatcher_oom(void) {
-  extern int g_malloc_fail_countdown;
   struct ui_scroll_dispatcher *dispatcher = NULL;
   int i;
   for (i = 0; i < 5; ++i) {

@@ -15,12 +15,15 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
+/** @brief CUPERTINO_TAB_BAR_MAX_ITEMS constant. */
 #define CUPERTINO_TAB_BAR_MAX_ITEMS 8
+/** @brief CUPERTINO_TAB_BAR_HEIGHT_STANDARD constant. */
 #define CUPERTINO_TAB_BAR_HEIGHT_STANDARD 49.0f
+/** @brief CUPERTINO_TAB_BAR_HEIGHT_HOME_INDICATOR constant. */
 #define CUPERTINO_TAB_BAR_HEIGHT_HOME_INDICATOR 83.0f
 
 /**

@@ -37,6 +37,7 @@ static ui_error_t theme_mode_equality(union ui_signal_payload a,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_theme_manager_create function. */
 ui_error_t ui_theme_manager_create(struct ui_arena *arena,
                                    struct ui_theme_manager **out_manager) {
   ui_error_t err;
@@ -67,6 +68,7 @@ ui_error_t ui_theme_manager_create(struct ui_arena *arena,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_theme_manager_destroy function. */
 ui_error_t ui_theme_manager_destroy(struct ui_theme_manager *manager) {
   ui_error_t err;
 
@@ -84,6 +86,7 @@ ui_error_t ui_theme_manager_destroy(struct ui_theme_manager *manager) {
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_theme_manager_set_mode function. */
 ui_error_t ui_theme_manager_set_mode(struct ui_theme_manager *manager,
                                      enum ui_theme_mode mode) {
   ui_error_t err;
@@ -104,6 +107,7 @@ ui_error_t ui_theme_manager_set_mode(struct ui_theme_manager *manager,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_theme_manager_get_mode function. */
 ui_error_t ui_theme_manager_get_mode(struct ui_theme_manager *manager,
                                      enum ui_theme_mode *out_mode) {
   if (!manager || !out_mode) {
@@ -114,6 +118,7 @@ ui_error_t ui_theme_manager_get_mode(struct ui_theme_manager *manager,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_theme_manager_get_change_signal function. */
 ui_error_t ui_theme_manager_get_change_signal(struct ui_theme_manager *manager,
                                               ui_signal_t **out_signal) {
   if (!manager || !out_signal) {

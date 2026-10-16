@@ -15,7 +15,6 @@ static ui_error_t test_argb_to_hct(void) {
   if (err != UI_ERROR_NONE) {
     fprintf(stderr, "ui_color_argb_to_hct failed\n");
     exit(1);
-    return UI_ERROR_NONE;
   }
 
   err = ui_color_hct_to_argb(&hct, &back);

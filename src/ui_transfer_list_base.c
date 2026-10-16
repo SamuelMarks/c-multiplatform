@@ -130,6 +130,7 @@ static ui_error_t transfer_list_cva_set_disabled_state(void *component,
 
 /* \brief ui_error
  */
+/** @brief ui_transfer_list_base_init function. */
 ui_error_t
 ui_transfer_list_base_init(struct ui_transfer_list_base *list,
                            struct ui_component *component,
@@ -216,6 +217,7 @@ static ui_error_t find_item(struct ui_transfer_list_item *head, int id,
 
 /* \brief ui_error
  */
+/** @brief ui_transfer_list_base_set_selected function. */
 ui_error_t
 ui_transfer_list_base_set_selected(struct ui_transfer_list_base *list, int id,
                                    int selected) {
@@ -301,6 +303,7 @@ static ui_error_t move_items(struct ui_transfer_list_item **src_head,
 
 /* \brief ui_error
  */
+/** @brief ui_transfer_list_base_move_selected function. */
 ui_error_t
 ui_transfer_list_base_move_selected(struct ui_transfer_list_base *list,
                                     int to_right) {
@@ -397,6 +400,7 @@ static ui_error_t free_list(struct ui_transfer_list_item *head) {
 
 /* \brief ui_error
  */
+/** @brief ui_transfer_list_base_cleanup function. */
 ui_error_t ui_transfer_list_base_cleanup(struct ui_transfer_list_base *list) {
   ui_error_t rc = UI_ERROR_NONE;
   ui_error_t free_rc;

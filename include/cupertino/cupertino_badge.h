@@ -15,12 +15,15 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
+/** @brief CUPERTINO_BADGE_DEFAULT_MAX_COUNT constant. */
 #define CUPERTINO_BADGE_DEFAULT_MAX_COUNT 99
+/** @brief CUPERTINO_BADGE_STANDARD_HEIGHT constant. */
 #define CUPERTINO_BADGE_STANDARD_HEIGHT 18.0f
+/** @brief CUPERTINO_BADGE_DOT_SIZE constant. */
 #define CUPERTINO_BADGE_DOT_SIZE 8.0f
 
 /**

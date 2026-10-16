@@ -142,7 +142,6 @@ static ui_error_t test_parse_cursor(void) {
   if (!cursor.images) {
     fprintf(stderr, "Expected cursor image\n");
     exit(1);
-    return UI_ERROR_NONE;
   }
   EXPECT_EQ(1, cursor.images->has_hotspot);
   EXPECT_FLOAT_EQ(10.0f, cursor.images->hotspot_x);

@@ -21,7 +21,6 @@ static ui_error_t test_shape_family(void) {
   err = ui_shape_family_get_radius(UI_SHAPE_FAMILY_NONE, &radius);
   if (err != UI_ERROR_NONE || radius != 0.0f) {
     exit(1);
-    return UI_ERROR_NONE;
   }
 
   err = ui_shape_family_get_radius(UI_SHAPE_FAMILY_EXTRA_SMALL, &radius);

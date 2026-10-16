@@ -14,7 +14,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
@@ -36,10 +36,10 @@ enum md3_button_variant {
  * @brief Material 3 Button skin wrapping ui_button_base.
  */
 struct md3_button {
-  struct ui_button_base *base;
-  enum md3_button_variant variant;
-  int is_loading;
-  char icon_name[32];
+  struct ui_button_base *base;     /**< base field. */
+  enum md3_button_variant variant; /**< variant field. */
+  int is_loading;                  /**< is_loading field. */
+  char icon_name[32];              /**< icon_name[32] field. */
 };
 
 /**

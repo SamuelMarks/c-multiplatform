@@ -359,6 +359,7 @@ mock_dockable_layout_base_destroy(struct ui_dockable_layout_base *b) {
 /* md3_icon                                                                  */
 /* ========================================================================= */
 
+/** @brief md3_icon_create function. */
 ui_error_t md3_icon_create(struct ui_engine *engine,
                            struct md3_icon **out_icon) {
   struct md3_icon *icon;
@@ -398,6 +399,7 @@ ui_error_t md3_icon_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_icon_destroy function. */
 ui_error_t md3_icon_destroy(struct md3_icon *icon) {
   ui_error_t rc;
 
@@ -417,6 +419,7 @@ ui_error_t md3_icon_destroy(struct md3_icon *icon) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_icon_set_style function. */
 ui_error_t md3_icon_set_style(struct md3_icon *icon,
                               enum md3_icon_style style) {
   if (icon == NULL) {
@@ -426,6 +429,7 @@ ui_error_t md3_icon_set_style(struct md3_icon *icon,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_icon_set_glyph function. */
 ui_error_t md3_icon_set_glyph(struct md3_icon *icon, const char *glyph_name) {
   ui_error_t rc;
 
@@ -450,6 +454,7 @@ ui_error_t md3_icon_set_glyph(struct md3_icon *icon, const char *glyph_name) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_icon_set_svg_path function. */
 ui_error_t md3_icon_set_svg_path(struct md3_icon *icon, const char *svg_path) {
   if (icon == NULL || svg_path == NULL || icon->base == NULL) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -457,6 +462,7 @@ ui_error_t md3_icon_set_svg_path(struct md3_icon *icon, const char *svg_path) {
   return ui_icon_base_set_svg_path(icon->base, svg_path);
 }
 
+/** @brief md3_icon_set_font_axes function. */
 ui_error_t md3_icon_set_font_axes(struct md3_icon *icon, int weight, int fill,
                                   int grade, float optical_size) {
   if (icon == NULL || weight < 100 || weight > 900 || fill < 0 || fill > 1 ||
@@ -471,6 +477,7 @@ ui_error_t md3_icon_set_font_axes(struct md3_icon *icon, int weight, int fill,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_icon_set_size function. */
 ui_error_t md3_icon_set_size(struct md3_icon *icon, float size_dp) {
   if (icon == NULL || size_dp <= 0.0f) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -479,6 +486,7 @@ ui_error_t md3_icon_set_size(struct md3_icon *icon, float size_dp) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_icon_set_rtl_mirroring function. */
 ui_error_t md3_icon_set_rtl_mirroring(struct md3_icon *icon, int auto_mirror) {
   if (icon == NULL) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -487,6 +495,7 @@ ui_error_t md3_icon_set_rtl_mirroring(struct md3_icon *icon, int auto_mirror) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_icon_set_semantic function. */
 ui_error_t md3_icon_set_semantic(struct md3_icon *icon, int is_semantic,
                                  const char *aria_label) {
   if (icon == NULL) {
@@ -512,6 +521,7 @@ ui_error_t md3_icon_set_semantic(struct md3_icon *icon, int is_semantic,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_icon_morph_to function. */
 ui_error_t md3_icon_morph_to(struct md3_icon *icon, const char *target_svg_path,
                              float progress) {
   if (icon == NULL || target_svg_path == NULL || progress < 0.0f ||
@@ -540,6 +550,7 @@ ui_error_t md3_icon_morph_to(struct md3_icon *icon, const char *target_svg_path,
 /* md3_chat_bubble                                                           */
 /* ========================================================================= */
 
+/** @brief md3_chat_bubble_create function. */
 ui_error_t md3_chat_bubble_create(struct ui_engine *engine,
                                   enum md3_chat_bubble_direction direction,
                                   struct md3_chat_bubble **out_bubble) {
@@ -587,6 +598,7 @@ ui_error_t md3_chat_bubble_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_chat_bubble_destroy function. */
 ui_error_t md3_chat_bubble_destroy(struct md3_chat_bubble *bubble) {
   ui_error_t rc;
 
@@ -614,6 +626,7 @@ ui_error_t md3_chat_bubble_destroy(struct md3_chat_bubble *bubble) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_chat_bubble_set_message function. */
 ui_error_t md3_chat_bubble_set_message(struct md3_chat_bubble *bubble,
                                        const char *text, const char *timestamp,
                                        enum md3_message_status status) {
@@ -637,6 +650,7 @@ ui_error_t md3_chat_bubble_set_message(struct md3_chat_bubble *bubble,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_chat_bubble_add_reaction function. */
 ui_error_t md3_chat_bubble_add_reaction(struct md3_chat_bubble *bubble,
                                         const char *emoji, int count) {
   if (bubble == NULL || emoji == NULL || count <= 0) {
@@ -661,6 +675,7 @@ ui_error_t md3_chat_bubble_add_reaction(struct md3_chat_bubble *bubble,
   return UI_ERROR_OUT_OF_MEMORY;
 }
 
+/** @brief md3_chat_bubble_set_expressive function. */
 ui_error_t md3_chat_bubble_set_expressive(struct md3_chat_bubble *bubble,
                                           int enabled) {
   if (bubble == NULL) {
@@ -674,6 +689,7 @@ ui_error_t md3_chat_bubble_set_expressive(struct md3_chat_bubble *bubble,
 /* md3_timeline                                                              */
 /* ========================================================================= */
 
+/** @brief md3_timeline_create function. */
 ui_error_t md3_timeline_create(struct ui_engine *engine,
                                enum md3_timeline_orientation orientation,
                                struct md3_timeline **out_timeline) {
@@ -706,6 +722,7 @@ ui_error_t md3_timeline_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_timeline_destroy function. */
 ui_error_t md3_timeline_destroy(struct md3_timeline *timeline) {
   ui_error_t rc;
 
@@ -725,6 +742,7 @@ ui_error_t md3_timeline_destroy(struct md3_timeline *timeline) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_timeline_add_node function. */
 ui_error_t md3_timeline_add_node(struct md3_timeline *timeline,
                                  const char *title, const char *description,
                                  enum md3_timeline_marker marker,
@@ -768,6 +786,7 @@ ui_error_t md3_timeline_add_node(struct md3_timeline *timeline,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_timeline_set_opposing function. */
 ui_error_t md3_timeline_set_opposing(struct md3_timeline *timeline,
                                      int opposing) {
   if (timeline == NULL) {
@@ -777,6 +796,7 @@ ui_error_t md3_timeline_set_opposing(struct md3_timeline *timeline,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_timeline_set_expressive function. */
 ui_error_t md3_timeline_set_expressive(struct md3_timeline *timeline,
                                        int enabled) {
   if (timeline == NULL) {
@@ -790,6 +810,7 @@ ui_error_t md3_timeline_set_expressive(struct md3_timeline *timeline,
 /* md3_file_uploader                                                         */
 /* ========================================================================= */
 
+/** @brief md3_file_uploader_create function. */
 ui_error_t md3_file_uploader_create(struct ui_engine *engine,
                                     struct md3_file_uploader **out_uploader) {
   struct md3_file_uploader *u;
@@ -822,6 +843,7 @@ ui_error_t md3_file_uploader_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_file_uploader_destroy function. */
 ui_error_t md3_file_uploader_destroy(struct md3_file_uploader *uploader) {
   ui_error_t rc;
 
@@ -838,6 +860,7 @@ ui_error_t md3_file_uploader_destroy(struct md3_file_uploader *uploader) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_file_uploader_set_max_files function. */
 ui_error_t md3_file_uploader_set_max_files(struct md3_file_uploader *uploader,
                                            int max_files) {
   if (uploader == NULL || max_files <= 0) {
@@ -848,6 +871,7 @@ ui_error_t md3_file_uploader_set_max_files(struct md3_file_uploader *uploader,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_file_uploader_set_allowed_formats function. */
 ui_error_t
 md3_file_uploader_set_allowed_formats(struct md3_file_uploader *uploader,
                                       const char *formats) {
@@ -870,6 +894,7 @@ md3_file_uploader_set_allowed_formats(struct md3_file_uploader *uploader,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_file_uploader_add_file function. */
 ui_error_t md3_file_uploader_add_file(struct md3_file_uploader *uploader,
                                       const char *file_name, size_t file_size) {
   if (uploader == NULL || file_name == NULL) {
@@ -897,6 +922,7 @@ ui_error_t md3_file_uploader_add_file(struct md3_file_uploader *uploader,
   return UI_ERROR_OUT_OF_MEMORY;
 }
 
+/** @brief md3_file_uploader_set_file_progress function. */
 ui_error_t
 md3_file_uploader_set_file_progress(struct md3_file_uploader *uploader,
                                     int file_index, float progress) {
@@ -909,6 +935,7 @@ md3_file_uploader_set_file_progress(struct md3_file_uploader *uploader,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_file_uploader_set_drag_over function. */
 ui_error_t md3_file_uploader_set_drag_over(struct md3_file_uploader *uploader,
                                            int drag_over) {
   if (uploader == NULL) {
@@ -920,6 +947,7 @@ ui_error_t md3_file_uploader_set_drag_over(struct md3_file_uploader *uploader,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_file_uploader_set_expressive function. */
 ui_error_t md3_file_uploader_set_expressive(struct md3_file_uploader *uploader,
                                             int enabled) {
   if (uploader == NULL) {
@@ -933,6 +961,7 @@ ui_error_t md3_file_uploader_set_expressive(struct md3_file_uploader *uploader,
 /* md3_video_player                                                          */
 /* ========================================================================= */
 
+/** @brief md3_video_player_create function. */
 ui_error_t md3_video_player_create(struct ui_engine *engine,
                                    struct md3_video_player **out_player) {
   struct md3_video_player *vp;
@@ -962,6 +991,7 @@ ui_error_t md3_video_player_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_video_player_destroy function. */
 ui_error_t md3_video_player_destroy(struct md3_video_player *player) {
   if (player == NULL) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -970,6 +1000,7 @@ ui_error_t md3_video_player_destroy(struct md3_video_player *player) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_video_player_play function. */
 ui_error_t md3_video_player_play(struct md3_video_player *player) {
   if (player == NULL) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -978,6 +1009,7 @@ ui_error_t md3_video_player_play(struct md3_video_player *player) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_video_player_pause function. */
 ui_error_t md3_video_player_pause(struct md3_video_player *player) {
   if (player == NULL) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -986,6 +1018,7 @@ ui_error_t md3_video_player_pause(struct md3_video_player *player) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_video_player_seek function. */
 ui_error_t md3_video_player_seek(struct md3_video_player *player,
                                  float time_seconds) {
   if (player == NULL || time_seconds < 0.0f) {
@@ -994,6 +1027,7 @@ ui_error_t md3_video_player_seek(struct md3_video_player *player,
   return ui_video_player_base_seek(&player->base, time_seconds);
 }
 
+/** @brief md3_video_player_set_volume function. */
 ui_error_t md3_video_player_set_volume(struct md3_video_player *player,
                                        float volume) {
   if (player == NULL || volume < 0.0f || volume > 1.0f) {
@@ -1002,6 +1036,7 @@ ui_error_t md3_video_player_set_volume(struct md3_video_player *player,
   return ui_video_player_base_set_volume(&player->base, volume);
 }
 
+/** @brief md3_video_player_set_playback_speed function. */
 ui_error_t md3_video_player_set_playback_speed(struct md3_video_player *player,
                                                float speed) {
   if (player == NULL || speed <= 0.0f) {
@@ -1011,6 +1046,7 @@ ui_error_t md3_video_player_set_playback_speed(struct md3_video_player *player,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_video_player_set_fullscreen function. */
 ui_error_t md3_video_player_set_fullscreen(struct md3_video_player *player,
                                            int fullscreen) {
   if (player == NULL) {
@@ -1020,6 +1056,7 @@ ui_error_t md3_video_player_set_fullscreen(struct md3_video_player *player,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_video_player_get_playback_direction function. */
 ui_error_t
 md3_video_player_get_playback_direction(const struct md3_video_player *player,
                                         int *out_is_ltr) {
@@ -1030,6 +1067,7 @@ md3_video_player_get_playback_direction(const struct md3_video_player *player,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_video_player_set_expressive function. */
 ui_error_t md3_video_player_set_expressive(struct md3_video_player *player,
                                            int enabled) {
   if (player == NULL) {
@@ -1043,6 +1081,7 @@ ui_error_t md3_video_player_set_expressive(struct md3_video_player *player,
 /* md3_rich_text_editor                                                      */
 /* ========================================================================= */
 
+/** @brief md3_rich_text_editor_create function. */
 ui_error_t
 md3_rich_text_editor_create(struct ui_engine *engine,
                             struct md3_rich_text_editor **out_editor) {
@@ -1073,6 +1112,7 @@ md3_rich_text_editor_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_rich_text_editor_destroy function. */
 ui_error_t md3_rich_text_editor_destroy(struct md3_rich_text_editor *editor) {
   ui_error_t rc;
 
@@ -1092,6 +1132,7 @@ ui_error_t md3_rich_text_editor_destroy(struct md3_rich_text_editor *editor) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_rich_text_editor_set_text function. */
 ui_error_t md3_rich_text_editor_set_text(struct md3_rich_text_editor *editor,
                                          const char *text) {
   if (editor == NULL) {
@@ -1112,6 +1153,7 @@ ui_error_t md3_rich_text_editor_set_text(struct md3_rich_text_editor *editor,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_rich_text_editor_apply_format function. */
 ui_error_t
 md3_rich_text_editor_apply_format(struct md3_rich_text_editor *editor,
                                   const char *format_tag) {
@@ -1121,6 +1163,7 @@ md3_rich_text_editor_apply_format(struct md3_rich_text_editor *editor,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_rich_text_editor_get_word_count function. */
 ui_error_t
 md3_rich_text_editor_get_word_count(const struct md3_rich_text_editor *editor,
                                     size_t *out_words, size_t *out_chars) {
@@ -1152,6 +1195,7 @@ md3_rich_text_editor_get_word_count(const struct md3_rich_text_editor *editor,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_rich_text_editor_undo function. */
 ui_error_t md3_rich_text_editor_undo(struct md3_rich_text_editor *editor) {
   if (editor == NULL || editor->base == NULL) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -1159,6 +1203,7 @@ ui_error_t md3_rich_text_editor_undo(struct md3_rich_text_editor *editor) {
   return ui_rich_text_editor_base_undo(editor->base);
 }
 
+/** @brief md3_rich_text_editor_redo function. */
 ui_error_t md3_rich_text_editor_redo(struct md3_rich_text_editor *editor) {
   if (editor == NULL || editor->base == NULL) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -1166,6 +1211,7 @@ ui_error_t md3_rich_text_editor_redo(struct md3_rich_text_editor *editor) {
   return ui_rich_text_editor_base_redo(editor->base);
 }
 
+/** @brief md3_rich_text_editor_set_expressive function. */
 ui_error_t
 md3_rich_text_editor_set_expressive(struct md3_rich_text_editor *editor,
                                     int enabled) {
@@ -1180,6 +1226,7 @@ md3_rich_text_editor_set_expressive(struct md3_rich_text_editor *editor,
 /* md3_section_index                                                         */
 /* ========================================================================= */
 
+/** @brief md3_section_index_create function. */
 ui_error_t md3_section_index_create(struct ui_engine *engine,
                                     struct md3_section_index **out_index) {
   struct md3_section_index *si;
@@ -1212,6 +1259,7 @@ ui_error_t md3_section_index_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_section_index_destroy function. */
 ui_error_t md3_section_index_destroy(struct md3_section_index *index) {
   ui_error_t rc;
 
@@ -1231,6 +1279,7 @@ ui_error_t md3_section_index_destroy(struct md3_section_index *index) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_section_index_set_sections function. */
 ui_error_t md3_section_index_set_sections(struct md3_section_index *index,
                                           const char **sections, size_t count) {
   ui_error_t rc;
@@ -1248,6 +1297,7 @@ ui_error_t md3_section_index_set_sections(struct md3_section_index *index,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_section_index_set_active_section function. */
 ui_error_t md3_section_index_set_active_section(struct md3_section_index *index,
                                                 int active_idx) {
   ui_error_t rc;
@@ -1265,6 +1315,7 @@ ui_error_t md3_section_index_set_active_section(struct md3_section_index *index,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_section_index_get_active_section function. */
 ui_error_t
 md3_section_index_get_active_section(const struct md3_section_index *index,
                                      int *out_active_idx) {
@@ -1275,6 +1326,7 @@ md3_section_index_get_active_section(const struct md3_section_index *index,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_section_index_set_magnifier function. */
 ui_error_t md3_section_index_set_magnifier(struct md3_section_index *index,
                                            int show_magnifier) {
   if (index == NULL) {
@@ -1284,6 +1336,7 @@ ui_error_t md3_section_index_set_magnifier(struct md3_section_index *index,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_section_index_set_rtl function. */
 ui_error_t md3_section_index_set_rtl(struct md3_section_index *index,
                                      int is_rtl) {
   if (index == NULL) {
@@ -1293,6 +1346,7 @@ ui_error_t md3_section_index_set_rtl(struct md3_section_index *index,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_section_index_set_expressive function. */
 ui_error_t md3_section_index_set_expressive(struct md3_section_index *index,
                                             int enabled) {
   if (index == NULL) {
@@ -1306,6 +1360,7 @@ ui_error_t md3_section_index_set_expressive(struct md3_section_index *index,
 /* md3_dockable_layout                                                       */
 /* ========================================================================= */
 
+/** @brief md3_dockable_layout_create function. */
 ui_error_t md3_dockable_layout_create(struct ui_engine *engine,
                                       struct md3_dockable_layout **out_layout) {
   struct md3_dockable_layout *dl;
@@ -1334,6 +1389,7 @@ ui_error_t md3_dockable_layout_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_dockable_layout_destroy function. */
 ui_error_t md3_dockable_layout_destroy(struct md3_dockable_layout *layout) {
   ui_error_t rc;
 
@@ -1353,6 +1409,7 @@ ui_error_t md3_dockable_layout_destroy(struct md3_dockable_layout *layout) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_dockable_layout_dock_panel function. */
 ui_error_t md3_dockable_layout_dock_panel(struct md3_dockable_layout *layout,
                                           int panel_id, int target_panel_id,
                                           enum ui_dock_edge edge) {
@@ -1363,6 +1420,7 @@ ui_error_t md3_dockable_layout_dock_panel(struct md3_dockable_layout *layout,
                                             target_panel_id, edge);
 }
 
+/** @brief md3_dockable_layout_remove_panel function. */
 ui_error_t md3_dockable_layout_remove_panel(struct md3_dockable_layout *layout,
                                             int panel_id) {
   if (layout == NULL || layout->base == NULL) {
@@ -1371,6 +1429,7 @@ ui_error_t md3_dockable_layout_remove_panel(struct md3_dockable_layout *layout,
   return ui_dockable_layout_base_remove_panel(layout->base, panel_id);
 }
 
+/** @brief md3_dockable_layout_serialize function. */
 ui_error_t md3_dockable_layout_serialize(struct md3_dockable_layout *layout,
                                          char *out_buffer, size_t buffer_size) {
   if (layout == NULL || layout->base == NULL || out_buffer == NULL) {
@@ -1380,6 +1439,7 @@ ui_error_t md3_dockable_layout_serialize(struct md3_dockable_layout *layout,
                                            buffer_size);
 }
 
+/** @brief md3_dockable_layout_set_expressive function. */
 ui_error_t
 md3_dockable_layout_set_expressive(struct md3_dockable_layout *layout,
                                    int enabled) {

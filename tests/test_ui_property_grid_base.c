@@ -7,6 +7,8 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_malloc_fail_countdown;
+
 static ui_error_t mock_factory(const struct ui_property_row *row,
                                void *user_data,
                                struct ui_component **out_comp) {
@@ -126,7 +128,11 @@ int main(void) {
     dummy_row.type = UI_PROPERTY_VALUE_TYPE_INT;
     dummy_row.is_read_only = UI_FALSE;
     if (i < 32) {
+#if defined(_MSC_VER)
+      sprintf_s(group_id_buf[i], sizeof(group_id_buf[i]), "Group%d", i);
+#else
       sprintf(group_id_buf[i], "Group%d", i);
+#endif
       dummy_row.group_id = group_id_buf[i];
     } else {
       dummy_row.group_id = NULL;
@@ -164,7 +170,6 @@ void test_property_grid_extra_err(void) {
   struct ui_arena *small_arena = NULL;
   struct ui_property_grid_base *grid = NULL;
   void *dummy = NULL;
-  extern int g_malloc_fail_countdown;
 
   ui_arena_create(4096, &small_arena);
   ui_arena_alloc(small_arena, 4096, 8, &dummy);

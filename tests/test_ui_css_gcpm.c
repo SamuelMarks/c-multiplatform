@@ -8,6 +8,8 @@
 #include "ui_cssom.h"
 /* clang-format on */
 
+extern int g_mock_strcpy_fail;
+
 /* Since ui_cssom provides ui_css_computed_style_get_property, we just need to
  * populate the struct ourselves since there is no
  * ui_css_computed_style_create/set */
@@ -123,7 +125,6 @@ static int test_gcpm_parse(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_mock_strcpy_fail;
     add_prop(&style, "string-set", "val");
     g_mock_strcpy_fail = 1;
     ui_css_gcpm_parse(&style, &props);

@@ -13,7 +13,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 /** @brief Opaque handle representing a camera stream component. */
 struct ui_camera_base;

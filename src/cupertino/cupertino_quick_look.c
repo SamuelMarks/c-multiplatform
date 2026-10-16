@@ -10,6 +10,7 @@
 #include <string.h>
 /* clang-format on */
 
+/** @brief cupertino_quick_look_create function. */
 ui_error_t
 cupertino_quick_look_create(struct ui_engine *engine,
                             const struct cupertino_quick_look_descriptor *desc,
@@ -44,6 +45,7 @@ cupertino_quick_look_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_quick_look_destroy function. */
 ui_error_t cupertino_quick_look_destroy(struct cupertino_quick_look *ql) {
   if (!ql) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -53,6 +55,7 @@ ui_error_t cupertino_quick_look_destroy(struct cupertino_quick_look *ql) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_quick_look_add_item function. */
 ui_error_t
 cupertino_quick_look_add_item(struct cupertino_quick_look *ql, const char *url,
                               const char *title,
@@ -89,6 +92,7 @@ cupertino_quick_look_add_item(struct cupertino_quick_look *ql, const char *url,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_quick_look_set_current_index function. */
 ui_error_t
 cupertino_quick_look_set_current_index(struct cupertino_quick_look *ql,
                                        size_t index) {
@@ -104,6 +108,7 @@ cupertino_quick_look_set_current_index(struct cupertino_quick_look *ql,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_quick_look_get_current_item function. */
 ui_error_t cupertino_quick_look_get_current_item(
     const struct cupertino_quick_look *ql,
     const struct cupertino_ql_preview_item **out_item) {
@@ -119,6 +124,7 @@ ui_error_t cupertino_quick_look_get_current_item(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_quick_look_set_open function. */
 ui_error_t cupertino_quick_look_set_open(struct cupertino_quick_look *ql,
                                          int is_open) {
   if (!ql) {
@@ -133,6 +139,7 @@ ui_error_t cupertino_quick_look_set_open(struct cupertino_quick_look *ql,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_quick_look_is_open function. */
 ui_error_t cupertino_quick_look_is_open(const struct cupertino_quick_look *ql,
                                         int *out_is_open) {
   if (!ql || !out_is_open) {
@@ -143,6 +150,7 @@ ui_error_t cupertino_quick_look_is_open(const struct cupertino_quick_look *ql,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_quick_look_set_markup_open function. */
 ui_error_t cupertino_quick_look_set_markup_open(struct cupertino_quick_look *ql,
                                                 int is_open) {
   if (!ql) {
@@ -162,6 +170,7 @@ ui_error_t cupertino_quick_look_set_markup_open(struct cupertino_quick_look *ql,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_quick_look_set_markup_tool function. */
 ui_error_t
 cupertino_quick_look_set_markup_tool(struct cupertino_quick_look *ql,
                                      enum cupertino_ql_markup_tool tool) {
@@ -180,6 +189,7 @@ cupertino_quick_look_set_markup_tool(struct cupertino_quick_look *ql,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_quick_look_get_markup_tool function. */
 ui_error_t
 cupertino_quick_look_get_markup_tool(const struct cupertino_quick_look *ql,
                                      enum cupertino_ql_markup_tool *out_tool) {
@@ -191,6 +201,7 @@ cupertino_quick_look_get_markup_tool(const struct cupertino_quick_look *ql,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_quick_look_apply_pinch_zoom function. */
 ui_error_t
 cupertino_quick_look_apply_pinch_zoom(struct cupertino_quick_look *ql,
                                       float zoom_delta,
@@ -213,6 +224,7 @@ cupertino_quick_look_apply_pinch_zoom(struct cupertino_quick_look *ql,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_quick_look_trigger_share function. */
 ui_error_t cupertino_quick_look_trigger_share(struct cupertino_quick_look *ql) {
   if (!ql) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -226,6 +238,7 @@ ui_error_t cupertino_quick_look_trigger_share(struct cupertino_quick_look *ql) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_quick_look_trigger_done function. */
 ui_error_t cupertino_quick_look_trigger_done(struct cupertino_quick_look *ql) {
   if (!ql) {
     return UI_ERROR_INVALID_ARGUMENT;

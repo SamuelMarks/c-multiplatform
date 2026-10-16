@@ -5,6 +5,9 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_motion_mock_fail;
+extern ui_error_t run_motion_coverage(void);
+
 #define EXPECT_EQ(expected, actual)                                            \
   do {                                                                         \
     if ((expected) != (actual)) {                                              \
@@ -137,6 +140,7 @@ static ui_error_t test_parse_offset_distance(void) {
   EXPECT_FLOAT_EQ(50.0f, distance.value);
 
   err = ui_css_parse_offset_distance("100px", &distance);
+  EXPECT_EQ(UI_ERROR_NONE, err);
 
   EXPECT_EQ(UI_CSS_UNIT_PX, distance.unit);
   EXPECT_FLOAT_EQ(100.0f, distance.value);
@@ -153,6 +157,7 @@ static ui_error_t test_parse_offset_position(void) {
             ui_css_parse_offset_position("auto", NULL));
 
   err = ui_css_parse_offset_position("auto", &pos);
+  EXPECT_EQ(UI_ERROR_NONE, err);
 
   EXPECT_EQ(1, pos.is_auto);
 
@@ -179,6 +184,7 @@ static ui_error_t test_parse_offset_anchor(void) {
             ui_css_parse_offset_anchor("auto", NULL));
 
   err = ui_css_parse_offset_anchor("auto", &anchor);
+  EXPECT_EQ(UI_ERROR_NONE, err);
 
   EXPECT_EQ(1, anchor.is_auto);
 
@@ -204,6 +210,7 @@ static ui_error_t test_parse_offset_rotate(void) {
             ui_css_parse_offset_rotate("auto", NULL));
 
   err = ui_css_parse_offset_rotate("auto", &rot);
+  EXPECT_EQ(UI_ERROR_NONE, err);
 
   EXPECT_EQ(1, rot.is_auto);
   EXPECT_EQ(0, rot.is_reverse);
@@ -235,8 +242,6 @@ int main(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_motion_mock_fail;
-    extern ui_error_t run_motion_coverage(void);
     struct ui_css_offset_path path;
     struct ui_css_value distance;
     struct ui_css_offset_position pos;

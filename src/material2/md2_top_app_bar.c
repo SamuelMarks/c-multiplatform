@@ -11,14 +11,16 @@
 #include <string.h>
 /* clang-format on */
 
+/** @brief md2_top_app_bar structure. */
 struct md2_top_app_bar {
-  struct ui_component *component;
-  struct ui_top_app_bar_base *base;
-  struct ui_arena *arena;
-  enum md2_top_app_bar_variant variant;
-  char *title;
+  struct ui_component *component;       /**< component field. */
+  struct ui_top_app_bar_base *base;     /**< base field. */
+  struct ui_arena *arena;               /**< arena field. */
+  enum md2_top_app_bar_variant variant; /**< variant field. */
+  char *title;                          /**< title field. */
 };
 
+/** @brief md2_top_app_bar_create function. */
 ui_error_t md2_top_app_bar_create(struct ui_engine *engine,
                                   enum md2_top_app_bar_variant variant,
                                   const char *title,
@@ -89,6 +91,7 @@ ui_error_t md2_top_app_bar_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md2_top_app_bar_destroy function. */
 ui_error_t md2_top_app_bar_destroy(struct md2_top_app_bar *bar) {
   ui_error_t rc = UI_ERROR_NONE;
   ui_error_t temp_rc;
@@ -153,6 +156,7 @@ ui_error_t md2_top_app_bar_destroy(struct md2_top_app_bar *bar) {
   return rc;
 }
 
+/** @brief md2_top_app_bar_set_title function. */
 ui_error_t md2_top_app_bar_set_title(struct md2_top_app_bar *bar,
                                      const char *title) {
   size_t len;
@@ -177,6 +181,7 @@ ui_error_t md2_top_app_bar_set_title(struct md2_top_app_bar *bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief md2_top_app_bar_get_base function. */
 ui_error_t md2_top_app_bar_get_base(struct md2_top_app_bar *bar,
                                     struct ui_top_app_bar_base **out_base) {
   if (!bar || !out_base) {

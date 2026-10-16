@@ -9,7 +9,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 /* clang-format off */
 #include "ui_error.h"
@@ -24,21 +24,21 @@ struct ui_shader_manager;
  * pass).
  *
  * @param manager The shader manager.
- * @param out_program_id Pointer to receive the compiled program ID.
+ * @param out_program Pointer to receive the compiled program ID.
  * @return UI_ERROR_NONE on success.
  */
 extern C_MULTIPLATFORM_EXPORT ui_error_t ui_effects_shaders_get_blur_h_program(
-    struct ui_shader_manager *manager, unsigned int *out_program_id);
+    struct ui_shader_manager *manager, unsigned int *out_program);
 
 /**
  * @brief Compiles and retrieves a Gaussian Blur shader program (vertical pass).
  *
  * @param manager The shader manager.
- * @param out_program_id Pointer to receive the compiled program ID.
+ * @param out_program Pointer to receive the compiled program ID.
  * @return UI_ERROR_NONE on success.
  */
 extern C_MULTIPLATFORM_EXPORT ui_error_t ui_effects_shaders_get_blur_v_program(
-    struct ui_shader_manager *manager, unsigned int *out_program_id);
+    struct ui_shader_manager *manager, unsigned int *out_program);
 
 /**
  * @brief Compiles and retrieves a blend shader program for a specific CSS blend
@@ -46,12 +46,12 @@ extern C_MULTIPLATFORM_EXPORT ui_error_t ui_effects_shaders_get_blur_v_program(
  *
  * @param manager The shader manager.
  * @param mode The blend mode.
- * @param out_program_id Pointer to receive the compiled program ID.
+ * @param out_program Pointer to receive the compiled program ID.
  * @return UI_ERROR_NONE on success.
  */
 extern C_MULTIPLATFORM_EXPORT ui_error_t ui_effects_shaders_get_blend_program(
     struct ui_shader_manager *manager, enum ui_css_blend_mode mode,
-    unsigned int *out_program_id);
+    unsigned int *out_program);
 
 /**
  * @brief Compiles and retrieves a color filter shader program.

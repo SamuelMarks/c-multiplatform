@@ -5,6 +5,8 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_mock_strcpy_fail;
+
 extern int g_malloc_fail_countdown;
 
 static int run_normal_tests(void) {
@@ -59,7 +61,6 @@ static int run_normal_tests(void) {
 #ifdef UI_TEST_MOCK_ALLOC
   {
     struct ui_modifier *mock_mod = NULL;
-    extern int g_mock_strcpy_fail;
     if (ui_modifier_create(&mock_mod) != UI_ERROR_NONE)
       return 1;
     g_mock_strcpy_fail = 1;

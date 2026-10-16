@@ -10,7 +10,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 /* clang-format off */
 #include "rasterizer.h"
@@ -88,6 +88,6 @@ extern const struct design_system_driver g_driver_fluent2;
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* DESIGN_SYSTEM_RENDERER_H */

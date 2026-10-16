@@ -9,6 +9,7 @@
 #include <string.h>
 /* clang-format on */
 
+/** @brief cupertino_popover_create function. */
 ui_error_t
 cupertino_popover_create(struct ui_engine *engine,
                          const struct cupertino_popover_descriptor *desc,
@@ -50,6 +51,7 @@ cupertino_popover_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_popover_destroy function. */
 ui_error_t cupertino_popover_destroy(struct cupertino_popover *popover) {
   ui_error_t rc = UI_ERROR_NONE;
 
@@ -66,6 +68,7 @@ ui_error_t cupertino_popover_destroy(struct cupertino_popover *popover) {
   return rc;
 }
 
+/** @brief cupertino_popover_present function. */
 ui_error_t cupertino_popover_present(struct cupertino_popover *popover,
                                      float anchor_x, float anchor_y,
                                      float anchor_w, float anchor_h,
@@ -128,6 +131,7 @@ ui_error_t cupertino_popover_present(struct cupertino_popover *popover,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_popover_dismiss function. */
 ui_error_t cupertino_popover_dismiss(struct cupertino_popover *popover) {
   if (!popover) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -137,6 +141,7 @@ ui_error_t cupertino_popover_dismiss(struct cupertino_popover *popover) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_popover_is_presented function. */
 ui_error_t
 cupertino_popover_is_presented(const struct cupertino_popover *popover,
                                int *out_is_presented) {
@@ -148,6 +153,7 @@ cupertino_popover_is_presented(const struct cupertino_popover *popover,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_popover_get_bounds function. */
 ui_error_t cupertino_popover_get_bounds(const struct cupertino_popover *popover,
                                         float *out_x, float *out_y,
                                         float *out_w, float *out_h) {
@@ -162,6 +168,7 @@ ui_error_t cupertino_popover_get_bounds(const struct cupertino_popover *popover,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_popover_get_arrow_position function. */
 ui_error_t cupertino_popover_get_arrow_position(
     const struct cupertino_popover *popover,
     enum cupertino_arrow_direction *out_direction, float *out_offset) {
@@ -174,6 +181,7 @@ ui_error_t cupertino_popover_get_arrow_position(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_popover_get_base function. */
 ui_error_t cupertino_popover_get_base(struct cupertino_popover *popover,
                                       struct ui_popover_base **out_base) {
   if (!popover || !out_base) {

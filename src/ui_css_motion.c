@@ -150,6 +150,7 @@ ui_error_t ui_css_parse_offset_distance(const char *str,
 
 /* \brief ui_error
  */
+/** @brief ui_css_parse_offset_position function. */
 ui_error_t
 ui_css_parse_offset_position(const char *str,
                              struct ui_css_offset_position *out_position) {
@@ -185,6 +186,7 @@ ui_css_parse_offset_position(const char *str,
 
 /* \brief ui_error
  */
+/** @brief ui_css_parse_offset_anchor function. */
 ui_error_t ui_css_parse_offset_anchor(const char *str,
                                       struct ui_css_offset_anchor *out_anchor) {
   ui_error_t rc;
@@ -217,6 +219,7 @@ ui_error_t ui_css_parse_offset_anchor(const char *str,
 
 /* \brief ui_error
  */
+/** @brief ui_css_parse_offset_rotate function. */
 ui_error_t ui_css_parse_offset_rotate(const char *str,
                                       struct ui_css_offset_rotate *out_rotate) {
   ui_error_t rc;

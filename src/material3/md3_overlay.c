@@ -14,6 +14,7 @@
  * MD3 Dialog
  * ========================================================================= */
 
+/** @brief md3_dialog_create function. */
 ui_error_t md3_dialog_create(struct ui_engine *engine,
                              enum md3_dialog_variant variant,
                              struct md3_dialog **out_dialog) {
@@ -44,6 +45,7 @@ ui_error_t md3_dialog_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_dialog_destroy function. */
 ui_error_t md3_dialog_destroy(struct md3_dialog *dialog) {
   ui_error_t rc;
 
@@ -56,6 +58,7 @@ ui_error_t md3_dialog_destroy(struct md3_dialog *dialog) {
   return rc;
 }
 
+/** @brief md3_dialog_set_headline function. */
 ui_error_t md3_dialog_set_headline(struct md3_dialog *dialog,
                                    const char *headline) {
   if (!dialog) {
@@ -77,6 +80,7 @@ ui_error_t md3_dialog_set_headline(struct md3_dialog *dialog,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_dialog_set_supporting_text function. */
 ui_error_t md3_dialog_set_supporting_text(struct md3_dialog *dialog,
                                           const char *text) {
   if (!dialog) {
@@ -98,6 +102,7 @@ ui_error_t md3_dialog_set_supporting_text(struct md3_dialog *dialog,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_dialog_set_open function. */
 ui_error_t md3_dialog_set_open(struct md3_dialog *dialog, int is_open) {
   if (!dialog) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -111,6 +116,7 @@ ui_error_t md3_dialog_set_open(struct md3_dialog *dialog, int is_open) {
  * MD3 Bottom Sheet
  * ========================================================================= */
 
+/** @brief md3_bottom_sheet_create function. */
 ui_error_t md3_bottom_sheet_create(struct ui_engine *engine,
                                    enum md3_bottom_sheet_variant variant,
                                    struct md3_bottom_sheet **out_sheet) {
@@ -141,6 +147,7 @@ ui_error_t md3_bottom_sheet_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_bottom_sheet_destroy function. */
 ui_error_t md3_bottom_sheet_destroy(struct md3_bottom_sheet *sheet) {
   ui_error_t rc;
 
@@ -153,6 +160,7 @@ ui_error_t md3_bottom_sheet_destroy(struct md3_bottom_sheet *sheet) {
   return rc;
 }
 
+/** @brief md3_bottom_sheet_set_open function. */
 ui_error_t md3_bottom_sheet_set_open(struct md3_bottom_sheet *sheet,
                                      int is_open) {
   if (!sheet) {
@@ -167,6 +175,7 @@ ui_error_t md3_bottom_sheet_set_open(struct md3_bottom_sheet *sheet,
  * MD3 Side Sheet
  * ========================================================================= */
 
+/** @brief md3_side_sheet_create function. */
 ui_error_t md3_side_sheet_create(struct ui_engine *engine, int is_modal,
                                  struct md3_side_sheet **out_sheet) {
   struct md3_side_sheet *sheet;
@@ -195,6 +204,7 @@ ui_error_t md3_side_sheet_create(struct ui_engine *engine, int is_modal,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_side_sheet_destroy function. */
 ui_error_t md3_side_sheet_destroy(struct md3_side_sheet *sheet) {
   ui_error_t rc;
 
@@ -207,6 +217,7 @@ ui_error_t md3_side_sheet_destroy(struct md3_side_sheet *sheet) {
   return rc;
 }
 
+/** @brief md3_side_sheet_set_open function. */
 ui_error_t md3_side_sheet_set_open(struct md3_side_sheet *sheet, int is_open) {
   if (!sheet) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -220,6 +231,7 @@ ui_error_t md3_side_sheet_set_open(struct md3_side_sheet *sheet, int is_open) {
  * MD3 Menu
  * ========================================================================= */
 
+/** @brief md3_menu_create function. */
 ui_error_t md3_menu_create(struct ui_engine *engine,
                            struct md3_menu **out_menu) {
   struct md3_menu *menu;
@@ -246,6 +258,7 @@ ui_error_t md3_menu_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_menu_destroy function. */
 ui_error_t md3_menu_destroy(struct md3_menu *menu) {
   ui_error_t rc;
 
@@ -262,6 +275,7 @@ ui_error_t md3_menu_destroy(struct md3_menu *menu) {
  * MD3 Tooltip
  * ========================================================================= */
 
+/** @brief md3_tooltip_create function. */
 ui_error_t md3_tooltip_create(struct ui_engine *engine,
                               enum md3_tooltip_variant variant,
                               const char *text,
@@ -310,6 +324,7 @@ ui_error_t md3_tooltip_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_tooltip_destroy function. */
 ui_error_t md3_tooltip_destroy(struct md3_tooltip *tooltip) {
   ui_error_t rc;
 
@@ -326,6 +341,7 @@ ui_error_t md3_tooltip_destroy(struct md3_tooltip *tooltip) {
  * MD3 Snackbar
  * ========================================================================= */
 
+/** @brief md3_snackbar_create function. */
 ui_error_t md3_snackbar_create(struct ui_engine *engine,
                                enum md3_snackbar_variant variant,
                                const char *message,
@@ -392,6 +408,7 @@ ui_error_t md3_snackbar_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_snackbar_destroy function. */
 ui_error_t md3_snackbar_destroy(struct md3_snackbar *snackbar) {
   ui_error_t rc;
 
@@ -411,6 +428,7 @@ ui_error_t md3_snackbar_destroy(struct md3_snackbar *snackbar) {
  * MD3 Badge
  * ========================================================================= */
 
+/** @brief md3_badge_create function. */
 ui_error_t md3_badge_create(struct ui_engine *engine, int count,
                             struct md3_badge **out_badge) {
   struct md3_badge *badge;
@@ -441,6 +459,7 @@ ui_error_t md3_badge_create(struct ui_engine *engine, int count,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_badge_destroy function. */
 ui_error_t md3_badge_destroy(struct md3_badge *badge) {
   ui_error_t rc;
 
@@ -453,6 +472,7 @@ ui_error_t md3_badge_destroy(struct md3_badge *badge) {
   return rc;
 }
 
+/** @brief md3_badge_set_count function. */
 ui_error_t md3_badge_set_count(struct md3_badge *badge, int count) {
   if (!badge) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -473,6 +493,7 @@ ui_error_t md3_badge_set_count(struct md3_badge *badge, int count) {
  * MD3 Datepicker & Timepicker
  * ========================================================================= */
 
+/** @brief md3_datepicker_create function. */
 ui_error_t md3_datepicker_create(struct ui_engine *engine,
                                  struct md3_datepicker **out_picker) {
   struct md3_datepicker *picker;
@@ -528,6 +549,7 @@ ui_error_t md3_datepicker_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_datepicker_destroy function. */
 ui_error_t md3_datepicker_destroy(struct md3_datepicker *picker) {
   ui_error_t rc;
 
@@ -544,6 +566,7 @@ ui_error_t md3_datepicker_destroy(struct md3_datepicker *picker) {
   return rc;
 }
 
+/** @brief md3_timepicker_create function. */
 ui_error_t md3_timepicker_create(struct ui_engine *engine, int is_24h,
                                  struct md3_timepicker **out_picker) {
   struct md3_timepicker *picker;
@@ -572,6 +595,7 @@ ui_error_t md3_timepicker_create(struct ui_engine *engine, int is_24h,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_timepicker_destroy function. */
 ui_error_t md3_timepicker_destroy(struct md3_timepicker *picker) {
   ui_error_t rc;
 
@@ -588,6 +612,7 @@ ui_error_t md3_timepicker_destroy(struct md3_timepicker *picker) {
  * MD3 Pull-to-Refresh
  * ========================================================================= */
 
+/** @brief md3_pull_to_refresh_create function. */
 ui_error_t md3_pull_to_refresh_create(struct ui_engine *engine,
                                       struct md3_pull_to_refresh **out_ptr) {
   struct md3_pull_to_refresh *ptr;
@@ -616,6 +641,7 @@ ui_error_t md3_pull_to_refresh_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_pull_to_refresh_destroy function. */
 ui_error_t md3_pull_to_refresh_destroy(struct md3_pull_to_refresh *ptr) {
   ui_error_t rc;
 

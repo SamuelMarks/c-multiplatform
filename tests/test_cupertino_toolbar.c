@@ -10,6 +10,11 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_cupertino_toolbar_mock_create_fail;
+extern int g_cupertino_toolbar_mock_destroy_fail;
+extern int g_cupertino_toolbar_mock_set_title_fail;
+extern int g_cupertino_toolbar_mock_set_mode_fail;
+
 SUITE(cupertino_toolbar_suite);
 
 TEST test_toolbar_invalid_args(void) {
@@ -83,13 +88,15 @@ TEST test_toolbar_invalid_args(void) {
   ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
 
   /* Destroy with toolbar->base == NULL */
-  struct ui_toolbar_base *saved_b = toolbar->base;
-  toolbar->base = NULL;
-  rc = cupertino_toolbar_destroy(toolbar);
-  ASSERT_EQ(UI_ERROR_NONE, rc);
-  ui_toolbar_base_destroy(saved_b);
+  {
+    struct ui_toolbar_base *saved_b = toolbar->base;
+    toolbar->base = NULL;
+    rc = cupertino_toolbar_destroy(toolbar);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+    ui_toolbar_base_destroy(saved_b);
 
-  PASS();
+    PASS();
+  }
 }
 
 TEST test_toolbar_lifecycle_and_items(void) {
@@ -193,10 +200,6 @@ TEST test_toolbar_oom_mock(void) {
   memset(&desc, 0, sizeof(desc));
 
 #ifdef UI_TEST_MOCK_ALLOC
-  extern int g_cupertino_toolbar_mock_create_fail;
-  extern int g_cupertino_toolbar_mock_destroy_fail;
-  extern int g_cupertino_toolbar_mock_set_title_fail;
-  extern int g_cupertino_toolbar_mock_set_mode_fail;
 
   /* Fail malloc for struct cupertino_toolbar */
   g_malloc_fail_countdown = 0;

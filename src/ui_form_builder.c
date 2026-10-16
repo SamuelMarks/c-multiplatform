@@ -85,10 +85,8 @@ ui_error_t ui_form_builder_group_start(ui_form_builder_t *builder,
   if (builder->depth == 0) {
     if (builder->root_group) {
       ui_error_t destroy_rc = ui_form_group_destroy(group);
-      if (destroy_rc != UI_ERROR_NONE) {
-        return destroy_rc;
-      }
-      return UI_ERROR_INVALID_ARGUMENT;
+      return (destroy_rc != UI_ERROR_NONE) ? destroy_rc
+                                           : UI_ERROR_INVALID_ARGUMENT;
     }
     builder->root_group = group;
   } else {
@@ -263,10 +261,7 @@ ui_error_t ui_form_builder_control(ui_form_builder_t *builder, const char *name,
     rc = ui_form_control_add_validator(ctrl, validator, user_data);
     if (rc != UI_ERROR_NONE) {
       ui_error_t destroy_rc = ui_form_control_destroy(ctrl);
-      if (destroy_rc != UI_ERROR_NONE) {
-        return destroy_rc;
-      }
-      return rc;
+      return (destroy_rc != UI_ERROR_NONE) ? destroy_rc : rc;
     }
   }
   node.type = UI_FORM_NODE_CONTROL;

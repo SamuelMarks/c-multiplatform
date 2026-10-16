@@ -13,11 +13,13 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
+/** @brief CUPERTINO_DOCK_TILE_MAX_ACTIONS constant. */
 #define CUPERTINO_DOCK_TILE_MAX_ACTIONS 16
+/** @brief CUPERTINO_DOCK_TILE_ICON_SIZE constant. */
 #define CUPERTINO_DOCK_TILE_ICON_SIZE 128.0f
 
 /**

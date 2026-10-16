@@ -4,6 +4,9 @@
 #include "ui_css_overflow.h"
 /* clang-format on */
 
+extern int g_overflow_mock_fail;
+extern ui_error_t run_overflow_coverage(void);
+
 static int test_parse_overflow(void) {
   enum ui_css_overflow overflow;
 
@@ -197,8 +200,6 @@ int main(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_overflow_mock_fail;
-    extern ui_error_t run_overflow_coverage(void);
     enum ui_css_overflow overflow;
     struct ui_css_text_overflow to;
     struct ui_css_block_ellipsis be;

@@ -10,6 +10,10 @@
 #include <string.h>
 /* clang-format on */
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 /**
  * @brief ui_mock_malloc.
  * @param size Parameter size.
@@ -26,7 +30,6 @@ extern void *ui_mock_realloc(void *ptr, size_t size);
 /**
  * @brief ui_mock_free.
  * @param ptr Parameter ptr.
- * @return Return value.
  */
 extern void ui_mock_free(void *ptr);
 /**
@@ -71,7 +74,12 @@ extern char *ui_mock_strdup(const char *src);
 #if defined(_MSC_VER)
 #define C_MULTIPLATFORM_STRDUP _strdup
 #else
-char *strdup(const char *);
+/**
+ * @brief Standard string duplication function.
+ * @param s String to duplicate.
+ * @return Newly allocated duplicate string.
+ */
+char *strdup(const char *s);
 #define C_MULTIPLATFORM_STRDUP strdup
 #endif
 #endif
@@ -113,6 +121,9 @@ static int mock_strcpy_fail_check(void) {
  */
 #define UI_STRNCPY(dest, destsz, src, count)                                   \
   strncpy_s((dest), (destsz), (src), (count))
+/** @def UI_STRCAT
+ * @brief Safe strcat wrapper
+ */
 #define UI_STRCAT(dest, destsz, src) strcat_s((dest), (destsz), (src))
 #else
 /** @def UI_STRCPY
@@ -124,6 +135,9 @@ static int mock_strcpy_fail_check(void) {
  * @brief Safe strncpy wrapper
  */
 #define UI_STRNCPY(dest, destsz, src, count) strncpy((dest), (src), (count))
+/** @def UI_STRCAT
+ * @brief Safe strcat wrapper
+ */
 #define UI_STRCAT(dest, destsz, src) (strcat((dest), (src)) == (dest) ? 0 : -1)
 #endif
 #else
@@ -137,6 +151,9 @@ static int mock_strcpy_fail_check(void) {
  */
 #define UI_STRNCPY(dest, destsz, src, count)                                   \
   strncpy_s((dest), (destsz), (src), (count))
+/** @def UI_STRCAT
+ * @brief Safe strcat wrapper
+ */
 #define UI_STRCAT(dest, destsz, src) strcat_s((dest), (destsz), (src))
 #else
 /** @def UI_STRCPY
@@ -147,8 +164,15 @@ static int mock_strcpy_fail_check(void) {
  * @brief Safe strncpy wrapper
  */
 #define UI_STRNCPY(dest, destsz, src, count) strncpy((dest), (src), (count))
+/** @def UI_STRCAT
+ * @brief Safe strcat wrapper
+ */
 #define UI_STRCAT(dest, destsz, src) (strcat((dest), (src)) == (dest) ? 0 : -1)
 #endif
 #endif
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 #endif /* UI_INTERNAL_MEM_H */

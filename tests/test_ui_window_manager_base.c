@@ -6,6 +6,9 @@
 #include <stdlib.h>
 /* clang-format on */
 
+extern int g_wm_mock_fail;
+extern ui_error_t ui_component_destroy(struct ui_component *);
+
 struct ui_window_manager_base {
   struct ui_component *component;
   struct ui_computed *data_signal;
@@ -101,7 +104,6 @@ static int test_invalid_args(void) {
 static int test_oom(void) {
   int failed = 0;
 #ifdef UI_TEST_MOCK_ALLOC
-  extern int g_wm_mock_fail;
   struct ui_window_manager_base *wm = NULL;
   int i;
   for (i = 0; i < 15; i++) {
@@ -133,7 +135,6 @@ static int test_missing_coverage(void) {
   int failed = 0;
   if (rc == UI_ERROR_NONE) {
     /* Manually destroy component and set to NULL for coverage */
-    extern ui_error_t ui_component_destroy(struct ui_component *);
     {
       ui_error_t rc_cleanup = ui_component_destroy(wm->component);
       assert(rc_cleanup == UI_ERROR_NONE);

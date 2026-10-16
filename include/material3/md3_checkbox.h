@@ -15,7 +15,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
@@ -24,10 +24,10 @@ struct ui_engine;
  * @brief Material 3 Checkbox skin wrapping ui_checkbox_base.
  */
 struct md3_checkbox {
-  struct ui_checkbox_base *base;
-  struct ui_control_value_accessor cva;
-  int is_indeterminate;
-  int is_disabled;
+  struct ui_checkbox_base *base;        /**< base field. */
+  struct ui_control_value_accessor cva; /**< cva field. */
+  int is_indeterminate;                 /**< is_indeterminate field. */
+  int is_disabled;                      /**< is_disabled field. */
 };
 
 /**

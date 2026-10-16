@@ -38,8 +38,10 @@ static ui_error_t mock_dialog_base_destroy(struct ui_dialog_base *dialog) {
 /** @endcond */
 #endif
 
+/** @brief CUPERTINO_BIOMETRICS_PI macro definition. */
 #define CUPERTINO_BIOMETRICS_PI 3.14159265f
 
+/** @brief cupertino_biometrics_create function. */
 ui_error_t
 cupertino_biometrics_create(struct ui_engine *engine,
                             const struct cupertino_biometrics_descriptor *desc,
@@ -127,6 +129,7 @@ cupertino_biometrics_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_biometrics_destroy function. */
 ui_error_t
 cupertino_biometrics_destroy(struct cupertino_biometrics_prompt *prompt) {
   ui_error_t rc;
@@ -147,6 +150,7 @@ cupertino_biometrics_destroy(struct cupertino_biometrics_prompt *prompt) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_biometrics_present function. */
 ui_error_t
 cupertino_biometrics_present(struct cupertino_biometrics_prompt *prompt) {
   if (!prompt) {
@@ -159,6 +163,7 @@ cupertino_biometrics_present(struct cupertino_biometrics_prompt *prompt) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_biometrics_dismiss function. */
 ui_error_t
 cupertino_biometrics_dismiss(struct cupertino_biometrics_prompt *prompt) {
   if (!prompt) {
@@ -170,6 +175,7 @@ cupertino_biometrics_dismiss(struct cupertino_biometrics_prompt *prompt) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_biometrics_authenticate function. */
 ui_error_t
 cupertino_biometrics_authenticate(struct cupertino_biometrics_prompt *prompt,
                                   int is_success) {
@@ -189,6 +195,7 @@ cupertino_biometrics_authenticate(struct cupertino_biometrics_prompt *prompt,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_biometrics_switch_to_passcode function. */
 ui_error_t cupertino_biometrics_switch_to_passcode(
     struct cupertino_biometrics_prompt *prompt) {
   if (!prompt) {
@@ -199,6 +206,7 @@ ui_error_t cupertino_biometrics_switch_to_passcode(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_biometrics_tick function. */
 ui_error_t cupertino_biometrics_tick(struct cupertino_biometrics_prompt *prompt,
                                      float delta_ms) {
   float t;
@@ -228,6 +236,7 @@ ui_error_t cupertino_biometrics_tick(struct cupertino_biometrics_prompt *prompt,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_biometrics_get_state function. */
 ui_error_t
 cupertino_biometrics_get_state(const struct cupertino_biometrics_prompt *prompt,
                                enum cupertino_biometric_state *out_state) {
@@ -239,6 +248,7 @@ cupertino_biometrics_get_state(const struct cupertino_biometrics_prompt *prompt,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_biometrics_get_shake_offset function. */
 ui_error_t cupertino_biometrics_get_shake_offset(
     const struct cupertino_biometrics_prompt *prompt, float *out_offset_x) {
   if (!prompt || !out_offset_x) {
@@ -249,6 +259,7 @@ ui_error_t cupertino_biometrics_get_shake_offset(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_biometrics_get_dimensions function. */
 ui_error_t cupertino_biometrics_get_dimensions(
     const struct cupertino_biometrics_prompt *prompt, float *out_width,
     float *out_height) {
@@ -261,6 +272,7 @@ ui_error_t cupertino_biometrics_get_dimensions(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_biometrics_get_base function. */
 ui_error_t
 cupertino_biometrics_get_base(struct cupertino_biometrics_prompt *prompt,
                               struct ui_dialog_base **out_base) {

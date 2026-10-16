@@ -40,7 +40,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
@@ -53,11 +53,11 @@ struct ui_engine;
  * @brief Material 3 Hover Card wrapping ui_hover_card_base.
  */
 struct md3_hover_card {
-  struct ui_hover_card_base *base;
-  struct ui_dom_node *anchor_node;
-  int is_visible;
-  float open_delay_ms;
-  float close_delay_ms;
+  struct ui_hover_card_base *base; /**< base field. */
+  struct ui_dom_node *anchor_node; /**< anchor_node field. */
+  int is_visible;                  /**< is_visible field. */
+  float open_delay_ms;             /**< open_delay_ms field. */
+  float close_delay_ms;            /**< close_delay_ms field. */
 };
 
 /**
@@ -108,10 +108,10 @@ md3_hover_card_hide(struct md3_hover_card *hover_card);
  * @brief Material 3 Popover wrapping ui_popover_base.
  */
 struct md3_popover {
-  struct ui_popover_base *base;
-  struct ui_dom_node *anchor_node;
-  int is_open;
-  int elevation_level;
+  struct ui_popover_base *base;    /**< base field. */
+  struct ui_dom_node *anchor_node; /**< anchor_node field. */
+  int is_open;                     /**< is_open field. */
+  int elevation_level;             /**< elevation_level field. */
 };
 
 /**
@@ -172,12 +172,12 @@ md3_popover_is_open(const struct md3_popover *popover, int *out_is_open);
  * @brief Material 3 Banner wrapping ui_banner_base.
  */
 struct md3_banner {
-  struct ui_banner_base *base;
-  char message[256];
-  char action_primary[64];
-  char action_secondary[64];
-  int is_open;
-  int is_dismissible;
+  struct ui_banner_base *base; /**< base field. */
+  char message[256];           /**< message[256] field. */
+  char action_primary[64];     /**< action_primary[64] field. */
+  char action_secondary[64];   /**< action_secondary[64] field. */
+  int is_open;                 /**< is_open field. */
+  int is_dismissible;          /**< is_dismissible field. */
 };
 
 /**
@@ -260,12 +260,12 @@ enum md3_alert_severity {
  * @brief Material 3 Contextual Inline Alert wrapping ui_alert_base.
  */
 struct md3_inline_alert {
-  struct ui_alert_base *base;
-  enum md3_alert_severity severity;
-  char title[128];
-  char message[256];
-  int is_dismissible;
-  int is_dismissed;
+  struct ui_alert_base *base;       /**< base field. */
+  enum md3_alert_severity severity; /**< severity field. */
+  char title[128];                  /**< title[128] field. */
+  char message[256];                /**< message[256] field. */
+  int is_dismissible;               /**< is_dismissible field. */
+  int is_dismissed;                 /**< is_dismissed field. */
 };
 
 /**
@@ -328,8 +328,8 @@ extern C_MULTIPLATFORM_EXPORT ui_error_t md3_inline_alert_set_dismissible(
  * @brief Material 3 Menubar wrapping ui_menubar_base.
  */
 struct md3_menubar {
-  struct ui_menubar_base *base;
-  size_t item_count;
+  struct ui_menubar_base *base; /**< base field. */
+  size_t item_count;            /**< item_count field. */
 };
 
 /**
@@ -370,10 +370,10 @@ md3_menubar_append_item(struct md3_menubar *menubar, struct ui_component *item);
  * @brief Material 3 Context Menu wrapping ui_context_menu_base.
  */
 struct md3_context_menu {
-  struct ui_context_menu_base *base;
-  int is_open;
-  int current_x;
-  int current_y;
+  struct ui_context_menu_base *base; /**< base field. */
+  int is_open;                       /**< is_open field. */
+  int current_x;                     /**< current_x field. */
+  int current_y;                     /**< current_y field. */
 };
 
 /**
@@ -419,8 +419,8 @@ md3_context_menu_open_at(struct md3_context_menu *menu, int x, int y,
  * @brief Stacked action item inside an action sheet.
  */
 struct md3_action_sheet_item {
-  char label[64];
-  char icon[32];
+  char label[64]; /**< label[64] field. */
+  char icon[32];  /**< icon[32] field. */
 };
 
 /**
@@ -428,11 +428,11 @@ struct md3_action_sheet_item {
  * @brief Material 3 Action Sheet wrapping ui_action_sheet_base.
  */
 struct md3_action_sheet {
-  struct ui_action_sheet_base *base;
-  struct md3_action_sheet_item actions[16];
-  size_t action_count;
-  char cancel_label[64];
-  int is_open;
+  struct ui_action_sheet_base *base;        /**< base field. */
+  struct md3_action_sheet_item actions[16]; /**< actions[16] field. */
+  size_t action_count;                      /**< action_count field. */
+  char cancel_label[64];                    /**< cancel_label[64] field. */
+  int is_open;                              /**< is_open field. */
 };
 
 /**
@@ -504,13 +504,13 @@ extern C_MULTIPLATFORM_EXPORT ui_error_t md3_action_sheet_is_open(
  * @brief Material 3 Coachmark Guided Tour wrapping ui_coachmark_tour.
  */
 struct md3_coachmark {
-  struct ui_coachmark_tour *base;
-  struct ui_dom_node *target_node;
-  char title[128];
-  char description[256];
-  int current_step;
-  int total_steps;
-  int is_active;
+  struct ui_coachmark_tour *base;  /**< base field. */
+  struct ui_dom_node *target_node; /**< target_node field. */
+  char title[128];                 /**< title[128] field. */
+  char description[256];           /**< description[256] field. */
+  int current_step;                /**< current_step field. */
+  int total_steps;                 /**< total_steps field. */
+  int is_active;                   /**< is_active field. */
 };
 
 /**
@@ -566,11 +566,11 @@ md3_coachmark_start(struct md3_coachmark *coachmark);
  * @brief Material 3 Color Picker wrapping ui_color_picker_base.
  */
 struct md3_color_picker {
-  struct ui_color_picker_base *base;
-  struct ui_control_value_accessor cva;
-  struct ui_color_hsv hsv;
-  struct ui_color_rgb rgb;
-  char hex_string[16];
+  struct ui_color_picker_base *base;    /**< base field. */
+  struct ui_control_value_accessor cva; /**< cva field. */
+  struct ui_color_hsv hsv;              /**< hsv field. */
+  struct ui_color_rgb rgb;              /**< rgb field. */
+  char hex_string[16];                  /**< hex_string[16] field. */
 };
 
 /**
@@ -675,9 +675,9 @@ extern C_MULTIPLATFORM_EXPORT ui_error_t md3_color_picker_get_hex(
  * @brief Action entry in a command palette.
  */
 struct md3_command_item {
-  char category[64];
-  char title[128];
-  char shortcut[32];
+  char category[64]; /**< category[64] field. */
+  char title[128];   /**< title[128] field. */
+  char shortcut[32]; /**< shortcut[32] field. */
 };
 
 /**
@@ -685,10 +685,10 @@ struct md3_command_item {
  * @brief Material 3 Command Palette wrapping ui_command_palette_base.
  */
 struct md3_command_palette {
-  struct ui_command_palette_base base;
-  struct md3_command_item commands[64];
-  size_t command_count;
-  int is_open;
+  struct ui_command_palette_base base;  /**< base field. */
+  struct md3_command_item commands[64]; /**< commands[64] field. */
+  size_t command_count;                 /**< command_count field. */
+  int is_open;                          /**< is_open field. */
 };
 
 /**

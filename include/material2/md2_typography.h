@@ -14,7 +14,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 /**
  * @enum md2_typography_style
@@ -41,11 +41,11 @@ enum md2_typography_style {
  * @brief Attributes for a Material Design 2 typography style.
  */
 struct md2_text_style {
-  float font_size_sp;
-  float line_height_sp;
-  int font_weight;
-  float letter_spacing_sp;
-  int all_caps;
+  float font_size_sp;      /**< font_size_sp field. */
+  float line_height_sp;    /**< line_height_sp field. */
+  int font_weight;         /**< font_weight field. */
+  float letter_spacing_sp; /**< letter_spacing_sp field. */
+  int all_caps;            /**< all_caps field. */
 };
 
 /**
@@ -61,6 +61,6 @@ extern C_MULTIPLATFORM_EXPORT ui_error_t md2_typography_get_style(
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* MATERIAL2_MD2_TYPOGRAPHY_H */

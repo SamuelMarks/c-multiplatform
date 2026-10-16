@@ -14,7 +14,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 /**
  * @enum md2_shape_category
@@ -39,6 +39,6 @@ extern C_MULTIPLATFORM_EXPORT ui_error_t md2_shape_get_corner_radius(
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* MATERIAL2_MD2_SHAPE_H */

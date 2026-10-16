@@ -13,6 +13,7 @@
 
 #if !defined(__APPLE__) && !defined(_WIN32) && !defined(_WIN64)
 
+/** @brief ui_font_provider_load_system_font function. */
 ui_error_t ui_font_provider_load_system_font(struct ui_font_manager *manager,
                                              const char *family_name,
                                              int weight, int is_italic,

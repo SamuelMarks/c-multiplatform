@@ -6,6 +6,9 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_malloc_fail_countdown;
+extern int g_mock_strcpy_fail;
+
 #define TEST_ASSERT(cond)                                                      \
   do {                                                                         \
     if (!(cond)) {                                                             \
@@ -61,6 +64,7 @@ static void test_page_parse_cases(void) {
     struct ui_css_rule *r;                                                     \
     struct ui_css_computed_style *s;                                           \
     struct ui_css_page_properties p;                                           \
+    const char *pg_val = (pg_str);                                             \
     ui_css_stylesheet_create(&sh);                                             \
     ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &r);                            \
     ui_css_rule_append_selector(r, UI_CSS_SELECTOR_TYPE_TAG, "div");           \
@@ -68,8 +72,8 @@ static void test_page_parse_cases(void) {
       ui_css_rule_append_declaration(r, "size", sz_str, 0);                    \
     if (mk_str)                                                                \
       ui_css_rule_append_declaration(r, "marks", mk_str, 0);                   \
-    if (pg_str)                                                                \
-      ui_css_rule_append_declaration(r, "page", pg_str, 0);                    \
+    if (pg_val)                                                                \
+      ui_css_rule_append_declaration(r, "page", pg_val, 0);                    \
     if (bld_str)                                                               \
       ui_css_rule_append_declaration(r, "bleed", bld_str, 0);                  \
     ui_css_stylesheet_append_rule(sh, r);                                      \
@@ -77,9 +81,8 @@ static void test_page_parse_cases(void) {
     ui_css_page_parse(s, &p);                                                  \
     TEST_ASSERT(p.size == sz_val);                                             \
     TEST_ASSERT(p.marks == mk_val);                                            \
-    if (pg_str && strcmp(pg_str, "auto") != 0) {                               \
-      TEST_ASSERT(p.page_name != NULL &&                                       \
-                  strcmp(p.page_name, pg_str ? pg_str : "") == 0);             \
+    if (pg_val && strcmp(pg_val, "auto") != 0) {                               \
+      TEST_ASSERT(p.page_name != NULL && strcmp(p.page_name, pg_val) == 0);    \
     } else {                                                                   \
       TEST_ASSERT(p.page_name == NULL);                                        \
     }                                                                          \
@@ -160,7 +163,6 @@ static void test_page_parse_cases(void) {
     ui_css_stylesheet_append_rule(sh, r);
     ui_css_resolve_style(sh, node, &s);
 
-    extern int g_malloc_fail_countdown;
     g_malloc_fail_countdown = 0;
     rc = ui_css_page_parse(s, &p);
     g_malloc_fail_countdown = -1;
@@ -176,7 +178,6 @@ static void test_page_parse_cases(void) {
     struct ui_css_rule *r;
     struct ui_css_computed_style *s;
     struct ui_css_page_properties p;
-    extern int g_mock_strcpy_fail;
     ui_css_stylesheet_create(&sh);
     ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &r);
     ui_css_rule_append_selector(r, UI_CSS_SELECTOR_TYPE_TAG, "div");

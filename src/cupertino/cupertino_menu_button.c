@@ -66,6 +66,7 @@ static ui_error_t mock_menu_button_base_set_text(struct ui_button_base *b,
 /** @endcond */
 #endif
 
+/** @brief cupertino_menu_button_create function. */
 ui_error_t cupertino_menu_button_create(
     struct ui_engine *engine,
     const struct cupertino_menu_button_descriptor *desc,
@@ -120,6 +121,7 @@ ui_error_t cupertino_menu_button_create(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_menu_button_destroy function. */
 ui_error_t cupertino_menu_button_destroy(struct cupertino_menu_button *menu) {
   ui_error_t rc;
 
@@ -138,6 +140,7 @@ ui_error_t cupertino_menu_button_destroy(struct cupertino_menu_button *menu) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_menu_button_add_item function. */
 ui_error_t
 cupertino_menu_button_add_item(struct cupertino_menu_button *menu,
                                const struct cupertino_menu_button_item *item) {
@@ -176,6 +179,7 @@ cupertino_menu_button_add_item(struct cupertino_menu_button *menu,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_menu_button_get_item_count function. */
 ui_error_t
 cupertino_menu_button_get_item_count(const struct cupertino_menu_button *menu,
                                      size_t *out_count) {
@@ -187,6 +191,7 @@ cupertino_menu_button_get_item_count(const struct cupertino_menu_button *menu,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_menu_button_get_item function. */
 ui_error_t
 cupertino_menu_button_get_item(const struct cupertino_menu_button *menu,
                                size_t index,
@@ -203,6 +208,7 @@ cupertino_menu_button_get_item(const struct cupertino_menu_button *menu,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_menu_button_select_item function. */
 ui_error_t cupertino_menu_button_select_item(struct cupertino_menu_button *menu,
                                              size_t index) {
   struct cupertino_menu_button_item *item;
@@ -249,12 +255,15 @@ ui_error_t cupertino_menu_button_select_item(struct cupertino_menu_button *menu,
   menu->is_open = 0;
 
   if (item->on_select) {
-    item->on_select(item->user_data);
+    rc = item->on_select(item->user_data);
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
 
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_menu_button_get_selected_index function. */
 ui_error_t cupertino_menu_button_get_selected_index(
     const struct cupertino_menu_button *menu, int *out_index) {
   if (!menu || !out_index) {
@@ -265,6 +274,7 @@ ui_error_t cupertino_menu_button_get_selected_index(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_menu_button_set_open function. */
 ui_error_t cupertino_menu_button_set_open(struct cupertino_menu_button *menu,
                                           int is_open) {
   if (!menu) {
@@ -275,6 +285,7 @@ ui_error_t cupertino_menu_button_set_open(struct cupertino_menu_button *menu,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_menu_button_is_open function. */
 ui_error_t
 cupertino_menu_button_is_open(const struct cupertino_menu_button *menu,
                               int *out_is_open) {
@@ -286,6 +297,7 @@ cupertino_menu_button_is_open(const struct cupertino_menu_button *menu,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_menu_button_get_current_title function. */
 ui_error_t cupertino_menu_button_get_current_title(
     const struct cupertino_menu_button *menu, const char **out_title) {
   if (!menu || !out_title) {
@@ -296,6 +308,7 @@ ui_error_t cupertino_menu_button_get_current_title(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_menu_button_get_button function. */
 ui_error_t
 cupertino_menu_button_get_button(struct cupertino_menu_button *menu,
                                  struct cupertino_button **out_button) {

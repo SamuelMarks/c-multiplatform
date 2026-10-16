@@ -85,10 +85,8 @@ ui_error_t ui_form_array_push(ui_form_array_t *array, ui_form_node_t node) {
         return UI_ERROR_OUT_OF_BOUNDS;
       }
 #else
-      void *dummy = memcpy(new_nodes, array->nodes,
-                           (size_t)array->count * sizeof(ui_form_node_t));
-      if (!dummy)
-        return UI_ERROR_OUT_OF_BOUNDS;
+      memcpy(new_nodes, array->nodes,
+             (size_t)array->count * sizeof(ui_form_node_t));
 #endif
     }
     array->nodes = new_nodes;
@@ -136,10 +134,8 @@ ui_error_t ui_form_array_insert_at(ui_form_array_t *array, size_t index,
         return UI_ERROR_OUT_OF_BOUNDS;
       }
 #else
-      void *dummy = memcpy(new_nodes, array->nodes,
-                           (size_t)array->count * sizeof(ui_form_node_t));
-      if (!dummy)
-        return UI_ERROR_OUT_OF_BOUNDS;
+      memcpy(new_nodes, array->nodes,
+             (size_t)array->count * sizeof(ui_form_node_t));
 #endif
     }
     array->nodes = new_nodes;

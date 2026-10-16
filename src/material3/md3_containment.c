@@ -271,6 +271,7 @@ mock_aspect_ratio_base_set_ratio(struct ui_aspect_ratio_base *b, float r) {
 /* md3_accordion & md3_expansion_panel                                       */
 /* ========================================================================= */
 
+/** @brief md3_accordion_create function. */
 ui_error_t md3_accordion_create(struct ui_engine *engine,
                                 struct md3_accordion **out_accordion) {
   struct md3_accordion *acc;
@@ -300,6 +301,7 @@ ui_error_t md3_accordion_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_accordion_destroy function. */
 ui_error_t md3_accordion_destroy(struct md3_accordion *accordion) {
   ui_error_t rc;
 
@@ -312,6 +314,7 @@ ui_error_t md3_accordion_destroy(struct md3_accordion *accordion) {
   return rc;
 }
 
+/** @brief md3_accordion_set_multi_expand function. */
 ui_error_t md3_accordion_set_multi_expand(struct md3_accordion *accordion,
                                           int multi_expand) {
   if (!accordion) {
@@ -321,6 +324,7 @@ ui_error_t md3_accordion_set_multi_expand(struct md3_accordion *accordion,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_expansion_panel_create function. */
 ui_error_t md3_expansion_panel_create(struct ui_engine *engine,
                                       struct md3_expansion_panel **out_panel) {
   struct md3_expansion_panel *panel;
@@ -353,6 +357,7 @@ ui_error_t md3_expansion_panel_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_expansion_panel_destroy function. */
 ui_error_t md3_expansion_panel_destroy(struct md3_expansion_panel *panel) {
   ui_error_t rc;
 
@@ -365,6 +370,7 @@ ui_error_t md3_expansion_panel_destroy(struct md3_expansion_panel *panel) {
   return rc;
 }
 
+/** @brief md3_accordion_add_panel function. */
 ui_error_t md3_accordion_add_panel(struct md3_accordion *accordion,
                                    struct md3_expansion_panel *panel) {
   ui_error_t rc;
@@ -388,6 +394,7 @@ ui_error_t md3_accordion_add_panel(struct md3_accordion *accordion,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_expansion_panel_set_expanded function. */
 ui_error_t md3_expansion_panel_set_expanded(struct md3_expansion_panel *panel,
                                             int is_expanded) {
   ui_error_t rc;
@@ -407,6 +414,7 @@ ui_error_t md3_expansion_panel_set_expanded(struct md3_expansion_panel *panel,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_expansion_panel_set_title function. */
 ui_error_t md3_expansion_panel_set_title(struct md3_expansion_panel *panel,
                                          const char *title,
                                          const char *subtitle) {
@@ -439,6 +447,7 @@ ui_error_t md3_expansion_panel_set_title(struct md3_expansion_panel *panel,
 /* md3_grid_list & md3_grid_tile                                             */
 /* ========================================================================= */
 
+/** @brief md3_grid_list_create function. */
 ui_error_t md3_grid_list_create(struct ui_engine *engine, int columns,
                                 struct md3_grid_list **out_grid_list) {
   struct md3_grid_list *gl;
@@ -469,6 +478,7 @@ ui_error_t md3_grid_list_create(struct ui_engine *engine, int columns,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_grid_list_destroy function. */
 ui_error_t md3_grid_list_destroy(struct md3_grid_list *grid_list) {
   ui_error_t rc;
 
@@ -481,6 +491,7 @@ ui_error_t md3_grid_list_destroy(struct md3_grid_list *grid_list) {
   return rc;
 }
 
+/** @brief md3_grid_list_add_tile function. */
 ui_error_t md3_grid_list_add_tile(struct md3_grid_list *grid_list, int rowspan,
                                   int colspan, const char *title) {
   size_t idx;
@@ -524,6 +535,7 @@ ui_error_t md3_grid_list_add_tile(struct md3_grid_list *grid_list, int rowspan,
 /* md3_surface                                                               */
 /* ========================================================================= */
 
+/** @brief md3_surface_create function. */
 ui_error_t md3_surface_create(struct ui_engine *engine,
                               enum md3_surface_role role, int elevation_level,
                               struct md3_surface **out_surface) {
@@ -557,6 +569,7 @@ ui_error_t md3_surface_create(struct ui_engine *engine,
       surf->base, (enum ui_elevation_level)elevation_level);
 }
 
+/** @brief md3_surface_destroy function. */
 ui_error_t md3_surface_destroy(struct md3_surface *surface) {
   if (!surface) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -565,6 +578,7 @@ ui_error_t md3_surface_destroy(struct md3_surface *surface) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_surface_set_elevation function. */
 ui_error_t md3_surface_set_elevation(struct md3_surface *surface,
                                      int elevation_level) {
   if (!surface || elevation_level < 0 || elevation_level > 5) {
@@ -580,6 +594,7 @@ ui_error_t md3_surface_set_elevation(struct md3_surface *surface,
 /* md3_avatar & md3_avatar_group                                             */
 /* ========================================================================= */
 
+/** @brief md3_avatar_create function. */
 ui_error_t md3_avatar_create(struct ui_engine *engine, enum ui_avatar_type type,
                              struct md3_avatar **out_avatar) {
   struct md3_avatar *av;
@@ -611,6 +626,7 @@ ui_error_t md3_avatar_create(struct ui_engine *engine, enum ui_avatar_type type,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_avatar_destroy function. */
 ui_error_t md3_avatar_destroy(struct md3_avatar *avatar) {
   ui_error_t rc;
 
@@ -623,6 +639,7 @@ ui_error_t md3_avatar_destroy(struct md3_avatar *avatar) {
   return rc;
 }
 
+/** @brief md3_avatar_set_name function. */
 ui_error_t md3_avatar_set_name(struct md3_avatar *avatar, const char *name) {
   const char *inits = NULL;
   ui_error_t rc;
@@ -656,6 +673,7 @@ ui_error_t md3_avatar_set_name(struct md3_avatar *avatar, const char *name) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_avatar_set_image_url function. */
 ui_error_t md3_avatar_set_image_url(struct md3_avatar *avatar,
                                     const char *image_url) {
   ui_error_t rc;
@@ -680,6 +698,7 @@ ui_error_t md3_avatar_set_image_url(struct md3_avatar *avatar,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_avatar_group_create function. */
 ui_error_t md3_avatar_group_create(struct ui_engine *engine, int max_visible,
                                    struct md3_avatar_group **out_group) {
   struct md3_avatar_group *grp;
@@ -710,6 +729,7 @@ ui_error_t md3_avatar_group_create(struct ui_engine *engine, int max_visible,
                                               (unsigned int)max_visible);
 }
 
+/** @brief md3_avatar_group_destroy function. */
 ui_error_t md3_avatar_group_destroy(struct md3_avatar_group *group) {
   ui_error_t rc;
 
@@ -722,6 +742,7 @@ ui_error_t md3_avatar_group_destroy(struct md3_avatar_group *group) {
   return rc;
 }
 
+/** @brief md3_avatar_group_append function. */
 ui_error_t md3_avatar_group_append(struct md3_avatar_group *group,
                                    struct md3_avatar *avatar) {
   ui_error_t rc;
@@ -749,6 +770,7 @@ ui_error_t md3_avatar_group_append(struct md3_avatar_group *group,
 /* md3_swipe_action                                                          */
 /* ========================================================================= */
 
+/** @brief md3_swipe_action_create function. */
 ui_error_t md3_swipe_action_create(struct ui_engine *engine,
                                    struct md3_swipe_action **out_action) {
   struct md3_swipe_action *act;
@@ -771,6 +793,7 @@ ui_error_t md3_swipe_action_create(struct ui_engine *engine,
   return ui_swipe_action_base_init(&act->base, (struct ui_component *)0x1234);
 }
 
+/** @brief md3_swipe_action_destroy function. */
 ui_error_t md3_swipe_action_destroy(struct md3_swipe_action *action) {
   if (!action) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -779,6 +802,7 @@ ui_error_t md3_swipe_action_destroy(struct md3_swipe_action *action) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_swipe_action_update function. */
 ui_error_t md3_swipe_action_update(struct md3_swipe_action *action,
                                    float delta_x) {
   ui_error_t rc;
@@ -795,6 +819,7 @@ ui_error_t md3_swipe_action_update(struct md3_swipe_action *action,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_swipe_action_commit function. */
 ui_error_t md3_swipe_action_commit(struct md3_swipe_action *action) {
   ui_error_t rc;
 
@@ -819,6 +844,7 @@ ui_error_t md3_swipe_action_commit(struct md3_swipe_action *action) {
 /* md3_skeleton                                                              */
 /* ========================================================================= */
 
+/** @brief md3_skeleton_create function. */
 ui_error_t md3_skeleton_create(struct ui_engine *engine,
                                enum md3_skeleton_variant variant,
                                struct md3_skeleton **out_skeleton) {
@@ -858,6 +884,7 @@ ui_error_t md3_skeleton_create(struct ui_engine *engine,
   return ui_skeleton_base_set_shape(skel->base, shape);
 }
 
+/** @brief md3_skeleton_destroy function. */
 ui_error_t md3_skeleton_destroy(struct md3_skeleton *skeleton) {
   ui_error_t rc;
 
@@ -870,6 +897,7 @@ ui_error_t md3_skeleton_destroy(struct md3_skeleton *skeleton) {
   return rc;
 }
 
+/** @brief md3_skeleton_set_size function. */
 ui_error_t md3_skeleton_set_size(struct md3_skeleton *skeleton, float width,
                                  float height) {
   ui_error_t rc;
@@ -893,6 +921,7 @@ ui_error_t md3_skeleton_set_size(struct md3_skeleton *skeleton, float width,
 /* md3_empty_state                                                           */
 /* ========================================================================= */
 
+/** @brief md3_empty_state_create function. */
 ui_error_t md3_empty_state_create(struct ui_engine *engine,
                                   struct md3_empty_state **out_empty_state) {
   struct md3_empty_state *es;
@@ -923,6 +952,7 @@ ui_error_t md3_empty_state_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_empty_state_destroy function. */
 ui_error_t md3_empty_state_destroy(struct md3_empty_state *empty_state) {
   if (!empty_state) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -931,6 +961,7 @@ ui_error_t md3_empty_state_destroy(struct md3_empty_state *empty_state) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_empty_state_set_content function. */
 ui_error_t md3_empty_state_set_content(struct md3_empty_state *empty_state,
                                        const char *title,
                                        const char *description) {
@@ -979,6 +1010,7 @@ ui_error_t md3_empty_state_set_content(struct md3_empty_state *empty_state,
 /* md3_masonry_layout                                                        */
 /* ========================================================================= */
 
+/** @brief md3_masonry_layout_create function. */
 ui_error_t md3_masonry_layout_create(struct ui_engine *engine, int columns,
                                      struct md3_masonry_layout **out_masonry) {
   struct md3_masonry_layout *ml;
@@ -1008,6 +1040,7 @@ ui_error_t md3_masonry_layout_create(struct ui_engine *engine, int columns,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_masonry_layout_destroy function. */
 ui_error_t md3_masonry_layout_destroy(struct md3_masonry_layout *masonry) {
   ui_error_t rc;
 
@@ -1020,6 +1053,7 @@ ui_error_t md3_masonry_layout_destroy(struct md3_masonry_layout *masonry) {
   return rc;
 }
 
+/** @brief md3_masonry_layout_reflow function. */
 ui_error_t md3_masonry_layout_reflow(struct md3_masonry_layout *masonry) {
   ui_error_t rc;
 
@@ -1039,6 +1073,7 @@ ui_error_t md3_masonry_layout_reflow(struct md3_masonry_layout *masonry) {
 /* md3_aspect_ratio                                                          */
 /* ========================================================================= */
 
+/** @brief md3_aspect_ratio_create function. */
 ui_error_t md3_aspect_ratio_create(struct ui_engine *engine, float ratio,
                                    struct md3_aspect_ratio **out_aspect_ratio) {
   struct md3_aspect_ratio *ar;
@@ -1066,6 +1101,7 @@ ui_error_t md3_aspect_ratio_create(struct ui_engine *engine, float ratio,
   return ui_aspect_ratio_base_set_ratio(ar->base, ratio);
 }
 
+/** @brief md3_aspect_ratio_destroy function. */
 ui_error_t md3_aspect_ratio_destroy(struct md3_aspect_ratio *aspect_ratio) {
   ui_error_t rc;
 
@@ -1078,6 +1114,7 @@ ui_error_t md3_aspect_ratio_destroy(struct md3_aspect_ratio *aspect_ratio) {
   return rc;
 }
 
+/** @brief md3_aspect_ratio_set_ratio function. */
 ui_error_t md3_aspect_ratio_set_ratio(struct md3_aspect_ratio *aspect_ratio,
                                       float ratio) {
   ui_error_t rc;

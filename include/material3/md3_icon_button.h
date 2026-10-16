@@ -14,7 +14,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
@@ -35,12 +35,12 @@ enum md3_icon_button_variant {
  * @brief Material 3 Icon Button skin wrapping ui_button_base.
  */
 struct md3_icon_button {
-  struct ui_button_base *base;
-  enum md3_icon_button_variant variant;
-  int is_toggleable;
-  int is_selected;
-  char icon_name[32];
-  char selected_icon_name[32];
+  struct ui_button_base *base;          /**< base field. */
+  enum md3_icon_button_variant variant; /**< variant field. */
+  int is_toggleable;                    /**< is_toggleable field. */
+  int is_selected;                      /**< is_selected field. */
+  char icon_name[32];                   /**< icon_name[32] field. */
+  char selected_icon_name[32];          /**< selected_icon_name[32] field. */
 };
 
 /**
@@ -143,6 +143,6 @@ extern C_MULTIPLATFORM_EXPORT ui_error_t md3_icon_button_get_base(
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* MATERIAL3_MD3_ICON_BUTTON_H */

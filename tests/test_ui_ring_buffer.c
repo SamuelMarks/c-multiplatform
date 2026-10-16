@@ -7,6 +7,9 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_ring_buffer_mock_load_fail_countdown;
+extern int g_ring_buffer_mock_cas_fail;
+
 extern int g_malloc_fail_countdown;
 
 #ifndef UI_SINGLE_THREADED
@@ -238,8 +241,6 @@ static int run_normal_tests(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_ring_buffer_mock_load_fail_countdown;
-    extern int g_ring_buffer_mock_cas_fail;
 
     g_ring_buffer_mock_load_fail_countdown = 0;
     if (ui_ring_buffer_push(rb, &test_val) != UI_ERROR_UNKNOWN)

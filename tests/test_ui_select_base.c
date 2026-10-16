@@ -22,7 +22,6 @@ static ui_error_t on_select_change(struct ui_select_base *select, int index,
   g_change_count++;
   g_last_selected_index = index;
   return UI_ERROR_NONE;
-  return UI_ERROR_NONE;
 }
 
 static ui_error_t on_select_open_change(struct ui_select_base *select,
@@ -33,7 +32,6 @@ static ui_error_t on_select_open_change(struct ui_select_base *select,
   }
   g_open_change_count++;
   g_last_open_state = is_open;
-  return UI_ERROR_NONE;
   return UI_ERROR_NONE;
 }
 

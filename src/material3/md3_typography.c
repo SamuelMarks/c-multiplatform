@@ -11,6 +11,7 @@
 #include <string.h>
 /* clang-format on */
 
+/** @brief g_base_styles[MD3_TYPESCALE_ROLE_COUNT] variable. */
 static const struct md3_type_style g_base_styles[MD3_TYPESCALE_ROLE_COUNT] = {
     {57.0f, 64.0f, -0.25f, 400}, /* DISPLAY_LARGE */
     {45.0f, 52.0f, 0.00f, 400},  /* DISPLAY_MEDIUM */
@@ -29,6 +30,7 @@ static const struct md3_type_style g_base_styles[MD3_TYPESCALE_ROLE_COUNT] = {
     {11.0f, 16.0f, 0.50f, 500}   /* LABEL_SMALL */
 };
 
+/** @brief g_emphasized_weights[MD3_TYPESCALE_ROLE_COUNT] variable. */
 static const int g_emphasized_weights[MD3_TYPESCALE_ROLE_COUNT] = {
     800, /* DISPLAY_LARGE */
     800, /* DISPLAY_MEDIUM */
@@ -47,6 +49,7 @@ static const int g_emphasized_weights[MD3_TYPESCALE_ROLE_COUNT] = {
     700  /* LABEL_SMALL */
 };
 
+/** @brief g_role_names[MD3_TYPESCALE_ROLE_COUNT] variable. */
 static const char *const g_role_names[MD3_TYPESCALE_ROLE_COUNT] = {
     "display-large",   "display-medium", "display-small", "headline-large",
     "headline-medium", "headline-small", "title-large",   "title-medium",
@@ -132,8 +135,8 @@ ui_error_t md3_typography_apply_tokens(int is_expressive,
       sprintf_s(buf, sizeof(buf), "--md-sys-typescale-%s-%s", g_role_names[i],
                 props[p].suffix);
 #else
-      snprintf(buf, sizeof(buf), "--md-sys-typescale-%s-%s", g_role_names[i],
-               props[p].suffix);
+      sprintf(buf, "--md-sys-typescale-%s-%s", g_role_names[i],
+              props[p].suffix);
 #endif
       rc = ui_design_token_set_number(dict, buf, props[p].value);
       if (rc != UI_ERROR_NONE) {

@@ -10,6 +10,13 @@
 #include <math.h>
 /* clang-format on */
 
+extern int g_cupertino_typography_mock_get_tracking_fail;
+extern int g_cupertino_typography_mock_token_fail;
+extern int g_cupertino_typography_mock_token_fail_step;
+extern int g_cupertino_typography_mock_weight_override;
+extern void cupertino_typography_mock_reset_token_count(void);
+extern int g_cupertino_typography_mock_get_style_fail;
+
 SUITE(cupertino_typography_suite);
 
 TEST test_typography_metrics_and_dynamic_type(void) {
@@ -169,11 +176,6 @@ TEST test_typography_tokens_injection(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
 TEST test_typography_mock_and_branch_coverage(void) {
-  extern int g_cupertino_typography_mock_get_tracking_fail;
-  extern int g_cupertino_typography_mock_token_fail;
-  extern int g_cupertino_typography_mock_token_fail_step;
-  extern int g_cupertino_typography_mock_weight_override;
-  extern void cupertino_typography_mock_reset_token_count(void);
 
   struct cupertino_type_metrics metrics;
   struct ui_arena *arena = NULL;
@@ -215,7 +217,6 @@ TEST test_typography_mock_and_branch_coverage(void) {
   rc = ui_design_token_dict_init(arena, &dict);
   ASSERT_EQ(UI_ERROR_NONE, rc);
 
-  extern int g_cupertino_typography_mock_get_style_fail;
   g_cupertino_typography_mock_get_style_fail = 1;
   rc = cupertino_typography_apply_tokens(&dict);
   ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);

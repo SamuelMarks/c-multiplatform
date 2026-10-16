@@ -528,6 +528,7 @@ static ui_error_t autocomplete_cva_set_disabled_state(void *component,
   return ui_input_base_set_disabled(ac->input, is_disabled);
 }
 
+/** @brief destroy_partially_created_autocomplete function. */
 static ui_error_t
 destroy_partially_created_autocomplete(struct ui_autocomplete_base *ac,
                                        int input_attached,

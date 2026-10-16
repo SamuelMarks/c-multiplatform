@@ -15,6 +15,7 @@
 /* md3_autocomplete                                                          */
 /* ========================================================================= */
 
+/** @brief md3_autocomplete_create function. */
 ui_error_t md3_autocomplete_create(struct ui_engine *engine,
                                    enum md3_text_field_variant variant,
                                    struct md3_autocomplete **out_autocomplete,
@@ -50,6 +51,7 @@ ui_error_t md3_autocomplete_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_autocomplete_destroy function. */
 ui_error_t md3_autocomplete_destroy(struct md3_autocomplete *autocomplete) {
   ui_error_t rc = UI_ERROR_NONE;
 
@@ -63,6 +65,7 @@ ui_error_t md3_autocomplete_destroy(struct md3_autocomplete *autocomplete) {
   return rc;
 }
 
+/** @brief md3_autocomplete_set_query function. */
 ui_error_t md3_autocomplete_set_query(struct md3_autocomplete *autocomplete,
                                       const char *query) {
   size_t len;
@@ -86,6 +89,7 @@ ui_error_t md3_autocomplete_set_query(struct md3_autocomplete *autocomplete,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_autocomplete_get_query function. */
 ui_error_t
 md3_autocomplete_get_query(const struct md3_autocomplete *autocomplete,
                            char *out_query, size_t query_capacity) {
@@ -114,6 +118,7 @@ md3_autocomplete_get_query(const struct md3_autocomplete *autocomplete,
 /* md3_select                                                                */
 /* ========================================================================= */
 
+/** @brief md3_select_create function. */
 ui_error_t md3_select_create(struct ui_engine *engine,
                              enum md3_text_field_variant variant,
                              struct md3_select **out_select,
@@ -153,6 +158,7 @@ ui_error_t md3_select_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_select_destroy function. */
 ui_error_t md3_select_destroy(struct md3_select *select) {
   ui_error_t rc = UI_ERROR_NONE;
 
@@ -166,6 +172,7 @@ ui_error_t md3_select_destroy(struct md3_select *select) {
   return rc;
 }
 
+/** @brief md3_select_add_option function. */
 ui_error_t md3_select_add_option(struct md3_select *select, const char *label,
                                  const char *value) {
   size_t idx;
@@ -206,6 +213,7 @@ ui_error_t md3_select_add_option(struct md3_select *select, const char *label,
   return ui_select_base_set_item_count(select->base, (int)select->option_count);
 }
 
+/** @brief md3_select_set_multiselect function. */
 ui_error_t md3_select_set_multiselect(struct md3_select *select, int is_multi) {
   if (!select) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -214,6 +222,7 @@ ui_error_t md3_select_set_multiselect(struct md3_select *select, int is_multi) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_select_set_open function. */
 ui_error_t md3_select_set_open(struct md3_select *select, int is_open) {
   if (!select) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -225,6 +234,7 @@ ui_error_t md3_select_set_open(struct md3_select *select, int is_open) {
   return ui_select_base_set_open(select->base, select->is_open);
 }
 
+/** @brief md3_select_set_selected_index function. */
 ui_error_t md3_select_set_selected_index(struct md3_select *select, int index) {
   size_t i;
 
@@ -244,6 +254,7 @@ ui_error_t md3_select_set_selected_index(struct md3_select *select, int index) {
   return ui_select_base_set_selected_index(select->base, index);
 }
 
+/** @brief md3_select_get_selected_index function. */
 ui_error_t md3_select_get_selected_index(const struct md3_select *select,
                                          int *out_index) {
   if (!select || !out_index) {
@@ -257,6 +268,7 @@ ui_error_t md3_select_get_selected_index(const struct md3_select *select,
 /* md3_pin_input                                                             */
 /* ========================================================================= */
 
+/** @brief md3_pin_input_create function. */
 ui_error_t md3_pin_input_create(struct ui_engine *engine, int length,
                                 struct md3_pin_input **out_pin_input,
                                 struct ui_control_value_accessor *out_cva) {
@@ -291,6 +303,7 @@ ui_error_t md3_pin_input_create(struct ui_engine *engine, int length,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_pin_input_destroy function. */
 ui_error_t md3_pin_input_destroy(struct md3_pin_input *pin_input) {
   ui_error_t rc = UI_ERROR_NONE;
 
@@ -304,6 +317,7 @@ ui_error_t md3_pin_input_destroy(struct md3_pin_input *pin_input) {
   return rc;
 }
 
+/** @brief md3_pin_input_set_masked function. */
 ui_error_t md3_pin_input_set_masked(struct md3_pin_input *pin_input,
                                     int is_masked) {
   if (!pin_input) {
@@ -313,6 +327,7 @@ ui_error_t md3_pin_input_set_masked(struct md3_pin_input *pin_input,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_pin_input_on_input function. */
 ui_error_t md3_pin_input_on_input(struct md3_pin_input *pin_input, int index,
                                   const char *c) {
   if (!pin_input || !c || index < 0 || index >= pin_input->length) {
@@ -327,6 +342,7 @@ ui_error_t md3_pin_input_on_input(struct md3_pin_input *pin_input, int index,
   return ui_pin_input_base_on_input(pin_input->base, index, c);
 }
 
+/** @brief md3_pin_input_on_backspace function. */
 ui_error_t md3_pin_input_on_backspace(struct md3_pin_input *pin_input,
                                       int index) {
   if (!pin_input || index < 0 || index >= pin_input->length) {
@@ -341,6 +357,7 @@ ui_error_t md3_pin_input_on_backspace(struct md3_pin_input *pin_input,
   return ui_pin_input_base_on_backspace(pin_input->base, index);
 }
 
+/** @brief md3_pin_input_on_paste function. */
 ui_error_t md3_pin_input_on_paste(struct md3_pin_input *pin_input,
                                   const char *pasted_text) {
   size_t len, i;
@@ -362,6 +379,7 @@ ui_error_t md3_pin_input_on_paste(struct md3_pin_input *pin_input,
   return ui_pin_input_base_on_paste(pin_input->base, pasted_text);
 }
 
+/** @brief md3_pin_input_get_value function. */
 ui_error_t md3_pin_input_get_value(const struct md3_pin_input *pin_input,
                                    char *out_text, size_t text_capacity) {
   int i;
@@ -386,6 +404,7 @@ ui_error_t md3_pin_input_get_value(const struct md3_pin_input *pin_input,
 /* md3_rating                                                                */
 /* ========================================================================= */
 
+/** @brief md3_rating_create function. */
 ui_error_t md3_rating_create(struct ui_engine *engine, int max_rating,
                              struct md3_rating **out_rating,
                              struct ui_control_value_accessor *out_cva) {
@@ -421,6 +440,7 @@ ui_error_t md3_rating_create(struct ui_engine *engine, int max_rating,
   return rc;
 }
 
+/** @brief md3_rating_destroy function. */
 ui_error_t md3_rating_destroy(struct md3_rating *rating) {
   ui_error_t rc = UI_ERROR_NONE;
 
@@ -434,6 +454,7 @@ ui_error_t md3_rating_destroy(struct md3_rating *rating) {
   return rc;
 }
 
+/** @brief md3_rating_set_value function. */
 ui_error_t md3_rating_set_value(struct md3_rating *rating, float value) {
   if (!rating) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -449,6 +470,7 @@ ui_error_t md3_rating_set_value(struct md3_rating *rating, float value) {
   return ui_rating_base_set_value(rating->base, value);
 }
 
+/** @brief md3_rating_get_value function. */
 ui_error_t md3_rating_get_value(const struct md3_rating *rating,
                                 float *out_value) {
   if (!rating || !out_value) {
@@ -458,6 +480,7 @@ ui_error_t md3_rating_get_value(const struct md3_rating *rating,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_rating_set_hover_preview function. */
 ui_error_t md3_rating_set_hover_preview(struct md3_rating *rating,
                                         float preview_value) {
   if (!rating) {
@@ -472,6 +495,7 @@ ui_error_t md3_rating_set_hover_preview(struct md3_rating *rating,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_rating_set_read_only function. */
 ui_error_t md3_rating_set_read_only(struct md3_rating *rating,
                                     int is_read_only) {
   if (!rating) {
@@ -485,6 +509,7 @@ ui_error_t md3_rating_set_read_only(struct md3_rating *rating,
 /* md3_spin_button                                                           */
 /* ========================================================================= */
 
+/** @brief md3_spin_button_create function. */
 ui_error_t md3_spin_button_create(struct ui_engine *engine, double min,
                                   double max, double step,
                                   struct md3_spin_button **out_spin_button,
@@ -527,6 +552,7 @@ ui_error_t md3_spin_button_create(struct ui_engine *engine, double min,
   return rc;
 }
 
+/** @brief md3_spin_button_destroy function. */
 ui_error_t md3_spin_button_destroy(struct md3_spin_button *spin_button) {
   ui_error_t rc = UI_ERROR_NONE;
 
@@ -540,6 +566,7 @@ ui_error_t md3_spin_button_destroy(struct md3_spin_button *spin_button) {
   return rc;
 }
 
+/** @brief md3_spin_button_set_value function. */
 ui_error_t md3_spin_button_set_value(struct md3_spin_button *spin_button,
                                      double value) {
   if (!spin_button) {
@@ -556,6 +583,7 @@ ui_error_t md3_spin_button_set_value(struct md3_spin_button *spin_button,
   return ui_spin_button_base_set_value(spin_button->base, value);
 }
 
+/** @brief md3_spin_button_get_value function. */
 ui_error_t md3_spin_button_get_value(const struct md3_spin_button *spin_button,
                                      double *out_value) {
   if (!spin_button || !out_value) {
@@ -565,6 +593,7 @@ ui_error_t md3_spin_button_get_value(const struct md3_spin_button *spin_button,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_spin_button_step function. */
 ui_error_t md3_spin_button_step(struct md3_spin_button *spin_button,
                                 int step_count) {
   double new_val;

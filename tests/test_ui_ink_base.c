@@ -51,7 +51,7 @@ static int test_ink_smoothing(void) {
 
   /* 1 (first) + 4 (segment1) + 4 (segment2) + 4 (finish) = 13 points total */
   if (count != 13) {
-    printf("Expected 13 smoothed points, got %zu\n", count);
+    printf("Expected 13 smoothed points, got %lu\n", (unsigned long)count);
     return 1;
   }
 

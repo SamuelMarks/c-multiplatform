@@ -15,7 +15,6 @@ static ui_error_t test_callback(void *user_data) {
   int *val = (int *)user_data;
   (*val)++;
   return UI_ERROR_NONE;
-  return UI_ERROR_NONE;
 }
 
 static int run_normal_tests(void) {

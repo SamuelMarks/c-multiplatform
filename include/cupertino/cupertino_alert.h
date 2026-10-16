@@ -14,13 +14,17 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
+/** @brief CUPERTINO_ALERT_MAX_ACTIONS constant. */
 #define CUPERTINO_ALERT_MAX_ACTIONS 8
+/** @brief CUPERTINO_ALERT_MAX_TEXT_FIELDS constant. */
 #define CUPERTINO_ALERT_MAX_TEXT_FIELDS 2
+/** @brief CUPERTINO_ALERT_STANDARD_WIDTH constant. */
 #define CUPERTINO_ALERT_STANDARD_WIDTH 270.0f
+/** @brief CUPERTINO_ALERT_CORNER_RADIUS constant. */
 #define CUPERTINO_ALERT_CORNER_RADIUS 14.0f
 
 /**

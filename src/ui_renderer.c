@@ -17,6 +17,7 @@ ui_error_t ui_renderer_native_init(struct ui_renderer *renderer);
 
 #if !defined(_WIN32) && !defined(__APPLE__)
 /* Stub for platforms without native backends. */
+/** @brief ui_renderer_native_init function. */
 ui_error_t ui_renderer_native_init(struct ui_renderer *renderer) {
   if (!renderer)
     return UI_ERROR_INVALID_ARGUMENT;

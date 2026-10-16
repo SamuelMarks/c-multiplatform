@@ -15,13 +15,17 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
+/** @brief CUPERTINO_PAGE_CONTROL_DOT_DIAMETER constant. */
 #define CUPERTINO_PAGE_CONTROL_DOT_DIAMETER 7.0f
+/** @brief CUPERTINO_PAGE_CONTROL_DOT_SPACING constant. */
 #define CUPERTINO_PAGE_CONTROL_DOT_SPACING 9.0f
+/** @brief CUPERTINO_PAGE_CONTROL_HEIGHT constant. */
 #define CUPERTINO_PAGE_CONTROL_HEIGHT 28.0f
+/** @brief CUPERTINO_PAGE_CONTROL_MAX_UNCOMPRESSED_DOTS constant. */
 #define CUPERTINO_PAGE_CONTROL_MAX_UNCOMPRESSED_DOTS 10
 
 /**

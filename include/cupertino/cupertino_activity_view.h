@@ -14,10 +14,11 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
+/** @brief CUPERTINO_ACTIVITY_VIEW_MAX_ITEMS constant. */
 #define CUPERTINO_ACTIVITY_VIEW_MAX_ITEMS 24
 
 /**

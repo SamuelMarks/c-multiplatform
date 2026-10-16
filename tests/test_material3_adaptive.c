@@ -280,6 +280,8 @@ TEST test_md3_adaptive_mock_fail_branches(void) {
   /* Cause rc != UI_ERROR_NONE inside md3_adaptive */
   g_md3_adaptive_mock_comp_null = 1;
   rc = md3_list_detail_pane_scaffold_create(engine, &s1);
+  if (rc) {
+  }
   md3_list_detail_pane_scaffold_destroy(s1);
 
   rc = md3_supporting_pane_scaffold_create(engine, &s2);
@@ -334,6 +336,8 @@ TEST test_md3_adaptive_mock_rc(void) {
   g_md3_adaptive_mock_comp_null = 1;
   rc = md3_list_detail_pane_scaffold_create(engine, &s1);
   rc = md3_supporting_pane_scaffold_create(engine, &s2);
+  if (rc) {
+  }
   g_md3_adaptive_mock_comp_null = 0;
 
   ui_engine_destroy(engine);
@@ -353,6 +357,8 @@ TEST test_md3_adaptive_mock_comp_null_branch(void) {
   g_md3_adaptive_mock_comp_null = 4;
   rc = md3_list_detail_pane_scaffold_create(engine, &s1);
   rc = md3_supporting_pane_scaffold_create(engine, &s2);
+  if (rc) {
+  }
   g_md3_adaptive_mock_comp_null = 0;
 
   ui_engine_destroy(engine);

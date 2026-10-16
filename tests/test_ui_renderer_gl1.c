@@ -6,6 +6,11 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_mock_gl1_glyph_box;
+extern int g_mock_gl1_glyph_metrics_fail;
+extern int g_mock_gles2_flush_fail;
+extern int g_mock_gles2_destroy_fail;
+
 extern int g_malloc_fail_countdown;
 
 static const unsigned char test_ttf_bytes[] = {
@@ -192,9 +197,6 @@ static int test_gl1(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
     {
-      extern int g_mock_gl1_glyph_box;
-      extern int g_mock_gl1_glyph_metrics_fail;
-      extern int g_mock_gles2_flush_fail;
 
       /* Flush failure */
       g_mock_gles2_flush_fail = 1;
@@ -239,7 +241,6 @@ static int test_gl1(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_mock_gles2_flush_fail;
     struct ui_vertex dummy_verts[8192];
     unsigned short dummy_indices[8192];
     int i;
@@ -318,7 +319,6 @@ static int test_gl1(void) {
   }
 
   {
-    extern int g_mock_gles2_destroy_fail;
     g_mock_gles2_destroy_fail = 1;
     if (ui_renderer_gl1_destroy(backend) != UI_ERROR_UNKNOWN) {
       return 1;

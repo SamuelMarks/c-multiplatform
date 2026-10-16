@@ -85,6 +85,7 @@ static ui_error_t mock_wm_component_destroy(struct ui_component *comp) {
 /** @endcond */
 #endif
 
+/** @brief ui_window_manager_base_create function. */
 ui_error_t ui_window_manager_base_create(
     struct ui_window_manager_base **out_window_manager) {
   struct ui_window_manager_base *wm;
@@ -162,6 +163,7 @@ cleanup:
   return rc;
 }
 
+/** @brief ui_window_manager_base_destroy function. */
 ui_error_t
 ui_window_manager_base_destroy(struct ui_window_manager_base *window_manager) {
   ui_error_t rc = UI_ERROR_NONE;
@@ -175,6 +177,7 @@ ui_window_manager_base_destroy(struct ui_window_manager_base *window_manager) {
   return rc;
 }
 
+/** @brief ui_window_manager_base_get_component function. */
 ui_error_t ui_window_manager_base_get_component(
     struct ui_window_manager_base *window_manager,
     struct ui_component **out_component) {
@@ -185,6 +188,7 @@ ui_error_t ui_window_manager_base_get_component(
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_window_manager_base_bring_to_front function. */
 ui_error_t ui_window_manager_base_bring_to_front(
     struct ui_window_manager_base *window_manager, int window_id) {
   int unused_id = window_id;
@@ -196,6 +200,7 @@ ui_error_t ui_window_manager_base_bring_to_front(
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_window_manager_base_drag function. */
 ui_error_t
 ui_window_manager_base_drag(struct ui_window_manager_base *window_manager,
                             int window_id, float delta_x, float delta_y) {
@@ -212,6 +217,7 @@ ui_window_manager_base_drag(struct ui_window_manager_base *window_manager,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_window_manager_base_bind_data function. */
 ui_error_t
 ui_window_manager_base_bind_data(struct ui_window_manager_base *widget,
                                  struct ui_computed *signal) {

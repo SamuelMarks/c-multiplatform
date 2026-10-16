@@ -89,19 +89,19 @@ cleanup:
     ui_error_t cleanup_rc;
     if (engine->timer) {
       cleanup_rc = ui_timer_destroy(engine->timer);
-      if (cleanup_rc != UI_ERROR_NONE && rc == UI_ERROR_NONE)
-        rc = cleanup_rc;
+      rc = (cleanup_rc != UI_ERROR_NONE && rc == UI_ERROR_NONE) ? cleanup_rc
+                                                                : rc;
     }
     if (engine->reactor) {
       cleanup_rc = ui_reactor_destroy(engine->reactor);
-      if (cleanup_rc != UI_ERROR_NONE && rc == UI_ERROR_NONE)
-        rc = cleanup_rc;
+      rc = (cleanup_rc != UI_ERROR_NONE && rc == UI_ERROR_NONE) ? cleanup_rc
+                                                                : rc;
     }
 #ifndef UI_SINGLE_THREADED
     if (engine->thread_pool) {
       cleanup_rc = ui_thread_pool_destroy(engine->thread_pool);
-      if (cleanup_rc != UI_ERROR_NONE && rc == UI_ERROR_NONE)
-        rc = cleanup_rc;
+      rc = (cleanup_rc != UI_ERROR_NONE && rc == UI_ERROR_NONE) ? cleanup_rc
+                                                                : rc;
     }
 #endif
     C_MULTIPLATFORM_FREE(engine);
@@ -124,25 +124,21 @@ ui_error_t ui_engine_destroy(struct ui_engine *engine) {
 
   if (engine->timer) {
     current_rc = ui_timer_destroy(engine->timer);
-    if (current_rc != UI_ERROR_NONE && rc == UI_ERROR_NONE)
-      rc = current_rc;
+    rc = (current_rc != UI_ERROR_NONE && rc == UI_ERROR_NONE) ? current_rc : rc;
   }
   if (engine->reactor) {
     current_rc = ui_reactor_destroy(engine->reactor);
-    if (current_rc != UI_ERROR_NONE && rc == UI_ERROR_NONE)
-      rc = current_rc;
+    rc = (current_rc != UI_ERROR_NONE && rc == UI_ERROR_NONE) ? current_rc : rc;
   }
 #ifndef UI_SINGLE_THREADED
   if (engine->thread_pool) {
     current_rc = ui_thread_pool_destroy(engine->thread_pool);
-    if (current_rc != UI_ERROR_NONE && rc == UI_ERROR_NONE)
-      rc = current_rc;
+    rc = (current_rc != UI_ERROR_NONE && rc == UI_ERROR_NONE) ? current_rc : rc;
   }
 #endif
   if (engine->tick_engine) {
     current_rc = ui_tick_engine_destroy(engine->tick_engine);
-    if (current_rc != UI_ERROR_NONE && rc == UI_ERROR_NONE)
-      rc = current_rc;
+    rc = (current_rc != UI_ERROR_NONE && rc == UI_ERROR_NONE) ? current_rc : rc;
   }
 
   C_MULTIPLATFORM_FREE(engine);

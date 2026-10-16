@@ -13,6 +13,8 @@
 extern int g_malloc_fail_countdown;
 /* clang-format on */
 
+extern int g_loupe_mock_fail;
+
 int main(void) {
   struct ui_arena *arena;
   struct ui_loupe_base *loupe = NULL;
@@ -139,7 +141,6 @@ int main(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_loupe_mock_fail;
     struct ui_loupe_base *loupe_fail = NULL;
     err = ui_loupe_base_create(arena, &config, &loupe_fail);
     if (err == UI_ERROR_NONE) {

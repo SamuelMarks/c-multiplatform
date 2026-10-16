@@ -6,6 +6,9 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_scaffold_mock_fail;
+extern int g_scaffold_slot_fail_idx;
+
 extern int g_malloc_fail_countdown;
 
 static ui_error_t test_scaffold_base(void) {
@@ -141,8 +144,6 @@ static ui_error_t test_scaffold_mocks(void) {
   struct ui_scaffold_base *scaffold = NULL;
   ui_error_t err;
   int idx;
-  extern int g_scaffold_mock_fail;
-  extern int g_scaffold_slot_fail_idx;
 
   /* 1: set_tag_name on ui-scaffold fails */
   g_scaffold_mock_fail = 1;

@@ -64,6 +64,7 @@ static ui_error_t mock_scaffold_component_destroy(struct ui_component *comp) {
 /** @endcond */
 #endif
 
+/** @brief cupertino_page_scaffold_create function. */
 ui_error_t cupertino_page_scaffold_create(
     struct ui_engine *engine,
     const struct cupertino_page_scaffold_descriptor *desc,
@@ -104,6 +105,7 @@ ui_error_t cupertino_page_scaffold_create(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_page_scaffold_destroy function. */
 ui_error_t
 cupertino_page_scaffold_destroy(struct cupertino_page_scaffold *scaffold) {
   ui_error_t rc;
@@ -124,6 +126,7 @@ cupertino_page_scaffold_destroy(struct cupertino_page_scaffold *scaffold) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_page_scaffold_set_nav_bar function. */
 ui_error_t
 cupertino_page_scaffold_set_nav_bar(struct cupertino_page_scaffold *scaffold,
                                     struct ui_component *nav_bar) {
@@ -144,6 +147,7 @@ cupertino_page_scaffold_set_nav_bar(struct cupertino_page_scaffold *scaffold,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_page_scaffold_get_nav_bar function. */
 ui_error_t cupertino_page_scaffold_get_nav_bar(
     const struct cupertino_page_scaffold *scaffold,
     struct ui_component **out_nav_bar) {
@@ -154,6 +158,7 @@ ui_error_t cupertino_page_scaffold_get_nav_bar(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_page_scaffold_set_body function. */
 ui_error_t
 cupertino_page_scaffold_set_body(struct cupertino_page_scaffold *scaffold,
                                  struct ui_component *body) {
@@ -174,6 +179,7 @@ cupertino_page_scaffold_set_body(struct cupertino_page_scaffold *scaffold,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_page_scaffold_get_body function. */
 ui_error_t
 cupertino_page_scaffold_get_body(const struct cupertino_page_scaffold *scaffold,
                                  struct ui_component **out_body) {
@@ -184,6 +190,7 @@ cupertino_page_scaffold_get_body(const struct cupertino_page_scaffold *scaffold,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_page_scaffold_set_background_style function. */
 ui_error_t cupertino_page_scaffold_set_background_style(
     struct cupertino_page_scaffold *scaffold,
     enum cupertino_scaffold_background background_style) {
@@ -194,6 +201,7 @@ ui_error_t cupertino_page_scaffold_set_background_style(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_page_scaffold_get_background_style function. */
 ui_error_t cupertino_page_scaffold_get_background_style(
     const struct cupertino_page_scaffold *scaffold,
     enum cupertino_scaffold_background *out_style) {
@@ -204,6 +212,7 @@ ui_error_t cupertino_page_scaffold_get_background_style(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_page_scaffold_set_resize_to_avoid_bottom_inset function. */
 ui_error_t cupertino_page_scaffold_set_resize_to_avoid_bottom_inset(
     struct cupertino_page_scaffold *scaffold, int resize) {
   if (!scaffold) {
@@ -213,6 +222,7 @@ ui_error_t cupertino_page_scaffold_set_resize_to_avoid_bottom_inset(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_page_scaffold_get_resize_to_avoid_bottom_inset function. */
 ui_error_t cupertino_page_scaffold_get_resize_to_avoid_bottom_inset(
     const struct cupertino_page_scaffold *scaffold, int *out_resize) {
   if (!scaffold || !out_resize) {
@@ -222,6 +232,7 @@ ui_error_t cupertino_page_scaffold_get_resize_to_avoid_bottom_inset(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_page_scaffold_set_safe_area_insets function. */
 ui_error_t cupertino_page_scaffold_set_safe_area_insets(
     struct cupertino_page_scaffold *scaffold,
     const struct cupertino_safe_area_insets *insets) {
@@ -232,6 +243,7 @@ ui_error_t cupertino_page_scaffold_set_safe_area_insets(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_page_scaffold_get_safe_area_insets function. */
 ui_error_t cupertino_page_scaffold_get_safe_area_insets(
     const struct cupertino_page_scaffold *scaffold,
     struct cupertino_safe_area_insets *out_insets) {
@@ -242,6 +254,7 @@ ui_error_t cupertino_page_scaffold_get_safe_area_insets(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_page_scaffold_set_bottom_inset function. */
 ui_error_t cupertino_page_scaffold_set_bottom_inset(
     struct cupertino_page_scaffold *scaffold, float bottom_inset) {
   if (!scaffold || bottom_inset < 0.0f) {
@@ -251,6 +264,7 @@ ui_error_t cupertino_page_scaffold_set_bottom_inset(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_page_scaffold_get_bottom_inset function. */
 ui_error_t cupertino_page_scaffold_get_bottom_inset(
     const struct cupertino_page_scaffold *scaffold, float *out_bottom_inset) {
   if (!scaffold || !out_bottom_inset) {
@@ -260,6 +274,7 @@ ui_error_t cupertino_page_scaffold_get_bottom_inset(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_page_scaffold_get_effective_padding function. */
 ui_error_t cupertino_page_scaffold_get_effective_padding(
     const struct cupertino_page_scaffold *scaffold, float *out_top_padding,
     float *out_bottom_padding) {
@@ -287,6 +302,7 @@ ui_error_t cupertino_page_scaffold_get_effective_padding(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_page_scaffold_set_dark_mode function. */
 ui_error_t
 cupertino_page_scaffold_set_dark_mode(struct cupertino_page_scaffold *scaffold,
                                       int is_dark) {
@@ -297,6 +313,7 @@ cupertino_page_scaffold_set_dark_mode(struct cupertino_page_scaffold *scaffold,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_page_scaffold_get_dark_mode function. */
 ui_error_t cupertino_page_scaffold_get_dark_mode(
     const struct cupertino_page_scaffold *scaffold, int *out_is_dark) {
   if (!scaffold || !out_is_dark) {
@@ -306,6 +323,7 @@ ui_error_t cupertino_page_scaffold_get_dark_mode(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_page_scaffold_get_base function. */
 ui_error_t
 cupertino_page_scaffold_get_base(struct cupertino_page_scaffold *scaffold,
                                  struct ui_scaffold_base **out_base) {

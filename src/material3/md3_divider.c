@@ -9,6 +9,7 @@
 #include <string.h>
 /* clang-format on */
 
+/** @brief md3_divider_create function. */
 ui_error_t md3_divider_create(struct ui_engine *engine,
                               enum ui_divider_orientation orientation,
                               int is_inset, struct md3_divider **out_divider) {
@@ -59,6 +60,7 @@ ui_error_t md3_divider_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_divider_destroy function. */
 ui_error_t md3_divider_destroy(struct md3_divider *divider) {
   ui_error_t rc;
 
@@ -71,6 +73,7 @@ ui_error_t md3_divider_destroy(struct md3_divider *divider) {
   return rc;
 }
 
+/** @brief md3_divider_set_orientation function. */
 ui_error_t
 md3_divider_set_orientation(struct md3_divider *divider,
                             enum ui_divider_orientation orientation) {
@@ -83,6 +86,7 @@ md3_divider_set_orientation(struct md3_divider *divider,
   return ui_divider_base_set_orientation(divider->base, orientation);
 }
 
+/** @brief md3_divider_set_inset function. */
 ui_error_t md3_divider_set_inset(struct md3_divider *divider, int is_inset) {
   if (!divider) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -92,6 +96,7 @@ ui_error_t md3_divider_set_inset(struct md3_divider *divider, int is_inset) {
   return ui_divider_base_set_inset(divider->base, divider->is_inset);
 }
 
+/** @brief md3_divider_get_base function. */
 ui_error_t md3_divider_get_base(struct md3_divider *divider,
                                 struct ui_divider_base **out_base) {
   if (!divider || !out_base) {

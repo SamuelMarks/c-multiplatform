@@ -25,6 +25,7 @@ mock_safe_area_manager_get_insets(struct ui_safe_area_manager *manager,
 /** @endcond */
 #endif
 
+/** @brief cupertino_status_bar_apply_preset function. */
 static void cupertino_status_bar_apply_preset(
     struct cupertino_status_bar *bar,
     enum cupertino_hardware_device_preset preset) {
@@ -57,6 +58,7 @@ static void cupertino_status_bar_apply_preset(
   }
 }
 
+/** @brief cupertino_status_bar_create function. */
 ui_error_t
 cupertino_status_bar_create(struct ui_engine *engine,
                             const struct cupertino_status_bar_descriptor *desc,
@@ -112,6 +114,7 @@ cupertino_status_bar_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_status_bar_destroy function. */
 ui_error_t cupertino_status_bar_destroy(struct cupertino_status_bar *bar) {
   if (!bar) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -121,6 +124,7 @@ ui_error_t cupertino_status_bar_destroy(struct cupertino_status_bar *bar) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_status_bar_set_style function. */
 ui_error_t
 cupertino_status_bar_set_style(struct cupertino_status_bar *bar,
                                enum cupertino_status_bar_style style) {
@@ -132,6 +136,7 @@ cupertino_status_bar_set_style(struct cupertino_status_bar *bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_status_bar_get_style function. */
 ui_error_t
 cupertino_status_bar_get_style(const struct cupertino_status_bar *bar,
                                enum cupertino_status_bar_style *out_style) {
@@ -143,6 +148,7 @@ cupertino_status_bar_get_style(const struct cupertino_status_bar *bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_status_bar_apply_insets function. */
 ui_error_t
 cupertino_status_bar_apply_insets(struct cupertino_status_bar *bar,
                                   const struct ui_safe_area_insets *insets) {
@@ -154,6 +160,7 @@ cupertino_status_bar_apply_insets(struct cupertino_status_bar *bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_status_bar_get_insets function. */
 ui_error_t
 cupertino_status_bar_get_insets(const struct cupertino_status_bar *bar,
                                 struct ui_safe_area_insets *out_insets) {
@@ -165,6 +172,7 @@ cupertino_status_bar_get_insets(const struct cupertino_status_bar *bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_status_bar_set_safe_area_manager function. */
 ui_error_t cupertino_status_bar_set_safe_area_manager(
     struct cupertino_status_bar *bar, struct ui_safe_area_manager *manager) {
   struct ui_safe_area_insets current_insets;
@@ -186,6 +194,7 @@ ui_error_t cupertino_status_bar_set_safe_area_manager(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_status_bar_set_time_text function. */
 ui_error_t cupertino_status_bar_set_time_text(struct cupertino_status_bar *bar,
                                               const char *time_text) {
   if (!bar) {
@@ -211,6 +220,7 @@ ui_error_t cupertino_status_bar_set_time_text(struct cupertino_status_bar *bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_status_bar_get_time_text function. */
 ui_error_t
 cupertino_status_bar_get_time_text(const struct cupertino_status_bar *bar,
                                    const char **out_time_text) {
@@ -222,6 +232,7 @@ cupertino_status_bar_get_time_text(const struct cupertino_status_bar *bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_status_bar_set_battery function. */
 ui_error_t cupertino_status_bar_set_battery(struct cupertino_status_bar *bar,
                                             float level, int is_charging) {
   if (!bar || level < 0.0f || level > 1.0f) {
@@ -233,6 +244,7 @@ ui_error_t cupertino_status_bar_set_battery(struct cupertino_status_bar *bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_status_bar_get_battery function. */
 ui_error_t
 cupertino_status_bar_get_battery(const struct cupertino_status_bar *bar,
                                  float *out_level, int *out_is_charging) {
@@ -245,6 +257,7 @@ cupertino_status_bar_get_battery(const struct cupertino_status_bar *bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_status_bar_set_signal function. */
 ui_error_t cupertino_status_bar_set_signal(struct cupertino_status_bar *bar,
                                            int cellular_bars, int wifi_bars) {
   if (!bar || cellular_bars < 0 || cellular_bars > 4 || wifi_bars < 0 ||
@@ -257,6 +270,7 @@ ui_error_t cupertino_status_bar_set_signal(struct cupertino_status_bar *bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_status_bar_get_signal function. */
 ui_error_t
 cupertino_status_bar_get_signal(const struct cupertino_status_bar *bar,
                                 int *out_cellular_bars, int *out_wifi_bars) {
@@ -269,6 +283,7 @@ cupertino_status_bar_get_signal(const struct cupertino_status_bar *bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_status_bar_get_bounds function. */
 ui_error_t
 cupertino_status_bar_get_bounds(const struct cupertino_status_bar *bar,
                                 float screen_w, float *out_w, float *out_h) {

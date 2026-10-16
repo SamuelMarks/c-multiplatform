@@ -14,10 +14,11 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
+/** @brief CUPERTINO_TOOLBAR_MAX_ITEMS constant. */
 #define CUPERTINO_TOOLBAR_MAX_ITEMS 16
 
 /**

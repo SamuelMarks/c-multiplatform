@@ -6,7 +6,9 @@
 /* clang-format on */
 
 int main(void) {
+#if !defined(_WIN32)
   struct ui_renderer renderer;
+#endif
 
   if (ui_renderer_gdiplus_init(NULL) != UI_ERROR_INVALID_ARGUMENT) {
     fprintf(stderr, "Expected UI_ERROR_INVALID_ARGUMENT for NULL renderer\n");

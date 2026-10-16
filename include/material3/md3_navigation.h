@@ -22,7 +22,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
@@ -35,8 +35,8 @@ struct ui_engine;
  * @brief Material 3 bottom navigation bar wrapping ui_bottom_nav_base.
  */
 struct md3_navigation_bar {
-  struct ui_bottom_nav_base *base;
-  size_t selected_index;
+  struct ui_bottom_nav_base *base; /**< base field. */
+  size_t selected_index;           /**< selected_index field. */
 };
 
 /**
@@ -98,8 +98,8 @@ extern C_MULTIPLATFORM_EXPORT ui_error_t md3_navigation_bar_get_selected(
  * @brief Material 3 navigation rail wrapping ui_nav_rail_base.
  */
 struct md3_navigation_rail {
-  struct ui_nav_rail_base *base;
-  int expanded;
+  struct ui_nav_rail_base *base; /**< base field. */
+  int expanded;                  /**< expanded field. */
 };
 
 /**
@@ -149,9 +149,9 @@ enum md3_navigation_drawer_variant {
  * @brief Material 3 Navigation Drawer wrapping ui_sidenav_base.
  */
 struct md3_navigation_drawer {
-  struct ui_sidenav_base *base;
-  enum md3_navigation_drawer_variant variant;
-  int is_open;
+  struct ui_sidenav_base *base;               /**< base field. */
+  enum md3_navigation_drawer_variant variant; /**< variant field. */
+  int is_open;                                /**< is_open field. */
 };
 
 /**
@@ -205,10 +205,10 @@ enum md3_window_size_class {
  * drawer.
  */
 struct md3_navigation_suite {
-  enum md3_window_size_class current_class;
-  struct md3_navigation_bar *bar;
-  struct md3_navigation_rail *rail;
-  struct md3_navigation_drawer *drawer;
+  enum md3_window_size_class current_class; /**< current_class field. */
+  struct md3_navigation_bar *bar;           /**< bar field. */
+  struct md3_navigation_rail *rail;         /**< rail field. */
+  struct md3_navigation_drawer *drawer;     /**< drawer field. */
 };
 
 /**
@@ -249,8 +249,8 @@ extern C_MULTIPLATFORM_EXPORT ui_error_t md3_navigation_suite_update_size_class(
  * @brief Material 3 Bottom App Bar wrapping ui_bottom_app_bar_base.
  */
 struct md3_bottom_app_bar {
-  struct ui_bottom_app_bar_base *base;
-  int has_fab;
+  struct ui_bottom_app_bar_base *base; /**< base field. */
+  int has_fab;                         /**< has_fab field. */
 };
 
 /**
@@ -293,9 +293,9 @@ enum md3_tabs_variant {
  * @brief Material 3 Tabs container wrapping ui_tabs_base.
  */
 struct md3_tabs {
-  struct ui_tabs_base *base;
-  enum md3_tabs_variant variant;
-  size_t selected_tab;
+  struct ui_tabs_base *base;     /**< base field. */
+  enum md3_tabs_variant variant; /**< variant field. */
+  size_t selected_tab;           /**< selected_tab field. */
 };
 
 /**

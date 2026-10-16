@@ -6,6 +6,8 @@
 #include <assert.h>
 /* clang-format on */
 
+extern int g_malloc_fail_countdown;
+
 extern int g_rte_mock_set_style_fail;
 extern int g_rte_mock_destroy_fail;
 extern int g_rte_mock_node_destroy_fail;
@@ -103,7 +105,6 @@ int main(void) {
   return 0;
 }
 void test_ui_rte_coverage_errs(void) {
-  extern int g_malloc_fail_countdown;
   struct ui_rich_text_editor_base *rte = NULL;
   int i;
   for (i = 0; i < 20; ++i) {
@@ -118,70 +119,77 @@ void test_ui_rte_errors3(void) {
     assert(rc_cleanup == UI_ERROR_NONE);
   }
   ui_rich_text_editor_base_get_component(NULL, NULL);
-  struct ui_component *comp;
-  ui_rich_text_editor_base_get_component(NULL, &comp);
-
-  ui_rich_text_editor_base_insert_text(NULL, NULL);
-  ui_rich_text_editor_base_insert_text(NULL, "a");
-
   {
-    struct ui_rich_text_editor_base *rte = NULL;
-    ui_rich_text_editor_base_create(&rte, NULL);
-    if (rte) {
-      ui_rich_text_editor_base_get_component(rte, NULL);
-      ui_rich_text_editor_base_insert_text(rte, NULL);
+    struct ui_component *comp;
+    ui_rich_text_editor_base_get_component(NULL, &comp);
 
-      /* Allocate buffer with a string */
-      ui_rich_text_editor_base_insert_text(rte, "A");
+    ui_rich_text_editor_base_insert_text(NULL, NULL);
+    ui_rich_text_editor_base_insert_text(NULL, "a");
 
-      /* Insert another to hit existing buffer and capacity check */
-      ui_rich_text_editor_base_insert_text(rte, "B");
+    {
+      struct ui_rich_text_editor_base *rte = NULL;
+      ui_rich_text_editor_base_create(&rte, NULL);
+      if (rte) {
+        ui_rich_text_editor_base_get_component(rte, NULL);
+        ui_rich_text_editor_base_insert_text(rte, NULL);
 
-      /* Mock CVA write to clear buffer, then insert to hit cur_len == 0 &&
-       * html_buffer != NULL */
-      {
-        struct ui_control_value_accessor cva;
-        struct ui_rich_text_editor_base *rte2 = NULL;
-        ui_rich_text_editor_base_create(&rte2, &cva);
-        if (rte2) {
-          union ui_signal_payload val;
-          val.ptr_val = "init";
-          cva.write_value(rte2, val);
-          val.ptr_val = "";
-          cva.write_value(rte2, val);
-          ui_rich_text_editor_base_insert_text(rte2, "C");
-          ui_rich_text_editor_base_destroy(rte2);
+        /* Allocate buffer with a string */
+        ui_rich_text_editor_base_insert_text(rte, "A");
+
+        /* Insert another to hit existing buffer and capacity check */
+        ui_rich_text_editor_base_insert_text(rte, "B");
+
+        /* Mock CVA write to clear buffer, then insert to hit cur_len == 0 &&
+         * html_buffer != NULL */
+        {
+          struct ui_control_value_accessor cva;
+          struct ui_rich_text_editor_base *rte2 = NULL;
+          ui_rich_text_editor_base_create(&rte2, &cva);
+          if (rte2) {
+            union ui_signal_payload val;
+            val.ptr_val = "init";
+            cva.write_value(rte2, val);
+            val.ptr_val = "";
+            cva.write_value(rte2, val);
+            ui_rich_text_editor_base_insert_text(rte2, "C");
+            ui_rich_text_editor_base_destroy(rte2);
+          }
+        }
+
+        /* Mock NULL component branches */
+        {
+          struct ui_rich_text_editor_base_mock {
+            struct ui_component *component;
+          };
+          struct ui_rich_text_editor_base_mock *mrte =
+              (struct ui_rich_text_editor_base_mock *)rte;
+          struct ui_component *saved_comp = mrte->component;
+          if (saved_comp)
+            ui_component_destroy(saved_comp);
+          mrte->component = NULL;
+          ui_rich_text_editor_base_destroy(
+              rte); /* Hits component == NULL in destroy */
+
+          ui_rich_text_editor_base_create(&rte, NULL);
+          mrte = (struct ui_rich_text_editor_base_mock *)rte;
+          saved_comp = mrte->component;
+          if (saved_comp)
+            ui_component_destroy(saved_comp);
+          mrte->component = NULL;
+          ui_rich_text_editor_base_insert_text(rte,
+                                               "Hits null component update");
+          ui_rich_text_editor_base_destroy(rte);
         }
       }
-
-      /* Mock NULL component branches */
-      {
-        struct ui_rich_text_editor_base_mock {
-          struct ui_component *component;
-        };
-        struct ui_rich_text_editor_base_mock *mrte =
-            (struct ui_rich_text_editor_base_mock *)rte;
-        struct ui_component *saved_comp = mrte->component;
-        mrte->component = NULL;
-        ui_rich_text_editor_base_destroy(
-            rte); /* Hits component == NULL in destroy */
-
-        ui_rich_text_editor_base_create(&rte, NULL);
-        mrte = (struct ui_rich_text_editor_base_mock *)rte;
-        saved_comp = mrte->component;
-        mrte->component = NULL;
-        ui_rich_text_editor_base_insert_text(rte, "Hits null component update");
-        ui_rich_text_editor_base_destroy(rte);
-      }
     }
-  }
 
-  ui_rich_text_editor_base_set_caret_from_point(NULL, 0, 0);
-  ui_rich_text_editor_base_undo(NULL);
-  ui_rich_text_editor_base_redo(NULL);
-  ui_rich_text_editor_base_ime_start(NULL);
-  ui_rich_text_editor_base_ime_update(NULL, NULL);
-  ui_rich_text_editor_base_ime_end(NULL);
+    ui_rich_text_editor_base_set_caret_from_point(NULL, 0, 0);
+    ui_rich_text_editor_base_undo(NULL);
+    ui_rich_text_editor_base_redo(NULL);
+    ui_rich_text_editor_base_ime_start(NULL);
+    ui_rich_text_editor_base_ime_update(NULL, NULL);
+    ui_rich_text_editor_base_ime_end(NULL);
+  }
 }
 
 void test_ui_rte_cva3(void) {
@@ -202,12 +210,14 @@ void test_ui_rte_cva3(void) {
                   "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
     cva.write_value(rte, val);
 
-    struct ui_component *cmp;
-    ui_rich_text_editor_base_get_component(rte, &cmp);
-
     {
-      ui_error_t rc_cleanup = ui_rich_text_editor_base_destroy(rte);
-      assert(rc_cleanup == UI_ERROR_NONE);
+      struct ui_component *cmp;
+      ui_rich_text_editor_base_get_component(rte, &cmp);
+
+      {
+        ui_error_t rc_cleanup = ui_rich_text_editor_base_destroy(rte);
+        assert(rc_cleanup == UI_ERROR_NONE);
+      }
     }
   }
 }
@@ -232,7 +242,6 @@ void test_ui_rte_cva_nulls3(void) {
 }
 void test_ui_rte_coverage_errs4(void) {
   /* To hit null new_buf we mock malloc via countdown */
-  extern int g_malloc_fail_countdown;
   struct ui_control_value_accessor cva;
   struct ui_rich_text_editor_base *rte = NULL;
 
@@ -269,11 +278,13 @@ void test_ui_rte_coverage_errs4(void) {
 }
 void test_ui_rte_coverage_errs5(void) {
   ui_rich_text_editor_base_create(NULL, NULL);
-  struct ui_control_value_accessor cva;
-  struct ui_rich_text_editor_base *rte = NULL;
-  ui_rich_text_editor_base_create(&rte, &cva);
-  if (rte) {
-    ui_rich_text_editor_base_insert_text(rte, "foo");
+  {
+    struct ui_control_value_accessor cva;
+    struct ui_rich_text_editor_base *rte = NULL;
+    ui_rich_text_editor_base_create(&rte, &cva);
+    if (rte) {
+      ui_rich_text_editor_base_insert_text(rte, "foo");
+    }
   }
 }
 void test_ui_rte_coverage_errs6(void) {
@@ -349,7 +360,6 @@ void test_ui_rte_coverage_errs8(void) {
 }
 
 void test_ui_rte_coverage_errs9(void) {
-  extern int g_malloc_fail_countdown;
   struct ui_rich_text_editor_base *rte = NULL;
   int i;
   for (i = 20; i < 30; ++i) {
@@ -360,7 +370,6 @@ void test_ui_rte_coverage_errs9(void) {
 }
 
 void test_ui_rte_coverage_errs10(void) {
-  extern int g_malloc_fail_countdown;
   struct ui_rich_text_editor_base *rte = NULL;
   int i;
   for (i = 30; i < 40; ++i) {
@@ -370,7 +379,6 @@ void test_ui_rte_coverage_errs10(void) {
   g_malloc_fail_countdown = -1;
 }
 void test_ui_rte_coverage_errs11(void) {
-  extern int g_malloc_fail_countdown;
   struct ui_rich_text_editor_base *rte = NULL;
   int i;
   for (i = 40; i < 60; ++i) {
@@ -380,7 +388,6 @@ void test_ui_rte_coverage_errs11(void) {
   g_malloc_fail_countdown = -1;
 }
 void test_ui_rte_coverage_errs12(void) {
-  extern int g_malloc_fail_countdown;
   struct ui_rich_text_editor_base *rte = NULL;
   int i;
   for (i = 60; i < 200; ++i) {
@@ -390,7 +397,6 @@ void test_ui_rte_coverage_errs12(void) {
   g_malloc_fail_countdown = -1;
 }
 void test_ui_rte_coverage_errs13(void) {
-  extern int g_malloc_fail_countdown;
   struct ui_rich_text_editor_base *rte = NULL;
   int i;
   for (i = 200; i < 400; ++i) {
@@ -417,41 +423,52 @@ void test_ui_rte_extra(void) {
     cva.register_on_touched(rte, NULL, NULL);
 
     /* Also trigger CVA change and touched */
-    struct ui_component *comp;
-    ui_rich_text_editor_base_get_component(rte, &comp);
-
-    ui_rich_text_editor_base_insert_text(
-        rte, "foo"); /* Will fail because disabled */
-    cva.set_disabled_state(rte, 0);
-
-    /* Try null checks */
-    cva.write_value(NULL, val);
-    cva.set_disabled_state(NULL, 1);
-    cva.register_on_change(NULL, NULL, NULL);
-    cva.register_on_touched(NULL, NULL, NULL);
-    ui_rich_text_editor_base_get_component(NULL, &comp);
-
     {
-      ui_error_t rc_cleanup = ui_rich_text_editor_base_destroy(rte);
-      assert(rc_cleanup == UI_ERROR_NONE);
+      struct ui_component *comp;
+      ui_rich_text_editor_base_get_component(rte, &comp);
+
+      ui_rich_text_editor_base_insert_text(
+          rte, "foo"); /* Will fail because disabled */
+      cva.set_disabled_state(rte, 0);
+
+      /* Try null checks */
+      cva.write_value(NULL, val);
+      cva.set_disabled_state(NULL, 1);
+      cva.register_on_change(NULL, NULL, NULL);
+      cva.register_on_touched(NULL, NULL, NULL);
+      ui_rich_text_editor_base_get_component(NULL, &comp);
+
+      {
+        ui_error_t rc_cleanup = ui_rich_text_editor_base_destroy(rte);
+        assert(rc_cleanup == UI_ERROR_NONE);
+      }
     }
   }
 
   /* trigger oom */
-  extern int g_malloc_fail_countdown;
-  int i;
-  for (i = 0; i < 10; ++i) {
-    g_malloc_fail_countdown = i;
-    ui_rich_text_editor_base_create(&rte, NULL);
+  {
+    int i;
+    for (i = 0; i < 10; ++i) {
+      g_malloc_fail_countdown = i;
+      ui_rich_text_editor_base_create(&rte, NULL);
+    }
+    g_malloc_fail_countdown = -1;
   }
-  g_malloc_fail_countdown = -1;
 }
 static ui_error_t dummy_on_change(union ui_signal_payload value,
                                   void *user_data) {
+  if (sizeof(value) == 0) {
+  }
+  if (sizeof(user_data) == 0) {
+  }
   return UI_ERROR_NONE;
 }
 
-static ui_error_t dummy_on_touched(void *user_data) { return UI_ERROR_NONE; }
+static ui_error_t dummy_on_touched(void *user_data) {
+  if (sizeof(user_data) == 0) {
+  }
+  return UI_ERROR_NONE;
+}
 
 void test_ui_rte_extra_more(void) {
   struct ui_control_value_accessor cva;
@@ -525,20 +542,28 @@ void test_ui_rte_cva2(void) {
     if (cva.write_value)
       cva.write_value(rte, val);
 
-    struct ui_component *comp;
-    ui_rich_text_editor_base_get_component(rte, &comp);
     {
-      ui_error_t rc_cleanup = ui_rich_text_editor_base_destroy(rte);
-      assert(rc_cleanup == UI_ERROR_NONE);
+      struct ui_component *comp;
+      ui_rich_text_editor_base_get_component(rte, &comp);
+      {
+        ui_error_t rc_cleanup = ui_rich_text_editor_base_destroy(rte);
+        assert(rc_cleanup == UI_ERROR_NONE);
+      }
     }
   }
 }
 
 static ui_error_t failing_cva_on_change(union ui_signal_payload payload,
                                         void *user_data) {
+  if (sizeof(payload) == 0) {
+  }
+  if (sizeof(user_data) == 0) {
+  }
   return UI_ERROR_NOT_FOUND;
 }
 static ui_error_t failing_cva_on_touched(void *user_data) {
+  if (sizeof(user_data) == 0) {
+  }
   return UI_ERROR_NOT_FOUND;
 }
 
@@ -561,7 +586,6 @@ void test_ui_rte_coverage_errs14(void) {
 }
 
 void test_ui_rte_coverage_errs15(void) {
-  extern int g_malloc_fail_countdown;
   struct ui_control_value_accessor cva;
   struct ui_rich_text_editor_base *rte = NULL;
   ui_rich_text_editor_base_create(&rte, &cva);

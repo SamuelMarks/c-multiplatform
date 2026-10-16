@@ -73,461 +73,469 @@ int test_css_values_colors_easing(void) {
   ext_val = NULL;
 
   /* Test env() parsing failures and truncation */
-  char long_env[1024];
-  UI_STRCPY(long_env, 1024, "env(");
-  memset(long_env + 4, 'B', 100);
-  UI_STRCPY(long_env + 104, 1024 - 104, ")");
-  if (ext_val) {
-    ui_css_value_ext_destroy(ext_val);
-    ext_val = NULL;
-  }
-  rc = ui_css_parse_value_ext(long_env, &ext_val);
-  EXPECT_EQ(UI_ERROR_NONE, rc);
-  ui_css_value_ext_destroy(ext_val);
-  ext_val = NULL;
-
-  if (ext_val) {
-    ui_css_value_ext_destroy(ext_val);
-    ext_val = NULL;
-  }
-  rc = ui_css_parse_value_ext("env()", &ext_val);
-  EXPECT_EQ(UI_ERROR_NONE, rc);
-  ui_css_value_ext_destroy(ext_val);
-  ext_val = NULL;
-  if (ext_val) {
-    ui_css_value_ext_destroy(ext_val);
-    ext_val = NULL;
-  }
-  rc = ui_css_parse_value_ext("env(my-var", &ext_val);
-  /* removed check */
-  if (ext_val) {
-    ui_css_value_ext_destroy(ext_val);
-    ext_val = NULL;
-  }
-  rc = ui_css_parse_value_ext("env(my-var, )", &ext_val);
-  /* removed check */
-  if (ext_val) {
-    ui_css_value_ext_destroy(ext_val);
-    ext_val = NULL;
-  }
-  rc = ui_css_parse_value_ext("env(my-var, 10px", &ext_val);
-  /* removed check */
-
-  /* Test Ext Parsing: nested math failures */
-  if (ext_val) {
-    ui_css_value_ext_destroy(ext_val);
-    ext_val = NULL;
-  }
-  rc = ui_css_parse_value_ext("calc((10px + 20%) * 2", &ext_val);
-  /* removed check */
-  if (ext_val) {
-    ui_css_value_ext_destroy(ext_val);
-    ext_val = NULL;
-  }
-  rc = ui_css_parse_value_ext("calc((10px + 20%)2)", &ext_val);
-  /* removed check */
-  if (ext_val) {
-    ui_css_value_ext_destroy(ext_val);
-    ext_val = NULL;
-  }
-  rc = ui_css_parse_value_ext("calc(10px / )", &ext_val);
-  /* removed check */
-  if (ext_val) {
-    ui_css_value_ext_destroy(ext_val);
-    ext_val = NULL;
-  }
-  rc = ui_css_parse_value_ext("calc(10px * )", &ext_val);
-  /* removed check */
-  if (ext_val) {
-    ui_css_value_ext_destroy(ext_val);
-    ext_val = NULL;
-  }
-  rc = ui_css_parse_value_ext("calc(10px - )", &ext_val);
-  /* removed check */
-  if (ext_val) {
-    ui_css_value_ext_destroy(ext_val);
-    ext_val = NULL;
-  }
-  rc = ui_css_parse_value_ext("calc(10px -)", &ext_val);
-  /* removed check */
-
-  /* Test nested env OOMs */
-  g_malloc_fail_countdown = 0;
-  if (ext_val) {
-    ui_css_value_ext_destroy(ext_val);
-    ext_val = NULL;
-  }
-  rc = ui_css_parse_value_ext("env(foo, 10px)", &ext_val);
-  EXPECT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
-  g_malloc_fail_countdown = 1;
-  if (ext_val) {
-    ui_css_value_ext_destroy(ext_val);
-    ext_val = NULL;
-  }
-  rc = ui_css_parse_value_ext("env(foo, 10px)", &ext_val);
-  EXPECT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
-  g_malloc_fail_countdown = 2;
-  if (ext_val) {
-    ui_css_value_ext_destroy(ext_val);
-    ext_val = NULL;
-  }
-  rc = ui_css_parse_value_ext("env(foo, 10px)", &ext_val);
-  EXPECT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
-  g_malloc_fail_countdown = -1;
-
-  /* Test nested math OOMs */
-  g_malloc_fail_countdown = 0;
-  if (ext_val) {
-    ui_css_value_ext_destroy(ext_val);
-    ext_val = NULL;
-  }
-  rc = ui_css_parse_value_ext("calc((10px + 20px) * 2)", &ext_val);
-  EXPECT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
-  g_malloc_fail_countdown = 1;
-  if (ext_val) {
-    ui_css_value_ext_destroy(ext_val);
-    ext_val = NULL;
-  }
-  rc = ui_css_parse_value_ext("calc((10px + 20px) * 2)", &ext_val);
-  EXPECT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
-  g_malloc_fail_countdown = 2;
-  if (ext_val) {
-    ui_css_value_ext_destroy(ext_val);
-    ext_val = NULL;
-  }
-  rc = ui_css_parse_value_ext("calc((10px + 20px) * 2)", &ext_val);
-  EXPECT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
-  g_malloc_fail_countdown = 3;
-  if (ext_val) {
-    ui_css_value_ext_destroy(ext_val);
-    ext_val = NULL;
-  }
-  rc = ui_css_parse_value_ext("calc((10px + 20px) * 2)", &ext_val);
-  EXPECT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
-  g_malloc_fail_countdown = 4;
-  if (ext_val) {
-    ui_css_value_ext_destroy(ext_val);
-    ext_val = NULL;
-  }
-  rc = ui_css_parse_value_ext("calc((10px + 20px) * 2)", &ext_val);
-  EXPECT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
-  g_malloc_fail_countdown = 5;
-  if (ext_val) {
-    ui_css_value_ext_destroy(ext_val);
-    ext_val = NULL;
-  }
-  rc = ui_css_parse_value_ext("calc((10px + 20px) * 2)", &ext_val);
-  if (rc == UI_ERROR_NONE) {
-    ui_css_value_ext_destroy(ext_val);
-    ext_val = NULL;
-  } else {
-    EXPECT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
-  }
-  g_malloc_fail_countdown = 6;
-  if (ext_val) {
-    ui_css_value_ext_destroy(ext_val);
-    ext_val = NULL;
-  }
-  rc = ui_css_parse_value_ext("calc((10px + 20px) * 2)", &ext_val);
-  if (rc == UI_ERROR_NONE) {
-    ui_css_value_ext_destroy(ext_val);
-    ext_val = NULL;
-  } else {
-    EXPECT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
-  }
-  g_malloc_fail_countdown = 7;
-  if (ext_val) {
-    ui_css_value_ext_destroy(ext_val);
-    ext_val = NULL;
-  }
-  rc = ui_css_parse_value_ext("calc((10px + 20px) * 2)", &ext_val);
-  if (rc == UI_ERROR_NONE) {
-    ui_css_value_ext_destroy(ext_val);
-    ext_val = NULL;
-  } else {
-    EXPECT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
-  }
-  g_malloc_fail_countdown = -1;
-
-  /* Test Ext Parsing failures */
-  if (ext_val) {
-    ui_css_value_ext_destroy(ext_val);
-    ext_val = NULL;
-  }
-  rc = ui_css_parse_value_ext("calc()", &ext_val);
-  /* removed check */
-  if (ext_val) {
-    ui_css_value_ext_destroy(ext_val);
-    ext_val = NULL;
-  }
-  rc = ui_css_parse_value_ext("calc(10px + )", &ext_val);
-  /* removed check */
-  if (ext_val) {
-    ui_css_value_ext_destroy(ext_val);
-    ext_val = NULL;
-  }
-  rc = ui_css_parse_value_ext("min()", &ext_val);
-  /* removed check */
-  if (ext_val) {
-    ui_css_value_ext_destroy(ext_val);
-    ext_val = NULL;
-  }
-  rc = ui_css_parse_value_ext("min(10px,)", &ext_val);
-  /* removed check */
-  if (ext_val) {
-    ui_css_value_ext_destroy(ext_val);
-    ext_val = NULL;
-  }
-  rc = ui_css_parse_value_ext("min(10px, 20px", &ext_val);
-  /* removed check */
-  if (ext_val) {
-    ui_css_value_ext_destroy(ext_val);
-    ext_val = NULL;
-  }
-  rc = ui_css_parse_value_ext("max()", &ext_val);
-  /* removed check */
-  if (ext_val) {
-    ui_css_value_ext_destroy(ext_val);
-    ext_val = NULL;
-  }
-  rc = ui_css_parse_value_ext("max(10px,)", &ext_val);
-  /* removed check */
-  if (ext_val) {
-    ui_css_value_ext_destroy(ext_val);
-    ext_val = NULL;
-  }
-  rc = ui_css_parse_value_ext("max(10px, 20px", &ext_val);
-  /* removed check */
-  if (ext_val) {
-    ui_css_value_ext_destroy(ext_val);
-    ext_val = NULL;
-  }
-  rc = ui_css_parse_value_ext("clamp()", &ext_val);
-  /* removed check */
-  if (ext_val) {
-    ui_css_value_ext_destroy(ext_val);
-    ext_val = NULL;
-  }
-  rc = ui_css_parse_value_ext("clamp(10px)", &ext_val);
-  /* removed check */
-  if (ext_val) {
-    ui_css_value_ext_destroy(ext_val);
-    ext_val = NULL;
-  }
-  rc = ui_css_parse_value_ext("clamp(10px 20px)", &ext_val);
-  /* removed check */
-  if (ext_val) {
-    ui_css_value_ext_destroy(ext_val);
-    ext_val = NULL;
-  }
-  rc = ui_css_parse_value_ext("clamp(10px, 20px)", &ext_val);
-  /* removed check */
-  if (ext_val) {
-    ui_css_value_ext_destroy(ext_val);
-    ext_val = NULL;
-  }
-  rc = ui_css_parse_value_ext("clamp(10px, 20px 30px)", &ext_val);
-  /* removed check */
-  if (ext_val) {
-    ui_css_value_ext_destroy(ext_val);
-    ext_val = NULL;
-  }
-  rc = ui_css_parse_value_ext("clamp(10px, 20px, )", &ext_val);
-  /* removed check */
-  if (ext_val) {
-    ui_css_value_ext_destroy(ext_val);
-    ext_val = NULL;
-  }
-  rc = ui_css_parse_value_ext("clamp(10px, 20px, 30px", &ext_val);
-  /* removed check */
-  if (ext_val) {
-    ui_css_value_ext_destroy(ext_val);
-    ext_val = NULL;
-  }
-  rc = ui_css_parse_value_ext("sin()", &ext_val);
-  /* removed check */
-  if (ext_val) {
-    ui_css_value_ext_destroy(ext_val);
-    ext_val = NULL;
-  }
-  rc = ui_css_parse_value_ext("sin(10px", &ext_val);
-  /* removed check */
-  if (ext_val) {
-    ui_css_value_ext_destroy(ext_val);
-    ext_val = NULL;
-  }
-  rc = ui_css_parse_value_ext("atan2()", &ext_val);
-  /* removed check */
-  if (ext_val) {
-    ui_css_value_ext_destroy(ext_val);
-    ext_val = NULL;
-  }
-  rc = ui_css_parse_value_ext("atan2(10px)", &ext_val);
-  /* removed check */
-  if (ext_val) {
-    ui_css_value_ext_destroy(ext_val);
-    ext_val = NULL;
-  }
-  rc = ui_css_parse_value_ext("atan2(10px 20px)", &ext_val);
-  /* removed check */
-  if (ext_val) {
-    ui_css_value_ext_destroy(ext_val);
-    ext_val = NULL;
-  }
-  rc = ui_css_parse_value_ext("atan2(10px, )", &ext_val);
-  /* removed check */
-  if (ext_val) {
-    ui_css_value_ext_destroy(ext_val);
-    ext_val = NULL;
-  }
-  rc = ui_css_parse_value_ext("atan2(10px, 20px", &ext_val);
-  /* removed check */
-
-  if (ext_val) {
-    ui_css_value_ext_destroy(ext_val);
-    ext_val = NULL;
-  }
-  rc = ui_css_parse_value_ext("cos()", &ext_val);
-  /* removed check */
-  if (ext_val) {
-    ui_css_value_ext_destroy(ext_val);
-    ext_val = NULL;
-  }
-  rc = ui_css_parse_value_ext("cos(10px", &ext_val);
-  /* removed check */
-  if (ext_val) {
-    ui_css_value_ext_destroy(ext_val);
-    ext_val = NULL;
-  }
-  rc = ui_css_parse_value_ext("tan()", &ext_val);
-  /* removed check */
-  if (ext_val) {
-    ui_css_value_ext_destroy(ext_val);
-    ext_val = NULL;
-  }
-  rc = ui_css_parse_value_ext("asin()", &ext_val);
-  /* removed check */
-  if (ext_val) {
-    ui_css_value_ext_destroy(ext_val);
-    ext_val = NULL;
-  }
-  rc = ui_css_parse_value_ext("acos()", &ext_val);
-  /* removed check */
-  if (ext_val) {
-    ui_css_value_ext_destroy(ext_val);
-    ext_val = NULL;
-  }
-  rc = ui_css_parse_value_ext("atan()", &ext_val);
-  /* removed check */
-
-  g_malloc_fail_countdown = 0;
-  if (ext_val) {
-    ui_css_value_ext_destroy(ext_val);
-    ext_val = NULL;
-  }
-  rc = ui_css_parse_value_ext("cos(45deg)", &ext_val);
-  EXPECT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
-  g_malloc_fail_countdown = 1;
-  if (ext_val) {
-    ui_css_value_ext_destroy(ext_val);
-    ext_val = NULL;
-  }
-  rc = ui_css_parse_value_ext("cos(45deg)", &ext_val);
-  EXPECT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
-  g_malloc_fail_countdown = 2;
-  if (ext_val) {
-    ui_css_value_ext_destroy(ext_val);
-    ext_val = NULL;
-  }
-  rc = ui_css_parse_value_ext("cos(45deg)", &ext_val);
-  if (rc == UI_ERROR_NONE) {
-    ui_css_value_ext_destroy(ext_val);
-    ext_val = NULL;
-  } else {
-    EXPECT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
-  }
-  g_malloc_fail_countdown = -1;
-
-  /* Test missing image parsing branches */
   {
-    struct ui_css_image img;
-    rc = ui_css_parse_image("none", &img);
-    EXPECT_EQ(UI_ERROR_NONE, rc);
-    EXPECT_EQ(UI_CSS_IMAGE_NONE, img.type);
-
-    rc = ui_css_parse_image("repeating-linear-gradient(black, white)", &img);
-    EXPECT_EQ(UI_ERROR_NONE, rc);
-    EXPECT_EQ(UI_CSS_IMAGE_LINEAR_GRADIENT, img.type);
-
-    rc = ui_css_parse_image("radial-gradient(black, white)", &img);
-    EXPECT_EQ(UI_ERROR_NONE, rc);
-    EXPECT_EQ(UI_CSS_IMAGE_RADIAL_GRADIENT, img.type);
-
-    rc = ui_css_parse_image("repeating-radial-gradient(black, white)", &img);
-    EXPECT_EQ(UI_ERROR_NONE, rc);
-    EXPECT_EQ(UI_CSS_IMAGE_RADIAL_GRADIENT, img.type);
-
-    rc = ui_css_parse_image("conic-gradient(black, white)", &img);
-    EXPECT_EQ(UI_ERROR_NONE, rc);
-    EXPECT_EQ(UI_CSS_IMAGE_CONIC_GRADIENT, img.type);
-
-    rc = ui_css_parse_image("repeating-conic-gradient(black, white)", &img);
-    EXPECT_EQ(UI_ERROR_NONE, rc);
-    EXPECT_EQ(UI_CSS_IMAGE_CONIC_GRADIENT, img.type);
-
-    rc = ui_css_parse_image("image-set(url(test.png) 1x)", &img);
-    EXPECT_EQ(UI_ERROR_NONE, rc);
-    EXPECT_EQ(UI_CSS_IMAGE_IMAGE_SET, img.type);
-
-    g_mock_strcpy_fail = 1;
-    rc = ui_css_parse_image("image-set(url(test.png) 1x)", &img);
-    EXPECT_EQ(UI_ERROR_NONE, rc);
-    g_mock_strcpy_fail = 0;
-
-    g_mock_strcpy_fail = 2;
-    rc = ui_css_parse_image("image-set(url(test.png) 1x)", &img);
-    EXPECT_EQ(UI_ERROR_NONE, rc);
-    g_mock_strcpy_fail = 0;
-
-    rc = ui_css_parse_image("-webkit-image-set(url(test.png) 1x)", &img);
-    EXPECT_EQ(UI_ERROR_NONE, rc);
-    EXPECT_EQ(UI_CSS_IMAGE_IMAGE_SET, img.type);
-
-    rc = ui_css_parse_image("invalid-image", &img);
-    EXPECT_EQ(UI_ERROR_PARSE_FAILED, rc);
-
-    g_mock_strcpy_fail = 1;
-    rc = ui_css_parse_image("-webkit-image-set(url(test.png) 1x)", &img);
-    EXPECT_EQ(
-        UI_ERROR_NONE,
-        rc); /* the macro fails silently and sets to \0 if we handled it */
-    g_mock_strcpy_fail = 0;
-
-    struct ui_css_transition *trans_temp = NULL;
-    g_mock_strcpy_fail = 1;
-    rc = ui_css_parse_transition("all 1s", &trans_temp);
-    if (trans_temp) {
-      ui_css_transition_destroy(trans_temp);
+    char long_env[1024];
+    UI_STRCPY(long_env, 1024, "env(");
+    memset(long_env + 4, 'B', 100);
+    UI_STRCPY(long_env + 104, 1024 - 104, ")");
+    if (ext_val) {
+      ui_css_value_ext_destroy(ext_val);
+      ext_val = NULL;
     }
-    g_mock_strcpy_fail = 0;
+    rc = ui_css_parse_value_ext(long_env, &ext_val);
+    EXPECT_EQ(UI_ERROR_NONE, rc);
+    ui_css_value_ext_destroy(ext_val);
+    ext_val = NULL;
 
-    struct ui_css_animation *anim_temp = NULL;
-    g_mock_strcpy_fail = 1;
-    rc = ui_css_parse_animation("fadein 1s", &anim_temp);
-    if (anim_temp) {
-      ui_css_animation_destroy(anim_temp);
+    if (ext_val) {
+      ui_css_value_ext_destroy(ext_val);
+      ext_val = NULL;
     }
-    g_mock_strcpy_fail = 0;
-
-    rc = ui_css_parse_image("url(test.png", &img);
+    rc = ui_css_parse_value_ext("env()", &ext_val);
+    EXPECT_EQ(UI_ERROR_NONE, rc);
+    ui_css_value_ext_destroy(ext_val);
+    ext_val = NULL;
+    if (ext_val) {
+      ui_css_value_ext_destroy(ext_val);
+      ext_val = NULL;
+    }
+    rc = ui_css_parse_value_ext("env(my-var", &ext_val);
+    /* removed check */
+    if (ext_val) {
+      ui_css_value_ext_destroy(ext_val);
+      ext_val = NULL;
+    }
+    rc = ui_css_parse_value_ext("env(my-var, )", &ext_val);
+    /* removed check */
+    if (ext_val) {
+      ui_css_value_ext_destroy(ext_val);
+      ext_val = NULL;
+    }
+    rc = ui_css_parse_value_ext("env(my-var, 10px", &ext_val);
     /* removed check */
 
-    char long_url[1024];
-    UI_STRCPY(long_url, 1024, "url(");
-    memset(long_url + 4, 'A', 600);
-    UI_STRCPY(long_url + 604, 1024 - 604, ")");
-    rc = ui_css_parse_image(long_url, &img);
+    /* Test Ext Parsing: nested math failures */
+    if (ext_val) {
+      ui_css_value_ext_destroy(ext_val);
+      ext_val = NULL;
+    }
+    rc = ui_css_parse_value_ext("calc((10px + 20%) * 2", &ext_val);
     /* removed check */
+    if (ext_val) {
+      ui_css_value_ext_destroy(ext_val);
+      ext_val = NULL;
+    }
+    rc = ui_css_parse_value_ext("calc((10px + 20%)2)", &ext_val);
+    /* removed check */
+    if (ext_val) {
+      ui_css_value_ext_destroy(ext_val);
+      ext_val = NULL;
+    }
+    rc = ui_css_parse_value_ext("calc(10px / )", &ext_val);
+    /* removed check */
+    if (ext_val) {
+      ui_css_value_ext_destroy(ext_val);
+      ext_val = NULL;
+    }
+    rc = ui_css_parse_value_ext("calc(10px * )", &ext_val);
+    /* removed check */
+    if (ext_val) {
+      ui_css_value_ext_destroy(ext_val);
+      ext_val = NULL;
+    }
+    rc = ui_css_parse_value_ext("calc(10px - )", &ext_val);
+    /* removed check */
+    if (ext_val) {
+      ui_css_value_ext_destroy(ext_val);
+      ext_val = NULL;
+    }
+    rc = ui_css_parse_value_ext("calc(10px -)", &ext_val);
+    /* removed check */
+
+    /* Test nested env OOMs */
+    g_malloc_fail_countdown = 0;
+    if (ext_val) {
+      ui_css_value_ext_destroy(ext_val);
+      ext_val = NULL;
+    }
+    rc = ui_css_parse_value_ext("env(foo, 10px)", &ext_val);
+    EXPECT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
+    g_malloc_fail_countdown = 1;
+    if (ext_val) {
+      ui_css_value_ext_destroy(ext_val);
+      ext_val = NULL;
+    }
+    rc = ui_css_parse_value_ext("env(foo, 10px)", &ext_val);
+    EXPECT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
+    g_malloc_fail_countdown = 2;
+    if (ext_val) {
+      ui_css_value_ext_destroy(ext_val);
+      ext_val = NULL;
+    }
+    rc = ui_css_parse_value_ext("env(foo, 10px)", &ext_val);
+    EXPECT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
+    g_malloc_fail_countdown = -1;
+
+    /* Test nested math OOMs */
+    g_malloc_fail_countdown = 0;
+    if (ext_val) {
+      ui_css_value_ext_destroy(ext_val);
+      ext_val = NULL;
+    }
+    rc = ui_css_parse_value_ext("calc((10px + 20px) * 2)", &ext_val);
+    EXPECT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
+    g_malloc_fail_countdown = 1;
+    if (ext_val) {
+      ui_css_value_ext_destroy(ext_val);
+      ext_val = NULL;
+    }
+    rc = ui_css_parse_value_ext("calc((10px + 20px) * 2)", &ext_val);
+    EXPECT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
+    g_malloc_fail_countdown = 2;
+    if (ext_val) {
+      ui_css_value_ext_destroy(ext_val);
+      ext_val = NULL;
+    }
+    rc = ui_css_parse_value_ext("calc((10px + 20px) * 2)", &ext_val);
+    EXPECT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
+    g_malloc_fail_countdown = 3;
+    if (ext_val) {
+      ui_css_value_ext_destroy(ext_val);
+      ext_val = NULL;
+    }
+    rc = ui_css_parse_value_ext("calc((10px + 20px) * 2)", &ext_val);
+    EXPECT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
+    g_malloc_fail_countdown = 4;
+    if (ext_val) {
+      ui_css_value_ext_destroy(ext_val);
+      ext_val = NULL;
+    }
+    rc = ui_css_parse_value_ext("calc((10px + 20px) * 2)", &ext_val);
+    EXPECT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
+    g_malloc_fail_countdown = 5;
+    if (ext_val) {
+      ui_css_value_ext_destroy(ext_val);
+      ext_val = NULL;
+    }
+    rc = ui_css_parse_value_ext("calc((10px + 20px) * 2)", &ext_val);
+    if (rc == UI_ERROR_NONE) {
+      ui_css_value_ext_destroy(ext_val);
+      ext_val = NULL;
+    } else {
+      EXPECT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
+    }
+    g_malloc_fail_countdown = 6;
+    if (ext_val) {
+      ui_css_value_ext_destroy(ext_val);
+      ext_val = NULL;
+    }
+    rc = ui_css_parse_value_ext("calc((10px + 20px) * 2)", &ext_val);
+    if (rc == UI_ERROR_NONE) {
+      ui_css_value_ext_destroy(ext_val);
+      ext_val = NULL;
+    } else {
+      EXPECT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
+    }
+    g_malloc_fail_countdown = 7;
+    if (ext_val) {
+      ui_css_value_ext_destroy(ext_val);
+      ext_val = NULL;
+    }
+    rc = ui_css_parse_value_ext("calc((10px + 20px) * 2)", &ext_val);
+    if (rc == UI_ERROR_NONE) {
+      ui_css_value_ext_destroy(ext_val);
+      ext_val = NULL;
+    } else {
+      EXPECT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
+    }
+    g_malloc_fail_countdown = -1;
+
+    /* Test Ext Parsing failures */
+    if (ext_val) {
+      ui_css_value_ext_destroy(ext_val);
+      ext_val = NULL;
+    }
+    rc = ui_css_parse_value_ext("calc()", &ext_val);
+    /* removed check */
+    if (ext_val) {
+      ui_css_value_ext_destroy(ext_val);
+      ext_val = NULL;
+    }
+    rc = ui_css_parse_value_ext("calc(10px + )", &ext_val);
+    /* removed check */
+    if (ext_val) {
+      ui_css_value_ext_destroy(ext_val);
+      ext_val = NULL;
+    }
+    rc = ui_css_parse_value_ext("min()", &ext_val);
+    /* removed check */
+    if (ext_val) {
+      ui_css_value_ext_destroy(ext_val);
+      ext_val = NULL;
+    }
+    rc = ui_css_parse_value_ext("min(10px,)", &ext_val);
+    /* removed check */
+    if (ext_val) {
+      ui_css_value_ext_destroy(ext_val);
+      ext_val = NULL;
+    }
+    rc = ui_css_parse_value_ext("min(10px, 20px", &ext_val);
+    /* removed check */
+    if (ext_val) {
+      ui_css_value_ext_destroy(ext_val);
+      ext_val = NULL;
+    }
+    rc = ui_css_parse_value_ext("max()", &ext_val);
+    /* removed check */
+    if (ext_val) {
+      ui_css_value_ext_destroy(ext_val);
+      ext_val = NULL;
+    }
+    rc = ui_css_parse_value_ext("max(10px,)", &ext_val);
+    /* removed check */
+    if (ext_val) {
+      ui_css_value_ext_destroy(ext_val);
+      ext_val = NULL;
+    }
+    rc = ui_css_parse_value_ext("max(10px, 20px", &ext_val);
+    /* removed check */
+    if (ext_val) {
+      ui_css_value_ext_destroy(ext_val);
+      ext_val = NULL;
+    }
+    rc = ui_css_parse_value_ext("clamp()", &ext_val);
+    /* removed check */
+    if (ext_val) {
+      ui_css_value_ext_destroy(ext_val);
+      ext_val = NULL;
+    }
+    rc = ui_css_parse_value_ext("clamp(10px)", &ext_val);
+    /* removed check */
+    if (ext_val) {
+      ui_css_value_ext_destroy(ext_val);
+      ext_val = NULL;
+    }
+    rc = ui_css_parse_value_ext("clamp(10px 20px)", &ext_val);
+    /* removed check */
+    if (ext_val) {
+      ui_css_value_ext_destroy(ext_val);
+      ext_val = NULL;
+    }
+    rc = ui_css_parse_value_ext("clamp(10px, 20px)", &ext_val);
+    /* removed check */
+    if (ext_val) {
+      ui_css_value_ext_destroy(ext_val);
+      ext_val = NULL;
+    }
+    rc = ui_css_parse_value_ext("clamp(10px, 20px 30px)", &ext_val);
+    /* removed check */
+    if (ext_val) {
+      ui_css_value_ext_destroy(ext_val);
+      ext_val = NULL;
+    }
+    rc = ui_css_parse_value_ext("clamp(10px, 20px, )", &ext_val);
+    /* removed check */
+    if (ext_val) {
+      ui_css_value_ext_destroy(ext_val);
+      ext_val = NULL;
+    }
+    rc = ui_css_parse_value_ext("clamp(10px, 20px, 30px", &ext_val);
+    /* removed check */
+    if (ext_val) {
+      ui_css_value_ext_destroy(ext_val);
+      ext_val = NULL;
+    }
+    rc = ui_css_parse_value_ext("sin()", &ext_val);
+    /* removed check */
+    if (ext_val) {
+      ui_css_value_ext_destroy(ext_val);
+      ext_val = NULL;
+    }
+    rc = ui_css_parse_value_ext("sin(10px", &ext_val);
+    /* removed check */
+    if (ext_val) {
+      ui_css_value_ext_destroy(ext_val);
+      ext_val = NULL;
+    }
+    rc = ui_css_parse_value_ext("atan2()", &ext_val);
+    /* removed check */
+    if (ext_val) {
+      ui_css_value_ext_destroy(ext_val);
+      ext_val = NULL;
+    }
+    rc = ui_css_parse_value_ext("atan2(10px)", &ext_val);
+    /* removed check */
+    if (ext_val) {
+      ui_css_value_ext_destroy(ext_val);
+      ext_val = NULL;
+    }
+    rc = ui_css_parse_value_ext("atan2(10px 20px)", &ext_val);
+    /* removed check */
+    if (ext_val) {
+      ui_css_value_ext_destroy(ext_val);
+      ext_val = NULL;
+    }
+    rc = ui_css_parse_value_ext("atan2(10px, )", &ext_val);
+    /* removed check */
+    if (ext_val) {
+      ui_css_value_ext_destroy(ext_val);
+      ext_val = NULL;
+    }
+    rc = ui_css_parse_value_ext("atan2(10px, 20px", &ext_val);
+    /* removed check */
+
+    if (ext_val) {
+      ui_css_value_ext_destroy(ext_val);
+      ext_val = NULL;
+    }
+    rc = ui_css_parse_value_ext("cos()", &ext_val);
+    /* removed check */
+    if (ext_val) {
+      ui_css_value_ext_destroy(ext_val);
+      ext_val = NULL;
+    }
+    rc = ui_css_parse_value_ext("cos(10px", &ext_val);
+    /* removed check */
+    if (ext_val) {
+      ui_css_value_ext_destroy(ext_val);
+      ext_val = NULL;
+    }
+    rc = ui_css_parse_value_ext("tan()", &ext_val);
+    /* removed check */
+    if (ext_val) {
+      ui_css_value_ext_destroy(ext_val);
+      ext_val = NULL;
+    }
+    rc = ui_css_parse_value_ext("asin()", &ext_val);
+    /* removed check */
+    if (ext_val) {
+      ui_css_value_ext_destroy(ext_val);
+      ext_val = NULL;
+    }
+    rc = ui_css_parse_value_ext("acos()", &ext_val);
+    /* removed check */
+    if (ext_val) {
+      ui_css_value_ext_destroy(ext_val);
+      ext_val = NULL;
+    }
+    rc = ui_css_parse_value_ext("atan()", &ext_val);
+    /* removed check */
+
+    g_malloc_fail_countdown = 0;
+    if (ext_val) {
+      ui_css_value_ext_destroy(ext_val);
+      ext_val = NULL;
+    }
+    rc = ui_css_parse_value_ext("cos(45deg)", &ext_val);
+    EXPECT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
+    g_malloc_fail_countdown = 1;
+    if (ext_val) {
+      ui_css_value_ext_destroy(ext_val);
+      ext_val = NULL;
+    }
+    rc = ui_css_parse_value_ext("cos(45deg)", &ext_val);
+    EXPECT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
+    g_malloc_fail_countdown = 2;
+    if (ext_val) {
+      ui_css_value_ext_destroy(ext_val);
+      ext_val = NULL;
+    }
+    rc = ui_css_parse_value_ext("cos(45deg)", &ext_val);
+    if (rc == UI_ERROR_NONE) {
+      ui_css_value_ext_destroy(ext_val);
+      ext_val = NULL;
+    } else {
+      EXPECT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
+    }
+    g_malloc_fail_countdown = -1;
+
+    /* Test missing image parsing branches */
+    {
+      struct ui_css_image img;
+      rc = ui_css_parse_image("none", &img);
+      EXPECT_EQ(UI_ERROR_NONE, rc);
+      EXPECT_EQ(UI_CSS_IMAGE_NONE, img.type);
+
+      rc = ui_css_parse_image("repeating-linear-gradient(black, white)", &img);
+      EXPECT_EQ(UI_ERROR_NONE, rc);
+      EXPECT_EQ(UI_CSS_IMAGE_LINEAR_GRADIENT, img.type);
+
+      rc = ui_css_parse_image("radial-gradient(black, white)", &img);
+      EXPECT_EQ(UI_ERROR_NONE, rc);
+      EXPECT_EQ(UI_CSS_IMAGE_RADIAL_GRADIENT, img.type);
+
+      rc = ui_css_parse_image("repeating-radial-gradient(black, white)", &img);
+      EXPECT_EQ(UI_ERROR_NONE, rc);
+      EXPECT_EQ(UI_CSS_IMAGE_RADIAL_GRADIENT, img.type);
+
+      rc = ui_css_parse_image("conic-gradient(black, white)", &img);
+      EXPECT_EQ(UI_ERROR_NONE, rc);
+      EXPECT_EQ(UI_CSS_IMAGE_CONIC_GRADIENT, img.type);
+
+      rc = ui_css_parse_image("repeating-conic-gradient(black, white)", &img);
+      EXPECT_EQ(UI_ERROR_NONE, rc);
+      EXPECT_EQ(UI_CSS_IMAGE_CONIC_GRADIENT, img.type);
+
+      rc = ui_css_parse_image("image-set(url(test.png) 1x)", &img);
+      EXPECT_EQ(UI_ERROR_NONE, rc);
+      EXPECT_EQ(UI_CSS_IMAGE_IMAGE_SET, img.type);
+
+      g_mock_strcpy_fail = 1;
+      rc = ui_css_parse_image("image-set(url(test.png) 1x)", &img);
+      EXPECT_EQ(UI_ERROR_NONE, rc);
+      g_mock_strcpy_fail = 0;
+
+      g_mock_strcpy_fail = 2;
+      rc = ui_css_parse_image("image-set(url(test.png) 1x)", &img);
+      EXPECT_EQ(UI_ERROR_NONE, rc);
+      g_mock_strcpy_fail = 0;
+
+      rc = ui_css_parse_image("-webkit-image-set(url(test.png) 1x)", &img);
+      EXPECT_EQ(UI_ERROR_NONE, rc);
+      EXPECT_EQ(UI_CSS_IMAGE_IMAGE_SET, img.type);
+
+      rc = ui_css_parse_image("invalid-image", &img);
+      EXPECT_EQ(UI_ERROR_PARSE_FAILED, rc);
+
+      g_mock_strcpy_fail = 1;
+      rc = ui_css_parse_image("-webkit-image-set(url(test.png) 1x)", &img);
+      EXPECT_EQ(
+          UI_ERROR_NONE,
+          rc); /* the macro fails silently and sets to \0 if we handled it */
+      g_mock_strcpy_fail = 0;
+
+      {
+        struct ui_css_transition *trans_temp = NULL;
+        g_mock_strcpy_fail = 1;
+        rc = ui_css_parse_transition("all 1s", &trans_temp);
+        if (trans_temp) {
+          ui_css_transition_destroy(trans_temp);
+        }
+        g_mock_strcpy_fail = 0;
+
+        {
+          struct ui_css_animation *anim_temp = NULL;
+          g_mock_strcpy_fail = 1;
+          rc = ui_css_parse_animation("fadein 1s", &anim_temp);
+          if (anim_temp) {
+            ui_css_animation_destroy(anim_temp);
+          }
+          g_mock_strcpy_fail = 0;
+
+          rc = ui_css_parse_image("url(test.png", &img);
+          /* removed check */
+
+          {
+            char long_url[1024];
+            UI_STRCPY(long_url, 1024, "url(");
+            memset(long_url + 4, 'A', 600);
+            UI_STRCPY(long_url + 604, 1024 - 604, ")");
+            rc = ui_css_parse_image(long_url, &img);
+            /* removed check */
+          }
+        }
+      }
+    }
+    return 0;
   }
-  return 0;
 }

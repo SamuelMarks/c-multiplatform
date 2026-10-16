@@ -4,6 +4,8 @@
 #include "ui_css_highlight_api.h"
 /* clang-format on */
 
+extern int g_mock_strcpy_fail;
+
 extern int g_malloc_fail_countdown;
 
 static int test_highlight_create(void) {
@@ -42,7 +44,6 @@ static int test_highlight_create(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_mock_strcpy_fail;
     g_mock_strcpy_fail = 1;
     if (ui_css_highlight_create(UI_CSS_HIGHLIGHT_TYPE_CUSTOM, "my-hl", &hl) ==
         UI_ERROR_NONE) {

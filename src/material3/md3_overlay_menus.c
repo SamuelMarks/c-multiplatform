@@ -490,6 +490,7 @@ static ui_error_t mock_color_picker_hex_to_rgb(const char *hex,
 /* Hover Card Implementation                                                 */
 /* ========================================================================= */
 
+/** @brief md3_hover_card_create function. */
 ui_error_t md3_hover_card_create(struct ui_engine *engine,
                                  struct ui_dom_node *anchor_node,
                                  struct md3_hover_card **out_hover_card) {
@@ -522,6 +523,7 @@ ui_error_t md3_hover_card_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_hover_card_destroy function. */
 ui_error_t md3_hover_card_destroy(struct md3_hover_card *hover_card) {
   ui_error_t rc;
 
@@ -540,6 +542,7 @@ ui_error_t md3_hover_card_destroy(struct md3_hover_card *hover_card) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_hover_card_show function. */
 ui_error_t md3_hover_card_show(struct md3_hover_card *hover_card) {
   ui_error_t rc;
 
@@ -556,6 +559,7 @@ ui_error_t md3_hover_card_show(struct md3_hover_card *hover_card) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_hover_card_hide function. */
 ui_error_t md3_hover_card_hide(struct md3_hover_card *hover_card) {
   ui_error_t rc;
 
@@ -576,6 +580,7 @@ ui_error_t md3_hover_card_hide(struct md3_hover_card *hover_card) {
 /* Popover Implementation                                                    */
 /* ========================================================================= */
 
+/** @brief md3_popover_create function. */
 ui_error_t md3_popover_create(struct ui_engine *engine,
                               struct ui_dom_node *anchor_node,
                               struct md3_popover **out_popover) {
@@ -607,6 +612,7 @@ ui_error_t md3_popover_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_popover_destroy function. */
 ui_error_t md3_popover_destroy(struct md3_popover *popover) {
   ui_error_t rc;
 
@@ -625,6 +631,7 @@ ui_error_t md3_popover_destroy(struct md3_popover *popover) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_popover_open function. */
 ui_error_t md3_popover_open(struct md3_popover *popover) {
   if (!popover) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -634,6 +641,7 @@ ui_error_t md3_popover_open(struct md3_popover *popover) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_popover_close function. */
 ui_error_t md3_popover_close(struct md3_popover *popover) {
   ui_error_t rc;
 
@@ -650,6 +658,7 @@ ui_error_t md3_popover_close(struct md3_popover *popover) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_popover_is_open function. */
 ui_error_t md3_popover_is_open(const struct md3_popover *popover,
                                int *out_is_open) {
   if (!popover || !out_is_open) {
@@ -664,6 +673,7 @@ ui_error_t md3_popover_is_open(const struct md3_popover *popover,
 /* Banner Implementation                                                     */
 /* ========================================================================= */
 
+/** @brief md3_banner_create function. */
 ui_error_t md3_banner_create(struct ui_engine *engine,
                              struct md3_banner **out_banner) {
   struct md3_banner *b;
@@ -692,6 +702,7 @@ ui_error_t md3_banner_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_banner_destroy function. */
 ui_error_t md3_banner_destroy(struct md3_banner *banner) {
   ui_error_t rc;
 
@@ -710,6 +721,7 @@ ui_error_t md3_banner_destroy(struct md3_banner *banner) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_banner_set_text function. */
 ui_error_t md3_banner_set_text(struct md3_banner *banner, const char *text) {
   ui_error_t rc;
 
@@ -732,6 +744,7 @@ ui_error_t md3_banner_set_text(struct md3_banner *banner, const char *text) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_banner_set_action function. */
 ui_error_t md3_banner_set_action(struct md3_banner *banner, int action_index,
                                  const char *label) {
   if (!banner || !label || (action_index != 0 && action_index != 1)) {
@@ -760,6 +773,7 @@ ui_error_t md3_banner_set_action(struct md3_banner *banner, int action_index,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_banner_set_open function. */
 ui_error_t md3_banner_set_open(struct md3_banner *banner, int is_open) {
   ui_error_t rc;
 
@@ -776,6 +790,7 @@ ui_error_t md3_banner_set_open(struct md3_banner *banner, int is_open) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_banner_is_open function. */
 ui_error_t md3_banner_is_open(const struct md3_banner *banner,
                               int *out_is_open) {
   if (!banner || !out_is_open) {
@@ -790,6 +805,7 @@ ui_error_t md3_banner_is_open(const struct md3_banner *banner,
 /* Inline Alert Implementation                                               */
 /* ========================================================================= */
 
+/** @brief md3_inline_alert_create function. */
 ui_error_t md3_inline_alert_create(struct ui_engine *engine,
                                    enum md3_alert_severity severity,
                                    struct md3_inline_alert **out_alert) {
@@ -833,6 +849,7 @@ ui_error_t md3_inline_alert_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_inline_alert_destroy function. */
 ui_error_t md3_inline_alert_destroy(struct md3_inline_alert *alert) {
   ui_error_t rc;
 
@@ -851,6 +868,7 @@ ui_error_t md3_inline_alert_destroy(struct md3_inline_alert *alert) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_inline_alert_set_title function. */
 ui_error_t md3_inline_alert_set_title(struct md3_inline_alert *alert,
                                       const char *title) {
   if (!alert || !title) {
@@ -867,6 +885,7 @@ ui_error_t md3_inline_alert_set_title(struct md3_inline_alert *alert,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_inline_alert_set_message function. */
 ui_error_t md3_inline_alert_set_message(struct md3_inline_alert *alert,
                                         const char *message) {
   if (!alert || !message) {
@@ -883,6 +902,7 @@ ui_error_t md3_inline_alert_set_message(struct md3_inline_alert *alert,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_inline_alert_set_dismissible function. */
 ui_error_t md3_inline_alert_set_dismissible(struct md3_inline_alert *alert,
                                             int dismissible) {
   ui_error_t rc;
@@ -904,6 +924,7 @@ ui_error_t md3_inline_alert_set_dismissible(struct md3_inline_alert *alert,
 /* Menubar Implementation                                                    */
 /* ========================================================================= */
 
+/** @brief md3_menubar_create function. */
 ui_error_t md3_menubar_create(struct ui_engine *engine,
                               struct md3_menubar **out_menubar) {
   struct md3_menubar *mb;
@@ -930,6 +951,7 @@ ui_error_t md3_menubar_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_menubar_destroy function. */
 ui_error_t md3_menubar_destroy(struct md3_menubar *menubar) {
   ui_error_t rc;
 
@@ -948,6 +970,7 @@ ui_error_t md3_menubar_destroy(struct md3_menubar *menubar) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_menubar_append_item function. */
 ui_error_t md3_menubar_append_item(struct md3_menubar *menubar,
                                    struct ui_component *item) {
   ui_error_t rc;
@@ -976,6 +999,7 @@ ui_error_t md3_menubar_append_item(struct md3_menubar *menubar,
 /* Context Menu Implementation                                               */
 /* ========================================================================= */
 
+/** @brief md3_context_menu_create function. */
 ui_error_t md3_context_menu_create(struct ui_engine *engine,
                                    struct md3_context_menu **out_context_menu) {
   struct md3_context_menu *cm;
@@ -1003,6 +1027,7 @@ ui_error_t md3_context_menu_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_context_menu_destroy function. */
 ui_error_t md3_context_menu_destroy(struct md3_context_menu *menu) {
   ui_error_t rc;
 
@@ -1021,6 +1046,7 @@ ui_error_t md3_context_menu_destroy(struct md3_context_menu *menu) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_context_menu_open_at function. */
 ui_error_t md3_context_menu_open_at(struct md3_context_menu *menu, int x, int y,
                                     int viewport_w, int viewport_h) {
   if (!menu || x < 0 || y < 0 || viewport_w <= 0 || viewport_h <= 0) {
@@ -1037,6 +1063,7 @@ ui_error_t md3_context_menu_open_at(struct md3_context_menu *menu, int x, int y,
 /* Action Sheet Implementation                                               */
 /* ========================================================================= */
 
+/** @brief md3_action_sheet_create function. */
 ui_error_t md3_action_sheet_create(struct ui_engine *engine,
                                    struct md3_action_sheet **out_sheet) {
   struct md3_action_sheet *as;
@@ -1066,6 +1093,7 @@ ui_error_t md3_action_sheet_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_action_sheet_destroy function. */
 ui_error_t md3_action_sheet_destroy(struct md3_action_sheet *sheet) {
   ui_error_t rc;
 
@@ -1084,6 +1112,7 @@ ui_error_t md3_action_sheet_destroy(struct md3_action_sheet *sheet) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_action_sheet_add_action function. */
 ui_error_t md3_action_sheet_add_action(struct md3_action_sheet *sheet,
                                        const char *label, const char *icon) {
   struct md3_action_sheet_item *item;
@@ -1113,6 +1142,7 @@ ui_error_t md3_action_sheet_add_action(struct md3_action_sheet *sheet,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_action_sheet_set_cancel_action function. */
 ui_error_t md3_action_sheet_set_cancel_action(struct md3_action_sheet *sheet,
                                               const char *cancel_label) {
   if (!sheet || !cancel_label) {
@@ -1130,6 +1160,7 @@ ui_error_t md3_action_sheet_set_cancel_action(struct md3_action_sheet *sheet,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_action_sheet_set_open function. */
 ui_error_t md3_action_sheet_set_open(struct md3_action_sheet *sheet,
                                      int is_open) {
   ui_error_t rc;
@@ -1147,6 +1178,7 @@ ui_error_t md3_action_sheet_set_open(struct md3_action_sheet *sheet,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_action_sheet_is_open function. */
 ui_error_t md3_action_sheet_is_open(const struct md3_action_sheet *sheet,
                                     int *out_is_open) {
   if (!sheet || !out_is_open) {
@@ -1161,6 +1193,7 @@ ui_error_t md3_action_sheet_is_open(const struct md3_action_sheet *sheet,
 /* Coachmark Implementation                                                  */
 /* ========================================================================= */
 
+/** @brief md3_coachmark_create function. */
 ui_error_t md3_coachmark_create(struct ui_engine *engine,
                                 struct ui_dom_node *target_node,
                                 struct md3_coachmark **out_coachmark) {
@@ -1186,6 +1219,7 @@ ui_error_t md3_coachmark_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_coachmark_destroy function. */
 ui_error_t md3_coachmark_destroy(struct md3_coachmark *coachmark) {
   if (!coachmark) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -1195,6 +1229,7 @@ ui_error_t md3_coachmark_destroy(struct md3_coachmark *coachmark) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_coachmark_set_content function. */
 ui_error_t md3_coachmark_set_content(struct md3_coachmark *coachmark,
                                      const char *title, const char *description,
                                      int step_index, int total_steps) {
@@ -1220,6 +1255,7 @@ ui_error_t md3_coachmark_set_content(struct md3_coachmark *coachmark,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_coachmark_start function. */
 ui_error_t md3_coachmark_start(struct md3_coachmark *coachmark) {
   if (!coachmark) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -1233,6 +1269,7 @@ ui_error_t md3_coachmark_start(struct md3_coachmark *coachmark) {
 /* Color Picker Implementation                                               */
 /* ========================================================================= */
 
+/** @brief md3_cp_cva_write_value function. */
 static ui_error_t md3_cp_cva_write_value(void *component,
                                          union ui_signal_payload value) {
   struct md3_color_picker *picker;
@@ -1250,6 +1287,7 @@ static ui_error_t md3_cp_cva_write_value(void *component,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_cp_cva_set_disabled_state function. */
 static ui_error_t md3_cp_cva_set_disabled_state(void *component,
                                                 ui_bool_t is_disabled) {
   if (!component) {
@@ -1261,6 +1299,7 @@ static ui_error_t md3_cp_cva_set_disabled_state(void *component,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_color_picker_create function. */
 ui_error_t md3_color_picker_create(struct ui_engine *engine,
                                    struct md3_color_picker **out_picker,
                                    struct ui_control_value_accessor **out_cva) {
@@ -1312,6 +1351,7 @@ ui_error_t md3_color_picker_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_color_picker_destroy function. */
 ui_error_t md3_color_picker_destroy(struct md3_color_picker *picker) {
   ui_error_t rc;
 
@@ -1330,6 +1370,7 @@ ui_error_t md3_color_picker_destroy(struct md3_color_picker *picker) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_color_picker_set_hsv function. */
 ui_error_t md3_color_picker_set_hsv(struct md3_color_picker *picker, double h,
                                     double s, double v) {
   ui_error_t rc;
@@ -1357,6 +1398,7 @@ ui_error_t md3_color_picker_set_hsv(struct md3_color_picker *picker, double h,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_color_picker_get_hsv function. */
 ui_error_t md3_color_picker_get_hsv(const struct md3_color_picker *picker,
                                     double *out_h, double *out_s,
                                     double *out_v) {
@@ -1370,6 +1412,7 @@ ui_error_t md3_color_picker_get_hsv(const struct md3_color_picker *picker,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_color_picker_set_rgb function. */
 ui_error_t md3_color_picker_set_rgb(struct md3_color_picker *picker,
                                     unsigned char r, unsigned char g,
                                     unsigned char b) {
@@ -1397,6 +1440,7 @@ ui_error_t md3_color_picker_set_rgb(struct md3_color_picker *picker,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_color_picker_get_rgb function. */
 ui_error_t md3_color_picker_get_rgb(const struct md3_color_picker *picker,
                                     unsigned char *out_r, unsigned char *out_g,
                                     unsigned char *out_b) {
@@ -1410,6 +1454,7 @@ ui_error_t md3_color_picker_get_rgb(const struct md3_color_picker *picker,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_color_picker_set_hex function. */
 ui_error_t md3_color_picker_set_hex(struct md3_color_picker *picker,
                                     const char *hex) {
   ui_error_t rc;
@@ -1438,6 +1483,7 @@ ui_error_t md3_color_picker_set_hex(struct md3_color_picker *picker,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_color_picker_get_hex function. */
 ui_error_t md3_color_picker_get_hex(const struct md3_color_picker *picker,
                                     char *out_hex, size_t hex_size) {
   if (!picker || !out_hex || hex_size < 8) {
@@ -1458,6 +1504,7 @@ ui_error_t md3_color_picker_get_hex(const struct md3_color_picker *picker,
 /* Command Palette Implementation                                            */
 /* ========================================================================= */
 
+/** @brief md3_command_palette_create function. */
 ui_error_t
 md3_command_palette_create(struct ui_engine *engine,
                            struct md3_command_palette **out_palette) {
@@ -1481,6 +1528,7 @@ md3_command_palette_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_command_palette_destroy function. */
 ui_error_t md3_command_palette_destroy(struct md3_command_palette *palette) {
   if (!palette) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -1490,6 +1538,7 @@ ui_error_t md3_command_palette_destroy(struct md3_command_palette *palette) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_command_palette_add_action function. */
 ui_error_t md3_command_palette_add_action(struct md3_command_palette *palette,
                                           const char *category,
                                           const char *title,
@@ -1530,6 +1579,7 @@ ui_error_t md3_command_palette_add_action(struct md3_command_palette *palette,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_command_palette_open function. */
 ui_error_t md3_command_palette_open(struct md3_command_palette *palette) {
   if (!palette) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -1539,6 +1589,7 @@ ui_error_t md3_command_palette_open(struct md3_command_palette *palette) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_command_palette_close function. */
 ui_error_t md3_command_palette_close(struct md3_command_palette *palette) {
   if (!palette) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -1548,6 +1599,7 @@ ui_error_t md3_command_palette_close(struct md3_command_palette *palette) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_command_palette_is_open function. */
 ui_error_t
 md3_command_palette_is_open(const struct md3_command_palette *palette,
                             int *out_is_open) {

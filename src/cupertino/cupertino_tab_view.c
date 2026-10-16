@@ -10,6 +10,7 @@
 #include <string.h>
 /* clang-format on */
 
+/** @brief cupertino_tab_view_create function. */
 ui_error_t
 cupertino_tab_view_create(struct ui_engine *engine,
                           const struct cupertino_tab_view_descriptor *desc,
@@ -44,6 +45,7 @@ cupertino_tab_view_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_tab_view_destroy function. */
 ui_error_t cupertino_tab_view_destroy(struct cupertino_tab_view *view) {
   if (!view) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -52,6 +54,7 @@ ui_error_t cupertino_tab_view_destroy(struct cupertino_tab_view *view) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_tab_view_push function. */
 ui_error_t cupertino_tab_view_push(struct cupertino_tab_view *view,
                                    struct ui_component *component,
                                    const char *title) {
@@ -84,6 +87,7 @@ ui_error_t cupertino_tab_view_push(struct cupertino_tab_view *view,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_tab_view_pop function. */
 ui_error_t cupertino_tab_view_pop(struct cupertino_tab_view *view,
                                   struct ui_component **out_popped) {
   if (!view) {
@@ -103,6 +107,7 @@ ui_error_t cupertino_tab_view_pop(struct cupertino_tab_view *view,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_tab_view_pop_to_root function. */
 ui_error_t cupertino_tab_view_pop_to_root(struct cupertino_tab_view *view) {
   size_t i;
 
@@ -118,6 +123,7 @@ ui_error_t cupertino_tab_view_pop_to_root(struct cupertino_tab_view *view) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_tab_view_get_stack_depth function. */
 ui_error_t
 cupertino_tab_view_get_stack_depth(const struct cupertino_tab_view *view,
                                    size_t *out_depth) {
@@ -128,6 +134,7 @@ cupertino_tab_view_get_stack_depth(const struct cupertino_tab_view *view,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_tab_view_get_current_view function. */
 ui_error_t
 cupertino_tab_view_get_current_view(const struct cupertino_tab_view *view,
                                     struct ui_component **out_component) {
@@ -138,6 +145,7 @@ cupertino_tab_view_get_current_view(const struct cupertino_tab_view *view,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_tab_view_get_current_title function. */
 ui_error_t
 cupertino_tab_view_get_current_title(const struct cupertino_tab_view *view,
                                      const char **out_title) {
@@ -148,6 +156,7 @@ cupertino_tab_view_get_current_title(const struct cupertino_tab_view *view,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_tab_view_set_scroll_offset function. */
 ui_error_t cupertino_tab_view_set_scroll_offset(struct cupertino_tab_view *view,
                                                 float offset) {
   if (!view) {
@@ -157,6 +166,7 @@ ui_error_t cupertino_tab_view_set_scroll_offset(struct cupertino_tab_view *view,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_tab_view_get_scroll_offset function. */
 ui_error_t
 cupertino_tab_view_get_scroll_offset(const struct cupertino_tab_view *view,
                                      float *out_offset) {
@@ -167,6 +177,7 @@ cupertino_tab_view_get_scroll_offset(const struct cupertino_tab_view *view,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_tab_view_handle_tab_tap function. */
 ui_error_t cupertino_tab_view_handle_tab_tap(struct cupertino_tab_view *view,
                                              int *out_did_scroll_to_top) {
   if (!view || !out_did_scroll_to_top) {

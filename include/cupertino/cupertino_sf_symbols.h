@@ -14,10 +14,11 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
+/** @brief CUPERTINO_SYMBOL_MAX_LAYERS constant. */
 #define CUPERTINO_SYMBOL_MAX_LAYERS 3
 
 /**

@@ -5,6 +5,8 @@
 #include "ui_css_content.h"
 /* clang-format on */
 
+extern ui_error_t run_content_coverage(void);
+
 extern int g_malloc_fail_countdown;
 
 static int test_parse_content_none_normal(void) {
@@ -106,13 +108,17 @@ static int test_parse_content_functions(void) {
   /* Very long url */
   {
     char long_url[1024];
-    char css_str[620];
+    char css_str[1200];
     int i;
     for (i = 0; i < 550; i++) {
       long_url[i] = 'a';
     }
     long_url[550] = '\0';
+#if defined(_MSC_VER)
+    sprintf_s(css_str, sizeof(css_str), "url(%s)", long_url);
+#else
     sprintf(css_str, "url(%s)", long_url);
+#endif
     if (ui_css_parse_content(css_str, &c) != UI_ERROR_PARSE_FAILED)
       return __LINE__;
     {
@@ -305,7 +311,7 @@ static int test_parse_content_oom(void) {
 static int test_parse_content_long(void) {
   struct ui_css_content c;
   char long_str[1024];
-  char css_str[620];
+  char css_str[1200];
   int i;
   for (i = 0; i < 550; i++) {
     long_str[i] = 'a';
@@ -313,7 +319,11 @@ static int test_parse_content_long(void) {
   long_str[550] = '\0';
 
   /* string */
+#if defined(_MSC_VER)
+  sprintf_s(css_str, sizeof(css_str), "\"%s\"", long_str);
+#else
   sprintf(css_str, "\"%s\"", long_str);
+#endif
   if (ui_css_parse_content(css_str, &c) != UI_ERROR_NONE)
     return __LINE__;
   {
@@ -322,7 +332,11 @@ static int test_parse_content_long(void) {
   }
 
   /* ident in attr */
+#if defined(_MSC_VER)
+  sprintf_s(css_str, sizeof(css_str), "attr(%s)", long_str);
+#else
   sprintf(css_str, "attr(%s)", long_str);
+#endif
   if (ui_css_parse_content(css_str, &c) != UI_ERROR_NONE)
     return __LINE__;
   {
@@ -331,7 +345,11 @@ static int test_parse_content_long(void) {
   }
 
   /* escape at end of max len */
+#if defined(_MSC_VER)
+  sprintf_s(css_str, sizeof(css_str), "\"%s\\\"\"", long_str);
+#else
   sprintf(css_str, "\"%s\\\"\"", long_str);
+#endif
   if (ui_css_parse_content(css_str, &c) != UI_ERROR_NONE)
     return __LINE__;
   {
@@ -346,10 +364,7 @@ int main(void) {
   int failures = 0;
 
 #ifdef UI_TEST_MOCK_ALLOC
-  {
-    extern ui_error_t run_content_coverage(void);
-    run_content_coverage();
-  }
+  { run_content_coverage(); }
 #endif
 
   {

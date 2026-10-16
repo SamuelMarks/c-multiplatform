@@ -10,6 +10,10 @@
 #include <math.h>
 /* clang-format on */
 
+extern int g_malloc_fail_countdown;
+extern int g_cupertino_segmented_control_mock_base_destroy_fail;
+extern int g_cupertino_segmented_control_mock_button_destroy_fail;
+
 SUITE(cupertino_segmented_control_suite);
 
 TEST test_segmented_control_lifecycle_and_cva(void) {
@@ -157,9 +161,6 @@ TEST test_segmented_control_oom_mock(void) {
   ui_error_t rc;
 
 #ifdef UI_TEST_MOCK_ALLOC
-  extern int g_malloc_fail_countdown;
-  extern int g_cupertino_segmented_control_mock_base_destroy_fail;
-  extern int g_cupertino_segmented_control_mock_button_destroy_fail;
 
   g_malloc_fail_countdown = 0;
   rc = cupertino_segmented_control_create(dummy_engine, &control, NULL);

@@ -15,7 +15,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 /**
  * @def MD3_SHAPE_MAX_VERTICES
@@ -80,9 +80,11 @@ struct md3_shape_vertex {
  * @brief Definition of a polygonal shape for morphing.
  */
 struct md3_shape {
-  enum md3_expressive_shape_type type;
-  size_t vertex_count;
-  struct md3_shape_vertex vertices[MD3_SHAPE_MAX_VERTICES];
+  enum md3_expressive_shape_type type; /**< type field. */
+  size_t vertex_count;                 /**< vertex_count field. */
+  struct md3_shape_vertex
+      vertices[MD3_SHAPE_MAX_VERTICES]; /**< vertices[MD3_SHAPE_MAX_VERTICES]
+                                           field. */
 };
 
 /**

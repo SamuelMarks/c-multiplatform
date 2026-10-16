@@ -147,6 +147,7 @@ static ui_error_t timepicker_cva_set_disabled_state(void *component,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_timepicker_base_create function. */
 ui_error_t
 ui_timepicker_base_create(struct ui_timepicker_base **out_timepicker,
                           struct ui_control_value_accessor *out_cva) {
@@ -187,6 +188,7 @@ cleanup:
   return rc;
 }
 
+/** @brief ui_timepicker_base_destroy function. */
 ui_error_t ui_timepicker_base_destroy(struct ui_timepicker_base *timepicker) {
   if (!timepicker) {
     return UI_ERROR_NONE;
@@ -195,6 +197,7 @@ ui_error_t ui_timepicker_base_destroy(struct ui_timepicker_base *timepicker) {
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_timepicker_base_set_time function. */
 ui_error_t ui_timepicker_base_set_time(struct ui_timepicker_base *timepicker,
                                        int hour, int minute) {
   if (!timepicker) {
@@ -225,6 +228,7 @@ ui_error_t ui_timepicker_base_set_time(struct ui_timepicker_base *timepicker,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_timepicker_base_get_time function. */
 ui_error_t
 ui_timepicker_base_get_time(const struct ui_timepicker_base *timepicker,
                             int *out_hour, int *out_minute) {
@@ -238,6 +242,7 @@ ui_timepicker_base_get_time(const struct ui_timepicker_base *timepicker,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_timepicker_base_get_formatted_time function. */
 ui_error_t ui_timepicker_base_get_formatted_time(
     const struct ui_timepicker_base *timepicker, int *out_hour, int *out_minute,
     enum ui_timepicker_period *out_period) {
@@ -269,6 +274,7 @@ ui_error_t ui_timepicker_base_get_formatted_time(
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_timepicker_base_set_format function. */
 ui_error_t ui_timepicker_base_set_format(struct ui_timepicker_base *timepicker,
                                          enum ui_timepicker_format format) {
   if (!timepicker) {
@@ -278,6 +284,7 @@ ui_error_t ui_timepicker_base_set_format(struct ui_timepicker_base *timepicker,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_timepicker_base_get_format function. */
 ui_error_t
 ui_timepicker_base_get_format(const struct ui_timepicker_base *timepicker,
                               enum ui_timepicker_format *out_format) {
@@ -313,6 +320,7 @@ mock_timepicker_get_formatted_time(const struct ui_timepicker_base *tp, int *h,
 /** @endcond */
 #endif
 
+/** @brief ui_timepicker_base_get_time_string function. */
 ui_error_t
 ui_timepicker_base_get_time_string(const struct ui_timepicker_base *timepicker,
                                    char **out_string) {

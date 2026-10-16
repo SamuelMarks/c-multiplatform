@@ -71,135 +71,144 @@ TEST run_normal_tests(void) {
   ASSERT_EQ(UI_ERROR_NONE, ui_dom_node_append_child(shadow_root, btn_node));
 
   /* Add another node to test scoping without trailing spaces */
-  struct ui_dom_node *btn2_node;
-  ASSERT_EQ(UI_ERROR_NONE,
-            ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &btn2_node));
-  ASSERT_EQ(UI_ERROR_NONE, ui_dom_node_set_tag_name(btn2_node, "button"));
-  ASSERT_EQ(UI_ERROR_NONE,
-            ui_dom_node_set_attribute(btn2_node, "class", "btn btn-secondary"));
-  ASSERT_EQ(UI_ERROR_NONE, ui_dom_node_append_child(shadow_root, btn2_node));
-
-  /* Add a matching rule to internal style and a non-class rule */
-  ASSERT_EQ(UI_ERROR_NONE,
-            ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &btn_rule));
-  ASSERT_EQ(UI_ERROR_NONE, ui_css_rule_append_selector(
-                               btn_rule, UI_CSS_SELECTOR_TYPE_CLASS, "btn"));
-  ASSERT_EQ(UI_ERROR_NONE,
-            ui_css_rule_append_declaration(btn_rule, "color", "blue", 0));
-  ASSERT_EQ(UI_ERROR_NONE, ui_css_stylesheet_append_rule(style, btn_rule));
-
-  struct ui_css_rule *tag_rule;
-  ASSERT_EQ(UI_ERROR_NONE,
-            ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &tag_rule));
-  ASSERT_EQ(UI_ERROR_NONE, ui_css_rule_append_selector(
-                               tag_rule, UI_CSS_SELECTOR_TYPE_TAG, "button"));
-  ASSERT_EQ(UI_ERROR_NONE, ui_css_stylesheet_append_rule(style, tag_rule));
-
-  /* Apply Scoped CSS encapsulation */
-  rc = ui_component_scope_styles(comp);
-  ASSERT_EQ(UI_ERROR_NONE, rc);
-
-  /* Create an empty component and scope to test NULL properties branches */
-  struct ui_component *empty_comp;
-  ASSERT_EQ(UI_ERROR_NONE, ui_component_create(&empty_comp));
-  ASSERT_EQ(UI_ERROR_NONE, ui_component_scope_styles(empty_comp));
-  ASSERT_EQ(UI_ERROR_NONE, ui_component_destroy(empty_comp));
-
-  /* Try to scope again (should return INVALID_ARGUMENT because already scoped)
-   */
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, ui_component_scope_styles(comp));
-
-  /* Test Property Binding */
-  rc = ui_component_set_property(comp, "--primary-color", "#f00");
-  ASSERT_EQ(UI_ERROR_NONE, rc);
-
-  /* Test Property Binding when it already exists */
-  rc = ui_component_set_property(comp, "--secondary-color", "#0f0");
-  ASSERT_EQ(UI_ERROR_NONE, rc);
-
-  ASSERT(comp->bound_properties != NULL);
-  ASSERT(comp->bound_properties->rules != NULL);
-  ASSERT(comp->bound_properties->rules->declarations != NULL);
-
-  /* Check that both properties are present */
   {
-    struct ui_css_declaration *decl =
-        comp->bound_properties->rules->declarations;
-    int found_primary = 0;
-    int found_secondary = 0;
+    struct ui_dom_node *btn2_node;
+    ASSERT_EQ(UI_ERROR_NONE,
+              ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &btn2_node));
+    ASSERT_EQ(UI_ERROR_NONE, ui_dom_node_set_tag_name(btn2_node, "button"));
+    ASSERT_EQ(UI_ERROR_NONE, ui_dom_node_set_attribute(btn2_node, "class",
+                                                       "btn btn-secondary"));
+    ASSERT_EQ(UI_ERROR_NONE, ui_dom_node_append_child(shadow_root, btn2_node));
 
-    while (decl) {
-      if (strcmp(decl->property_name, "--primary-color") == 0 &&
-          strcmp(decl->property_value, "#f00") == 0) {
-        found_primary = 1;
+    /* Add a matching rule to internal style and a non-class rule */
+    ASSERT_EQ(UI_ERROR_NONE,
+              ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &btn_rule));
+    ASSERT_EQ(UI_ERROR_NONE, ui_css_rule_append_selector(
+                                 btn_rule, UI_CSS_SELECTOR_TYPE_CLASS, "btn"));
+    ASSERT_EQ(UI_ERROR_NONE,
+              ui_css_rule_append_declaration(btn_rule, "color", "blue", 0));
+    ASSERT_EQ(UI_ERROR_NONE, ui_css_stylesheet_append_rule(style, btn_rule));
+
+    {
+      struct ui_css_rule *tag_rule;
+      ASSERT_EQ(UI_ERROR_NONE,
+                ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &tag_rule));
+      ASSERT_EQ(UI_ERROR_NONE,
+                ui_css_rule_append_selector(tag_rule, UI_CSS_SELECTOR_TYPE_TAG,
+                                            "button"));
+      ASSERT_EQ(UI_ERROR_NONE, ui_css_stylesheet_append_rule(style, tag_rule));
+
+      /* Apply Scoped CSS encapsulation */
+      rc = ui_component_scope_styles(comp);
+      ASSERT_EQ(UI_ERROR_NONE, rc);
+
+      /* Create an empty component and scope to test NULL properties branches */
+      {
+        struct ui_component *empty_comp;
+        ASSERT_EQ(UI_ERROR_NONE, ui_component_create(&empty_comp));
+        ASSERT_EQ(UI_ERROR_NONE, ui_component_scope_styles(empty_comp));
+        ASSERT_EQ(UI_ERROR_NONE, ui_component_destroy(empty_comp));
+
+        /* Try to scope again (should return INVALID_ARGUMENT because already
+         * scoped)
+         */
+        ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, ui_component_scope_styles(comp));
+
+        /* Test Property Binding */
+        rc = ui_component_set_property(comp, "--primary-color", "#f00");
+        ASSERT_EQ(UI_ERROR_NONE, rc);
+
+        /* Test Property Binding when it already exists */
+        rc = ui_component_set_property(comp, "--secondary-color", "#0f0");
+        ASSERT_EQ(UI_ERROR_NONE, rc);
+
+        ASSERT(comp->bound_properties != NULL);
+        ASSERT(comp->bound_properties->rules != NULL);
+        ASSERT(comp->bound_properties->rules->declarations != NULL);
+
+        /* Check that both properties are present */
+        {
+          struct ui_css_declaration *decl =
+              comp->bound_properties->rules->declarations;
+          int found_primary = 0;
+          int found_secondary = 0;
+
+          while (decl) {
+            if (strcmp(decl->property_name, "--primary-color") == 0 &&
+                strcmp(decl->property_value, "#f00") == 0) {
+              found_primary = 1;
+            }
+            if (strcmp(decl->property_name, "--secondary-color") == 0 &&
+                strcmp(decl->property_value, "#0f0") == 0) {
+              found_secondary = 1;
+            }
+            decl = decl->next;
+          }
+          ASSERT(found_primary && found_secondary);
+        }
+
+        ASSERT(comp->scope_id != NULL);
+
+        /* Verify DOM node class rewriting */
+        ASSERT_EQ(UI_ERROR_NONE,
+                  ui_dom_node_get_attribute(btn_node, "class", &scoped_class));
+        ASSERT(scoped_class != NULL);
+        ASSERT(strstr(scoped_class, comp->scope_id) != NULL);
+
+        /* Verify internal rule rewriting */
+        ASSERT(style->rules != NULL);
+        ASSERT(style->rules->selectors != NULL);
+        ASSERT(strstr(style->rules->selectors->value, comp->scope_id) != NULL);
+
+        rc = ui_component_mount(comp, host_node);
+        ASSERT_EQ(UI_ERROR_NONE, rc);
+
+        ASSERT_EQ(host_node, comp->host_node);
+
+        /* Destroying component should destroy its opaque DOM/style trees */
+        ASSERT_EQ(UI_ERROR_NONE, ui_component_destroy(comp));
+
+        /* Clean up host node manually as it sits outside the component */
+        {
+          ui_error_t rc_cleanup = ui_dom_node_destroy(host_node);
+          ASSERT_EQ(UI_ERROR_NONE, rc_cleanup);
+        }
+
+        /* 2. Test Invalid Arguments */
+        ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, ui_component_create(NULL));
+
+        /* Just call destroy on NULL to ensure it doesn't crash */
+        ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, ui_component_destroy(NULL));
+
+        ASSERT_EQ(UI_ERROR_NONE, ui_component_create(&comp));
+        ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+                  ui_component_mount(NULL, host_node));
+        ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, ui_component_mount(comp, NULL));
+
+        ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+                  ui_component_set_default_style(NULL, style));
+        ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+                  ui_component_set_default_style(comp, NULL));
+
+        ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+                  ui_component_inject_style_override(NULL, ".x{}"));
+        ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+                  ui_component_inject_style_override(comp, NULL));
+
+        ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+                  ui_component_set_property(NULL, "--x", "1"));
+        ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+                  ui_component_set_property(comp, NULL, "1"));
+        ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+                  ui_component_set_property(comp, "--x", NULL));
+
+        ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, ui_component_scope_styles(NULL));
+
+        ASSERT_EQ(UI_ERROR_NONE, ui_component_destroy(comp));
+        PASS();
       }
-      if (strcmp(decl->property_name, "--secondary-color") == 0 &&
-          strcmp(decl->property_value, "#0f0") == 0) {
-        found_secondary = 1;
-      }
-      decl = decl->next;
     }
-    ASSERT(found_primary && found_secondary);
   }
-
-  ASSERT(comp->scope_id != NULL);
-
-  /* Verify DOM node class rewriting */
-  ASSERT_EQ(UI_ERROR_NONE,
-            ui_dom_node_get_attribute(btn_node, "class", &scoped_class));
-  ASSERT(scoped_class != NULL);
-  ASSERT(strstr(scoped_class, comp->scope_id) != NULL);
-
-  /* Verify internal rule rewriting */
-  ASSERT(style->rules != NULL);
-  ASSERT(style->rules->selectors != NULL);
-  ASSERT(strstr(style->rules->selectors->value, comp->scope_id) != NULL);
-
-  rc = ui_component_mount(comp, host_node);
-  ASSERT_EQ(UI_ERROR_NONE, rc);
-
-  ASSERT_EQ(host_node, comp->host_node);
-
-  /* Destroying component should destroy its opaque DOM/style trees */
-  ASSERT_EQ(UI_ERROR_NONE, ui_component_destroy(comp));
-
-  /* Clean up host node manually as it sits outside the component */
-  {
-    ui_error_t rc_cleanup = ui_dom_node_destroy(host_node);
-    ASSERT_EQ(UI_ERROR_NONE, rc_cleanup);
-  }
-
-  /* 2. Test Invalid Arguments */
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, ui_component_create(NULL));
-
-  /* Just call destroy on NULL to ensure it doesn't crash */
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, ui_component_destroy(NULL));
-
-  ASSERT_EQ(UI_ERROR_NONE, ui_component_create(&comp));
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, ui_component_mount(NULL, host_node));
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, ui_component_mount(comp, NULL));
-
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
-            ui_component_set_default_style(NULL, style));
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
-            ui_component_set_default_style(comp, NULL));
-
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
-            ui_component_inject_style_override(NULL, ".x{}"));
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
-            ui_component_inject_style_override(comp, NULL));
-
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
-            ui_component_set_property(NULL, "--x", "1"));
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
-            ui_component_set_property(comp, NULL, "1"));
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
-            ui_component_set_property(comp, "--x", NULL));
-
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, ui_component_scope_styles(NULL));
-
-  ASSERT_EQ(UI_ERROR_NONE, ui_component_destroy(comp));
-  PASS();
 }
 
 TEST run_oom_tests(void) {

@@ -87,6 +87,7 @@ struct ui_timer {
 #endif
 };
 
+/** @brief ui_timer_create_custom function. */
 ui_error_t ui_timer_create_custom(const struct ui_timer_config *config,
                                   struct ui_timer **out_timer) {
   struct ui_timer *timer = NULL;
@@ -111,6 +112,7 @@ ui_error_t ui_timer_create_custom(const struct ui_timer_config *config,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_timer_create_monotonic function. */
 ui_error_t ui_timer_create_monotonic(struct ui_timer **out_timer) {
   struct ui_timer *timer = NULL;
 
@@ -138,6 +140,7 @@ ui_error_t ui_timer_create_monotonic(struct ui_timer **out_timer) {
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_timer_destroy function. */
 ui_error_t ui_timer_destroy(struct ui_timer *timer) {
   if (!timer) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -147,6 +150,7 @@ ui_error_t ui_timer_destroy(struct ui_timer *timer) {
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_timer_now function. */
 ui_error_t ui_timer_now(struct ui_timer *timer, double *out_time_secs) {
   if (!timer || !out_time_secs) {
     return UI_ERROR_INVALID_ARGUMENT;

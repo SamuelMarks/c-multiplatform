@@ -38,7 +38,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
@@ -51,12 +51,12 @@ struct ui_engine;
  * @brief Material 3 Expansion Panel component.
  */
 struct md3_expansion_panel {
-  struct ui_disclosure_base *base;
-  int is_expanded;
-  int is_disabled;
-  char title[128];
-  char subtitle[128];
-  float elevation;
+  struct ui_disclosure_base *base; /**< base field. */
+  int is_expanded;                 /**< is_expanded field. */
+  int is_disabled;                 /**< is_disabled field. */
+  char title[128];                 /**< title[128] field. */
+  char subtitle[128];              /**< subtitle[128] field. */
+  float elevation;                 /**< elevation field. */
 };
 
 /**
@@ -64,10 +64,10 @@ struct md3_expansion_panel {
  * @brief Material 3 Accordion container managing expansion panels.
  */
 struct md3_accordion {
-  struct ui_accordion_base *base;
-  int multi_expand;
-  struct md3_expansion_panel *panels[32];
-  size_t panel_count;
+  struct ui_accordion_base *base;         /**< base field. */
+  int multi_expand;                       /**< multi_expand field. */
+  struct md3_expansion_panel *panels[32]; /**< panels[32] field. */
+  size_t panel_count;                     /**< panel_count field. */
 };
 
 /**
@@ -158,9 +158,9 @@ extern C_MULTIPLATFORM_EXPORT ui_error_t md3_expansion_panel_set_title(
  * @brief A single tile in a Material 3 Grid List.
  */
 struct md3_grid_tile {
-  int rowspan;
-  int colspan;
-  char title[64];
+  int rowspan;    /**< rowspan field. */
+  int colspan;    /**< colspan field. */
+  char title[64]; /**< title[64] field. */
 };
 
 /**
@@ -168,11 +168,11 @@ struct md3_grid_tile {
  * @brief Material 3 Grid List component.
  */
 struct md3_grid_list {
-  struct ui_grid_list_base *base;
-  int columns;
-  float gutter;
-  struct md3_grid_tile tiles[64];
-  size_t tile_count;
+  struct ui_grid_list_base *base; /**< base field. */
+  int columns;                    /**< columns field. */
+  float gutter;                   /**< gutter field. */
+  struct md3_grid_tile tiles[64]; /**< tiles[64] field. */
+  size_t tile_count;              /**< tile_count field. */
 };
 
 /**
@@ -233,11 +233,11 @@ enum md3_surface_role {
  * @brief Material 3 Surface / Paper canvas container.
  */
 struct md3_surface {
-  struct ui_surface_base *base;
-  enum md3_surface_role role;
-  int elevation_level;
-  float corner_radius;
-  int has_outline;
+  struct ui_surface_base *base; /**< base field. */
+  enum md3_surface_role role;   /**< role field. */
+  int elevation_level;          /**< elevation_level field. */
+  float corner_radius;          /**< corner_radius field. */
+  int has_outline;              /**< has_outline field. */
 };
 
 /**
@@ -281,12 +281,12 @@ md3_surface_set_elevation(struct md3_surface *surface, int elevation_level);
  * @brief Material 3 Avatar component.
  */
 struct md3_avatar {
-  struct ui_avatar_base *base;
-  enum ui_avatar_type type;
-  float size_dp;
-  char name[64];
-  char initials[8];
-  char image_url[256];
+  struct ui_avatar_base *base; /**< base field. */
+  enum ui_avatar_type type;    /**< type field. */
+  float size_dp;               /**< size_dp field. */
+  char name[64];               /**< name[64] field. */
+  char initials[8];            /**< initials[8] field. */
+  char image_url[256];         /**< image_url[256] field. */
 };
 
 /**
@@ -294,10 +294,10 @@ struct md3_avatar {
  * @brief Material 3 Avatar Group container.
  */
 struct md3_avatar_group {
-  struct ui_avatar_group_base *base;
-  int max_visible;
-  struct md3_avatar *avatars[32];
-  size_t avatar_count;
+  struct ui_avatar_group_base *base; /**< base field. */
+  int max_visible;                   /**< max_visible field. */
+  struct md3_avatar *avatars[32];    /**< avatars[32] field. */
+  size_t avatar_count;               /**< avatar_count field. */
 };
 
 /**
@@ -381,9 +381,9 @@ extern C_MULTIPLATFORM_EXPORT ui_error_t md3_avatar_group_append(
  * @brief Material 3 Swipe Action container for list items and cards.
  */
 struct md3_swipe_action {
-  struct ui_swipe_action_base base;
-  float threshold_ratio;
-  int is_dismissed;
+  struct ui_swipe_action_base base; /**< base field. */
+  float threshold_ratio;            /**< threshold_ratio field. */
+  int is_dismissed;                 /**< is_dismissed field. */
 };
 
 /**
@@ -444,12 +444,12 @@ enum md3_skeleton_variant {
  * @brief Material 3 Shimmer Skeleton Placeholder component.
  */
 struct md3_skeleton {
-  struct ui_skeleton_base *base;
-  enum md3_skeleton_variant variant;
-  float width;
-  float height;
-  float shimmer_duration_ms;
-  int is_reduced_motion;
+  struct ui_skeleton_base *base;     /**< base field. */
+  enum md3_skeleton_variant variant; /**< variant field. */
+  float width;                       /**< width field. */
+  float height;                      /**< height field. */
+  float shimmer_duration_ms;         /**< shimmer_duration_ms field. */
+  int is_reduced_motion;             /**< is_reduced_motion field. */
 };
 
 /**
@@ -493,10 +493,10 @@ md3_skeleton_set_size(struct md3_skeleton *skeleton, float width, float height);
  * @brief Material 3 Empty State layout container.
  */
 struct md3_empty_state {
-  struct ui_empty_state_base *base;
-  char title[128];
-  char description[256];
-  char primary_action_label[64];
+  struct ui_empty_state_base *base; /**< base field. */
+  char title[128];                  /**< title[128] field. */
+  char description[256];            /**< description[256] field. */
+  char primary_action_label[64];    /**< primary_action_label[64] field. */
 };
 
 /**
@@ -539,9 +539,9 @@ md3_empty_state_set_content(struct md3_empty_state *empty_state,
  * @brief Material 3 Multi-column dynamic Masonry card layout.
  */
 struct md3_masonry_layout {
-  struct ui_masonry_layout_base *base;
-  int columns;
-  float gutter_dp;
+  struct ui_masonry_layout_base *base; /**< base field. */
+  int columns;                         /**< columns field. */
+  float gutter_dp;                     /**< gutter_dp field. */
 };
 
 /**
@@ -583,8 +583,8 @@ md3_masonry_layout_reflow(struct md3_masonry_layout *masonry);
  * @brief Material 3 Strict Aspect Ratio container.
  */
 struct md3_aspect_ratio {
-  struct ui_aspect_ratio_base *base;
-  float ratio;
+  struct ui_aspect_ratio_base *base; /**< base field. */
+  float ratio;                       /**< ratio field. */
 };
 
 /**

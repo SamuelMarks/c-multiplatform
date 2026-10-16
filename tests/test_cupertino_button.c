@@ -9,6 +9,10 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_cupertino_button_mock_set_text_fail;
+extern int g_cupertino_button_mock_set_disabled_fail;
+extern int g_cupertino_button_mock_destroy_fail;
+
 #ifdef UI_TEST_MOCK_ALLOC
 extern int g_malloc_fail_countdown;
 #endif
@@ -145,9 +149,6 @@ TEST test_button_oom_mock(void) {
   desc.text = "OOM Test";
 
 #ifdef UI_TEST_MOCK_ALLOC
-  extern int g_cupertino_button_mock_set_text_fail;
-  extern int g_cupertino_button_mock_set_disabled_fail;
-  extern int g_cupertino_button_mock_destroy_fail;
 
   g_malloc_fail_countdown = 0;
   rc = cupertino_button_create(dummy_engine, &desc, &button);

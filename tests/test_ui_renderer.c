@@ -4,6 +4,10 @@
 #include <stdlib.h>
 /* clang-format on */
 
+extern int g_native_init_fail;
+extern int g_gles_init_fail;
+extern int g_malloc_fail_countdown;
+
 static ui_error_t mock_destroy_fail(void *ctx) {
   if (ctx) {
     return UI_ERROR_UNKNOWN;
@@ -23,9 +27,23 @@ int main(void) {
   test_ui_renderer_oom_fallback_error();
   test_ui_renderer_oom_real();
 #ifdef _WIN32
-  if (getenv("WINELOADER") != NULL) {
-    printf("Skipping ui_renderer tests under Wine CI to avoid pipe hangs.\n");
-    return 0;
+  {
+    char *wine_env = NULL;
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+    size_t wine_len = 0;
+    if (_dupenv_s(&wine_env, &wine_len, "WINELOADER") == 0 &&
+        wine_env != NULL) {
+      free(wine_env);
+      printf("Skipping ui_renderer tests under Wine CI to avoid pipe hangs.\n");
+      return 0;
+    }
+#else
+    wine_env = getenv("WINELOADER");
+    if (wine_env != NULL) {
+      printf("Skipping ui_renderer tests under Wine CI to avoid pipe hangs.\n");
+      return 0;
+    }
+#endif
   }
 #endif
 
@@ -185,8 +203,8 @@ int main(void) {
     struct ui_renderer gles_renderer;
     struct ui_rect rect;
     struct ui_color color;
-    struct ui_css_image gradient;
-    struct ui_path path;
+    struct ui_css_image gradient = {0};
+    struct ui_path path = {0};
 
     rect.x = 0;
     rect.y = 0;
@@ -275,7 +293,6 @@ int main(void) {
 
 void test_ui_renderer_oom_fallback(void) {
   struct ui_renderer *renderer;
-  extern int g_native_init_fail;
   g_native_init_fail = 1;
   ui_renderer_create(&renderer);
   g_native_init_fail = 0;
@@ -283,8 +300,6 @@ void test_ui_renderer_oom_fallback(void) {
 
 void test_ui_renderer_oom_fallback_error(void) {
   struct ui_renderer *renderer;
-  extern int g_native_init_fail;
-  extern int g_gles_init_fail;
   g_native_init_fail = 1;
   g_gles_init_fail = 1;
   ui_renderer_create(&renderer);
@@ -292,7 +307,6 @@ void test_ui_renderer_oom_fallback_error(void) {
   g_gles_init_fail = 0;
 }
 void test_ui_renderer_oom_real(void) {
-  extern int g_malloc_fail_countdown;
   struct ui_renderer *renderer;
   g_malloc_fail_countdown = 0;
   ui_renderer_create(&renderer);

@@ -44,6 +44,7 @@ struct ui_tray_manager {
 #endif
 };
 
+/** @brief ui_tray_manager_create function. */
 ui_error_t ui_tray_manager_create(struct ui_tray_manager **out_tray) {
   struct ui_tray_manager *tray = NULL;
 
@@ -65,6 +66,7 @@ ui_error_t ui_tray_manager_create(struct ui_tray_manager **out_tray) {
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_tray_manager_destroy function. */
 ui_error_t ui_tray_manager_destroy(struct ui_tray_manager *tray) {
   ui_error_t rc = UI_ERROR_NONE;
   if (!tray) {
@@ -79,6 +81,7 @@ ui_error_t ui_tray_manager_destroy(struct ui_tray_manager *tray) {
   return rc;
 }
 
+/** @brief ui_tray_manager_set_icon function. */
 ui_error_t ui_tray_manager_set_icon(struct ui_tray_manager *tray,
                                     struct ui_image_base *image) {
   if (!tray || !image) {
@@ -90,6 +93,7 @@ ui_error_t ui_tray_manager_set_icon(struct ui_tray_manager *tray,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_tray_manager_set_tooltip function. */
 ui_error_t ui_tray_manager_set_tooltip(struct ui_tray_manager *tray,
                                        const char *tooltip) {
   if (!tray || !tooltip) {
@@ -107,6 +111,7 @@ ui_error_t ui_tray_manager_set_tooltip(struct ui_tray_manager *tray,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_tray_manager_set_context_menu function. */
 ui_error_t ui_tray_manager_set_context_menu(struct ui_tray_manager *tray,
                                             struct ui_menu_base *menu) {
   if (!tray || !menu) {
@@ -118,6 +123,7 @@ ui_error_t ui_tray_manager_set_context_menu(struct ui_tray_manager *tray,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_tray_manager_show function. */
 ui_error_t ui_tray_manager_show(struct ui_tray_manager *tray) {
   if (!tray) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -135,6 +141,7 @@ ui_error_t ui_tray_manager_show(struct ui_tray_manager *tray) {
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_tray_manager_hide function. */
 ui_error_t ui_tray_manager_hide(struct ui_tray_manager *tray) {
   if (!tray) {
     return UI_ERROR_INVALID_ARGUMENT;

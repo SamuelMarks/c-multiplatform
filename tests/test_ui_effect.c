@@ -24,6 +24,8 @@ static ui_error_t mock_graph_set(struct ui_reactive_node *n, struct ui_reactive_
 extern int g_malloc_fail_countdown;
 
 static ui_error_t failing_effect(void *user_data) {
+  if (sizeof(user_data) == 0) {
+  }
   return UI_ERROR_INVALID_ARGUMENT;
 }
 static ui_error_t dummy_effect(void *user_data) {

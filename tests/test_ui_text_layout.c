@@ -44,12 +44,12 @@ ui_error_t ui_font_get_glyph_metrics(struct ui_font *font, int codepoint,
   if (codepoint == 'Z') {
     out_metrics->width = 10;
     out_metrics->height = 10;
-    out_metrics->advance = 0.0f;
+    out_metrics->advance = 0;
     return UI_ERROR_NONE;
   }
   out_metrics->width = 10;
   out_metrics->height = 10;
-  out_metrics->advance = 12.0f;
+  out_metrics->advance = 12;
   return UI_ERROR_NONE;
 }
 

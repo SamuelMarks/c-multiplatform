@@ -70,6 +70,7 @@ struct ui_aspect_ratio_base {
   struct ui_signal *ratio_signal; /**< Optional signal for binding the ratio */
 };
 
+/** @brief ui_aspect_ratio_base_create function. */
 ui_error_t
 ui_aspect_ratio_base_create(struct ui_aspect_ratio_base **out_aspect_ratio) {
   struct ui_aspect_ratio_base *ar;
@@ -139,6 +140,7 @@ cleanup:
   return rc;
 }
 
+/** @brief ui_aspect_ratio_base_destroy function. */
 ui_error_t
 ui_aspect_ratio_base_destroy(struct ui_aspect_ratio_base *aspect_ratio) {
   ui_error_t rc = UI_ERROR_NONE;
@@ -188,6 +190,7 @@ ui_aspect_ratio_base_set_ratio(struct ui_aspect_ratio_base *aspect_ratio,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_aspect_ratio_base_get_component function. */
 ui_error_t
 ui_aspect_ratio_base_get_component(struct ui_aspect_ratio_base *aspect_ratio,
                                    struct ui_component **out_component) {
@@ -198,6 +201,7 @@ ui_aspect_ratio_base_get_component(struct ui_aspect_ratio_base *aspect_ratio,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_aspect_ratio_base_bind_ratio function. */
 ui_error_t ui_aspect_ratio_base_bind_ratio(struct ui_aspect_ratio_base *widget,
                                            struct ui_signal *signal) {
   if (!widget) {

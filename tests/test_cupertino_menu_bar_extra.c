@@ -9,6 +9,8 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_cupertino_menu_bar_extra_mock_recompute_fail;
+
 extern int g_malloc_fail_countdown;
 
 TEST test_menu_bar_extra_lifecycle(void) {
@@ -277,7 +279,6 @@ TEST test_menu_bar_extra_edge_cases(void) {
   ASSERT_EQ(UI_ERROR_NONE, rc);
 
 #ifdef UI_TEST_MOCK_ALLOC
-  extern int g_cupertino_menu_bar_extra_mock_recompute_fail;
   g_cupertino_menu_bar_extra_mock_recompute_fail = 1;
   memset(&desc, 0, sizeof(desc));
   rc = cupertino_menu_bar_extra_create(dummy_engine, &desc, &extra);

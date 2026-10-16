@@ -10,6 +10,7 @@
 #include <string.h>
 /* clang-format on */
 
+/** @brief cupertino_activity_view_create function. */
 ui_error_t cupertino_activity_view_create(
     struct ui_engine *engine,
     const struct cupertino_activity_view_descriptor *desc,
@@ -54,6 +55,7 @@ ui_error_t cupertino_activity_view_create(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_activity_view_destroy function. */
 ui_error_t
 cupertino_activity_view_destroy(struct cupertino_activity_view *view) {
   if (!view) {
@@ -63,6 +65,7 @@ cupertino_activity_view_destroy(struct cupertino_activity_view *view) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_activity_view_add_item function. */
 ui_error_t
 cupertino_activity_view_add_item(struct cupertino_activity_view *view,
                                  const struct cupertino_activity_item *item) {
@@ -97,6 +100,7 @@ cupertino_activity_view_add_item(struct cupertino_activity_view *view,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_activity_view_get_item_count function. */
 ui_error_t cupertino_activity_view_get_item_count(
     const struct cupertino_activity_view *view, size_t *out_count) {
   if (!view || !out_count) {
@@ -106,6 +110,7 @@ ui_error_t cupertino_activity_view_get_item_count(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_activity_view_get_item function. */
 ui_error_t
 cupertino_activity_view_get_item(const struct cupertino_activity_view *view,
                                  size_t index,
@@ -122,6 +127,7 @@ cupertino_activity_view_get_item(const struct cupertino_activity_view *view,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_activity_view_present function. */
 ui_error_t
 cupertino_activity_view_present(struct cupertino_activity_view *view) {
   if (!view) {
@@ -131,6 +137,7 @@ cupertino_activity_view_present(struct cupertino_activity_view *view) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_activity_view_dismiss function. */
 ui_error_t
 cupertino_activity_view_dismiss(struct cupertino_activity_view *view) {
   if (!view) {
@@ -140,6 +147,7 @@ cupertino_activity_view_dismiss(struct cupertino_activity_view *view) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_activity_view_is_open function. */
 ui_error_t
 cupertino_activity_view_is_open(const struct cupertino_activity_view *view,
                                 int *out_is_open) {
@@ -150,6 +158,7 @@ cupertino_activity_view_is_open(const struct cupertino_activity_view *view,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_activity_view_perform_activity function. */
 ui_error_t
 cupertino_activity_view_perform_activity(struct cupertino_activity_view *view,
                                          size_t index) {
@@ -173,6 +182,7 @@ cupertino_activity_view_perform_activity(struct cupertino_activity_view *view,
   return rc;
 }
 
+/** @brief cupertino_activity_view_get_last_activated_index function. */
 ui_error_t cupertino_activity_view_get_last_activated_index(
     const struct cupertino_activity_view *view, int *out_index) {
   if (!view || !out_index) {
@@ -182,6 +192,7 @@ ui_error_t cupertino_activity_view_get_last_activated_index(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_activity_view_get_share_content function. */
 ui_error_t cupertino_activity_view_get_share_content(
     const struct cupertino_activity_view *view, const char **out_text,
     const char **out_url) {

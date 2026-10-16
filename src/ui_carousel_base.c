@@ -120,6 +120,7 @@ struct ui_carousel_base {
   struct ui_computed *data_signal; /**< Optional bound data signal */
 };
 
+/** @brief ui_carousel_base_create function. */
 ui_error_t ui_carousel_base_create(struct ui_carousel_base **out_carousel,
                                    const struct ui_carousel_config *config) {
   struct ui_carousel_base *carousel;
@@ -257,6 +258,7 @@ cleanup:
   return rc;
 }
 
+/** @brief ui_carousel_base_destroy function. */
 ui_error_t ui_carousel_base_destroy(struct ui_carousel_base *carousel) {
   if (!carousel)
     return UI_ERROR_NONE;
@@ -290,6 +292,7 @@ ui_error_t ui_carousel_base_set_item_count(struct ui_carousel_base *carousel,
   return ui_virtual_scroll_base_set_item_count(carousel->virtual_scroll, count);
 }
 
+/** @brief ui_carousel_base_set_viewport_size function. */
 ui_error_t ui_carousel_base_set_viewport_size(struct ui_carousel_base *carousel,
                                               float width, float height) {
   if (!carousel)
@@ -298,6 +301,7 @@ ui_error_t ui_carousel_base_set_viewport_size(struct ui_carousel_base *carousel,
                                                   width, height);
 }
 
+/** @brief ui_carousel_base_get_component function. */
 ui_error_t ui_carousel_base_get_component(struct ui_carousel_base *carousel,
                                           struct ui_component **out_component) {
   if (!carousel || !out_component) {
@@ -307,6 +311,7 @@ ui_error_t ui_carousel_base_get_component(struct ui_carousel_base *carousel,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_carousel_base_process_event function. */
 ui_error_t ui_carousel_base_process_event(struct ui_carousel_base *carousel,
                                           const struct ui_event *event,
                                           double timestamp_ms) {
@@ -376,6 +381,7 @@ ui_error_t ui_carousel_base_process_event(struct ui_carousel_base *carousel,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_carousel_base_tick function. */
 ui_error_t ui_carousel_base_tick(struct ui_carousel_base *carousel,
                                  double timestamp_ms) {
   if (timestamp_ms > 0.0) {
@@ -432,6 +438,7 @@ ui_error_t ui_carousel_base_scroll_to_index(struct ui_carousel_base *carousel,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_carousel_base_bind_data function. */
 ui_error_t ui_carousel_base_bind_data(struct ui_carousel_base *widget,
                                       struct ui_computed *signal) {
   if (!widget) {

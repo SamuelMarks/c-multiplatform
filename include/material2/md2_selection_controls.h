@@ -19,7 +19,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 /**
  * @struct md2_checkbox
@@ -159,6 +159,6 @@ extern C_MULTIPLATFORM_EXPORT ui_error_t md2_slider_get_base(
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* MATERIAL2_MD2_SELECTION_CONTROLS_H */

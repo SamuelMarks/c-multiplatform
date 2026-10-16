@@ -10,6 +10,11 @@
 #include <math.h>
 /* clang-format on */
 
+extern int g_malloc_fail_countdown;
+extern int g_cupertino_slider_mock_set_min_fail;
+extern int g_cupertino_slider_mock_set_max_fail;
+extern int g_cupertino_slider_mock_destroy_fail;
+
 SUITE(cupertino_slider_suite);
 
 TEST test_slider_lifecycle_and_cva(void) {
@@ -140,10 +145,6 @@ TEST test_slider_oom_mock(void) {
   ui_error_t rc;
 
 #ifdef UI_TEST_MOCK_ALLOC
-  extern int g_malloc_fail_countdown;
-  extern int g_cupertino_slider_mock_set_min_fail;
-  extern int g_cupertino_slider_mock_set_max_fail;
-  extern int g_cupertino_slider_mock_destroy_fail;
 
   g_malloc_fail_countdown = 0;
   rc = cupertino_slider_create(dummy_engine, 0.0f, 100.0f, &slider, NULL);

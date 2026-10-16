@@ -131,7 +131,6 @@ TEST test_photo_picker_selection_and_filters(void) {
   int limit = 0;
   float w = 0.0f;
   float h = 0.0f;
-  int i;
   char id_buf[32];
   ui_error_t rc;
 
@@ -277,7 +276,15 @@ TEST test_photo_picker_selection_and_filters(void) {
 
   /* Exceed asset capacity */
   while (picker->asset_count < CUPERTINO_PHOTO_PICKER_MAX_ASSETS) {
-    snprintf(id_buf, sizeof(id_buf), "ID_%d", picker->asset_count);
+#if defined(_MSC_VER)
+    sprintf_s(id_buf, sizeof(id_buf), "ID_%d", picker->asset_count);
+#else
+#if defined(_MSC_VER)
+    sprintf_s(id_buf, sizeof(id_buf), "ID_%d", picker->asset_count);
+#else
+    sprintf(id_buf, "ID_%d", picker->asset_count);
+#endif
+#endif
     rc = cupertino_photo_picker_add_asset(picker, id_buf, "Asset", 0);
     ASSERT_EQ(UI_ERROR_NONE, rc);
   }

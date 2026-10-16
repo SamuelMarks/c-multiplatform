@@ -8,6 +8,8 @@
 #endif
 /* clang-format on */
 
+extern int g_malloc_fail_countdown;
+
 struct ui_reactor {
   void *head;
   void *tasks_head;
@@ -354,7 +356,6 @@ int main(void) {
   return 0;
 }
 void test_ui_reactor_oom(void) {
-  extern int g_malloc_fail_countdown;
   struct ui_reactor *reactor = NULL;
   ui_error_t rc;
 

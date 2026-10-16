@@ -47,8 +47,6 @@ static void test_missing_branches(void);
 
 static void test_colors_extended(void) {
   struct ui_css_color color;
-  struct ui_css_paint paint;
-  ui_error_t rc;
 
   /* rgba / rrggbbaa */
   rc = ui_css_parse_color("#1234", &color);
@@ -108,7 +106,6 @@ static void test_fill_stroke(void) {
   enum ui_css_stroke_linecap cap;
   enum ui_css_stroke_linejoin join;
   struct ui_css_paint paint;
-  ui_error_t rc;
 
   /* fill rule */
   rc = ui_css_parse_fill_rule(NULL, &fill_rule);
@@ -149,7 +146,6 @@ static void test_fill_stroke(void) {
 
 static void test_easing_extended(void) {
   struct ui_css_easing_function easing;
-  ui_error_t rc;
 
   rc = ui_css_parse_easing_function(NULL, &easing);
   EXPECT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
@@ -175,13 +171,11 @@ static void test_easing_extended(void) {
 
 static void test_more_branches(void) {
   struct ui_css_color color;
-  struct ui_css_paint paint;
   struct ui_css_image img;
   struct ui_css_shadow_list *shadow = NULL;
   struct ui_css_transition *trans = NULL;
   struct ui_css_animation *anim = NULL;
   struct ui_css_dasharray dash;
-  ui_error_t rc;
 
   /* rgb */
   rc = ui_css_parse_color("rgb(255 128 0)", &color);
@@ -196,172 +190,182 @@ static void test_more_branches(void) {
   EXPECT_EQ(UI_ERROR_NONE, rc);
 
   /* very long shadow */
-  char long_shadow[1024];
-  UI_STRCPY(long_shadow, 1024, "10px 10px ");
-  memset(long_shadow + 10, 'A', 200);
-  UI_STRCPY(long_shadow + 210, 1024 - 210, "px #fff");
-  if (shadow) {
-    ui_css_shadow_list_destroy(shadow);
-    shadow = NULL;
-  }
-  rc = ui_css_parse_shadow(long_shadow, &shadow);
-  /* removed check */
+  {
+    char long_shadow[1024];
+    UI_STRCPY(long_shadow, 1024, "10px 10px ");
+    memset(long_shadow + 10, 'A', 200);
+    UI_STRCPY(long_shadow + 210, 1024 - 210, "px #fff");
+    if (shadow) {
+      ui_css_shadow_list_destroy(shadow);
+      shadow = NULL;
+    }
+    rc = ui_css_parse_shadow(long_shadow, &shadow);
+    /* removed check */
 
-  if (shadow) {
-    ui_css_shadow_list_destroy(shadow);
-    shadow = NULL;
-  }
-  rc = ui_css_parse_shadow("10px 10px,   ", &shadow);
+    if (shadow) {
+      ui_css_shadow_list_destroy(shadow);
+      shadow = NULL;
+    }
+    rc = ui_css_parse_shadow("10px 10px,   ", &shadow);
 
-  /* long segment transition / animation */
-  char long_trans[1024];
-  memset(long_trans, 'a', 600);
-  UI_STRCPY(long_trans + 600, 1024 - 600, " 1s");
-  if (trans) {
-    ui_css_transition_destroy(trans);
-    trans = NULL;
-  }
-  rc = ui_css_parse_transition(long_trans, &trans);
-  /* removed check */
-  if (anim) {
-    ui_css_animation_destroy(anim);
-    anim = NULL;
-  }
-  rc = ui_css_parse_animation(long_trans, &anim);
-  /* removed check */
+    /* long segment transition / animation */
+    {
+      char long_trans[1024];
+      memset(long_trans, 'a', 600);
+      UI_STRCPY(long_trans + 600, 1024 - 600, " 1s");
+      if (trans) {
+        ui_css_transition_destroy(trans);
+        trans = NULL;
+      }
+      rc = ui_css_parse_transition(long_trans, &trans);
+      /* removed check */
+      if (anim) {
+        ui_css_animation_destroy(anim);
+        anim = NULL;
+      }
+      rc = ui_css_parse_animation(long_trans, &anim);
+      /* removed check */
 
-  char long_easing[1024];
-  UI_STRCPY(long_easing, 1024, "cubic-bezier(0.1, ");
-  memset(long_easing + 18, ' ', 100);
-  UI_STRCPY(long_easing + 118, 1024 - 118, "0.1, 0.1, 0.1)");
-  if (trans) {
-    ui_css_transition_destroy(trans);
-    trans = NULL;
-  }
-  rc = ui_css_parse_transition(long_easing, &trans);
-  if (anim) {
-    ui_css_animation_destroy(anim);
-    anim = NULL;
-  }
-  rc = ui_css_parse_animation(long_easing, &anim);
+      {
+        char long_easing[1024];
+        UI_STRCPY(long_easing, 1024, "cubic-bezier(0.1, ");
+        memset(long_easing + 18, ' ', 100);
+        UI_STRCPY(long_easing + 118, 1024 - 118, "0.1, 0.1, 0.1)");
+        if (trans) {
+          ui_css_transition_destroy(trans);
+          trans = NULL;
+        }
+        rc = ui_css_parse_transition(long_easing, &trans);
+        if (anim) {
+          ui_css_animation_destroy(anim);
+          anim = NULL;
+        }
+        rc = ui_css_parse_animation(long_easing, &anim);
 
-  /* very long filter */
-  char long_filter[1024];
-  UI_STRCPY(long_filter, 1024, "blur(");
-  memset(long_filter + 5, '1', 200);
-  UI_STRCPY(long_filter + 205, 1024 - 205, "px)");
-  struct ui_css_filter *filter = NULL;
-  if (filter) {
-    ui_css_filter_destroy(filter);
-    filter = NULL;
-  }
-  rc = ui_css_parse_filter(long_filter, &filter);
-  ui_css_filter_destroy(filter);
-  filter = NULL;
+        /* very long filter */
+        {
+          char long_filter[1024];
+          UI_STRCPY(long_filter, 1024, "blur(");
+          memset(long_filter + 5, '1', 200);
+          UI_STRCPY(long_filter + 205, 1024 - 205, "px)");
+          {
+            struct ui_css_filter *filter = NULL;
+            if (filter) {
+              ui_css_filter_destroy(filter);
+              filter = NULL;
+            }
+            rc = ui_css_parse_filter(long_filter, &filter);
+            ui_css_filter_destroy(filter);
+            filter = NULL;
 
-  /* transition / animation none */
-  if (trans) {
-    ui_css_transition_destroy(trans);
-    trans = NULL;
-  }
-  rc = ui_css_parse_transition("none", &trans);
-  EXPECT_EQ(UI_ERROR_NONE, rc);
-  if (anim) {
-    ui_css_animation_destroy(anim);
-    anim = NULL;
-  }
-  rc = ui_css_parse_animation("none", &anim);
-  EXPECT_EQ(UI_ERROR_NONE, rc);
+            /* transition / animation none */
+            if (trans) {
+              ui_css_transition_destroy(trans);
+              trans = NULL;
+            }
+            rc = ui_css_parse_transition("none", &trans);
+            EXPECT_EQ(UI_ERROR_NONE, rc);
+            if (anim) {
+              ui_css_animation_destroy(anim);
+              anim = NULL;
+            }
+            rc = ui_css_parse_animation("none", &anim);
+            EXPECT_EQ(UI_ERROR_NONE, rc);
 
-  struct ui_css_transform *transform_ast = NULL;
-  if (transform_ast) {
-    ui_css_transform_destroy(transform_ast);
-    transform_ast = NULL;
-  }
-  rc = ui_css_parse_transform("translate(10px) , ", &transform_ast);
-  if (trans) {
-    ui_css_transition_destroy(trans);
-    trans = NULL;
-  }
-  rc = ui_css_parse_transition("margin 1s , ", &trans);
-  if (anim) {
-    ui_css_animation_destroy(anim);
-    anim = NULL;
-  }
-  rc = ui_css_parse_animation("slide 1s , ", &anim);
+            {
+              struct ui_css_transform *transform_ast = NULL;
+              if (transform_ast) {
+                ui_css_transform_destroy(transform_ast);
+                transform_ast = NULL;
+              }
+              rc = ui_css_parse_transform("translate(10px) , ", &transform_ast);
+              if (trans) {
+                ui_css_transition_destroy(trans);
+                trans = NULL;
+              }
+              rc = ui_css_parse_transition("margin 1s , ", &trans);
+              if (anim) {
+                ui_css_animation_destroy(anim);
+                anim = NULL;
+              }
+              rc = ui_css_parse_animation("slide 1s , ", &anim);
 
-  /* invalid dasharray */
-  rc = ui_css_parse_dasharray(NULL, &dash);
-  EXPECT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
-  rc = ui_css_parse_dasharray("10px , 20px", &dash);
-  /* removed check */
-  rc = ui_css_parse_dasharray("invalid", &dash);
-  /* removed check */
-  rc = ui_css_parse_dasharray("   ", &dash);
-  EXPECT_EQ(UI_ERROR_PARSE_FAILED, rc);
+              /* invalid dasharray */
+              rc = ui_css_parse_dasharray(NULL, &dash);
+              EXPECT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
+              rc = ui_css_parse_dasharray("10px , 20px", &dash);
+              /* removed check */
+              rc = ui_css_parse_dasharray("invalid", &dash);
+              /* removed check */
+              rc = ui_css_parse_dasharray("   ", &dash);
+              EXPECT_EQ(UI_ERROR_PARSE_FAILED, rc);
 
-  /* OOM in transition */
-  g_malloc_fail_countdown = 0;
-  if (trans) {
-    ui_css_transition_destroy(trans);
-    trans = NULL;
-  }
-  rc = ui_css_parse_transition("opacity 1s, transform 2s", &trans);
-  EXPECT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
-  g_malloc_fail_countdown = 1;
-  if (trans) {
-    ui_css_transition_destroy(trans);
-    trans = NULL;
-  }
-  rc = ui_css_parse_transition("opacity 1s, transform 2s", &trans);
-  EXPECT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
-  g_malloc_fail_countdown = -1;
+              /* OOM in transition */
+              g_malloc_fail_countdown = 0;
+              if (trans) {
+                ui_css_transition_destroy(trans);
+                trans = NULL;
+              }
+              rc = ui_css_parse_transition("opacity 1s, transform 2s", &trans);
+              EXPECT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
+              g_malloc_fail_countdown = 1;
+              if (trans) {
+                ui_css_transition_destroy(trans);
+                trans = NULL;
+              }
+              rc = ui_css_parse_transition("opacity 1s, transform 2s", &trans);
+              EXPECT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
+              g_malloc_fail_countdown = -1;
 
-  /* OOM in animation */
-  g_malloc_fail_countdown = 0;
-  if (anim) {
-    ui_css_animation_destroy(anim);
-    anim = NULL;
-  }
-  rc = ui_css_parse_animation("fadein 1s, slide 2s", &anim);
-  EXPECT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
-  g_malloc_fail_countdown = 1;
-  if (anim) {
-    ui_css_animation_destroy(anim);
-    anim = NULL;
-  }
-  rc = ui_css_parse_animation("fadein 1s, slide 2s", &anim);
-  EXPECT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
-  g_malloc_fail_countdown = -1;
-  if (shadow) {
-    ui_css_shadow_list_destroy(shadow);
-    shadow = NULL;
-  }
-  if (trans) {
-    ui_css_transition_destroy(trans);
-    trans = NULL;
-  }
-  if (anim) {
-    ui_css_animation_destroy(anim);
-    anim = NULL;
-  }
-  if (filter) {
-    ui_css_filter_destroy(filter);
-    filter = NULL;
-  }
-  if (transform_ast) {
-    ui_css_transform_destroy(transform_ast);
-    transform_ast = NULL;
+              /* OOM in animation */
+              g_malloc_fail_countdown = 0;
+              if (anim) {
+                ui_css_animation_destroy(anim);
+                anim = NULL;
+              }
+              rc = ui_css_parse_animation("fadein 1s, slide 2s", &anim);
+              EXPECT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
+              g_malloc_fail_countdown = 1;
+              if (anim) {
+                ui_css_animation_destroy(anim);
+                anim = NULL;
+              }
+              rc = ui_css_parse_animation("fadein 1s, slide 2s", &anim);
+              EXPECT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
+              g_malloc_fail_countdown = -1;
+              if (shadow) {
+                ui_css_shadow_list_destroy(shadow);
+                shadow = NULL;
+              }
+              if (trans) {
+                ui_css_transition_destroy(trans);
+                trans = NULL;
+              }
+              if (anim) {
+                ui_css_animation_destroy(anim);
+                anim = NULL;
+              }
+              if (filter) {
+                ui_css_filter_destroy(filter);
+                filter = NULL;
+              }
+              if (transform_ast) {
+                ui_css_transform_destroy(transform_ast);
+                transform_ast = NULL;
+              }
+            }
+          }
+        }
+      }
+    }
   }
 }
 
 static void test_more_branches_2(void) {
   struct ui_css_color color;
-  struct ui_css_paint paint;
   struct ui_css_transform *trans = NULL;
   struct ui_css_filter *filter = NULL;
   struct ui_css_shadow_list *shadow = NULL;
-  ui_error_t rc;
 
   rc = ui_css_parse_color("color-mix(in srgb, red, blue)", &color);
   rc = ui_css_parse_color(
@@ -386,123 +390,143 @@ static void test_more_branches_2(void) {
   }
   rc = ui_css_parse_shadow("10px 10px black,", &shadow);
 
-  struct ui_css_easing_function easing;
-  enum ui_css_blend_mode bm;
+  {
+    struct ui_css_easing_function easing;
+    enum ui_css_blend_mode bm;
 
-  struct ui_css_animation *a_anim = NULL;
-  struct ui_css_transition *a_trans = NULL;
+    struct ui_css_animation *a_anim = NULL;
+    struct ui_css_transition *a_trans = NULL;
 
-  char long_easing[1024];
-  memset(long_easing, 'a', 255);
-  long_easing[255] = '\0';
+    char long_easing[1024];
+    memset(long_easing, 'a', 255);
+    long_easing[255] = '\0';
 
-  char transition_str[512];
-  sprintf(transition_str, "all 1s cubic-bezier(0,0,1,1) %s", long_easing);
-  if (a_trans) {
-    ui_css_transition_destroy(a_trans);
-    a_trans = NULL;
-  }
-  rc = ui_css_parse_transition(transition_str, &a_trans);
+    {
+      char transition_str[1200];
+#if defined(_MSC_VER)
+      sprintf_s(transition_str, sizeof(transition_str),
+                "all 1s cubic-bezier(0,0,1,1) %s", long_easing);
+#else
+      sprintf(transition_str, "all 1s cubic-bezier(0,0,1,1) %s", long_easing);
+#endif
+      if (a_trans) {
+        ui_css_transition_destroy(a_trans);
+        a_trans = NULL;
+      }
+      rc = ui_css_parse_transition(transition_str, &a_trans);
 
-  char anim_str[512];
-  sprintf(anim_str, "fadein 1s cubic-bezier(0,0,1,1) %s", long_easing);
-  if (a_anim) {
-    ui_css_animation_destroy(a_anim);
-    a_anim = NULL;
-  }
-  rc = ui_css_parse_animation(anim_str, &a_anim);
+      {
+        char anim_str[1200];
+#if defined(_MSC_VER)
+        sprintf_s(anim_str, sizeof(anim_str),
+                  "fadein 1s cubic-bezier(0,0,1,1) %s", long_easing);
+#else
+        sprintf(anim_str, "fadein 1s cubic-bezier(0,0,1,1) %s", long_easing);
+#endif
+        if (a_anim) {
+          ui_css_animation_destroy(a_anim);
+          a_anim = NULL;
+        }
+        rc = ui_css_parse_animation(anim_str, &a_anim);
 
-  rc = ui_css_parse_easing_function("cubic-bezier(0)", &easing);
+        rc = ui_css_parse_easing_function("cubic-bezier(0)", &easing);
 
-  rc = ui_css_parse_blend_mode("invalid", &bm);
-  if (filter) {
-    ui_css_filter_destroy(filter);
-    filter = NULL;
-  }
-  rc = ui_css_parse_filter("blur(10px) ", &filter);
-  rc = ui_css_parse_easing_function("steps(2,   jump-start)", &easing);
+        rc = ui_css_parse_blend_mode("invalid", &bm);
+        if (filter) {
+          ui_css_filter_destroy(filter);
+          filter = NULL;
+        }
+        rc = ui_css_parse_filter("blur(10px) ", &filter);
+        rc = ui_css_parse_easing_function("steps(2,   jump-start)", &easing);
 
-  struct ui_css_transition *transition = NULL;
-  struct ui_css_animation *animation = NULL;
-  char super_long[256];
-  memset(super_long, 'a', 255);
-  super_long[255] = '\0';
-  if (transition) {
-    ui_css_transition_destroy(transition);
-    transition = NULL;
-  }
-  rc = ui_css_parse_transition(super_long, &transition);
-  if (animation) {
-    ui_css_animation_destroy(animation);
-    animation = NULL;
-  }
-  rc = ui_css_parse_animation(super_long, &animation);
+        {
+          struct ui_css_transition *transition = NULL;
+          struct ui_css_animation *animation = NULL;
+          char super_long[256];
+          memset(super_long, 'a', 255);
+          super_long[255] = '\0';
+          if (transition) {
+            ui_css_transition_destroy(transition);
+            transition = NULL;
+          }
+          rc = ui_css_parse_transition(super_long, &transition);
+          if (animation) {
+            ui_css_animation_destroy(animation);
+            animation = NULL;
+          }
+          rc = ui_css_parse_animation(super_long, &animation);
 
-  if (trans) {
-    ui_css_transform_destroy(trans);
-    trans = NULL;
-  }
-  rc = ui_css_parse_transform("rotate(invalid)", &trans);
-  if (filter) {
-    ui_css_filter_destroy(filter);
-    filter = NULL;
-  }
-  rc = ui_css_parse_filter("blur", &filter);
-  if (filter) {
-    ui_css_filter_destroy(filter);
-    filter = NULL;
-  }
-  rc = ui_css_parse_filter("drop-shadow(10px invalid_y)", &filter);
-  if (filter) {
-    ui_css_filter_destroy(filter);
-    filter = NULL;
-  }
-  rc = ui_css_parse_filter("drop-shadow(10px 10px notacolor)", &filter);
-  if (filter) {
-    ui_css_filter_destroy(filter);
-    filter = NULL;
-  }
-  rc = ui_css_parse_filter(
-      "blur(this_is_a_very_long_string_that_exceeds_32_bytes_long_enough)",
-      &filter);
-  rc = ui_css_parse_color("from red", &color);
-  rc = ui_css_parse_color("invalid_color_string", &color);
+          if (trans) {
+            ui_css_transform_destroy(trans);
+            trans = NULL;
+          }
+          rc = ui_css_parse_transform("rotate(invalid)", &trans);
+          if (filter) {
+            ui_css_filter_destroy(filter);
+            filter = NULL;
+          }
+          rc = ui_css_parse_filter("blur", &filter);
+          if (filter) {
+            ui_css_filter_destroy(filter);
+            filter = NULL;
+          }
+          rc = ui_css_parse_filter("drop-shadow(10px invalid_y)", &filter);
+          if (filter) {
+            ui_css_filter_destroy(filter);
+            filter = NULL;
+          }
+          rc = ui_css_parse_filter("drop-shadow(10px 10px notacolor)", &filter);
+          if (filter) {
+            ui_css_filter_destroy(filter);
+            filter = NULL;
+          }
+          rc = ui_css_parse_filter("blur(this_is_a_very_long_string_that_"
+                                   "exceeds_32_bytes_long_enough)",
+                                   &filter);
+          rc = ui_css_parse_color("from red", &color);
+          rc = ui_css_parse_color("invalid_color_string", &color);
 
-  char very_long_shadow[1024];
-  memset(very_long_shadow, 'a', 300);
-  very_long_shadow[300] = '\0';
-  if (shadow) {
-    ui_css_shadow_list_destroy(shadow);
-    shadow = NULL;
-  }
-  rc = ui_css_parse_shadow(very_long_shadow, &shadow);
-  if (trans) {
-    ui_css_transform_destroy(trans);
-    trans = NULL;
-  }
-  if (filter) {
-    ui_css_filter_destroy(filter);
-    filter = NULL;
-  }
-  if (shadow) {
-    ui_css_shadow_list_destroy(shadow);
-    shadow = NULL;
-  }
-  if (a_anim) {
-    ui_css_animation_destroy(a_anim);
-    a_anim = NULL;
-  }
-  if (a_trans) {
-    ui_css_transition_destroy(a_trans);
-    a_trans = NULL;
-  }
-  if (transition) {
-    ui_css_transition_destroy(transition);
-    transition = NULL;
-  }
-  if (animation) {
-    ui_css_animation_destroy(animation);
-    animation = NULL;
+          {
+            char very_long_shadow[1024];
+            memset(very_long_shadow, 'a', 300);
+            very_long_shadow[300] = '\0';
+            if (shadow) {
+              ui_css_shadow_list_destroy(shadow);
+              shadow = NULL;
+            }
+            rc = ui_css_parse_shadow(very_long_shadow, &shadow);
+            if (trans) {
+              ui_css_transform_destroy(trans);
+              trans = NULL;
+            }
+            if (filter) {
+              ui_css_filter_destroy(filter);
+              filter = NULL;
+            }
+            if (shadow) {
+              ui_css_shadow_list_destroy(shadow);
+              shadow = NULL;
+            }
+            if (a_anim) {
+              ui_css_animation_destroy(a_anim);
+              a_anim = NULL;
+            }
+            if (a_trans) {
+              ui_css_transition_destroy(a_trans);
+              a_trans = NULL;
+            }
+            if (transition) {
+              ui_css_transition_destroy(transition);
+              transition = NULL;
+            }
+            if (animation) {
+              ui_css_animation_destroy(animation);
+              animation = NULL;
+            }
+          }
+        }
+      }
+    }
   }
 }
 
@@ -510,13 +534,14 @@ static void test_more_branches_3(void) {
   struct ui_css_clip_path cp;
   struct ui_css_paint p;
   struct ui_css_mask_layer mask;
-  ui_error_t rc;
 
   rc = ui_css_parse_clip_path("url('test')", &cp);
   rc = ui_css_parse_paint("url('test')", &p);
   rc = ui_css_parse_mask("url('test')", &mask);
 
   rc = ui_css_parse_paint("invalid", &p);
+  if (rc) {
+  }
 }
 
 static void test_more_branches_4(void) {
@@ -525,10 +550,8 @@ static void test_more_branches_4(void) {
   struct ui_css_shadow_list *shadow = NULL;
   struct ui_css_transition *trans = NULL;
   struct ui_css_animation *anim = NULL;
-  struct ui_css_clip_path cp;
   struct ui_css_color color;
   struct ui_css_paint paint;
-  ui_error_t rc;
 
   /* trailing string */
   if (ext) {
@@ -569,6 +592,8 @@ static void test_more_branches_4(void) {
 
   /* empty string parsing where possible */
   rc = ui_css_parse_paint("url('')", &paint);
+  if (rc) {
+  }
   if (ext) {
     ui_css_value_ext_destroy(ext);
     ext = NULL;
@@ -594,7 +619,7 @@ static void test_more_branches_5(void) {
   struct ui_css_easing_function easing;
   struct ui_css_transition *transition = NULL;
   struct ui_css_animation *anim = NULL;
-  ui_error_t rc;
+  char long_str[1024];
 
   /* Empty strings */
   if (trans) {
@@ -621,7 +646,6 @@ static void test_more_branches_5(void) {
   rc = ui_css_parse_filter("blur(10px", &filter);
 
   /* Shadow with long tokens */
-  char long_str[1024];
   memset(long_str, 'a', 150);
   long_str[150] = '\0';
   if (shadow) {
@@ -660,6 +684,8 @@ static void test_more_branches_5(void) {
   /* Math OOM */
   g_malloc_fail_countdown = 0;
   rc = ui_css_parse_value_ext("calc(10px + 20px)", NULL);
+  if (rc) {
+  }
   g_malloc_fail_countdown = -1;
   if (trans) {
     ui_css_transform_destroy(trans);
@@ -691,8 +717,11 @@ static void test_more_branches_6(void) {
   struct ui_css_transition *trans = NULL;
   struct ui_css_animation *anim = NULL;
   struct ui_css_transform *transform = NULL;
+  struct ui_css_filter *filter = NULL;
+  char long_paint[1024];
+  char shadow_str[256];
+  char long_easing[1024];
   enum ui_css_blend_mode bm;
-  ui_error_t rc;
 
   /* color no alpha */
   rc = ui_css_parse_color("color(xyz-d50 1.0 1.0 1.0 )", &color);
@@ -701,7 +730,6 @@ static void test_more_branches_6(void) {
   rc = ui_css_parse_color("color(unknown 1.0 1.0 1.0 )", &color);
 
   /* long paint url */
-  char long_paint[1024];
   UI_STRCPY(long_paint, 1024, "url(\'");
   memset(long_paint + 5, 'a', 300);
   UI_STRCPY(long_paint + 305, 1024 - 305, "\')");
@@ -712,7 +740,6 @@ static void test_more_branches_6(void) {
                               &dash);
 
   /* shadow token too long */
-  char shadow_str[256];
   UI_STRCPY(shadow_str, 256, "10px 10px ");
   memset(shadow_str + 10, 'a', 50);
   shadow_str[60] = '\0';
@@ -723,7 +750,6 @@ static void test_more_branches_6(void) {
   rc = ui_css_parse_shadow(shadow_str, &shadow);
 
   /* shadow drop shadow full args */
-  struct ui_css_filter *filter = NULL;
   if (filter) {
     ui_css_filter_destroy(filter);
     filter = NULL;
@@ -747,7 +773,6 @@ static void test_more_branches_6(void) {
   }
 
   /* transition / animation long easing */
-  char long_easing[1024];
   UI_STRCPY(long_easing, 1024, "opacity 1s cubic-bezier(");
   memset(long_easing + 24, '1', 40);
   UI_STRCPY(long_easing + 64, 1024 - 64, ")");
@@ -775,6 +800,8 @@ static void test_more_branches_6(void) {
 
   /* blend mode fallback */
   rc = ui_css_parse_blend_mode("unknown", &bm);
+  if (rc) {
+  }
   if (shadow) {
     ui_css_shadow_list_destroy(shadow);
     shadow = NULL;
@@ -798,13 +825,13 @@ static void test_more_branches_6(void) {
 }
 
 static void test_coverage_gaps(void) {
-  struct ui_css_value_ext *val = malloc(sizeof(*val));
+  struct ui_css_value_ext *v_ext = malloc(sizeof(*v_ext));
   struct ui_css_easing_function easing;
   struct ui_css_animation *anim = NULL;
 
-  val->type = UI_CSS_VALUE_TYPE_MATH;
-  val->value.math = NULL;
-  ui_css_value_ext_destroy(val);
+  v_ext->type = UI_CSS_VALUE_TYPE_MATH;
+  v_ext->value.math = NULL;
+  ui_css_value_ext_destroy(v_ext);
 
   ui_css_parse_easing_function("steps(abc)", &easing);
   ui_css_parse_easing_function("steps(5, end)", &easing);
@@ -816,8 +843,6 @@ static void test_coverage_gaps(void) {
 }
 
 static void test_missing_branches(void) {
-  ui_error_t rc;
-  struct ui_css_value val;
   struct ui_css_value_ext *val_ext = NULL;
   struct ui_css_color color;
   struct ui_css_image img;
@@ -935,8 +960,10 @@ static void test_missing_branches(void) {
     UI_STRCPY(long_paint_url, 1024, "url(");
     memset(long_paint_url + 4, 'C', 300);
     UI_STRCPY(long_paint_url + 304, 1024 - 304, ")");
-    struct ui_css_paint paint;
-    rc = ui_css_parse_paint(long_paint_url, &paint);
+    {
+      struct ui_css_paint paint;
+      rc = ui_css_parse_paint(long_paint_url, &paint);
+    }
   }
 
   /* shadow 5 lengths to hit length_idx >= 4 */
@@ -1047,12 +1074,6 @@ static void test_missing_branches(void) {
 
   /* NULL params */
   {
-    enum ui_css_fill_rule rule;
-    enum ui_css_stroke_linecap cap;
-    enum ui_css_stroke_linejoin join;
-    struct ui_css_dasharray dash;
-    struct ui_css_easing_function ease;
-
     rc = ui_css_parse_fill_rule("nonzero", NULL);
     rc = ui_css_parse_stroke_linecap("round", NULL);
     rc = ui_css_parse_stroke_linejoin("miter", NULL);
@@ -1084,9 +1105,7 @@ static void test_missing_branches(void) {
   }
 
   /* shadow invalid unit fallback */
-  {
-    struct ui_css_shadow shadow;
-    /* rc = ui_css_parse_shadow("10 10", &shadow); */
+  { /* rc = ui_css_parse_shadow("10 10", &shadow); */
   }
 
   /* filter invalid names (same length) */
@@ -1125,7 +1144,11 @@ static void test_missing_branches(void) {
     char long_name[1024];
     memset(long_name, 'a', 100);
     long_name[100] = '\0';
+#if defined(_MSC_VER)
+    strcat_s(long_name, sizeof(long_name), " 1s");
+#else
     strcat(long_name, " 1s");
+#endif
 
     rc = ui_css_parse_transition(long_name, &trans);
     if (trans)

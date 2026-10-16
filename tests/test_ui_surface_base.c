@@ -6,6 +6,8 @@
 #include <stdlib.h>
 /* clang-format on */
 
+extern int g_surface_mock_fail;
+
 extern int g_malloc_fail_countdown;
 
 #define ASSERT_SUCCESS(expr)                                                   \
@@ -67,7 +69,6 @@ static int run_oom_tests(void) {
   g_malloc_fail_countdown = -1;
 
   {
-    extern int g_surface_mock_fail;
     g_surface_mock_fail = 1;
     g_malloc_fail_countdown = 1;
     if (ui_surface_base_create(&surface) != UI_ERROR_UNKNOWN)

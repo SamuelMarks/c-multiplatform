@@ -93,9 +93,12 @@ mock_ui_bottom_nav_item_base_set_active(struct ui_bottom_nav_item_base *item,
 /** @endcond */
 #endif
 
+/** @brief CUPERTINO_TAB_BAR_HEIGHT_STANDARD macro definition. */
 #define CUPERTINO_TAB_BAR_HEIGHT_STANDARD 49.0f
+/** @brief CUPERTINO_TAB_BAR_HEIGHT_HOME_INDICATOR macro definition. */
 #define CUPERTINO_TAB_BAR_HEIGHT_HOME_INDICATOR 83.0f
 
+/** @brief cupertino_tab_bar_create function. */
 ui_error_t
 cupertino_tab_bar_create(struct ui_engine *engine,
                          const struct cupertino_tab_bar_descriptor *desc,
@@ -147,6 +150,7 @@ cupertino_tab_bar_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_tab_bar_destroy function. */
 ui_error_t cupertino_tab_bar_destroy(struct cupertino_tab_bar *tab_bar) {
   ui_error_t rc;
   size_t i;
@@ -177,6 +181,7 @@ ui_error_t cupertino_tab_bar_destroy(struct cupertino_tab_bar *tab_bar) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_tab_bar_add_item function. */
 ui_error_t cupertino_tab_bar_add_item(
     struct cupertino_tab_bar *tab_bar,
     const struct cupertino_tab_item_descriptor *item_desc, size_t *out_index) {
@@ -257,6 +262,7 @@ ui_error_t cupertino_tab_bar_add_item(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_tab_bar_set_selected function. */
 ui_error_t cupertino_tab_bar_set_selected(struct cupertino_tab_bar *tab_bar,
                                           size_t index) {
   ui_error_t rc;
@@ -281,6 +287,7 @@ ui_error_t cupertino_tab_bar_set_selected(struct cupertino_tab_bar *tab_bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_tab_bar_get_selected function. */
 ui_error_t
 cupertino_tab_bar_get_selected(const struct cupertino_tab_bar *tab_bar,
                                size_t *out_index) {
@@ -292,6 +299,7 @@ cupertino_tab_bar_get_selected(const struct cupertino_tab_bar *tab_bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_tab_bar_set_badge function. */
 ui_error_t cupertino_tab_bar_set_badge(struct cupertino_tab_bar *tab_bar,
                                        size_t index, const char *badge_text) {
   if (!tab_bar || index >= tab_bar->item_count) {
@@ -316,6 +324,7 @@ ui_error_t cupertino_tab_bar_set_badge(struct cupertino_tab_bar *tab_bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_tab_bar_get_badge function. */
 ui_error_t cupertino_tab_bar_get_badge(const struct cupertino_tab_bar *tab_bar,
                                        size_t index,
                                        const char **out_badge_text) {
@@ -328,6 +337,7 @@ ui_error_t cupertino_tab_bar_get_badge(const struct cupertino_tab_bar *tab_bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_tab_bar_set_home_indicator_present function. */
 ui_error_t
 cupertino_tab_bar_set_home_indicator_present(struct cupertino_tab_bar *tab_bar,
                                              int present) {
@@ -339,6 +349,7 @@ cupertino_tab_bar_set_home_indicator_present(struct cupertino_tab_bar *tab_bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_tab_bar_is_home_indicator_present function. */
 ui_error_t cupertino_tab_bar_is_home_indicator_present(
     const struct cupertino_tab_bar *tab_bar, int *out_present) {
   if (!tab_bar || !out_present) {
@@ -349,6 +360,7 @@ ui_error_t cupertino_tab_bar_is_home_indicator_present(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_tab_bar_get_height function. */
 ui_error_t cupertino_tab_bar_get_height(const struct cupertino_tab_bar *tab_bar,
                                         float *out_height) {
   if (!tab_bar || !out_height) {
@@ -361,6 +373,7 @@ ui_error_t cupertino_tab_bar_get_height(const struct cupertino_tab_bar *tab_bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_tab_bar_get_item_count function. */
 ui_error_t
 cupertino_tab_bar_get_item_count(const struct cupertino_tab_bar *tab_bar,
                                  size_t *out_count) {
@@ -372,6 +385,7 @@ cupertino_tab_bar_get_item_count(const struct cupertino_tab_bar *tab_bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_tab_bar_get_base function. */
 ui_error_t cupertino_tab_bar_get_base(struct cupertino_tab_bar *tab_bar,
                                       struct ui_bottom_nav_base **out_base) {
   if (!tab_bar || !out_base) {
@@ -382,6 +396,7 @@ ui_error_t cupertino_tab_bar_get_base(struct cupertino_tab_bar *tab_bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_tab_bar_set_adaptive_sidebar function. */
 ui_error_t
 cupertino_tab_bar_set_adaptive_sidebar(struct cupertino_tab_bar *tab_bar,
                                        int enabled, float breakpoint,
@@ -396,6 +411,7 @@ cupertino_tab_bar_set_adaptive_sidebar(struct cupertino_tab_bar *tab_bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_tab_bar_get_adaptive_sidebar function. */
 ui_error_t
 cupertino_tab_bar_get_adaptive_sidebar(const struct cupertino_tab_bar *tab_bar,
                                        int *out_enabled, float *out_breakpoint,
@@ -410,6 +426,7 @@ cupertino_tab_bar_get_adaptive_sidebar(const struct cupertino_tab_bar *tab_bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_tab_bar_update_layout_for_width function. */
 ui_error_t
 cupertino_tab_bar_update_layout_for_width(struct cupertino_tab_bar *tab_bar,
                                           float viewport_width,
@@ -429,6 +446,7 @@ cupertino_tab_bar_update_layout_for_width(struct cupertino_tab_bar *tab_bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_tab_bar_is_in_sidebar_mode function. */
 ui_error_t
 cupertino_tab_bar_is_in_sidebar_mode(const struct cupertino_tab_bar *tab_bar,
                                      int *out_is_sidebar) {
@@ -440,6 +458,7 @@ cupertino_tab_bar_is_in_sidebar_mode(const struct cupertino_tab_bar *tab_bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_tab_bar_get_layout_bounds function. */
 ui_error_t cupertino_tab_bar_get_layout_bounds(
     const struct cupertino_tab_bar *tab_bar, float viewport_w, float viewport_h,
     float *out_x, float *out_y, float *out_w, float *out_h) {

@@ -13,12 +13,15 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
+/** @brief CUPERTINO_MENU_BAR_HEIGHT constant. */
 #define CUPERTINO_MENU_BAR_HEIGHT 24.0f
+/** @brief CUPERTINO_MENU_BAR_MAX_MENUS constant. */
 #define CUPERTINO_MENU_BAR_MAX_MENUS 16
+/** @brief CUPERTINO_MENU_BAR_MAX_ITEMS constant. */
 #define CUPERTINO_MENU_BAR_MAX_ITEMS 32
 
 /**
@@ -36,11 +39,11 @@ enum cupertino_menu_item_state {
  * @brief Single item entry within a menu.
  */
 struct cupertino_menu_item {
-  char title[64];
-  char shortcut[32];
-  int is_enabled;
-  int is_separator;
-  enum cupertino_menu_item_state state;
+  char title[64];                       /**< title[64] field. */
+  char shortcut[32];                    /**< shortcut[32] field. */
+  int is_enabled;                       /**< is_enabled field. */
+  int is_separator;                     /**< is_separator field. */
+  enum cupertino_menu_item_state state; /**< state field. */
 };
 
 /**
@@ -48,9 +51,12 @@ struct cupertino_menu_item {
  * @brief Top-level menu column containing items.
  */
 struct cupertino_menu {
-  char title[64];
-  int item_count;
-  struct cupertino_menu_item items[CUPERTINO_MENU_BAR_MAX_ITEMS];
+  char title[64]; /**< title[64] field. */
+  int item_count; /**< item_count field. */
+  struct cupertino_menu_item items
+      [CUPERTINO_MENU_BAR_MAX_ITEMS]; /**<
+                                         items[CUPERTINO_MENU_BAR_MAX_ITEMS]
+                                         field. */
 };
 
 /**
@@ -66,12 +72,15 @@ struct cupertino_menu_bar_descriptor {
  * @brief macOS Menu Bar instance.
  */
 struct cupertino_menu_bar {
-  char app_name[64];
-  int menu_count;
-  struct cupertino_menu menus[CUPERTINO_MENU_BAR_MAX_MENUS];
+  char app_name[64]; /**< app_name[64] field. */
+  int menu_count;    /**< menu_count field. */
+  struct cupertino_menu menus
+      [CUPERTINO_MENU_BAR_MAX_MENUS]; /**<
+                                         menus[CUPERTINO_MENU_BAR_MAX_MENUS]
+                                         field. */
   int active_menu_index; /**< Index of open dropdown menu (-1 if closed). */
-  float width;
-  float height;
+  float width;           /**< width field. */
+  float height;          /**< height field. */
 };
 
 /**

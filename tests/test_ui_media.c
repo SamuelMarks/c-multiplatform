@@ -25,7 +25,6 @@ static ui_error_t dummy_open(struct ui_media_source *source, const char *uri) {
 
   if (g_malloc_fail_countdown == 0) {
     return UI_ERROR_OUT_OF_MEMORY;
-    return UI_ERROR_NONE;
   }
   if (g_malloc_fail_countdown > 0) {
     g_malloc_fail_countdown--;
@@ -52,7 +51,6 @@ static ui_error_t dummy_read_packet(struct ui_media_source *source,
 
   if (data->packets_read >= data->max_packets) {
     return UI_ERROR_EOF;
-    return UI_ERROR_NONE;
   }
 
   out_packet->data = NULL;
@@ -75,7 +73,6 @@ static ui_error_t dummy_seek(struct ui_media_source *source,
   data = (struct dummy_user_data *)source->user_data;
   data->packets_read = (int)(timestamp_us / 1000);
   return UI_ERROR_NONE;
-  return UI_ERROR_NONE;
 }
 
 static ui_error_t dummy_get_duration(struct ui_media_source *source,
@@ -86,7 +83,6 @@ static ui_error_t dummy_get_duration(struct ui_media_source *source,
 
   data = (struct dummy_user_data *)source->user_data;
   *out_duration_us = (ui_int64)data->max_packets * 1000;
-  return UI_ERROR_NONE;
   return UI_ERROR_NONE;
 }
 

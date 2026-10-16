@@ -9,6 +9,7 @@
 #include <string.h>
 /* clang-format on */
 
+/** @brief cupertino_dock_tile_create function. */
 ui_error_t
 cupertino_dock_tile_create(struct ui_engine *engine,
                            const struct cupertino_dock_tile_descriptor *desc,
@@ -51,6 +52,7 @@ cupertino_dock_tile_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_dock_tile_destroy function. */
 ui_error_t cupertino_dock_tile_destroy(struct cupertino_dock_tile *dock_tile) {
   if (!dock_tile) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -60,6 +62,7 @@ ui_error_t cupertino_dock_tile_destroy(struct cupertino_dock_tile *dock_tile) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_dock_tile_set_badge_label function. */
 ui_error_t
 cupertino_dock_tile_set_badge_label(struct cupertino_dock_tile *dock_tile,
                                     const char *label) {
@@ -84,6 +87,7 @@ cupertino_dock_tile_set_badge_label(struct cupertino_dock_tile *dock_tile,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_dock_tile_get_badge_label function. */
 ui_error_t
 cupertino_dock_tile_get_badge_label(const struct cupertino_dock_tile *dock_tile,
                                     const char **out_label,
@@ -97,6 +101,7 @@ cupertino_dock_tile_get_badge_label(const struct cupertino_dock_tile *dock_tile,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_dock_tile_set_progress function. */
 ui_error_t
 cupertino_dock_tile_set_progress(struct cupertino_dock_tile *dock_tile,
                                  float progress, int is_visible) {
@@ -109,6 +114,7 @@ cupertino_dock_tile_set_progress(struct cupertino_dock_tile *dock_tile,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_dock_tile_get_progress function. */
 ui_error_t
 cupertino_dock_tile_get_progress(const struct cupertino_dock_tile *dock_tile,
                                  float *out_progress, int *out_is_visible) {
@@ -121,6 +127,7 @@ cupertino_dock_tile_get_progress(const struct cupertino_dock_tile *dock_tile,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_dock_tile_add_action function. */
 ui_error_t cupertino_dock_tile_add_action(struct cupertino_dock_tile *dock_tile,
                                           const char *title, int action_id) {
   size_t idx;
@@ -150,6 +157,7 @@ ui_error_t cupertino_dock_tile_add_action(struct cupertino_dock_tile *dock_tile,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_dock_tile_get_action_count function. */
 ui_error_t cupertino_dock_tile_get_action_count(
     const struct cupertino_dock_tile *dock_tile, size_t *out_count) {
   if (!dock_tile || !out_count) {
@@ -160,6 +168,7 @@ ui_error_t cupertino_dock_tile_get_action_count(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_dock_tile_get_action_at function. */
 ui_error_t
 cupertino_dock_tile_get_action_at(const struct cupertino_dock_tile *dock_tile,
                                   size_t index, const char **out_title,
@@ -181,6 +190,7 @@ cupertino_dock_tile_get_action_at(const struct cupertino_dock_tile *dock_tile,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_dock_tile_trigger_action function. */
 ui_error_t
 cupertino_dock_tile_trigger_action(struct cupertino_dock_tile *dock_tile,
                                    int action_id, int *out_handled) {
@@ -203,6 +213,7 @@ cupertino_dock_tile_trigger_action(struct cupertino_dock_tile *dock_tile,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_dock_tile_get_badge_bounds function. */
 ui_error_t cupertino_dock_tile_get_badge_bounds(
     const struct cupertino_dock_tile *dock_tile, float *out_x, float *out_y,
     float *out_w, float *out_h) {
@@ -235,6 +246,7 @@ ui_error_t cupertino_dock_tile_get_badge_bounds(
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_dock_tile_get_progress_bounds function. */
 ui_error_t cupertino_dock_tile_get_progress_bounds(
     const struct cupertino_dock_tile *dock_tile, float *out_x, float *out_y,
     float *out_w, float *out_h) {

@@ -18,14 +18,17 @@ static ui_error_t make_path(char *dest, size_t dest_sz, const char *dir,
   if (!dest || dest_sz == 0 || !dir || !filename) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
+  if (strlen(dir) + 1 + strlen(filename) >= dest_sz) {
+    return UI_ERROR_IO_FAILED;
+  }
 #if defined(_MSC_VER)
   written = sprintf_s(dest, dest_sz, "%s/%s", dir, filename);
   if (written < 0) {
     return UI_ERROR_IO_FAILED;
   }
 #else
-  written = snprintf(dest, dest_sz, "%s/%s", dir, filename);
-  if (written < 0 || (size_t)written >= dest_sz) {
+  written = sprintf(dest, "%s/%s", dir, filename);
+  if (written < 0) {
     return UI_ERROR_IO_FAILED;
   }
 #endif
@@ -485,7 +488,7 @@ cupertino_render_all(const struct design_system_options *opts) {
   day = 1;
   for (row = 0; row < 5; ++row) {
     for (col = 0; col < 7; ++col) {
-      char num[4];
+      char num[16];
       float cx = 40.0f + (float)col * 38.0f;
       float cy = 115.0f + (float)row * 40.0f;
       if (row == 0 && col < 2)
@@ -495,7 +498,7 @@ cupertino_render_all(const struct design_system_options *opts) {
 #if defined(_MSC_VER)
       sprintf_s(num, sizeof(num), "%d", day);
 #else
-      snprintf(num, sizeof(num), "%d", day);
+      sprintf(num, "%d", day);
 #endif
       if (day == 30) {
         rc = draw_circle(c, cx, cy, 16.0f, p.system_blue);

@@ -10,9 +10,16 @@ extern int g_malloc_fail_countdown;
 static int g_callback_called = 0;
 static void *g_callback_user_data = NULL;
 
-static void test_callback(void *user_data) {
+static ui_error_t test_callback(void *user_data) {
   g_callback_called = 1;
   g_callback_user_data = user_data;
+  return UI_ERROR_NONE;
+}
+
+static ui_error_t failing_callback(void *user_data) {
+  if (user_data) {
+  }
+  return UI_ERROR_UNKNOWN;
 }
 
 int main(void) {
@@ -150,6 +157,7 @@ int main(void) {
   }
 
   /* Process event tests */
+  memset(&evt, 0, sizeof(evt));
   assert(ui_key_manager_process_event(NULL, &evt, &handled) ==
          UI_ERROR_INVALID_ARGUMENT);
 
@@ -235,8 +243,22 @@ int main(void) {
 
   /* Full branch coverage additions */
   {
-    int dummy_id;
-    struct ui_hotkey null_cb_hk;
+    struct ui_hotkey fail_hk = {0};
+    fail_hk.id = 777;
+    fail_hk.key_code = 'Q';
+    fail_hk.modifiers = UI_MODIFIER_CTRL;
+    fail_hk.callback = failing_callback;
+    rc = ui_key_manager_register(&manager, &fail_hk);
+    assert(rc == UI_ERROR_NONE);
+    evt.key_code = 'Q';
+    evt.modifiers = UI_MODIFIER_CTRL;
+    rc = ui_key_manager_process_event(&manager, &evt, &handled);
+    assert(rc == UI_ERROR_UNKNOWN);
+    rc = ui_key_manager_unregister(&manager, 777);
+    assert(rc == UI_ERROR_NONE);
+  }
+  {
+    struct ui_hotkey null_cb_hk = {0};
     char fmt_buf[32];
 
     /* Missing branches in add_hotkey */

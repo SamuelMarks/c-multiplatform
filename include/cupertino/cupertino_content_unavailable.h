@@ -15,12 +15,15 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
+/** @brief CUPERTINO_CONTENT_UNAVAILABLE_HERO_ICON_SIZE constant. */
 #define CUPERTINO_CONTENT_UNAVAILABLE_HERO_ICON_SIZE 48.0f
+/** @brief CUPERTINO_CONTENT_UNAVAILABLE_DEFAULT_WIDTH constant. */
 #define CUPERTINO_CONTENT_UNAVAILABLE_DEFAULT_WIDTH 320.0f
+/** @brief CUPERTINO_CONTENT_UNAVAILABLE_DEFAULT_HEIGHT constant. */
 #define CUPERTINO_CONTENT_UNAVAILABLE_DEFAULT_HEIGHT 240.0f
 
 /**
@@ -52,16 +55,16 @@ struct cupertino_content_unavailable_descriptor {
  * @brief Cupertino empty state view instance wrapping ui_empty_state_base.
  */
 struct cupertino_content_unavailable_view {
-  struct ui_empty_state_base *base;
-  enum cupertino_content_unavailable_style style;
-  char symbol_name[64];
-  char title[128];
-  char description_text[256];
-  char action_title[64];
-  char search_query[64];
-  int action_triggered_count;
-  float width;
-  float height;
+  struct ui_empty_state_base *base;               /**< base field. */
+  enum cupertino_content_unavailable_style style; /**< style field. */
+  char symbol_name[64];                           /**< symbol_name[64] field. */
+  char title[128];                                /**< title[128] field. */
+  char description_text[256]; /**< description_text[256] field. */
+  char action_title[64];      /**< action_title[64] field. */
+  char search_query[64];      /**< search_query[64] field. */
+  int action_triggered_count; /**< action_triggered_count field. */
+  float width;                /**< width field. */
+  float height;               /**< height field. */
 };
 
 /**

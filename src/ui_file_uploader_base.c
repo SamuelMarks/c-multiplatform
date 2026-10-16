@@ -212,6 +212,7 @@ ui_error_t ui_file_uploader_destroy(struct ui_file_uploader_base *uploader) {
 
 /* \brief ui_error
  */
+/** @brief ui_file_uploader_on_drag_enter function. */
 ui_error_t
 ui_file_uploader_on_drag_enter(struct ui_file_uploader_base *uploader) {
   if (uploader == NULL) {
@@ -235,6 +236,7 @@ ui_file_uploader_on_drag_enter(struct ui_file_uploader_base *uploader) {
 
 /* \brief ui_error
  */
+/** @brief ui_file_uploader_on_drag_leave function. */
 ui_error_t
 ui_file_uploader_on_drag_leave(struct ui_file_uploader_base *uploader) {
   if (uploader == NULL) {
@@ -327,6 +329,7 @@ ui_error_t ui_file_uploader_drop_file(struct ui_file_uploader_base *uploader,
 
 /* \brief ui_error
  */
+/** @brief ui_file_uploader_read_files function. */
 ui_error_t ui_file_uploader_read_files(struct ui_file_uploader_base *uploader) {
   int i;
   FILE *fp = NULL;
@@ -429,6 +432,7 @@ cleanup:
 
 /* \brief ui_error
  */
+/** @brief ui_file_uploader_register_dropzone function. */
 ui_error_t
 ui_file_uploader_register_dropzone(struct ui_file_uploader_base *uploader,
                                    struct ui_drag_drop_context *drag_ctx) {

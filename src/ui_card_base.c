@@ -106,6 +106,7 @@ struct ui_card_base {
   struct ui_signal *data_signal;        /**< data_signal */
 };
 
+/** @brief ui_card_base_create function. */
 ui_error_t ui_card_base_create(struct ui_card_base **out_card) {
   struct ui_card_base *card;
   struct ui_css_stylesheet *default_style = NULL;
@@ -210,6 +211,7 @@ cleanup:
   return rc;
 }
 
+/** @brief ui_card_base_destroy function. */
 ui_error_t ui_card_base_destroy(struct ui_card_base *card) {
   if (!card) {
     return UI_ERROR_NONE;
@@ -221,6 +223,7 @@ ui_error_t ui_card_base_destroy(struct ui_card_base *card) {
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_card_base_set_header function. */
 ui_error_t ui_card_base_set_header(struct ui_card_base *card,
                                    struct ui_component *header_content) {
   if (!card) {
@@ -233,6 +236,7 @@ ui_error_t ui_card_base_set_header(struct ui_card_base *card,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_card_base_set_content function. */
 ui_error_t ui_card_base_set_content(struct ui_card_base *card,
                                     struct ui_component *content) {
   if (!card) {
@@ -245,6 +249,7 @@ ui_error_t ui_card_base_set_content(struct ui_card_base *card,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_card_base_set_actions function. */
 ui_error_t ui_card_base_set_actions(struct ui_card_base *card,
                                     struct ui_component *actions) {
   if (!card) {
@@ -294,6 +299,7 @@ ui_error_t ui_card_base_set_subtitle(struct ui_card_base *card,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_card_base_get_component function. */
 ui_error_t ui_card_base_get_component(struct ui_card_base *card,
                                       struct ui_component **out_component) {
   if (!card || !out_component) {
@@ -303,6 +309,7 @@ ui_error_t ui_card_base_get_component(struct ui_card_base *card,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_card_base_bind_data function. */
 ui_error_t ui_card_base_bind_data(struct ui_card_base *widget,
                                   struct ui_signal *signal) {
   if (!widget) {

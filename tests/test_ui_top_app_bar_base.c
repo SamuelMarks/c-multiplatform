@@ -7,6 +7,8 @@
 #include <stdio.h>
 /* clang-format on */
 
+extern int g_top_app_bar_mock_fail;
+
 struct ui_top_app_bar_base {
   struct ui_arena *arena;
   struct ui_top_app_bar_config config;
@@ -26,7 +28,6 @@ static int test_top_app_bar_lifecycle(void) {
   int failed = 0;
 #ifdef UI_TEST_MOCK_ALLOC
   int i;
-  extern int g_top_app_bar_mock_fail;
 #endif
 
   rc = ui_arena_create(1024 * 1024, &arena);

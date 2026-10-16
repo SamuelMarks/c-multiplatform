@@ -81,9 +81,7 @@ static ui_error_t strdup_arena(struct ui_arena *arena, const char *str,
       return UI_ERROR_OUT_OF_BOUNDS;
     }
 #else
-    void *dummy = memcpy(copy, str, len + 1);
-    if (!dummy)
-      return UI_ERROR_OUT_OF_BOUNDS;
+    memcpy(copy, str, len + 1);
 #endif
     *out_str = copy;
   }
@@ -126,11 +124,8 @@ ui_error_t ui_form_group_add_node(ui_form_group_t *group, const char *name,
         return UI_ERROR_OUT_OF_BOUNDS;
       }
 #else
-      void *dummy =
-          memcpy(new_entries, group->entries,
-                 (size_t)group->count * sizeof(struct ui_form_group_entry));
-      if (!dummy)
-        return UI_ERROR_OUT_OF_BOUNDS;
+      memcpy(new_entries, group->entries,
+             (size_t)group->count * sizeof(struct ui_form_group_entry));
 #endif
     }
     group->entries = new_entries;

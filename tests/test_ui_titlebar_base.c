@@ -117,7 +117,7 @@ static int test_oom(void) {
   int failed = 0;
 #ifdef UI_TEST_MOCK_ALLOC
   struct ui_arena *small_arena;
-  struct ui_titlebar_config config;
+  struct ui_titlebar_config config = {0};
   struct ui_titlebar_base *tb;
   void *dummy = NULL;
 

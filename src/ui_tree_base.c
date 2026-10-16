@@ -127,10 +127,15 @@ static ui_error_t
 tree_base_get_prev_visible_node_internal(struct ui_tree_base *tree, void *node,
                                          void **out_prev);
 #else
+/** @brief tree_base_is_expanded_internal macro definition. */
 #define tree_base_is_expanded_internal ui_tree_base_is_expanded
+/** @brief tree_base_set_expanded_internal macro definition. */
 #define tree_base_set_expanded_internal ui_tree_base_set_expanded
+/** @brief tree_base_get_node_index_internal macro definition. */
 #define tree_base_get_node_index_internal get_node_index
+/** @brief tree_base_get_next_visible_node_internal macro definition. */
 #define tree_base_get_next_visible_node_internal get_next_visible_node
+/** @brief tree_base_get_prev_visible_node_internal macro definition. */
 #define tree_base_get_prev_visible_node_internal get_prev_visible_node
 #endif
 
@@ -149,6 +154,7 @@ struct ui_tree_base {
   struct ui_computed *data_signal;            /**< data_signal */
 };
 
+/** @brief ui_tree_base_create function. */
 ui_error_t ui_tree_base_create(struct ui_tree_base **out_tree,
                                const struct ui_tree_model *model) {
   struct ui_tree_base *tree;
@@ -182,6 +188,7 @@ ui_error_t ui_tree_base_create(struct ui_tree_base **out_tree,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_tree_base_destroy function. */
 ui_error_t ui_tree_base_destroy(struct ui_tree_base *tree) {
   if (!tree)
     return UI_ERROR_NONE;
@@ -195,6 +202,7 @@ ui_error_t ui_tree_base_destroy(struct ui_tree_base *tree) {
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_tree_base_get_selection_model function. */
 ui_error_t
 ui_tree_base_get_selection_model(struct ui_tree_base *tree,
                                  struct ui_selection_model **out_model) {
@@ -205,6 +213,7 @@ ui_tree_base_get_selection_model(struct ui_tree_base *tree,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_tree_base_is_expanded function. */
 ui_error_t ui_tree_base_is_expanded(const struct ui_tree_base *tree,
                                     void *node_id, int *out_is_expanded) {
   size_t i;
@@ -220,6 +229,7 @@ ui_error_t ui_tree_base_is_expanded(const struct ui_tree_base *tree,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_tree_base_set_expanded function. */
 ui_error_t ui_tree_base_set_expanded(struct ui_tree_base *tree, void *node_id,
                                      int expanded) {
   size_t i;
@@ -262,6 +272,7 @@ ui_error_t ui_tree_base_set_expanded(struct ui_tree_base *tree, void *node_id,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_tree_base_toggle_node function. */
 ui_error_t ui_tree_base_toggle_node(struct ui_tree_base *tree, void *node_id) {
   int is_expanded = 0;
   ui_error_t rc;
@@ -276,6 +287,7 @@ ui_error_t ui_tree_base_toggle_node(struct ui_tree_base *tree, void *node_id) {
   return tree_base_set_expanded_internal(tree, node_id, !is_expanded);
 }
 
+/** @brief ui_tree_base_set_active_node function. */
 ui_error_t ui_tree_base_set_active_node(struct ui_tree_base *tree,
                                         void *node_id) {
   if (!tree)
@@ -284,6 +296,7 @@ ui_error_t ui_tree_base_set_active_node(struct ui_tree_base *tree,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_tree_base_get_active_node function. */
 ui_error_t ui_tree_base_get_active_node(const struct ui_tree_base *tree,
                                         void **out_node) {
   if (!tree || !out_node) {
@@ -413,6 +426,7 @@ static ui_error_t get_prev_visible_node(struct ui_tree_base *tree, void *node,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_tree_base_handle_key_event function. */
 ui_error_t
 ui_tree_base_handle_key_event(struct ui_tree_base *tree,
                               const struct ui_keyboard_event *event) {
@@ -617,6 +631,7 @@ static ui_error_t render_recursive(struct ui_tree_base *tree, void *node,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_tree_base_render function. */
 ui_error_t ui_tree_base_render(struct ui_tree_base *tree,
                                struct ui_dom_node *container) {
   struct ui_dom_node *tree_root = NULL;
@@ -655,6 +670,7 @@ ui_error_t ui_tree_base_render(struct ui_tree_base *tree,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_tree_base_bind_data function. */
 ui_error_t ui_tree_base_bind_data(struct ui_tree_base *widget,
                                   struct ui_computed *signal) {
   if (!widget) {

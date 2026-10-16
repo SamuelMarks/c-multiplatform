@@ -11,6 +11,8 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_cupertino_shareplay_mock_avatar_destroy_fail;
+
 SUITE(cupertino_shareplay_suite);
 
 TEST test_shareplay_invalid_arguments(void) {
@@ -210,7 +212,6 @@ TEST test_shareplay_lifecycle_and_waves(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_cupertino_shareplay_mock_avatar_destroy_fail;
     rc = cupertino_shareplay_create(dummy_engine, &desc, &ctrl);
     ASSERT_EQ(UI_ERROR_NONE, rc);
 

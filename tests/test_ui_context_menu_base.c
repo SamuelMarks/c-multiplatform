@@ -6,6 +6,9 @@
 #include <stdlib.h>
 /* clang-format on */
 
+extern int g_malloc_fail_countdown;
+extern int g_context_menu_mock_fail;
+
 /* We need to hook into the menu's internal styling to see if it actually got
    clamped. Since ui_menu_base_open_at writes inline CSS to the menu's component
    root, we could ideally inspect it, but for a simple test we just verify the
@@ -71,60 +74,60 @@ static int test_context_menu_clamping(void) {
     return 1;
   ui_menu_base_close(menu);
 
-  struct ui_computed *anim = NULL;
-  ui_context_menu_base_bind_open(ctx_menu, NULL);
-  ui_context_menu_base_get_animating_signal(ctx_menu, &anim);
-
-  ui_context_menu_base_destroy(ctx_menu);
-
-  /* Test NULLs */
-  ui_context_menu_base_create(NULL);
-  ui_context_menu_base_destroy(NULL);
   {
-    struct ui_context_menu_base *no_menu =
-        (struct ui_context_menu_base *)calloc(1, 64);
-    rc = ui_context_menu_base_destroy(no_menu);
-    assert(rc == UI_ERROR_NONE);
-  }
-  ui_context_menu_base_get_menu(NULL, &menu);
-  ui_context_menu_base_get_menu(ctx_menu, NULL);
-  ui_context_menu_base_open_at(NULL, director, 0, 0, 0, 0, 0, 0);
-  ui_context_menu_base_open_at(ctx_menu, NULL, 0, 0, 0, 0, 0, 0);
-  ui_context_menu_base_bind_open(NULL, NULL);
-  ui_context_menu_base_get_animating_signal(NULL, &anim);
-  ui_context_menu_base_get_animating_signal(ctx_menu, NULL);
+    struct ui_computed *anim = NULL;
+    ui_context_menu_base_bind_open(ctx_menu, NULL);
+    ui_context_menu_base_get_animating_signal(ctx_menu, &anim);
 
-  /* Test malloc fails */
+    ui_context_menu_base_destroy(ctx_menu);
+
+    /* Test NULLs */
+    ui_context_menu_base_create(NULL);
+    ui_context_menu_base_destroy(NULL);
+    {
+      struct ui_context_menu_base *no_menu =
+          (struct ui_context_menu_base *)calloc(1, 64);
+      rc = ui_context_menu_base_destroy(no_menu);
+      assert(rc == UI_ERROR_NONE);
+    }
+    ui_context_menu_base_get_menu(NULL, &menu);
+    ui_context_menu_base_get_menu(ctx_menu, NULL);
+    ui_context_menu_base_open_at(NULL, director, 0, 0, 0, 0, 0, 0);
+    ui_context_menu_base_open_at(ctx_menu, NULL, 0, 0, 0, 0, 0, 0);
+    ui_context_menu_base_bind_open(NULL, NULL);
+    ui_context_menu_base_get_animating_signal(NULL, &anim);
+    ui_context_menu_base_get_animating_signal(ctx_menu, NULL);
+
+    /* Test malloc fails */
 #ifdef UI_TEST_MOCK_ALLOC
-  extern int g_malloc_fail_countdown;
-  g_malloc_fail_countdown = 0;
-  if (ui_context_menu_base_create(&ctx_menu) != UI_ERROR_OUT_OF_MEMORY)
-    return 1;
-  g_malloc_fail_countdown = 1;
-  /* Fails in ui_menu_base_create which is the second malloc usually */
-  ui_context_menu_base_create(&ctx_menu);
-  g_malloc_fail_countdown = -1;
+    g_malloc_fail_countdown = 0;
+    if (ui_context_menu_base_create(&ctx_menu) != UI_ERROR_OUT_OF_MEMORY)
+      return 1;
+    g_malloc_fail_countdown = 1;
+    /* Fails in ui_menu_base_create which is the second malloc usually */
+    ui_context_menu_base_create(&ctx_menu);
+    g_malloc_fail_countdown = -1;
 
-  {
-    extern int g_context_menu_mock_fail;
-    rc = ui_context_menu_base_create(&ctx_menu);
-    assert(rc == UI_ERROR_NONE);
-    g_context_menu_mock_fail = 1;
-    rc = ui_context_menu_base_destroy(ctx_menu);
-    assert(rc != UI_ERROR_NONE);
-    g_context_menu_mock_fail = 0;
-  }
+    {
+      rc = ui_context_menu_base_create(&ctx_menu);
+      assert(rc == UI_ERROR_NONE);
+      g_context_menu_mock_fail = 1;
+      rc = ui_context_menu_base_destroy(ctx_menu);
+      assert(rc != UI_ERROR_NONE);
+      g_context_menu_mock_fail = 0;
+    }
 #endif
 
-  {
-    ui_error_t rc_cleanup = ui_overlay_director_destroy(director);
-    assert(rc_cleanup == UI_ERROR_NONE);
+    {
+      ui_error_t rc_cleanup = ui_overlay_director_destroy(director);
+      assert(rc_cleanup == UI_ERROR_NONE);
+    }
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(body);
+      assert(rc_cleanup == UI_ERROR_NONE);
+    }
+    return 0;
   }
-  {
-    ui_error_t rc_cleanup = ui_dom_node_destroy(body);
-    assert(rc_cleanup == UI_ERROR_NONE);
-  }
-  return 0;
 }
 
 int main(void) {

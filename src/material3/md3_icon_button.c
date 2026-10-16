@@ -10,6 +10,7 @@
 #include <string.h>
 /* clang-format on */
 
+/** @brief md3_icon_button_create function. */
 ui_error_t md3_icon_button_create(struct ui_engine *engine,
                                   enum md3_icon_button_variant variant,
                                   const char *icon_name,
@@ -50,6 +51,7 @@ ui_error_t md3_icon_button_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_icon_button_destroy function. */
 ui_error_t md3_icon_button_destroy(struct md3_icon_button *button) {
   ui_error_t rc;
 
@@ -62,6 +64,7 @@ ui_error_t md3_icon_button_destroy(struct md3_icon_button *button) {
   return rc;
 }
 
+/** @brief md3_icon_button_set_toggleable function. */
 ui_error_t md3_icon_button_set_toggleable(struct md3_icon_button *button,
                                           int toggleable,
                                           const char *selected_icon_name) {
@@ -86,6 +89,7 @@ ui_error_t md3_icon_button_set_toggleable(struct md3_icon_button *button,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_icon_button_set_selected function. */
 ui_error_t md3_icon_button_set_selected(struct md3_icon_button *button,
                                         int selected) {
   struct ui_component *comp;
@@ -119,6 +123,7 @@ ui_error_t md3_icon_button_set_selected(struct md3_icon_button *button,
                                    button->is_selected ? "true" : "false");
 }
 
+/** @brief md3_icon_button_is_selected function. */
 ui_error_t md3_icon_button_is_selected(const struct md3_icon_button *button,
                                        int *out_selected) {
   if (!button || !out_selected) {
@@ -129,6 +134,7 @@ ui_error_t md3_icon_button_is_selected(const struct md3_icon_button *button,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_icon_button_set_disabled function. */
 ui_error_t md3_icon_button_set_disabled(struct md3_icon_button *button,
                                         int disabled) {
   if (!button) {
@@ -138,6 +144,7 @@ ui_error_t md3_icon_button_set_disabled(struct md3_icon_button *button,
   return ui_button_base_set_disabled(button->base, disabled);
 }
 
+/** @brief md3_icon_button_set_on_click function. */
 ui_error_t md3_icon_button_set_on_click(struct md3_icon_button *button,
                                         ui_button_on_click_t on_click,
                                         void *user_data) {
@@ -148,6 +155,7 @@ ui_error_t md3_icon_button_set_on_click(struct md3_icon_button *button,
   return ui_button_base_set_on_click(button->base, on_click, user_data);
 }
 
+/** @brief md3_icon_button_set_icon function. */
 ui_error_t md3_icon_button_set_icon(struct md3_icon_button *button,
                                     const char *icon_name) {
   if (!button) {
@@ -169,6 +177,7 @@ ui_error_t md3_icon_button_set_icon(struct md3_icon_button *button,
   }
 }
 
+/** @brief md3_icon_button_get_base function. */
 ui_error_t md3_icon_button_get_base(struct md3_icon_button *button,
                                     struct ui_button_base **out_base) {
   if (!button || !out_base) {

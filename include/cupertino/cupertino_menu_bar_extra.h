@@ -13,10 +13,11 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
+/** @brief CUPERTINO_MENU_BAR_EXTRA_STANDARD_HEIGHT constant. */
 #define CUPERTINO_MENU_BAR_EXTRA_STANDARD_HEIGHT 24.0f
 
 /**

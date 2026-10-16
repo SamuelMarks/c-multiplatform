@@ -249,6 +249,7 @@ ui_window_backend_android_create(struct ui_window_backend **out_backend) {
 
 /* \brief ui_error
  */
+/** @brief ui_window_backend_android_destroy function. */
 ui_error_t
 ui_window_backend_android_destroy(struct ui_window_backend *backend) {
   if (!backend) {

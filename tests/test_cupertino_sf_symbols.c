@@ -12,6 +12,9 @@
 /* clang-format on */
 
 SUITE(cupertino_sf_symbols_suite);
+#ifdef UI_TEST_MOCK_ALLOC
+extern void test_cupertino_symbol_evaluate_layers(struct cupertino_symbol *s);
+#endif
 
 TEST test_symbols_invalid_arguments(void) {
   struct cupertino_symbol_descriptor desc;
@@ -216,8 +219,6 @@ TEST test_symbols_rendering_modes_and_weights(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern void test_cupertino_symbol_evaluate_layers(struct cupertino_symbol *
-                                                      s);
     sym->rendering_mode = (enum cupertino_symbol_rendering_mode)999;
     test_cupertino_symbol_evaluate_layers(sym);
     ASSERT_EQ(1.0f, sym->layers[0].opacity);

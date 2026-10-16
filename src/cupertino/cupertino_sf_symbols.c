@@ -18,6 +18,7 @@ void test_cupertino_symbol_evaluate_layers(struct cupertino_symbol *sym) {
 }
 #endif
 
+/** @brief s_weight_multipliers[CUPERTINO_SYMBOL_WEIGHT_COUNT] variable. */
 static const float s_weight_multipliers[CUPERTINO_SYMBOL_WEIGHT_COUNT] = {
     0.60f, /* UltraLight */
     0.75f, /* Thin */
@@ -30,6 +31,7 @@ static const float s_weight_multipliers[CUPERTINO_SYMBOL_WEIGHT_COUNT] = {
     2.00f  /* Black */
 };
 
+/** @brief evaluate_symbol_layers function. */
 static void evaluate_symbol_layers(struct cupertino_symbol *sym) {
   float base_thickness;
   int i;
@@ -94,6 +96,7 @@ static void evaluate_symbol_layers(struct cupertino_symbol *sym) {
   }
 }
 
+/** @brief cupertino_symbol_create function. */
 ui_error_t
 cupertino_symbol_create(struct ui_engine *engine,
                         const struct cupertino_symbol_descriptor *desc,
@@ -158,6 +161,7 @@ cupertino_symbol_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_symbol_destroy function. */
 ui_error_t cupertino_symbol_destroy(struct cupertino_symbol *symbol) {
   if (!symbol) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -167,6 +171,7 @@ ui_error_t cupertino_symbol_destroy(struct cupertino_symbol *symbol) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_symbol_set_name function. */
 ui_error_t cupertino_symbol_set_name(struct cupertino_symbol *symbol,
                                      const char *name) {
   if (!symbol || !name) {
@@ -183,6 +188,7 @@ ui_error_t cupertino_symbol_set_name(struct cupertino_symbol *symbol,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_symbol_set_rendering_mode function. */
 ui_error_t
 cupertino_symbol_set_rendering_mode(struct cupertino_symbol *symbol,
                                     enum cupertino_symbol_rendering_mode mode) {
@@ -195,6 +201,7 @@ cupertino_symbol_set_rendering_mode(struct cupertino_symbol *symbol,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_symbol_set_weight function. */
 ui_error_t cupertino_symbol_set_weight(struct cupertino_symbol *symbol,
                                        enum cupertino_symbol_weight weight) {
   if (!symbol || (int)weight < 0 ||
@@ -207,6 +214,7 @@ ui_error_t cupertino_symbol_set_weight(struct cupertino_symbol *symbol,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_symbol_set_size function. */
 ui_error_t cupertino_symbol_set_size(struct cupertino_symbol *symbol,
                                      enum cupertino_symbol_size size) {
   if (!symbol || (int)size < 0 || (int)size > 2) {
@@ -218,6 +226,7 @@ ui_error_t cupertino_symbol_set_size(struct cupertino_symbol *symbol,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_symbol_set_palette function. */
 ui_error_t cupertino_symbol_set_palette(struct cupertino_symbol *symbol,
                                         ui_color_t primary,
                                         ui_color_t secondary,
@@ -233,6 +242,7 @@ ui_error_t cupertino_symbol_set_palette(struct cupertino_symbol *symbol,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_symbol_get_layer function. */
 ui_error_t
 cupertino_symbol_get_layer(const struct cupertino_symbol *symbol,
                            int layer_index,
@@ -246,6 +256,7 @@ cupertino_symbol_get_layer(const struct cupertino_symbol *symbol,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_symbol_get_dimensions function. */
 ui_error_t
 cupertino_symbol_get_dimensions(const struct cupertino_symbol *symbol,
                                 float *out_width, float *out_height) {

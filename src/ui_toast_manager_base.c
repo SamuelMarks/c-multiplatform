@@ -213,6 +213,7 @@ struct ui_toast_manager_base {
   int is_hovered; /**< is_hovered */
 };
 
+/** @brief ui_toast_manager_base_create function. */
 ui_error_t
 ui_toast_manager_base_create(struct ui_toast_manager_base **out_manager) {
   struct ui_toast_manager_base *manager;
@@ -269,6 +270,7 @@ static ui_error_t free_toast_entry(struct ui_toast_entry *entry) {
   return rc;
 }
 
+/** @brief ui_toast_manager_base_destroy function. */
 ui_error_t
 ui_toast_manager_base_destroy(struct ui_toast_manager_base *manager) {
   int i;
@@ -288,6 +290,7 @@ ui_toast_manager_base_destroy(struct ui_toast_manager_base *manager) {
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_toast_manager_base_show function. */
 ui_error_t ui_toast_manager_base_show(struct ui_toast_manager_base *manager,
                                       const struct ui_toast_config *config,
                                       double current_time_secs,
@@ -365,6 +368,7 @@ ui_error_t ui_toast_manager_base_show(struct ui_toast_manager_base *manager,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_toast_manager_base_dismiss function. */
 ui_error_t ui_toast_manager_base_dismiss(struct ui_toast_manager_base *manager,
                                          ui_toast_id id) {
   int i;
@@ -394,6 +398,7 @@ ui_error_t ui_toast_manager_base_dismiss(struct ui_toast_manager_base *manager,
   return UI_ERROR_NOT_FOUND;
 }
 
+/** @brief ui_toast_manager_base_tick function. */
 ui_error_t ui_toast_manager_base_tick(struct ui_toast_manager_base *manager,
                                       double current_time_secs) {
   int i;
@@ -462,6 +467,7 @@ ui_error_t ui_toast_manager_base_tick(struct ui_toast_manager_base *manager,
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_toast_manager_base_handle_event function. */
 ui_error_t
 ui_toast_manager_base_handle_event(struct ui_toast_manager_base *manager,
                                    const struct ui_event *event,
@@ -548,6 +554,7 @@ static ui_error_t get_region_style(enum ui_toast_region region,
   }
 }
 
+/** @brief ui_toast_manager_base_render function. */
 ui_error_t ui_toast_manager_base_render(struct ui_toast_manager_base *manager,
                                         struct ui_overlay_director *director) {
   int i;

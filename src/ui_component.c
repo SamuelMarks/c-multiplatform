@@ -266,6 +266,7 @@ ui_error_t ui_component_destroy(struct ui_component *component) {
 
 /* \brief ui_error
  */
+/** @brief ui_component_set_default_style function. */
 ui_error_t
 ui_component_set_default_style(struct ui_component *component,
                                struct ui_css_stylesheet *stylesheet) {

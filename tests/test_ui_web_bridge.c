@@ -4,6 +4,8 @@
 #include <stdio.h>
 /* clang-format on */
 
+extern int g_web_bridge_mock_fail;
+
 #ifdef UI_TEST_MOCK_ALLOC
 extern int g_malloc_fail_countdown;
 #endif
@@ -161,7 +163,6 @@ static int test_web_bridge(void) {
   /* Test flush failure in ensure_buffer */
   {
     int i;
-    extern int g_web_bridge_mock_fail;
     ui_web_bridge_shutdown();
     for (i = 0; i < 700; i++) {
       ui_web_bridge_create_node((ui_uint32)i, "span");

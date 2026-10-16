@@ -16,7 +16,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
@@ -30,10 +30,10 @@ struct ui_engine;
  * @brief Represents an individual segment button in the segmented button group.
  */
 struct md3_segment_item {
-  struct ui_segmented_button_base *base;
-  int id;
-  char label[64];
-  char icon[32];
+  struct ui_segmented_button_base *base; /**< base field. */
+  int id;                                /**< id field. */
+  char label[64];                        /**< label[64] field. */
+  char icon[32];                         /**< icon[32] field. */
 };
 
 /**
@@ -41,13 +41,16 @@ struct md3_segment_item {
  * @brief Material 3 Segmented Button skin wrapping ui_segmented_control_base.
  */
 struct md3_segmented_button {
-  struct ui_segmented_control_base *base;
-  enum ui_segmented_control_mode mode;
-  struct ui_control_value_accessor cva;
-  struct md3_segment_item segments[MD3_SEGMENTED_BUTTON_MAX_SEGMENTS];
-  size_t segment_count;
-  int selected_segment_id;
-  int disabled;
+  struct ui_segmented_control_base *base; /**< base field. */
+  enum ui_segmented_control_mode mode;    /**< mode field. */
+  struct ui_control_value_accessor cva;   /**< cva field. */
+  struct md3_segment_item segments
+      [MD3_SEGMENTED_BUTTON_MAX_SEGMENTS]; /**<
+                                              segments[MD3_SEGMENTED_BUTTON_MAX_SEGMENTS]
+                                              field. */
+  size_t segment_count;                    /**< segment_count field. */
+  int selected_segment_id;                 /**< selected_segment_id field. */
+  int disabled;                            /**< disabled field. */
 };
 
 /**
@@ -123,6 +126,6 @@ md3_segmented_button_get_base(struct md3_segmented_button *button,
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* MATERIAL3_MD3_SEGMENTED_BUTTON_H */

@@ -7,6 +7,8 @@
 #include <math.h>
 /* clang-format on */
 
+extern int g_color_picker_mock_fail;
+
 static int test_hsv_rgb_conversions(void) {
   struct ui_color_rgb rgb = {0};
   struct ui_color_hsv hsv = {0};
@@ -138,7 +140,6 @@ static int test_hsv_rgb_conversions(void) {
   if (rc != UI_ERROR_NONE || fabs(hsv.v - (128.0 / 255.0)) > 0.01 ||
       hsv.s != 0.0)
     return 1;
-
   return 0;
 }
 
@@ -184,7 +185,6 @@ static int test_hex_conversions(void) {
   rc = ui_color_picker_hex_to_rgb("#00F", &rgb);
   if (rc != UI_ERROR_PARSE_FAILED)
     return 1;
-
   return 0;
 }
 
@@ -239,7 +239,6 @@ static int test_2d_mapping(void) {
   rc = ui_color_picker_calc_hsv_from_2d(0.0, 150.0, -50.0, 100.0, 100.0, &hsv);
   if (rc != UI_ERROR_NONE || hsv.s != 1.0 || hsv.v != 1.0)
     return 1;
-
   return 0;
 }
 
@@ -310,8 +309,8 @@ static int test_manager_state(void) {
     cva.register_on_touched(picker, NULL, NULL);
   if (cva.set_disabled_state)
     cva.set_disabled_state(picker, 1);
+  val.int_val = (0x00FF00 << 8) | 0xFF; /* Green */
   if (cva.write_value) {
-    val.int_val = (0x00FF00 << 8) | 0xFF; /* Green */
     cva.write_value(picker, val);
   }
 
@@ -343,7 +342,6 @@ static int test_manager_state(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_color_picker_mock_fail;
     g_color_picker_mock_fail = 1;
     if (ui_color_picker_base_set_rgb(picker, &rgb) != UI_ERROR_UNKNOWN)
       return 1;

@@ -11,6 +11,10 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_cupertino_search_bar_mock_init_fail;
+extern int g_cupertino_search_bar_mock_cleanup_fail;
+extern int g_cupertino_search_bar_mock_set_query_fail;
+
 SUITE(cupertino_search_bar_suite);
 
 TEST test_search_bar_invalid_args(void) {
@@ -307,9 +311,6 @@ TEST test_search_bar_lifecycle_and_features(void) {
 
 TEST test_search_bar_oom_mock(void) {
 #ifdef UI_TEST_MOCK_ALLOC
-  extern int g_cupertino_search_bar_mock_init_fail;
-  extern int g_cupertino_search_bar_mock_cleanup_fail;
-  extern int g_cupertino_search_bar_mock_set_query_fail;
 #endif
   struct cupertino_search_bar_descriptor desc;
   struct cupertino_search_bar *bar = NULL;

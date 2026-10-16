@@ -376,6 +376,7 @@ ui_error_t ui_window_backend_linux_destroy(struct ui_window_backend *backend) {
 /* Non-Linux Platform Stub (or Linux without X11 when Wayland is not active) */
 
 #if !defined(UI_ENABLE_WAYLAND)
+/** @brief ui_window_backend_linux_create function. */
 ui_error_t
 ui_window_backend_linux_create(struct ui_window_backend **out_backend) {
   if (!out_backend) {
@@ -387,6 +388,7 @@ ui_window_backend_linux_create(struct ui_window_backend **out_backend) {
 
 /* \brief ui_error
  */
+/** @brief ui_window_backend_linux_destroy function. */
 ui_error_t ui_window_backend_linux_destroy(struct ui_window_backend *backend) {
   if (!backend) {
     return UI_ERROR_INVALID_ARGUMENT;

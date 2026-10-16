@@ -1,3 +1,8 @@
+/**
+ * @file test_mock_backend.c
+ * @brief Unit tests for the auth_flow mock backend.
+ */
+
 /* clang-format off */
 #include "../mock_backend.h"
 #include "../../../src/ui_internal_mem.h"

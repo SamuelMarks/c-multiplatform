@@ -15,24 +15,28 @@ extern int g_md3_adaptive_mock_comp_null;
 #include <string.h>
 /* clang-format on */
 
+/** @brief md3_list_detail_pane_scaffold structure. */
 struct md3_list_detail_pane_scaffold {
-  struct ui_adaptive_pane_scaffold_base *base;
+  struct ui_adaptive_pane_scaffold_base *base; /**< base field. */
 };
 
+/** @brief md3_supporting_pane_scaffold structure. */
 struct md3_supporting_pane_scaffold {
-  struct ui_adaptive_pane_scaffold_base *base;
+  struct ui_adaptive_pane_scaffold_base *base; /**< base field. */
 };
 
+/** @brief md3_navigation_suite_scaffold structure. */
 struct md3_navigation_suite_scaffold {
-  struct ui_component *component;
-  struct ui_dom_node *root_node;
-  enum ui_adaptive_window_width_class width_class;
+  struct ui_component *component;                  /**< component field. */
+  struct ui_dom_node *root_node;                   /**< root_node field. */
+  enum ui_adaptive_window_width_class width_class; /**< width_class field. */
 };
 
 /* ========================================================================= */
 /* List-Detail Pane Scaffold Implementation                                  */
 /* ========================================================================= */
 
+/** @brief md3_list_detail_pane_scaffold_create function. */
 ui_error_t md3_list_detail_pane_scaffold_create(
     struct ui_engine *engine,
     struct md3_list_detail_pane_scaffold **out_scaffold) {
@@ -86,6 +90,7 @@ ui_error_t md3_list_detail_pane_scaffold_create(
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_list_detail_pane_scaffold_destroy function. */
 ui_error_t md3_list_detail_pane_scaffold_destroy(
     struct md3_list_detail_pane_scaffold *scaffold) {
   ui_error_t rc;
@@ -101,6 +106,7 @@ ui_error_t md3_list_detail_pane_scaffold_destroy(
   return rc;
 }
 
+/** @brief md3_list_detail_pane_scaffold_get_base function. */
 ui_error_t md3_list_detail_pane_scaffold_get_base(
     struct md3_list_detail_pane_scaffold *scaffold,
     struct ui_adaptive_pane_scaffold_base **out_base) {
@@ -112,6 +118,7 @@ ui_error_t md3_list_detail_pane_scaffold_get_base(
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_list_detail_pane_scaffold_set_list_pane function. */
 ui_error_t md3_list_detail_pane_scaffold_set_list_pane(
     struct md3_list_detail_pane_scaffold *scaffold,
     struct ui_component *list_component) {
@@ -122,6 +129,7 @@ ui_error_t md3_list_detail_pane_scaffold_set_list_pane(
       scaffold->base, UI_PANE_ROLE_PRIMARY, list_component);
 }
 
+/** @brief md3_list_detail_pane_scaffold_set_detail_pane function. */
 ui_error_t md3_list_detail_pane_scaffold_set_detail_pane(
     struct md3_list_detail_pane_scaffold *scaffold,
     struct ui_component *detail_component) {
@@ -132,6 +140,7 @@ ui_error_t md3_list_detail_pane_scaffold_set_detail_pane(
       scaffold->base, UI_PANE_ROLE_SECONDARY, detail_component);
 }
 
+/** @brief md3_list_detail_pane_scaffold_set_extra_pane function. */
 ui_error_t md3_list_detail_pane_scaffold_set_extra_pane(
     struct md3_list_detail_pane_scaffold *scaffold,
     struct ui_component *extra_component) {
@@ -146,6 +155,7 @@ ui_error_t md3_list_detail_pane_scaffold_set_extra_pane(
 /* Supporting Pane Scaffold Implementation                                   */
 /* ========================================================================= */
 
+/** @brief md3_supporting_pane_scaffold_create function. */
 ui_error_t md3_supporting_pane_scaffold_create(
     struct ui_engine *engine,
     struct md3_supporting_pane_scaffold **out_scaffold) {
@@ -198,6 +208,7 @@ ui_error_t md3_supporting_pane_scaffold_create(
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_supporting_pane_scaffold_destroy function. */
 ui_error_t md3_supporting_pane_scaffold_destroy(
     struct md3_supporting_pane_scaffold *scaffold) {
   ui_error_t rc;
@@ -213,6 +224,7 @@ ui_error_t md3_supporting_pane_scaffold_destroy(
   return rc;
 }
 
+/** @brief md3_supporting_pane_scaffold_get_base function. */
 ui_error_t md3_supporting_pane_scaffold_get_base(
     struct md3_supporting_pane_scaffold *scaffold,
     struct ui_adaptive_pane_scaffold_base **out_base) {
@@ -224,6 +236,7 @@ ui_error_t md3_supporting_pane_scaffold_get_base(
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_supporting_pane_scaffold_set_main_pane function. */
 ui_error_t md3_supporting_pane_scaffold_set_main_pane(
     struct md3_supporting_pane_scaffold *scaffold,
     struct ui_component *main_component) {
@@ -234,6 +247,7 @@ ui_error_t md3_supporting_pane_scaffold_set_main_pane(
       scaffold->base, UI_PANE_ROLE_PRIMARY, main_component);
 }
 
+/** @brief md3_supporting_pane_scaffold_set_supporting_pane function. */
 ui_error_t md3_supporting_pane_scaffold_set_supporting_pane(
     struct md3_supporting_pane_scaffold *scaffold,
     struct ui_component *supporting_component) {
@@ -248,6 +262,7 @@ ui_error_t md3_supporting_pane_scaffold_set_supporting_pane(
 /* Navigation Suite Scaffold Implementation                                  */
 /* ========================================================================= */
 
+/** @brief md3_navigation_suite_scaffold_create function. */
 ui_error_t md3_navigation_suite_scaffold_create(
     struct ui_engine *engine,
     struct md3_navigation_suite_scaffold **out_scaffold) {
@@ -311,6 +326,7 @@ ui_error_t md3_navigation_suite_scaffold_create(
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_navigation_suite_scaffold_destroy function. */
 ui_error_t md3_navigation_suite_scaffold_destroy(
     struct md3_navigation_suite_scaffold *scaffold) {
   if (scaffold == NULL) {
@@ -326,6 +342,7 @@ ui_error_t md3_navigation_suite_scaffold_destroy(
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_navigation_suite_scaffold_set_window_width_class function. */
 ui_error_t md3_navigation_suite_scaffold_set_window_width_class(
     struct md3_navigation_suite_scaffold *scaffold,
     enum ui_adaptive_window_width_class width_class) {
@@ -359,6 +376,7 @@ ui_error_t md3_navigation_suite_scaffold_set_window_width_class(
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_navigation_suite_scaffold_get_component function. */
 ui_error_t md3_navigation_suite_scaffold_get_component(
     struct md3_navigation_suite_scaffold *scaffold,
     struct ui_component **out_component) {

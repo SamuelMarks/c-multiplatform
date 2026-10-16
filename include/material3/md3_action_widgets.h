@@ -21,7 +21,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
@@ -51,14 +51,15 @@ enum md3_button_group_selection_mode {
  * @brief Material 3 Button Group wrapping ui_button_group_base.
  */
 struct md3_button_group {
-  struct ui_button_group_base *base;
-  enum md3_button_group_orientation orientation;
-  enum md3_button_group_selection_mode selection_mode;
-  struct md3_button **buttons;
-  size_t button_count;
-  size_t capacity;
-  int *selected_states;
-  int focused_index;
+  struct ui_button_group_base *base;             /**< base field. */
+  enum md3_button_group_orientation orientation; /**< orientation field. */
+  enum md3_button_group_selection_mode
+      selection_mode;          /**< selection_mode field. */
+  struct md3_button **buttons; /**< buttons field. */
+  size_t button_count;         /**< button_count field. */
+  size_t capacity;             /**< capacity field. */
+  int *selected_states;        /**< selected_states field. */
+  int focused_index;           /**< focused_index field. */
 };
 
 /**
@@ -139,10 +140,10 @@ md3_button_group_navigate(struct md3_button_group *group, int delta);
  * @brief Material 3 Toggle Button wrapping ui_toggle_base.
  */
 struct md3_toggle_button {
-  struct ui_toggle_base *base;
-  int is_selected;
-  char text[64];
-  char icon_name[32];
+  struct ui_toggle_base *base; /**< base field. */
+  int is_selected;             /**< is_selected field. */
+  char text[64];               /**< text[64] field. */
+  char icon_name[32];          /**< icon_name[32] field. */
 };
 
 /**
@@ -221,11 +222,11 @@ enum md3_toolbar_variant {
  * @brief Item slot hosted within toolbar.
  */
 struct md3_toolbar_item {
-  int id;
-  float width;
-  int is_overflow;
-  char title[64];
-  struct md3_toolbar_item *next;
+  int id;                        /**< id field. */
+  float width;                   /**< width field. */
+  int is_overflow;               /**< is_overflow field. */
+  char title[64];                /**< title[64] field. */
+  struct md3_toolbar_item *next; /**< next field. */
 };
 
 /**
@@ -233,14 +234,14 @@ struct md3_toolbar_item {
  * @brief Material 3 Toolbar wrapping ui_toolbar_base.
  */
 struct md3_toolbar {
-  struct ui_toolbar_base *base;
-  enum md3_toolbar_variant variant;
-  float available_width;
-  struct md3_toolbar_item *items;
-  size_t item_count;
-  size_t visible_count;
-  size_t overflow_count;
-  int focused_index;
+  struct ui_toolbar_base *base;     /**< base field. */
+  enum md3_toolbar_variant variant; /**< variant field. */
+  float available_width;            /**< available_width field. */
+  struct md3_toolbar_item *items;   /**< items field. */
+  size_t item_count;                /**< item_count field. */
+  size_t visible_count;             /**< visible_count field. */
+  size_t overflow_count;            /**< overflow_count field. */
+  int focused_index;                /**< focused_index field. */
 };
 
 /**

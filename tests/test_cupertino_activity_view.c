@@ -123,8 +123,16 @@ TEST test_activity_view_items_and_presentation(void) {
 
   /* Item 0: AirDrop contact */
   memset(&item, 0, sizeof(item));
+#if defined(_MSC_VER)
+  strcpy_s(item.title, sizeof(item.title), "Alice's iPhone");
+#else
   strcpy(item.title, "Alice's iPhone");
+#endif
+#if defined(_MSC_VER)
+  strcpy_s(item.symbol_name, sizeof(item.symbol_name), "person.crop.circle");
+#else
   strcpy(item.symbol_name, "person.crop.circle");
+#endif
   item.category = CUPERTINO_ACTIVITY_AIRDROP;
   item.is_disabled = 0;
   rc = cupertino_activity_view_add_item(view, &item);
@@ -132,8 +140,16 @@ TEST test_activity_view_items_and_presentation(void) {
 
   /* Item 1: App extension (Messages) */
   memset(&item, 0, sizeof(item));
+#if defined(_MSC_VER)
+  strcpy_s(item.title, sizeof(item.title), "Messages");
+#else
   strcpy(item.title, "Messages");
+#endif
+#if defined(_MSC_VER)
+  strcpy_s(item.symbol_name, sizeof(item.symbol_name), "message.fill");
+#else
   strcpy(item.symbol_name, "message.fill");
+#endif
   item.category = CUPERTINO_ACTIVITY_APP_EXTENSION;
   item.is_disabled = 0;
   rc = cupertino_activity_view_add_item(view, &item);
@@ -141,8 +157,16 @@ TEST test_activity_view_items_and_presentation(void) {
 
   /* Item 2: Disabled App extension */
   memset(&item, 0, sizeof(item));
+#if defined(_MSC_VER)
+  strcpy_s(item.title, sizeof(item.title), "Mail");
+#else
   strcpy(item.title, "Mail");
+#endif
+#if defined(_MSC_VER)
+  strcpy_s(item.symbol_name, sizeof(item.symbol_name), "envelope.fill");
+#else
   strcpy(item.symbol_name, "envelope.fill");
+#endif
   item.category = CUPERTINO_ACTIVITY_APP_EXTENSION;
   item.is_disabled = 1;
   rc = cupertino_activity_view_add_item(view, &item);
@@ -150,8 +174,16 @@ TEST test_activity_view_items_and_presentation(void) {
 
   /* Item 3: System action (Copy) */
   memset(&item, 0, sizeof(item));
+#if defined(_MSC_VER)
+  strcpy_s(item.title, sizeof(item.title), "Copy");
+#else
   strcpy(item.title, "Copy");
+#endif
+#if defined(_MSC_VER)
+  strcpy_s(item.symbol_name, sizeof(item.symbol_name), "doc.on.doc");
+#else
   strcpy(item.symbol_name, "doc.on.doc");
+#endif
   item.category = CUPERTINO_ACTIVITY_SYSTEM_ACTION;
   item.is_disabled = 0;
   rc = cupertino_activity_view_add_item(view, &item);
@@ -215,7 +247,11 @@ TEST test_activity_view_items_and_presentation(void) {
   /* Fill remaining slots to reach CUPERTINO_ACTIVITY_VIEW_MAX_ITEMS */
   for (i = 4; i < CUPERTINO_ACTIVITY_VIEW_MAX_ITEMS; i++) {
     memset(&item, 0, sizeof(item));
+#if defined(_MSC_VER)
+    strcpy_s(item.title, sizeof(item.title), "Action");
+#else
     strcpy(item.title, "Action");
+#endif
     rc = cupertino_activity_view_add_item(view, &item);
     ASSERT_EQ(UI_ERROR_NONE, rc);
   }

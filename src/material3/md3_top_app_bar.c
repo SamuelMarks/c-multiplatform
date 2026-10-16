@@ -176,6 +176,7 @@ ui_error_t md3_top_app_bar_test_duplicate_string(struct ui_arena *arena,
 }
 #endif
 
+/** @brief md3_top_app_bar_create function. */
 ui_error_t md3_top_app_bar_create(struct ui_engine *engine,
                                   const struct md3_top_app_bar_config *config,
                                   struct md3_top_app_bar **out_bar) {
@@ -254,6 +255,7 @@ cleanup:
   return rc;
 }
 
+/** @brief md3_top_app_bar_destroy function. */
 ui_error_t md3_top_app_bar_destroy(struct md3_top_app_bar *bar) {
   ui_error_t rc;
   ui_error_t final_rc = UI_ERROR_NONE;
@@ -280,6 +282,7 @@ ui_error_t md3_top_app_bar_destroy(struct md3_top_app_bar *bar) {
   return final_rc;
 }
 
+/** @brief md3_top_app_bar_handle_scroll function. */
 ui_error_t md3_top_app_bar_handle_scroll(struct md3_top_app_bar *bar,
                                          float scroll_y, float delta_y) {
   if (!bar) {
@@ -292,6 +295,7 @@ ui_error_t md3_top_app_bar_handle_scroll(struct md3_top_app_bar *bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_top_app_bar_get_base function. */
 ui_error_t md3_top_app_bar_get_base(struct md3_top_app_bar *bar,
                                     struct ui_top_app_bar_base **out_base) {
   if (!bar || !out_base) {
@@ -302,6 +306,7 @@ ui_error_t md3_top_app_bar_get_base(struct md3_top_app_bar *bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_top_app_bar_set_navigation_icon function. */
 ui_error_t md3_top_app_bar_set_navigation_icon(struct md3_top_app_bar *bar,
                                                struct md3_icon_button *icon) {
   if (!bar) {
@@ -311,6 +316,7 @@ ui_error_t md3_top_app_bar_set_navigation_icon(struct md3_top_app_bar *bar,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_top_app_bar_add_action_item function. */
 ui_error_t md3_top_app_bar_add_action_item(struct md3_top_app_bar *bar,
                                            struct md3_icon_button *action) {
   size_t new_capacity;

@@ -348,7 +348,9 @@ struct ui_tree_model g_default_tree_model;
 #define s_default_table_model g_default_table_model
 #define s_default_tree_model g_default_tree_model
 #else
+/** @brief s_default_table_model variable. */
 static struct ui_table_model s_default_table_model;
+/** @brief s_default_tree_model variable. */
 static struct ui_tree_model s_default_tree_model;
 #endif
 
@@ -356,6 +358,7 @@ static struct ui_tree_model s_default_tree_model;
 /* md3_table                                                                 */
 /* ========================================================================= */
 
+/** @brief md3_default_row_count function. */
 static size_t md3_default_row_count(void *user_data) {
   if (user_data != NULL) {
     return 0;
@@ -363,6 +366,7 @@ static size_t md3_default_row_count(void *user_data) {
   return 0;
 }
 
+/** @brief md3_default_col_count function. */
 static size_t md3_default_col_count(void *user_data) {
   if (user_data != NULL) {
     return 0;
@@ -370,6 +374,7 @@ static size_t md3_default_col_count(void *user_data) {
   return 0;
 }
 
+/** @brief md3_default_render_cell function. */
 static ui_error_t md3_default_render_cell(size_t row, size_t col,
                                           struct ui_dom_node *cell_node,
                                           void *user_data) {
@@ -379,6 +384,7 @@ static ui_error_t md3_default_render_cell(size_t row, size_t col,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_default_render_header function. */
 static ui_error_t md3_default_render_header(size_t col,
                                             struct ui_dom_node *header_node,
                                             void *user_data) {
@@ -388,6 +394,7 @@ static ui_error_t md3_default_render_header(size_t col,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_table_create function. */
 ui_error_t md3_table_create(struct ui_engine *engine,
                             struct md3_table **out_table) {
   struct md3_table *tbl;
@@ -441,6 +448,7 @@ ui_error_t md3_table_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_table_destroy function. */
 ui_error_t md3_table_destroy(struct md3_table *table) {
   ui_error_t rc;
 
@@ -468,6 +476,7 @@ ui_error_t md3_table_destroy(struct md3_table *table) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_table_set_density function. */
 ui_error_t md3_table_set_density(struct md3_table *table,
                                  enum md3_table_density density) {
   if (table == NULL) {
@@ -477,6 +486,7 @@ ui_error_t md3_table_set_density(struct md3_table *table,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_table_get_row_height function. */
 ui_error_t md3_table_get_row_height(const struct md3_table *table,
                                     float *out_height_dp) {
   if (table == NULL || out_height_dp == NULL) {
@@ -493,6 +503,7 @@ ui_error_t md3_table_get_row_height(const struct md3_table *table,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_table_set_model function. */
 ui_error_t md3_table_set_model(struct md3_table *table,
                                const struct ui_table_model *model) {
   if (table == NULL) {
@@ -506,6 +517,7 @@ ui_error_t md3_table_set_model(struct md3_table *table,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_table_set_sticky_header function. */
 ui_error_t md3_table_set_sticky_header(struct md3_table *table, int sticky) {
   if (table == NULL) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -514,6 +526,7 @@ ui_error_t md3_table_set_sticky_header(struct md3_table *table, int sticky) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_table_set_sticky_first_column function. */
 ui_error_t md3_table_set_sticky_first_column(struct md3_table *table,
                                              int sticky) {
   if (table == NULL) {
@@ -523,6 +536,7 @@ ui_error_t md3_table_set_sticky_first_column(struct md3_table *table,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_table_set_sticky_last_column function. */
 ui_error_t md3_table_set_sticky_last_column(struct md3_table *table,
                                             int sticky) {
   if (table == NULL) {
@@ -532,6 +546,7 @@ ui_error_t md3_table_set_sticky_last_column(struct md3_table *table,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_table_set_selectable function. */
 ui_error_t md3_table_set_selectable(struct md3_table *table, int selectable) {
   if (table == NULL) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -540,6 +555,7 @@ ui_error_t md3_table_set_selectable(struct md3_table *table, int selectable) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_table_select_row function. */
 ui_error_t md3_table_select_row(struct md3_table *table, size_t row_index,
                                 int selected) {
   size_t i;
@@ -571,6 +587,7 @@ ui_error_t md3_table_select_row(struct md3_table *table, size_t row_index,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_table_is_row_selected function. */
 ui_error_t md3_table_is_row_selected(const struct md3_table *table,
                                      size_t row_index, int *out_selected) {
   size_t i;
@@ -589,6 +606,7 @@ ui_error_t md3_table_is_row_selected(const struct md3_table *table,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_table_select_all function. */
 ui_error_t md3_table_select_all(struct md3_table *table, int selected) {
   size_t i;
   size_t limit;
@@ -610,6 +628,7 @@ ui_error_t md3_table_select_all(struct md3_table *table, int selected) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_table_get_selection_state function. */
 ui_error_t md3_table_get_selection_state(const struct md3_table *table,
                                          int *out_all_selected,
                                          int *out_indeterminate) {
@@ -630,6 +649,7 @@ ui_error_t md3_table_get_selection_state(const struct md3_table *table,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_table_set_hovered_row function. */
 ui_error_t md3_table_set_hovered_row(struct md3_table *table,
                                      size_t row_index) {
   if (table == NULL) {
@@ -640,6 +660,7 @@ ui_error_t md3_table_set_hovered_row(struct md3_table *table,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_table_set_virtual_scroll function. */
 ui_error_t md3_table_set_virtual_scroll(struct md3_table *table, int enabled,
                                         size_t viewport_height) {
   if (table == NULL) {
@@ -650,6 +671,7 @@ ui_error_t md3_table_set_virtual_scroll(struct md3_table *table, int enabled,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_table_set_horizontal_scroll function. */
 ui_error_t md3_table_set_horizontal_scroll(struct md3_table *table,
                                            int enabled) {
   if (table == NULL) {
@@ -659,6 +681,7 @@ ui_error_t md3_table_set_horizontal_scroll(struct md3_table *table,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_table_set_glassmorphism function. */
 ui_error_t md3_table_set_glassmorphism(struct md3_table *table, int enabled) {
   if (table == NULL) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -667,6 +690,7 @@ ui_error_t md3_table_set_glassmorphism(struct md3_table *table, int enabled) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_table_toggle_row_expansion function. */
 ui_error_t md3_table_toggle_row_expansion(struct md3_table *table,
                                           size_t row_index) {
   size_t i;
@@ -698,6 +722,7 @@ ui_error_t md3_table_toggle_row_expansion(struct md3_table *table,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_table_is_row_expanded function. */
 ui_error_t md3_table_is_row_expanded(const struct md3_table *table,
                                      size_t row_index, int *out_expanded) {
   size_t i;
@@ -716,6 +741,7 @@ ui_error_t md3_table_is_row_expanded(const struct md3_table *table,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_table_resize_column function. */
 ui_error_t md3_table_resize_column(struct md3_table *table, size_t col_index,
                                    float new_width) {
   if (table == NULL || table->datagrid_base == NULL) {
@@ -729,6 +755,7 @@ ui_error_t md3_table_resize_column(struct md3_table *table, size_t col_index,
 /* md3_paginator                                                             */
 /* ========================================================================= */
 
+/** @brief md3_paginator_create function. */
 ui_error_t md3_paginator_create(struct ui_engine *engine,
                                 struct md3_paginator **out_paginator) {
   struct md3_paginator *p;
@@ -767,6 +794,7 @@ ui_error_t md3_paginator_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_paginator_destroy function. */
 ui_error_t md3_paginator_destroy(struct md3_paginator *paginator) {
   ui_error_t rc;
 
@@ -786,6 +814,7 @@ ui_error_t md3_paginator_destroy(struct md3_paginator *paginator) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_paginator_set_config function. */
 ui_error_t md3_paginator_set_config(struct md3_paginator *paginator,
                                     size_t total_items, size_t page_size) {
   ui_error_t rc;
@@ -806,6 +835,7 @@ ui_error_t md3_paginator_set_config(struct md3_paginator *paginator,
   return rc;
 }
 
+/** @brief md3_paginator_set_current_page function. */
 ui_error_t md3_paginator_set_current_page(struct md3_paginator *paginator,
                                           size_t page_index) {
   ui_error_t rc;
@@ -824,6 +854,7 @@ ui_error_t md3_paginator_set_current_page(struct md3_paginator *paginator,
   return rc;
 }
 
+/** @brief md3_paginator_get_current_page function. */
 ui_error_t md3_paginator_get_current_page(const struct md3_paginator *paginator,
                                           size_t *out_page) {
   if (paginator == NULL || paginator->base == NULL || out_page == NULL) {
@@ -832,6 +863,7 @@ ui_error_t md3_paginator_get_current_page(const struct md3_paginator *paginator,
   return ui_pagination_base_get_current_page(paginator->base, out_page);
 }
 
+/** @brief md3_paginator_get_total_pages function. */
 ui_error_t md3_paginator_get_total_pages(const struct md3_paginator *paginator,
                                          size_t *out_total_pages) {
   if (paginator == NULL || paginator->base == NULL || out_total_pages == NULL) {
@@ -840,6 +872,7 @@ ui_error_t md3_paginator_get_total_pages(const struct md3_paginator *paginator,
   return ui_pagination_base_get_total_pages(paginator->base, out_total_pages);
 }
 
+/** @brief md3_paginator_next function. */
 ui_error_t md3_paginator_next(struct md3_paginator *paginator) {
   ui_error_t rc;
 
@@ -856,6 +889,7 @@ ui_error_t md3_paginator_next(struct md3_paginator *paginator) {
                                              &paginator->current_page);
 }
 
+/** @brief md3_paginator_prev function. */
 ui_error_t md3_paginator_prev(struct md3_paginator *paginator) {
   ui_error_t rc;
 
@@ -872,6 +906,7 @@ ui_error_t md3_paginator_prev(struct md3_paginator *paginator) {
                                              &paginator->current_page);
 }
 
+/** @brief md3_paginator_first function. */
 ui_error_t md3_paginator_first(struct md3_paginator *paginator) {
   ui_error_t rc;
 
@@ -888,6 +923,7 @@ ui_error_t md3_paginator_first(struct md3_paginator *paginator) {
                                              &paginator->current_page);
 }
 
+/** @brief md3_paginator_last function. */
 ui_error_t md3_paginator_last(struct md3_paginator *paginator) {
   ui_error_t rc;
 
@@ -904,6 +940,7 @@ ui_error_t md3_paginator_last(struct md3_paginator *paginator) {
                                              &paginator->current_page);
 }
 
+/** @brief md3_paginator_set_page_size_options function. */
 ui_error_t md3_paginator_set_page_size_options(struct md3_paginator *paginator,
                                                const size_t *options,
                                                size_t count) {
@@ -920,6 +957,7 @@ ui_error_t md3_paginator_set_page_size_options(struct md3_paginator *paginator,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_paginator_get_page_size function. */
 ui_error_t md3_paginator_get_page_size(const struct md3_paginator *paginator,
                                        size_t *out_page_size) {
   if (paginator == NULL || out_page_size == NULL) {
@@ -929,6 +967,7 @@ ui_error_t md3_paginator_get_page_size(const struct md3_paginator *paginator,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_paginator_set_page_size function. */
 ui_error_t md3_paginator_set_page_size(struct md3_paginator *paginator,
                                        size_t page_size) {
   if (paginator == NULL || page_size == 0) {
@@ -937,6 +976,7 @@ ui_error_t md3_paginator_set_page_size(struct md3_paginator *paginator,
   return md3_paginator_set_config(paginator, paginator->total_items, page_size);
 }
 
+/** @brief md3_paginator_get_range_label function. */
 ui_error_t md3_paginator_get_range_label(const struct md3_paginator *paginator,
                                          char *buffer, size_t buffer_size) {
   size_t start;
@@ -957,17 +997,25 @@ ui_error_t md3_paginator_get_range_label(const struct md3_paginator *paginator,
     }
   }
 
+  {
+    char tmp_buf[128];
 #if defined(_MSC_VER)
-  sprintf_s(buffer, buffer_size, "%lu - %lu of %lu", (unsigned long)start,
-            (unsigned long)end, (unsigned long)paginator->total_items);
+    sprintf_s(tmp_buf, sizeof(tmp_buf), "%lu - %lu of %lu",
+              (unsigned long)start, (unsigned long)end,
+              (unsigned long)paginator->total_items);
+    strncpy_s(buffer, buffer_size, tmp_buf, _TRUNCATE);
 #else
-  snprintf(buffer, buffer_size, "%lu - %lu of %lu", (unsigned long)start,
-           (unsigned long)end, (unsigned long)paginator->total_items);
+    sprintf(tmp_buf, "%lu - %lu of %lu", (unsigned long)start,
+            (unsigned long)end, (unsigned long)paginator->total_items);
+    strncpy(buffer, tmp_buf, buffer_size - 1);
+    buffer[buffer_size - 1] = '\0';
 #endif
+  }
 
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_paginator_set_compact function. */
 ui_error_t md3_paginator_set_compact(struct md3_paginator *paginator,
                                      int compact) {
   if (paginator == NULL) {
@@ -977,6 +1025,7 @@ ui_error_t md3_paginator_set_compact(struct md3_paginator *paginator,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_paginator_set_expressive function. */
 ui_error_t md3_paginator_set_expressive(struct md3_paginator *paginator,
                                         int enabled) {
   if (paginator == NULL) {
@@ -990,6 +1039,7 @@ ui_error_t md3_paginator_set_expressive(struct md3_paginator *paginator,
 /* md3_sort_header                                                           */
 /* ========================================================================= */
 
+/** @brief md3_sort_header_create function. */
 ui_error_t md3_sort_header_create(struct ui_engine *engine,
                                   const char *column_id,
                                   struct md3_sort_header **out_header) {
@@ -1030,6 +1080,7 @@ ui_error_t md3_sort_header_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_sort_header_destroy function. */
 ui_error_t md3_sort_header_destroy(struct md3_sort_header *header) {
   ui_error_t rc;
 
@@ -1049,6 +1100,7 @@ ui_error_t md3_sort_header_destroy(struct md3_sort_header *header) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_sort_header_cycle function. */
 ui_error_t md3_sort_header_cycle(struct md3_sort_header *header) {
   ui_error_t rc;
 
@@ -1071,6 +1123,7 @@ ui_error_t md3_sort_header_cycle(struct md3_sort_header *header) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_sort_header_set_direction function. */
 ui_error_t md3_sort_header_set_direction(struct md3_sort_header *header,
                                          enum ui_sort_direction direction) {
   if (header == NULL) {
@@ -1080,6 +1133,7 @@ ui_error_t md3_sort_header_set_direction(struct md3_sort_header *header,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_sort_header_get_direction function. */
 ui_error_t
 md3_sort_header_get_direction(const struct md3_sort_header *header,
                               enum ui_sort_direction *out_direction) {
@@ -1090,6 +1144,7 @@ md3_sort_header_get_direction(const struct md3_sort_header *header,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_sort_header_set_cycle_mode function. */
 ui_error_t md3_sort_header_set_cycle_mode(struct md3_sort_header *header,
                                           int allow_none) {
   if (header == NULL) {
@@ -1099,6 +1154,7 @@ ui_error_t md3_sort_header_set_cycle_mode(struct md3_sort_header *header,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_sort_header_get_arrow_rotation function. */
 ui_error_t
 md3_sort_header_get_arrow_rotation(const struct md3_sort_header *header,
                                    float *out_degrees) {
@@ -1116,6 +1172,7 @@ md3_sort_header_get_arrow_rotation(const struct md3_sort_header *header,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_sort_header_set_priority function. */
 ui_error_t md3_sort_header_set_priority(struct md3_sort_header *header,
                                         int priority) {
   if (header == NULL) {
@@ -1125,6 +1182,7 @@ ui_error_t md3_sort_header_set_priority(struct md3_sort_header *header,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_sort_header_get_priority function. */
 ui_error_t md3_sort_header_get_priority(const struct md3_sort_header *header,
                                         int *out_priority) {
   if (header == NULL || out_priority == NULL) {
@@ -1134,6 +1192,7 @@ ui_error_t md3_sort_header_get_priority(const struct md3_sort_header *header,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_sort_header_set_expressive function. */
 ui_error_t md3_sort_header_set_expressive(struct md3_sort_header *header,
                                           int enabled) {
   if (header == NULL) {
@@ -1147,6 +1206,7 @@ ui_error_t md3_sort_header_set_expressive(struct md3_sort_header *header,
 /* md3_tree                                                                  */
 /* ========================================================================= */
 
+/** @brief md3_default_tree_root_count function. */
 static size_t md3_default_tree_root_count(void *user_data) {
   if (user_data != NULL) {
     return 0;
@@ -1154,6 +1214,7 @@ static size_t md3_default_tree_root_count(void *user_data) {
   return 0;
 }
 
+/** @brief md3_default_tree_root_node function. */
 static void *md3_default_tree_root_node(size_t index, void *user_data) {
   if (index > 0 || user_data != NULL) {
     return NULL;
@@ -1161,6 +1222,7 @@ static void *md3_default_tree_root_node(size_t index, void *user_data) {
   return NULL;
 }
 
+/** @brief md3_default_tree_parent function. */
 static void *md3_default_tree_parent(void *node, void *user_data) {
   if (node != NULL || user_data != NULL) {
     return NULL;
@@ -1168,6 +1230,7 @@ static void *md3_default_tree_parent(void *node, void *user_data) {
   return NULL;
 }
 
+/** @brief md3_default_tree_child_count function. */
 static size_t md3_default_tree_child_count(void *node, void *user_data) {
   if (node != NULL || user_data != NULL) {
     return 0;
@@ -1175,6 +1238,7 @@ static size_t md3_default_tree_child_count(void *node, void *user_data) {
   return 0;
 }
 
+/** @brief md3_default_tree_child function. */
 static void *md3_default_tree_child(void *node, size_t index, void *user_data) {
   if (node != NULL || index > 0 || user_data != NULL) {
     return NULL;
@@ -1182,6 +1246,7 @@ static void *md3_default_tree_child(void *node, size_t index, void *user_data) {
   return NULL;
 }
 
+/** @brief md3_default_tree_render function. */
 static ui_error_t md3_default_tree_render(void *node,
                                           struct ui_dom_node *dom_node,
                                           void *user_data) {
@@ -1191,6 +1256,7 @@ static ui_error_t md3_default_tree_render(void *node,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_tree_create function. */
 ui_error_t md3_tree_create(struct ui_engine *engine,
                            const struct ui_tree_model *model,
                            struct md3_tree **out_tree) {
@@ -1252,6 +1318,7 @@ ui_error_t md3_tree_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_tree_destroy function. */
 ui_error_t md3_tree_destroy(struct md3_tree *tree) {
   ui_error_t rc;
 
@@ -1271,6 +1338,7 @@ ui_error_t md3_tree_destroy(struct md3_tree *tree) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_tree_set_node_expanded function. */
 ui_error_t md3_tree_set_node_expanded(struct md3_tree *tree, void *node_id,
                                       int expanded) {
   size_t i;
@@ -1302,6 +1370,7 @@ ui_error_t md3_tree_set_node_expanded(struct md3_tree *tree, void *node_id,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_tree_is_node_expanded function. */
 ui_error_t md3_tree_is_node_expanded(const struct md3_tree *tree, void *node_id,
                                      int *out_expanded) {
   size_t i;
@@ -1320,6 +1389,7 @@ ui_error_t md3_tree_is_node_expanded(const struct md3_tree *tree, void *node_id,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_tree_toggle_node_expanded function. */
 ui_error_t md3_tree_toggle_node_expanded(struct md3_tree *tree, void *node_id) {
   int is_exp = 0;
   ui_error_t rc;
@@ -1332,6 +1402,7 @@ ui_error_t md3_tree_toggle_node_expanded(struct md3_tree *tree, void *node_id) {
   return md3_tree_set_node_expanded(tree, node_id, is_exp ? 0 : 1);
 }
 
+/** @brief md3_tree_set_indent function. */
 ui_error_t md3_tree_set_indent(struct md3_tree *tree, float indent_px) {
   if (tree == NULL || indent_px < 0.0f) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -1340,6 +1411,7 @@ ui_error_t md3_tree_set_indent(struct md3_tree *tree, float indent_px) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_tree_get_indent function. */
 ui_error_t md3_tree_get_indent(const struct md3_tree *tree,
                                float *out_indent_px) {
   if (tree == NULL || out_indent_px == NULL) {
@@ -1349,6 +1421,7 @@ ui_error_t md3_tree_get_indent(const struct md3_tree *tree,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_tree_set_guide_lines function. */
 ui_error_t md3_tree_set_guide_lines(struct md3_tree *tree, int enabled) {
   if (tree == NULL) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -1357,6 +1430,7 @@ ui_error_t md3_tree_set_guide_lines(struct md3_tree *tree, int enabled) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_tree_select_node function. */
 ui_error_t md3_tree_select_node(struct md3_tree *tree, void *node_id,
                                 int selected) {
   size_t i;
@@ -1391,6 +1465,7 @@ ui_error_t md3_tree_select_node(struct md3_tree *tree, void *node_id,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_tree_is_node_selected function. */
 ui_error_t md3_tree_is_node_selected(const struct md3_tree *tree, void *node_id,
                                      int *out_selected) {
   size_t i;
@@ -1409,6 +1484,7 @@ ui_error_t md3_tree_is_node_selected(const struct md3_tree *tree, void *node_id,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_tree_set_multi_select function. */
 ui_error_t md3_tree_set_multi_select(struct md3_tree *tree, int multi_select) {
   if (tree == NULL) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -1417,6 +1493,7 @@ ui_error_t md3_tree_set_multi_select(struct md3_tree *tree, int multi_select) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_tree_set_node_checked_state function. */
 ui_error_t md3_tree_set_node_checked_state(struct md3_tree *tree, void *node_id,
                                            int state) {
   size_t i;
@@ -1440,6 +1517,7 @@ ui_error_t md3_tree_set_node_checked_state(struct md3_tree *tree, void *node_id,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_tree_get_node_checked_state function. */
 ui_error_t md3_tree_get_node_checked_state(const struct md3_tree *tree,
                                            void *node_id, int *out_state) {
   size_t i;
@@ -1458,6 +1536,7 @@ ui_error_t md3_tree_get_node_checked_state(const struct md3_tree *tree,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_tree_set_virtual_scroll function. */
 ui_error_t md3_tree_set_virtual_scroll(struct md3_tree *tree, int enabled) {
   if (tree == NULL) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -1466,6 +1545,7 @@ ui_error_t md3_tree_set_virtual_scroll(struct md3_tree *tree, int enabled) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_tree_set_expressive function. */
 ui_error_t md3_tree_set_expressive(struct md3_tree *tree, int enabled) {
   if (tree == NULL) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -1478,6 +1558,7 @@ ui_error_t md3_tree_set_expressive(struct md3_tree *tree, int enabled) {
 /* md3_tree_grid                                                             */
 /* ========================================================================= */
 
+/** @brief md3_tree_grid_create function. */
 ui_error_t md3_tree_grid_create(struct ui_engine *engine,
                                 const struct ui_tree_model *model,
                                 struct md3_tree_grid **out_tree_grid) {
@@ -1514,6 +1595,7 @@ ui_error_t md3_tree_grid_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_tree_grid_destroy function. */
 ui_error_t md3_tree_grid_destroy(struct md3_tree_grid *tg) {
   ui_error_t rc;
 
@@ -1533,6 +1615,7 @@ ui_error_t md3_tree_grid_destroy(struct md3_tree_grid *tg) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_tree_grid_set_column_count function. */
 ui_error_t md3_tree_grid_set_column_count(struct md3_tree_grid *tg,
                                           size_t count) {
   if (tg == NULL || count == 0) {
@@ -1542,6 +1625,7 @@ ui_error_t md3_tree_grid_set_column_count(struct md3_tree_grid *tg,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_tree_grid_set_node_expanded function. */
 ui_error_t md3_tree_grid_set_node_expanded(struct md3_tree_grid *tg,
                                            void *node_id, int expanded) {
   size_t i;
@@ -1573,6 +1657,7 @@ ui_error_t md3_tree_grid_set_node_expanded(struct md3_tree_grid *tg,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_tree_grid_is_node_expanded function. */
 ui_error_t md3_tree_grid_is_node_expanded(const struct md3_tree_grid *tg,
                                           void *node_id, int *out_expanded) {
   size_t i;
@@ -1591,6 +1676,7 @@ ui_error_t md3_tree_grid_is_node_expanded(const struct md3_tree_grid *tg,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_tree_grid_select_row function. */
 ui_error_t md3_tree_grid_select_row(struct md3_tree_grid *tg, void *node_id,
                                     int selected) {
   size_t i;
@@ -1622,6 +1708,7 @@ ui_error_t md3_tree_grid_select_row(struct md3_tree_grid *tg, void *node_id,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_tree_grid_is_row_selected function. */
 ui_error_t md3_tree_grid_is_row_selected(const struct md3_tree_grid *tg,
                                          void *node_id, int *out_selected) {
   size_t i;
@@ -1640,6 +1727,7 @@ ui_error_t md3_tree_grid_is_row_selected(const struct md3_tree_grid *tg,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_tree_grid_set_indent function. */
 ui_error_t md3_tree_grid_set_indent(struct md3_tree_grid *tg, float indent_px) {
   if (tg == NULL || indent_px < 0.0f) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -1648,6 +1736,7 @@ ui_error_t md3_tree_grid_set_indent(struct md3_tree_grid *tg, float indent_px) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_tree_grid_set_sticky_headers function. */
 ui_error_t md3_tree_grid_set_sticky_headers(struct md3_tree_grid *tg,
                                             int sticky) {
   if (tg == NULL) {
@@ -1657,6 +1746,7 @@ ui_error_t md3_tree_grid_set_sticky_headers(struct md3_tree_grid *tg,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_tree_grid_set_zebra_shading function. */
 ui_error_t md3_tree_grid_set_zebra_shading(struct md3_tree_grid *tg,
                                            int enabled) {
   if (tg == NULL) {
@@ -1666,6 +1756,7 @@ ui_error_t md3_tree_grid_set_zebra_shading(struct md3_tree_grid *tg,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_tree_grid_set_expressive function. */
 ui_error_t md3_tree_grid_set_expressive(struct md3_tree_grid *tg, int enabled) {
   if (tg == NULL) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -1678,6 +1769,7 @@ ui_error_t md3_tree_grid_set_expressive(struct md3_tree_grid *tg, int enabled) {
 /* md3_transfer_list                                                         */
 /* ========================================================================= */
 
+/** @brief md3_transfer_list_create function. */
 ui_error_t
 md3_transfer_list_create(struct ui_engine *engine,
                          struct md3_transfer_list **out_transfer_list) {
@@ -1711,6 +1803,7 @@ md3_transfer_list_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_transfer_list_destroy function. */
 ui_error_t md3_transfer_list_destroy(struct md3_transfer_list *tl) {
   struct md3_transfer_item *curr;
   struct md3_transfer_item *next;
@@ -1737,6 +1830,7 @@ ui_error_t md3_transfer_list_destroy(struct md3_transfer_list *tl) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_transfer_list_add_item function. */
 ui_error_t md3_transfer_list_add_item(struct md3_transfer_list *tl,
                                       int to_right, int id, const char *label,
                                       void *data) {
@@ -1772,6 +1866,7 @@ ui_error_t md3_transfer_list_add_item(struct md3_transfer_list *tl,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_transfer_list_set_item_selected function. */
 ui_error_t md3_transfer_list_set_item_selected(struct md3_transfer_list *tl,
                                                int is_right, int id,
                                                int selected) {
@@ -1793,6 +1888,7 @@ ui_error_t md3_transfer_list_set_item_selected(struct md3_transfer_list *tl,
   return UI_ERROR_NOT_FOUND;
 }
 
+/** @brief md3_transfer_list_move_selected_right function. */
 ui_error_t md3_transfer_list_move_selected_right(struct md3_transfer_list *tl) {
   struct md3_transfer_item *curr;
   struct md3_transfer_item *prev = NULL;
@@ -1822,6 +1918,7 @@ ui_error_t md3_transfer_list_move_selected_right(struct md3_transfer_list *tl) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_transfer_list_move_all_right function. */
 ui_error_t md3_transfer_list_move_all_right(struct md3_transfer_list *tl) {
   struct md3_transfer_item *curr;
   struct md3_transfer_item *next;
@@ -1842,6 +1939,7 @@ ui_error_t md3_transfer_list_move_all_right(struct md3_transfer_list *tl) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_transfer_list_move_selected_left function. */
 ui_error_t md3_transfer_list_move_selected_left(struct md3_transfer_list *tl) {
   struct md3_transfer_item *curr;
   struct md3_transfer_item *prev = NULL;
@@ -1871,6 +1969,7 @@ ui_error_t md3_transfer_list_move_selected_left(struct md3_transfer_list *tl) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_transfer_list_move_all_left function. */
 ui_error_t md3_transfer_list_move_all_left(struct md3_transfer_list *tl) {
   struct md3_transfer_item *curr;
   struct md3_transfer_item *next;
@@ -1891,6 +1990,7 @@ ui_error_t md3_transfer_list_move_all_left(struct md3_transfer_list *tl) {
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_transfer_list_set_left_filter function. */
 ui_error_t md3_transfer_list_set_left_filter(struct md3_transfer_list *tl,
                                              const char *query) {
   if (tl == NULL) {
@@ -1911,6 +2011,7 @@ ui_error_t md3_transfer_list_set_left_filter(struct md3_transfer_list *tl,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_transfer_list_set_right_filter function. */
 ui_error_t md3_transfer_list_set_right_filter(struct md3_transfer_list *tl,
                                               const char *query) {
   if (tl == NULL) {
@@ -1931,6 +2032,7 @@ ui_error_t md3_transfer_list_set_right_filter(struct md3_transfer_list *tl,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_transfer_list_get_left_counts function. */
 ui_error_t md3_transfer_list_get_left_counts(const struct md3_transfer_list *tl,
                                              size_t *out_selected,
                                              size_t *out_total) {
@@ -1956,6 +2058,7 @@ ui_error_t md3_transfer_list_get_left_counts(const struct md3_transfer_list *tl,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_transfer_list_get_right_counts function. */
 ui_error_t
 md3_transfer_list_get_right_counts(const struct md3_transfer_list *tl,
                                    size_t *out_selected, size_t *out_total) {
@@ -1981,6 +2084,7 @@ md3_transfer_list_get_right_counts(const struct md3_transfer_list *tl,
   return UI_ERROR_NONE;
 }
 
+/** @brief md3_transfer_list_set_expressive function. */
 ui_error_t md3_transfer_list_set_expressive(struct md3_transfer_list *tl,
                                             int enabled) {
   if (tl == NULL) {

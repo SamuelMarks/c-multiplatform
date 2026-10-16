@@ -10,6 +10,10 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_cupertino_desktop_text_mock_test_helpers;
+extern int g_cupertino_desktop_text_mock_add_item_fail_at;
+extern int g_cupertino_desktop_text_mock_recompute_fail;
+
 extern int g_malloc_fail_countdown;
 
 TEST test_desktop_text_toolbar_lifecycle_and_items(void) {
@@ -45,7 +49,6 @@ TEST test_desktop_text_toolbar_lifecycle_and_items(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_cupertino_desktop_text_mock_test_helpers;
     int k;
     for (k = 1; k <= 5; k++) {
       g_cupertino_desktop_text_mock_test_helpers = k;
@@ -232,8 +235,6 @@ TEST test_desktop_text_toolbar_oom(void) {
   const char *out_t, *out_s;
   ui_error_t rc;
 #ifdef UI_TEST_MOCK_ALLOC
-  extern int g_cupertino_desktop_text_mock_add_item_fail_at;
-  extern int g_cupertino_desktop_text_mock_recompute_fail;
   int i;
 #endif
 

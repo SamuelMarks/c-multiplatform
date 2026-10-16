@@ -39,9 +39,6 @@ static ui_error_t on_click_handler(struct ui_button_base *button,
   }
   click_count++;
   return UI_ERROR_NONE;
-  return UI_ERROR_NONE;
-  return UI_ERROR_NONE;
-  return UI_ERROR_NONE;
 }
 
 static ui_error_t run_normal_tests(void) {
@@ -280,58 +277,6 @@ static ui_error_t run_normal_tests(void) {
     return rc;
 
   return UI_ERROR_NONE;
-  return UI_ERROR_NONE;
-  return UI_ERROR_NONE;
-}
-
-static ui_error_t run_oom_test_create_step(int i,
-                                           struct ui_button_base **out_btn,
-                                           int *out_continue, int *out_break) {
-  ui_error_t rc;
-  g_malloc_fail_countdown = i;
-  rc = ui_button_base_create(out_btn);
-  if (rc != UI_ERROR_NONE && rc != UI_ERROR_OUT_OF_MEMORY) {
-    g_malloc_fail_countdown = -1;
-    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
-  }
-  if (rc == UI_ERROR_OUT_OF_MEMORY) {
-    g_malloc_fail_countdown = -1;
-    *out_continue = 1;
-    return UI_ERROR_NONE;
-  }
-  g_malloc_fail_countdown = -1;
-  {
-    ui_error_t destroy_rc = ui_button_base_destroy(*out_btn);
-    if (destroy_rc != UI_ERROR_NONE)
-      return destroy_rc;
-  }
-  *out_break = 1;
-  return UI_ERROR_NONE;
-}
-
-static ui_error_t run_oom_test_disable_step(int i, struct ui_button_base *btn,
-                                            int disabled, int *out_continue,
-                                            int *out_break) {
-  ui_error_t rc;
-  g_malloc_fail_countdown = i;
-  rc = ui_button_base_set_disabled(btn, disabled);
-  if (rc != UI_ERROR_NONE && rc != UI_ERROR_OUT_OF_MEMORY) {
-    g_malloc_fail_countdown = -1;
-    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
-  }
-  if (rc == UI_ERROR_OUT_OF_MEMORY) {
-    g_malloc_fail_countdown = -1;
-    {
-      ui_error_t set_rc = ui_button_base_set_disabled(btn, !disabled);
-      if (set_rc != UI_ERROR_NONE)
-        return set_rc;
-    }
-    *out_continue = 1;
-    return UI_ERROR_NONE;
-  }
-  g_malloc_fail_countdown = -1;
-  *out_break = 1;
-  return UI_ERROR_NONE;
 }
 
 static ui_error_t run_oom_tests(void) {
@@ -411,8 +356,6 @@ static ui_error_t run_oom_tests(void) {
   if (rc != UI_ERROR_NONE)
     return rc;
 
-  return UI_ERROR_NONE;
-  return UI_ERROR_NONE;
   return UI_ERROR_NONE;
 }
 

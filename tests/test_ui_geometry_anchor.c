@@ -31,9 +31,9 @@ static int s_tests_failed = 0;
   } while (0)
 
 static ui_error_t test_invalid_args(void) {
-  struct ui_layout_node target;
-  struct ui_layout_node overlay;
-  struct ui_anchor_config config;
+  struct ui_layout_node target = {0};
+  struct ui_layout_node overlay = {0};
+  struct ui_anchor_config config = {0};
   float out_x, out_y;
 
   ASSERT_TRUE(ui_geometry_anchor_compute(NULL, &overlay, &config, 100, 100,

@@ -14,15 +14,21 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
+/** @brief CUPERTINO_ISLAND_COMPACT_WIDTH constant. */
 #define CUPERTINO_ISLAND_COMPACT_WIDTH 126.0f
+/** @brief CUPERTINO_ISLAND_COMPACT_HEIGHT constant. */
 #define CUPERTINO_ISLAND_COMPACT_HEIGHT 37.0f
+/** @brief CUPERTINO_ISLAND_MINIMAL_SIZE constant. */
 #define CUPERTINO_ISLAND_MINIMAL_SIZE 37.0f
+/** @brief CUPERTINO_ISLAND_EXPANDED_WIDTH constant. */
 #define CUPERTINO_ISLAND_EXPANDED_WIDTH 370.0f
+/** @brief CUPERTINO_ISLAND_EXPANDED_HEIGHT constant. */
 #define CUPERTINO_ISLAND_EXPANDED_HEIGHT 160.0f
+/** @brief CUPERTINO_ISLAND_TOP_MARGIN constant. */
 #define CUPERTINO_ISLAND_TOP_MARGIN 11.0f
 
 /**
@@ -63,18 +69,18 @@ struct cupertino_dynamic_island_descriptor {
  * @brief Dynamic Island container instance.
  */
 struct cupertino_dynamic_island {
-  enum cupertino_island_state state;
-  enum cupertino_island_template template_type;
-  float screen_width;
-  float current_width;
-  float current_height;
-  float current_corner_radius;
-  float target_width;
-  float target_height;
-  float target_corner_radius;
-  float morph_progress; /**< Spring interpolation progress [0.0, 1.0]. */
-  int is_animating;
-  ui_color_t background_color;
+  enum cupertino_island_state state;            /**< state field. */
+  enum cupertino_island_template template_type; /**< template_type field. */
+  float screen_width;                           /**< screen_width field. */
+  float current_width;                          /**< current_width field. */
+  float current_height;                         /**< current_height field. */
+  float current_corner_radius; /**< current_corner_radius field. */
+  float target_width;          /**< target_width field. */
+  float target_height;         /**< target_height field. */
+  float target_corner_radius;  /**< target_corner_radius field. */
+  float morph_progress;        /**< Spring interpolation progress [0.0, 1.0]. */
+  int is_animating;            /**< is_animating field. */
+  ui_color_t background_color; /**< background_color field. */
 };
 
 /**

@@ -13,13 +13,17 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
+/** @brief CUPERTINO_WHEEL_DEFAULT_HEIGHT constant. */
 #define CUPERTINO_WHEEL_DEFAULT_HEIGHT 216.0f
+/** @brief CUPERTINO_WHEEL_DEFAULT_ITEM_HEIGHT constant. */
 #define CUPERTINO_WHEEL_DEFAULT_ITEM_HEIGHT 32.0f
+/** @brief CUPERTINO_WHEEL_PERSPECTIVE_DISTANCE constant. */
 #define CUPERTINO_WHEEL_PERSPECTIVE_DISTANCE 300.0f
+/** @brief CUPERTINO_WHEEL_DECELERATION_RATE constant. */
 #define CUPERTINO_WHEEL_DECELERATION_RATE 0.990f
 
 /**
@@ -38,10 +42,10 @@ struct cupertino_wheel_descriptor {
  * @brief Cupertino 3D cylinder wheel picker instance.
  */
 struct cupertino_wheel {
-  int item_count;
-  int selected_index;
-  float viewport_height;
-  float item_height;
+  int item_count;        /**< item_count field. */
+  int selected_index;    /**< selected_index field. */
+  float viewport_height; /**< viewport_height field. */
+  float item_height;     /**< item_height field. */
   float scroll_offset_y; /**< Current vertical scroll position in points. */
   float velocity_y;      /**< Fling velocity in points per millisecond. */
   float target_offset_y; /**< Target magnetic snap detent offset. */

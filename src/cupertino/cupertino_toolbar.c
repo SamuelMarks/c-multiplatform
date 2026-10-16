@@ -62,8 +62,10 @@ static ui_error_t mock_toolbar_base_set_mode(struct ui_toolbar_base *base,
 /** @endcond */
 #endif
 
+/** @brief CUPERTINO_TOOLBAR_STANDARD_HEIGHT macro definition. */
 #define CUPERTINO_TOOLBAR_STANDARD_HEIGHT 44.0f
 
+/** @brief cupertino_toolbar_create function. */
 ui_error_t
 cupertino_toolbar_create(struct ui_engine *engine,
                          const struct cupertino_toolbar_descriptor *desc,
@@ -118,6 +120,7 @@ cupertino_toolbar_create(struct ui_engine *engine,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_toolbar_destroy function. */
 ui_error_t cupertino_toolbar_destroy(struct cupertino_toolbar *toolbar) {
   ui_error_t rc;
 
@@ -137,6 +140,7 @@ ui_error_t cupertino_toolbar_destroy(struct cupertino_toolbar *toolbar) {
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_toolbar_add_action function. */
 ui_error_t cupertino_toolbar_add_action(struct cupertino_toolbar *toolbar,
                                         const char *title, int is_destructive,
                                         int is_disabled, size_t *out_index) {
@@ -173,6 +177,7 @@ ui_error_t cupertino_toolbar_add_action(struct cupertino_toolbar *toolbar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_toolbar_add_flexible_space function. */
 ui_error_t
 cupertino_toolbar_add_flexible_space(struct cupertino_toolbar *toolbar,
                                      size_t *out_index) {
@@ -200,6 +205,7 @@ cupertino_toolbar_add_flexible_space(struct cupertino_toolbar *toolbar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_toolbar_add_fixed_space function. */
 ui_error_t cupertino_toolbar_add_fixed_space(struct cupertino_toolbar *toolbar,
                                              float width, size_t *out_index) {
   struct cupertino_toolbar_item *item;
@@ -227,6 +233,7 @@ ui_error_t cupertino_toolbar_add_fixed_space(struct cupertino_toolbar *toolbar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_toolbar_get_item_count function. */
 ui_error_t
 cupertino_toolbar_get_item_count(const struct cupertino_toolbar *toolbar,
                                  size_t *out_count) {
@@ -238,6 +245,7 @@ cupertino_toolbar_get_item_count(const struct cupertino_toolbar *toolbar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_toolbar_set_item_disabled function. */
 ui_error_t
 cupertino_toolbar_set_item_disabled(struct cupertino_toolbar *toolbar,
                                     size_t index, int is_disabled) {
@@ -249,6 +257,7 @@ cupertino_toolbar_set_item_disabled(struct cupertino_toolbar *toolbar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_toolbar_is_item_disabled function. */
 ui_error_t
 cupertino_toolbar_is_item_disabled(const struct cupertino_toolbar *toolbar,
                                    size_t index, int *out_disabled) {
@@ -260,6 +269,7 @@ cupertino_toolbar_is_item_disabled(const struct cupertino_toolbar *toolbar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_toolbar_get_height function. */
 ui_error_t cupertino_toolbar_get_height(const struct cupertino_toolbar *toolbar,
                                         float *out_height) {
   if (!toolbar || !out_height) {
@@ -270,6 +280,7 @@ ui_error_t cupertino_toolbar_get_height(const struct cupertino_toolbar *toolbar,
   return UI_ERROR_NONE;
 }
 
+/** @brief cupertino_toolbar_get_base function. */
 ui_error_t cupertino_toolbar_get_base(struct cupertino_toolbar *toolbar,
                                       struct ui_toolbar_base **out_base) {
   if (!toolbar || !out_base) {

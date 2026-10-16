@@ -4,6 +4,8 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_avatar_mock_fail;
+
 extern int g_malloc_fail_countdown;
 
 static ui_error_t run_normal_tests(void) {
@@ -362,7 +364,6 @@ static ui_error_t run_mock_tests(void) {
   struct ui_icon_base *icon1 = NULL;
   struct ui_icon_base *icon2 = NULL;
   ui_error_t rc;
-  extern int g_avatar_mock_fail;
 
   rc = ui_avatar_base_create(&avatar);
   if (rc != UI_ERROR_NONE) {

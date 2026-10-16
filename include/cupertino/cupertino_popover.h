@@ -14,14 +14,19 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
+/** @brief CUPERTINO_POPOVER_ARROW_HEIGHT constant. */
 #define CUPERTINO_POPOVER_ARROW_HEIGHT 12.0f
+/** @brief CUPERTINO_POPOVER_ARROW_BASE_WIDTH constant. */
 #define CUPERTINO_POPOVER_ARROW_BASE_WIDTH 24.0f
+/** @brief CUPERTINO_POPOVER_CORNER_RADIUS constant. */
 #define CUPERTINO_POPOVER_CORNER_RADIUS 13.0f
+/** @brief CUPERTINO_POPOVER_DEFAULT_WIDTH constant. */
 #define CUPERTINO_POPOVER_DEFAULT_WIDTH 280.0f
+/** @brief CUPERTINO_POPOVER_DEFAULT_HEIGHT constant. */
 #define CUPERTINO_POPOVER_DEFAULT_HEIGHT 200.0f
 
 /**
@@ -55,17 +60,19 @@ struct cupertino_popover_descriptor {
  * @brief Cupertino popover instance.
  */
 struct cupertino_popover {
-  struct ui_popover_base *base;
-  float content_width;
-  float content_height;
-  enum cupertino_arrow_direction permitted_arrows;
-  enum cupertino_arrow_direction actual_arrow_direction;
-  float arrow_offset; /**< Offset of arrow center along popover edge. */
-  float bounds_x;
-  float bounds_y;
-  float bounds_w;
-  float bounds_h;
-  int is_presented;
+  struct ui_popover_base *base; /**< base field. */
+  float content_width;          /**< content_width field. */
+  float content_height;         /**< content_height field. */
+  enum cupertino_arrow_direction
+      permitted_arrows; /**< permitted_arrows field. */
+  enum cupertino_arrow_direction
+      actual_arrow_direction; /**< actual_arrow_direction field. */
+  float arrow_offset;         /**< Offset of arrow center along popover edge. */
+  float bounds_x;             /**< bounds_x field. */
+  float bounds_y;             /**< bounds_y field. */
+  float bounds_w;             /**< bounds_w field. */
+  float bounds_h;             /**< bounds_h field. */
+  int is_presented;           /**< is_presented field. */
 };
 
 /**

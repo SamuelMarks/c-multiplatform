@@ -11,6 +11,7 @@
 /** @brief Global direction state for BIDI manager */
 static enum ui_bidi_direction g_ui_bidi_dir = UI_BIDI_DIR_LTR;
 
+/** @brief ui_bidi_set_direction function. */
 ui_error_t ui_bidi_set_direction(enum ui_bidi_direction direction) {
   if (direction != UI_BIDI_DIR_LTR && direction != UI_BIDI_DIR_RTL) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -25,6 +26,7 @@ ui_error_t ui_bidi_set_direction(enum ui_bidi_direction direction) {
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_bidi_get_direction function. */
 ui_error_t ui_bidi_get_direction(enum ui_bidi_direction *out_dir) {
   if (!out_dir) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -33,6 +35,7 @@ ui_error_t ui_bidi_get_direction(enum ui_bidi_direction *out_dir) {
   return UI_ERROR_NONE;
 }
 
+/** @brief ui_bidi_normalize_horizontal_key function. */
 ui_error_t ui_bidi_normalize_horizontal_key(enum ui_key_code key,
                                             enum ui_key_code *out_key) {
   if (!out_key) {

@@ -156,7 +156,11 @@ TEST test_stepper_lifecycle_and_steps(void) {
    * 8) */
   for (i = 0; i < 5; i++) {
     char sid[16];
+#if defined(_MSC_VER)
+    sprintf_s(sid, sizeof(sid), "step%d", i);
+#else
     sprintf(sid, "step%d", i);
+#endif
     rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &h[i]);
     ASSERT_EQ(UI_ERROR_NONE, rc);
     rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &c[i]);

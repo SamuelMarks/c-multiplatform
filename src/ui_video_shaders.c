@@ -36,6 +36,7 @@ static const char *yuv_fragment_source =
 
 /* \brief ui_error
  */
+/** @brief ui_video_shaders_get_yuv_program function. */
 ui_error_t ui_video_shaders_get_yuv_program(struct ui_shader_manager *manager,
                                             unsigned int *out_program_id) {
   if (!manager || !out_program_id) {

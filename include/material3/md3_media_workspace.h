@@ -35,7 +35,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 struct ui_engine;
 
@@ -59,20 +59,20 @@ enum md3_icon_style {
  * @brief Material 3 Icon component wrapping ui_icon_base.
  */
 struct md3_icon {
-  struct ui_icon_base *base;
-  enum md3_icon_style style;
-  float size_dp;
-  int font_weight;
-  int font_fill;
-  int font_grade;
-  float optical_size;
-  int rtl_mirroring;
-  int is_semantic;
-  char aria_label[128];
-  char current_glyph[64];
-  char morph_target[256];
-  float morph_progress;
-  int is_morphing;
+  struct ui_icon_base *base; /**< base field. */
+  enum md3_icon_style style; /**< style field. */
+  float size_dp;             /**< size_dp field. */
+  int font_weight;           /**< font_weight field. */
+  int font_fill;             /**< font_fill field. */
+  int font_grade;            /**< font_grade field. */
+  float optical_size;        /**< optical_size field. */
+  int rtl_mirroring;         /**< rtl_mirroring field. */
+  int is_semantic;           /**< is_semantic field. */
+  char aria_label[128];      /**< aria_label[128] field. */
+  char current_glyph[64];    /**< current_glyph[64] field. */
+  char morph_target[256];    /**< morph_target[256] field. */
+  float morph_progress;      /**< morph_progress field. */
+  int is_morphing;           /**< is_morphing field. */
 };
 
 /**
@@ -205,8 +205,8 @@ enum md3_message_status {
  * @brief Emoji reaction chip attached to chat bubble.
  */
 struct md3_chat_reaction {
-  char emoji[16];
-  int count;
+  char emoji[16]; /**< emoji[16] field. */
+  int count;      /**< count field. */
 };
 
 /**
@@ -214,15 +214,15 @@ struct md3_chat_reaction {
  * @brief Material 3 Chat Bubble component wrapping ui_chat_bubble_base.
  */
 struct md3_chat_bubble {
-  struct ui_chat_bubble_base *base;
-  struct ui_arena *arena;
-  enum md3_chat_bubble_direction direction;
-  char message_text[512];
-  char timestamp[32];
-  enum md3_message_status status;
-  struct md3_chat_reaction reactions[8];
-  size_t reaction_count;
-  int is_expressive;
+  struct ui_chat_bubble_base *base;         /**< base field. */
+  struct ui_arena *arena;                   /**< arena field. */
+  enum md3_chat_bubble_direction direction; /**< direction field. */
+  char message_text[512];                   /**< message_text[512] field. */
+  char timestamp[32];                       /**< timestamp[32] field. */
+  enum md3_message_status status;           /**< status field. */
+  struct md3_chat_reaction reactions[8];    /**< reactions[8] field. */
+  size_t reaction_count;                    /**< reaction_count field. */
+  int is_expressive;                        /**< is_expressive field. */
 };
 
 /**
@@ -319,11 +319,11 @@ enum md3_timeline_line_style {
  * @brief Individual node record in an md3_timeline.
  */
 struct md3_timeline_item {
-  char title[64];
-  char description[128];
-  enum md3_timeline_marker marker;
-  enum md3_timeline_line_style line_style;
-  int is_expanded;
+  char title[64];                          /**< title[64] field. */
+  char description[128];                   /**< description[128] field. */
+  enum md3_timeline_marker marker;         /**< marker field. */
+  enum md3_timeline_line_style line_style; /**< line_style field. */
+  int is_expanded;                         /**< is_expanded field. */
 };
 
 /**
@@ -331,12 +331,12 @@ struct md3_timeline_item {
  * @brief Material 3 Timeline component wrapping ui_timeline_base.
  */
 struct md3_timeline {
-  struct ui_timeline_base *base;
-  enum md3_timeline_orientation orientation;
-  int is_opposing;
-  int is_expressive;
-  struct md3_timeline_item items[32];
-  size_t item_count;
+  struct ui_timeline_base *base;             /**< base field. */
+  enum md3_timeline_orientation orientation; /**< orientation field. */
+  int is_opposing;                           /**< is_opposing field. */
+  int is_expressive;                         /**< is_expressive field. */
+  struct md3_timeline_item items[32];        /**< items[32] field. */
+  size_t item_count;                         /**< item_count field. */
 };
 
 /**
@@ -403,10 +403,10 @@ md3_timeline_set_expressive(struct md3_timeline *timeline, int enabled);
  * @brief Individual file in an upload queue.
  */
 struct md3_upload_file_item {
-  char file_name[128];
-  size_t file_size;
-  float progress;
-  int is_error;
+  char file_name[128]; /**< file_name[128] field. */
+  size_t file_size;    /**< file_size field. */
+  float progress;      /**< progress field. */
+  int is_error;        /**< is_error field. */
 };
 
 /**
@@ -414,13 +414,13 @@ struct md3_upload_file_item {
  * @brief Material 3 File Uploader component wrapping ui_file_uploader_base.
  */
 struct md3_file_uploader {
-  struct ui_file_uploader_base base;
-  int max_files;
-  char allowed_formats[128];
-  int is_drag_over;
-  int is_expressive;
-  struct md3_upload_file_item files[32];
-  size_t file_count;
+  struct ui_file_uploader_base base;     /**< base field. */
+  int max_files;                         /**< max_files field. */
+  char allowed_formats[128];             /**< allowed_formats[128] field. */
+  int is_drag_over;                      /**< is_drag_over field. */
+  int is_expressive;                     /**< is_expressive field. */
+  struct md3_upload_file_item files[32]; /**< files[32] field. */
+  size_t file_count;                     /**< file_count field. */
 };
 
 /**
@@ -514,10 +514,10 @@ extern C_MULTIPLATFORM_EXPORT ui_error_t md3_file_uploader_set_expressive(
  * @brief Material 3 Video Player component wrapping ui_video_player_base.
  */
 struct md3_video_player {
-  struct ui_video_player_base base;
-  struct ui_component comp;
-  float playback_speed;
-  int is_expressive;
+  struct ui_video_player_base base; /**< base field. */
+  struct ui_component comp;         /**< comp field. */
+  float playback_speed;             /**< playback_speed field. */
+  int is_expressive;                /**< is_expressive field. */
 };
 
 /**
@@ -628,9 +628,9 @@ md3_video_player_set_expressive(struct md3_video_player *player, int enabled);
  * ui_rich_text_editor_base.
  */
 struct md3_rich_text_editor {
-  struct ui_rich_text_editor_base *base;
-  char text_buffer[2048];
-  int is_expressive;
+  struct ui_rich_text_editor_base *base; /**< base field. */
+  char text_buffer[2048];                /**< text_buffer[2048] field. */
+  int is_expressive;                     /**< is_expressive field. */
 };
 
 /**
@@ -722,12 +722,12 @@ extern C_MULTIPLATFORM_EXPORT ui_error_t md3_rich_text_editor_set_expressive(
  * ui_section_index_base.
  */
 struct md3_section_index {
-  struct ui_section_index_base *base;
-  int active_section;
-  int show_magnifier;
-  int is_rtl;
-  int is_expressive;
-  size_t section_count;
+  struct ui_section_index_base *base; /**< base field. */
+  int active_section;                 /**< active_section field. */
+  int show_magnifier;                 /**< show_magnifier field. */
+  int is_rtl;                         /**< is_rtl field. */
+  int is_expressive;                  /**< is_expressive field. */
+  size_t section_count;               /**< section_count field. */
 };
 
 /**
@@ -821,8 +821,8 @@ md3_section_index_set_expressive(struct md3_section_index *index, int enabled);
  * ui_dockable_layout_base.
  */
 struct md3_dockable_layout {
-  struct ui_dockable_layout_base *base;
-  int is_expressive;
+  struct ui_dockable_layout_base *base; /**< base field. */
+  int is_expressive;                    /**< is_expressive field. */
 };
 
 /**

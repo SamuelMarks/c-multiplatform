@@ -5,6 +5,8 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_list_base_mock_fail;
+
 extern int g_malloc_fail_countdown;
 
 static int run_normal_tests(void) {
@@ -90,7 +92,6 @@ static int run_normal_tests(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    extern int g_list_base_mock_fail;
     struct ui_list_base *fail_list = NULL;
     struct ui_list_item_base *fail_item = NULL;
 

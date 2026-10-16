@@ -14,6 +14,71 @@
 #include <stdio.h>
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_computed_mock_cas_fail = 0;
+int g_computed_mock_graph_get_fail = 0;
+int g_computed_mock_graph_set_fail = 0;
+
+/**
+ * @brief mock_computed_atomic_cas.
+ * @param target Target atomic.
+ * @param expected Expected value.
+ * @param new_value New value.
+ * @param out_swapped Output swapped flag.
+ * @return Return value.
+ */
+static ui_error_t mock_computed_atomic_cas(ui_atomic_t *target, long expected,
+                                           long new_value, int *out_swapped) {
+  if (g_computed_mock_cas_fail != 0) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_atomic_cas)(target, expected, new_value, out_swapped);
+}
+#undef ui_atomic_cas
+/** @cond */
+#define ui_atomic_cas mock_computed_atomic_cas
+/** @endcond */
+
+/**
+ * @brief mock_computed_graph_get_current_node.
+ * @param out_node Output node.
+ * @return Return value.
+ */
+static ui_error_t
+mock_computed_graph_get_current_node(struct ui_reactive_node **out_node) {
+  if (g_computed_mock_graph_get_fail != 0) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_reactive_graph_get_current_node)(out_node);
+}
+#undef ui_reactive_graph_get_current_node
+/** @cond */
+#define ui_reactive_graph_get_current_node mock_computed_graph_get_current_node
+/** @endcond */
+
+/**
+ * @brief mock_computed_graph_set_current_node.
+ * @param node Node to set.
+ * @param out_prev_node Output previous node.
+ * @return Return value.
+ */
+static ui_error_t
+mock_computed_graph_set_current_node(struct ui_reactive_node *node,
+                                     struct ui_reactive_node **out_prev_node) {
+  if (g_computed_mock_graph_set_fail == 1 && out_prev_node != NULL) {
+    return UI_ERROR_UNKNOWN;
+  }
+  if (g_computed_mock_graph_set_fail == 2 && out_prev_node == NULL) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_reactive_graph_set_current_node)(node, out_prev_node);
+}
+#undef ui_reactive_graph_set_current_node
+/** @cond */
+#define ui_reactive_graph_set_current_node mock_computed_graph_set_current_node
+/** @endcond */
+#endif
+
 /**
  * @struct ui_computed
  * \brief ui_computed
@@ -117,12 +182,7 @@ static ui_error_t ui_computed_on_notify(void *user_data) {
   }
 
   if (comp->is_dirty) {
-    {
-      ui_error_t _rc_c = ui_computed_unlock(comp);
-      if (_rc_c != UI_ERROR_NONE)
-        return _rc_c;
-    }
-    return UI_ERROR_NONE; /* Already dirty, no need to re-notify */
+    return ui_computed_unlock(comp); /* Already dirty, no need to re-notify */
   }
 
   comp->is_dirty = UI_TRUE;
@@ -139,24 +199,20 @@ static ui_error_t ui_computed_on_notify(void *user_data) {
     }
   }
 
-  {
-    ui_error_t _rc_c = ui_computed_unlock(comp);
-    if (_rc_c != UI_ERROR_NONE)
-      return _rc_c;
-  }
+  rc = ui_computed_unlock(comp);
 
   if (subs_copy) {
     for (i = 0; i < subs_count; i++) {
-      rc = subs_copy[i]->notify_fn(subs_copy[i]->user_data);
-      if (rc != UI_ERROR_NONE) {
+      ui_error_t notify_rc = subs_copy[i]->notify_fn(subs_copy[i]->user_data);
+      if (notify_rc != UI_ERROR_NONE) {
         C_MULTIPLATFORM_FREE(subs_copy);
-        return rc;
+        return (rc != UI_ERROR_NONE) ? rc : notify_rc;
       }
     }
     C_MULTIPLATFORM_FREE(subs_copy);
   }
 
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 /**
@@ -238,19 +294,17 @@ ui_error_t ui_computed_get(ui_computed_t *computed,
   /* Dependency tracking */
   {
     ui_error_t _rc_g = ui_reactive_graph_get_current_node(&current_node);
-    if (_rc_g != UI_ERROR_NONE)
-      return _rc_g;
+    if (_rc_g != UI_ERROR_NONE) {
+      ui_error_t unlock_rc = ui_computed_unlock(computed);
+      return (unlock_rc != UI_ERROR_NONE) ? unlock_rc : _rc_g;
+    }
   }
 
   if (current_node && current_node != &computed->self_node) {
     rc = ui_computed_add_subscriber(computed, current_node);
     if (rc != UI_ERROR_NONE) {
-      {
-        ui_error_t _rc_c = ui_computed_unlock(computed);
-        if (_rc_c != UI_ERROR_NONE)
-          return _rc_c;
-      }
-      return rc;
+      ui_error_t unlock_rc = ui_computed_unlock(computed);
+      return (unlock_rc != UI_ERROR_NONE) ? unlock_rc : rc;
     }
   }
 
@@ -259,41 +313,33 @@ ui_error_t ui_computed_get(ui_computed_t *computed,
     {
       ui_error_t _rc_g =
           ui_reactive_graph_set_current_node(&computed->self_node, &prev_node);
-      if (_rc_g != UI_ERROR_NONE)
-        return _rc_g;
+      if (_rc_g != UI_ERROR_NONE) {
+        ui_error_t unlock_rc = ui_computed_unlock(computed);
+        return (unlock_rc != UI_ERROR_NONE) ? unlock_rc : _rc_g;
+      }
     }
 
     rc = computed->compute_fn(computed->user_data, &computed->cached_value);
     if (rc != UI_ERROR_NONE) {
-      {
-        ui_error_t _rc_g = ui_reactive_graph_set_current_node(prev_node, NULL);
-        if (_rc_g != UI_ERROR_NONE)
-          return _rc_g;
-      }
-      {
-        ui_error_t _rc_c = ui_computed_unlock(computed);
-        if (_rc_c != UI_ERROR_NONE)
-          return _rc_c;
-      }
-      return rc;
+      ui_error_t graph_rc = ui_reactive_graph_set_current_node(prev_node, NULL);
+      ui_error_t unlock_rc = ui_computed_unlock(computed);
+      return (graph_rc != UI_ERROR_NONE)
+                 ? graph_rc
+                 : ((unlock_rc != UI_ERROR_NONE) ? unlock_rc : rc);
     }
 
     {
       ui_error_t _rc_g = ui_reactive_graph_set_current_node(prev_node, NULL);
-      if (_rc_g != UI_ERROR_NONE)
-        return _rc_g;
+      if (_rc_g != UI_ERROR_NONE) {
+        ui_error_t unlock_rc = ui_computed_unlock(computed);
+        return (unlock_rc != UI_ERROR_NONE) ? unlock_rc : _rc_g;
+      }
     }
     computed->is_dirty = UI_FALSE;
   }
 
   *out_value = computed->cached_value;
-
-  {
-    ui_error_t _rc_c = ui_computed_unlock(computed);
-    if (_rc_c != UI_ERROR_NONE)
-      return _rc_c;
-  }
-  return UI_ERROR_NONE;
+  return ui_computed_unlock(computed);
 }
 
 /**

@@ -313,19 +313,23 @@ ui_error_t ui_font_get_vmetrics(struct ui_font *font, float font_size,
   return UI_ERROR_NONE;
 }
 
+/** @brief read_u16_be function. */
 static unsigned short read_u16_be(const unsigned char *p) {
   return (unsigned short)(((unsigned short)p[0] << 8) | (unsigned short)p[1]);
 }
 
+/** @brief read_s16_be function. */
 static short read_s16_be(const unsigned char *p) {
   return (short)read_u16_be(p);
 }
 
+/** @brief read_u32_be function. */
 static unsigned int read_u32_be(const unsigned char *p) {
   return (((unsigned int)p[0] << 24) | ((unsigned int)p[1] << 16) |
           ((unsigned int)p[2] << 8) | (unsigned int)p[3]);
 }
 
+/** @brief get_glyph_coverage_index function. */
 static int get_glyph_coverage_index(const unsigned char *data, size_t size,
                                     size_t cov_offset, int glyph) {
   unsigned short format;
@@ -363,6 +367,7 @@ static int get_glyph_coverage_index(const unsigned char *data, size_t size,
   return -1;
 }
 
+/** @brief get_glyph_class function. */
 static int get_glyph_class(const unsigned char *data, size_t size,
                            size_t class_def_offset, int glyph) {
   unsigned short format;
@@ -398,6 +403,7 @@ static int get_glyph_class(const unsigned char *data, size_t size,
   return 0;
 }
 
+/** @brief parse_gpos_pair_pos function. */
 static int parse_gpos_pair_pos(const unsigned char *data, size_t size,
                                int glyph1, int glyph2, int *out_kern) {
   size_t gpos_offset = 0;
