@@ -1,12 +1,12 @@
 extern int g_layout_compute_mock_fail;
 
 static void test_extra_coverage(void) {
-  struct ui_dom_node *root;
-  struct ui_css_stylesheet *sheet;
-  struct ui_layout_node *lroot;
-  struct ui_css_rule *rule;
-  struct ui_layout_node *fake_child;
-  struct ui_dom_node *mix_root, *b1, *i1, *b2;
+  struct ui_dom_node *root = NULL;
+  struct ui_css_stylesheet *sheet = NULL;
+  struct ui_layout_node *lroot = NULL;
+  struct ui_css_rule *rule = NULL;
+  struct ui_layout_node *fake_child = NULL;
+  struct ui_dom_node *mix_root = NULL, *b1 = NULL, *i1 = NULL, *b2 = NULL;
   int i, j;
   const char *displays[] = {"none",  "run-in",    "grid",
                             "table", "flow-root", "inline-block"};
@@ -16,8 +16,8 @@ static void test_extra_coverage(void) {
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
   ui_dom_node_set_tag_name(root, "div");
   for (i = 0; i < 6; ++i) {
-    struct ui_css_stylesheet *temp_sheet;
-    struct ui_css_rule *temp_rule;
+    struct ui_css_stylesheet *temp_sheet = NULL;
+    struct ui_css_rule *temp_rule = NULL;
     ui_css_stylesheet_create(&temp_sheet);
     ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &temp_rule);
     ui_css_rule_append_selector(temp_rule, UI_CSS_SELECTOR_TYPE_TAG, "div");
@@ -111,7 +111,7 @@ static void test_extra_coverage(void) {
   ui_dom_node_set_attribute(b2, "class", "b2");
 
   {
-    struct ui_dom_node *tb1, *ti1, *tb2;
+    struct ui_dom_node *tb1 = NULL, *ti1 = NULL, *tb2 = NULL;
     ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &tb1);
     ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &ti1);
     ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &tb2);
@@ -124,8 +124,9 @@ static void test_extra_coverage(void) {
     ui_dom_node_append_child(mix_root, b2);
 
     {
-      struct ui_css_stylesheet *mix_sheet;
-      struct ui_css_rule *r_mixroot, *r_b1, *r_i1, *r_b2;
+      struct ui_css_stylesheet *mix_sheet = NULL;
+      struct ui_css_rule *r_mixroot = NULL, *r_b1 = NULL, *r_i1 = NULL,
+                         *r_b2 = NULL;
       ui_css_stylesheet_create(&mix_sheet);
 
       ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &r_mixroot);
@@ -156,8 +157,8 @@ static void test_extra_coverage(void) {
     }
 
     for (j = 0; j < 3; ++j) {
-      struct ui_css_stylesheet *mix_sheet;
-      struct ui_css_rule *r_mixroot, *r_i1;
+      struct ui_css_stylesheet *mix_sheet = NULL;
+      struct ui_css_rule *r_mixroot = NULL, *r_i1 = NULL;
       ui_css_stylesheet_create(&mix_sheet);
 
       ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &r_mixroot);
@@ -206,10 +207,10 @@ static void test_flex_grow_shrink(void);
 static void test_oom_loop(void);
 
 static void test_nested_overflow_violation(void) {
-  struct ui_dom_node *root, *child, *grandchild;
-  struct ui_css_stylesheet *sheet;
+  struct ui_dom_node *root = NULL, *child = NULL, *grandchild = NULL;
+  struct ui_css_stylesheet *sheet = NULL;
   struct ui_layout_node *lroot = NULL;
-  struct ui_css_rule *r1, *r2, *r3;
+  struct ui_css_rule *r1 = NULL, *r2 = NULL, *r3 = NULL;
 
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
   ui_dom_node_set_tag_name(root, "div");
@@ -269,10 +270,10 @@ static void test_nested_overflow_violation(void) {
 }
 
 static int test_overflow_violation(void) {
-  struct ui_dom_node *root, *child;
-  struct ui_css_stylesheet *sheet;
+  struct ui_dom_node *root = NULL, *child = NULL;
+  struct ui_css_stylesheet *sheet = NULL;
   struct ui_layout_node *lroot = NULL;
-  struct ui_css_rule *r1, *r2;
+  struct ui_css_rule *r1 = NULL, *r2 = NULL;
   ui_error_t rc;
 
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);

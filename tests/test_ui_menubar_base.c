@@ -11,10 +11,10 @@ extern int g_menubar_mock_fail;
 extern int g_malloc_fail_countdown;
 
 static ui_error_t test_menubar_base(void) {
-  struct ui_menubar_base *menubar;
-  struct ui_component *menu_item;
+  struct ui_menubar_base *menubar = NULL;
+  struct ui_component *menu_item = NULL;
   ui_error_t err;
-  const char *attr_val;
+  const char *attr_val = NULL;
 
   err = ui_menubar_base_create(&menubar);
   if (err != UI_ERROR_NONE) {
@@ -60,7 +60,7 @@ static ui_error_t test_menubar_base(void) {
 }
 
 static int test_edge_cases(void) {
-  struct ui_menubar_base *menubar;
+  struct ui_menubar_base *menubar = NULL;
   struct ui_component item;
   int i;
   ui_error_t err;

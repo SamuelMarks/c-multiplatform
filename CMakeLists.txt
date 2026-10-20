@@ -90,6 +90,7 @@ option(BUILD_VISUAL_TESTS "Build and run visual fuzzy-match tests" ON)
 option(UI_ENABLE_ASAN "Enable AddressSanitizer (ASAN)" OFF)
 
 # Synchronize with CDD / external matrix variables
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 if(DEFINED BUILD_SHARED_LIBS)
     set(UI_SHARED_LIB ${BUILD_SHARED_LIBS})
 else()
@@ -218,6 +219,12 @@ else()
     set(C_ORM_CRT_LINKAGE "Shared" CACHE STRING "" FORCE)
 endif()
 
+if(EMSCRIPTEN)
+    set(UI_SINGLE_THREADED ON)
+    set(CDD_THREADING OFF CACHE BOOL "" FORCE)
+    set(CFS_THREADING OFF CACHE BOOL "" FORCE)
+endif()
+
 if(UI_SINGLE_THREADED)
     add_compile_definitions(UI_SINGLE_THREADED)
 else()
@@ -264,7 +271,7 @@ if(EMSCRIPTEN)
     endif()
 
     # Exported functions and methods
-    set(UI_WASM_EXPORTED_FUNCS "_main,_malloc,_free,_c-multiplatform-cdk_tick,_ui_web_bridge_dispatch_event,_ui_web_bridge_dispatch_resize,_ui_web_bridge_dispatch_key")
+    set(UI_WASM_EXPORTED_FUNCS "_main,_malloc,_free,_ui_engine_tick,_ui_web_bridge_dispatch_event,_ui_web_bridge_dispatch_resize,_ui_web_bridge_dispatch_key")
     set(UI_WASM_RUNTIME_METHODS "ccall,cwrap,UTF8ToString,stringToUTF8,setValue,getValue")
 
     if(CMAKE_BUILD_TYPE MATCHES "Debug")
@@ -276,8 +283,8 @@ if(EMSCRIPTEN)
     endif()
 
     if(NOT UI_SINGLE_THREADED)
-        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -s USE_PTHREADS=1")
-        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s USE_PTHREADS=1 -s PTHREAD_POOL_SIZE=4")
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread")
+        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread -s PTHREAD_POOL_SIZE=16")
     endif()
 
     # Linker specific flags
@@ -500,6 +507,9 @@ if(UI_SHARED_LIB)
     add_library(c-multiplatform-material2 SHARED ${UI_DESIGN_SYSTEM_M2_SRC})
     add_library(c-multiplatform-material3 SHARED ${UI_DESIGN_SYSTEM_M3_SRC})
     add_library(c-multiplatform-cupertino SHARED ${UI_DESIGN_SYSTEM_CUPERTINO_SRC})
+    foreach(tgt c-multiplatform-material2 c-multiplatform-material3 c-multiplatform-cupertino)
+        target_compile_definitions(${tgt} PRIVATE C_MULTIPLATFORM_BUILD_SHARED)
+    endforeach()
 else()
     add_library(c-multiplatform-material2 STATIC ${UI_DESIGN_SYSTEM_M2_SRC})
     add_library(c-multiplatform-material3 STATIC ${UI_DESIGN_SYSTEM_M3_SRC})
@@ -534,7 +544,11 @@ if(UI_ENABLE_DESIGN_SYSTEM_CUPERTINO)
 endif()
 
 if(UI_SHARED_LIB)
-    target_compile_definitions(c-multiplatform-cdk PUBLIC C_MULTIPLATFORM_BUILD_SHARED)
+    target_compile_definitions(c-multiplatform-cdk PRIVATE C_MULTIPLATFORM_BUILD_SHARED)
+    target_compile_definitions(c-multiplatform-cdk INTERFACE C_MULTIPLATFORM_USE_SHARED)
+    foreach(tgt c-multiplatform-material2 c-multiplatform-material3 c-multiplatform-cupertino)
+        target_compile_definitions(${tgt} INTERFACE C_MULTIPLATFORM_USE_SHARED)
+    endforeach()
 endif()
 
 if(NOT UI_SINGLE_THREADED)

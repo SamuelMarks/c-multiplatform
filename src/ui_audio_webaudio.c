@@ -11,6 +11,7 @@
 #if defined(__EMSCRIPTEN__)
 #include <emscripten.h>
 #include <stddef.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #endif
@@ -26,13 +27,14 @@ struct ui_audio_sink {
   int channels;
 };
 
-/* Using JS interop via EM_ASM for WebAudio initialization and write.
-   This avoids needing complex C-side structs. */
+/* Using JS interop via emscripten_run_script for WebAudio initialization and
+   write. This avoids needing complex C-side structs and works in strict C89. */
 
 static ui_error_t wa_create_sink(struct ui_audio_sink_backend *backend,
                                  const struct ui_audio_sink_config *config,
                                  struct ui_audio_sink **out_sink) {
   struct ui_audio_sink *sink = NULL;
+  char script[256];
 
   if (!backend || !config || !out_sink) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -47,17 +49,14 @@ static ui_error_t wa_create_sink(struct ui_audio_sink_backend *backend,
   sink->frame_size = config->frame_size;
   sink->channels = config->channels;
 
-  /* EM_ASM returns a handle integer representing the JS object (simplified) */
-  sink->ctx_id = MAIN_THREAD_EM_ASM_INT(
-      {
-        if (!window.uiWebAudioCtx) {
-          window.uiWebAudioCtx =
-              new (window.AudioContext ||
-                   window.webkitAudioContext)({sampleRate : $0});
-        }
-        return 1;
-      },
-      config->sample_rate);
+  sprintf(script,
+          "(function() { if (typeof window !== 'undefined' && "
+          "!window.uiWebAudioCtx && (window.AudioContext || "
+          "window.webkitAudioContext)) { window.uiWebAudioCtx = new "
+          "(window.AudioContext || window.webkitAudioContext)({sampleRate: "
+          "%d}); } return 1; })()",
+          config->sample_rate);
+  sink->ctx_id = emscripten_run_script_int(script);
 
   if (!sink->ctx_id) {
     free(sink);
@@ -107,11 +106,10 @@ static ui_error_t wa_start(struct ui_audio_sink_backend *backend,
   if (!backend || !sink) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
-  MAIN_THREAD_EM_ASM({
-    if (window.uiWebAudioCtx &&window.uiWebAudioCtx.state == = 'suspended') {
-      window.uiWebAudioCtx.resume();
-    }
-  });
+  emscripten_run_script(
+      "if (typeof window !== 'undefined' && window.uiWebAudioCtx && "
+      "window.uiWebAudioCtx.state === 'suspended') { "
+      "window.uiWebAudioCtx.resume(); }");
   return UI_ERROR_NONE;
 }
 
@@ -120,11 +118,10 @@ static ui_error_t wa_stop(struct ui_audio_sink_backend *backend,
   if (!backend || !sink) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
-  MAIN_THREAD_EM_ASM({
-    if (window.uiWebAudioCtx &&window.uiWebAudioCtx.state == = 'running') {
-      window.uiWebAudioCtx.suspend();
-    }
-  });
+  emscripten_run_script(
+      "if (typeof window !== 'undefined' && window.uiWebAudioCtx && "
+      "window.uiWebAudioCtx.state === 'running') { "
+      "window.uiWebAudioCtx.suspend(); }");
   return UI_ERROR_NONE;
 }
 

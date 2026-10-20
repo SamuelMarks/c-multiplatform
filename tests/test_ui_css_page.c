@@ -10,13 +10,11 @@ extern int g_malloc_fail_countdown;
 extern int g_mock_strcpy_fail;
 
 #define TEST_ASSERT(cond)                                                      \
-  do {                                                                         \
-    if (!(cond)) {                                                             \
-      fprintf(stderr, "Assertion failed: %s at %s:%d\n", #cond, __FILE__,      \
-              __LINE__);                                                       \
-      exit(1);                                                                 \
-    }                                                                          \
-  } while (0)
+  if (!(cond)) {                                                               \
+    fprintf(stderr, "Assertion failed: %s at %s:%d\n", #cond, __FILE__,        \
+            __LINE__);                                                         \
+    exit(1);                                                                   \
+  }
 
 static void test_page_parse_cases(void) {
   struct ui_css_stylesheet *sheet = NULL;
@@ -59,23 +57,26 @@ static void test_page_parse_cases(void) {
   /* Helper to test a set of properties */
 #define TEST_PAGE_PROPS(sz_str, sz_val, mk_str, mk_val, pg_str, bld_str,       \
                         bld_auto)                                              \
-  do {                                                                         \
-    struct ui_css_stylesheet *sh;                                              \
-    struct ui_css_rule *r;                                                     \
-    struct ui_css_computed_style *s;                                           \
+  {                                                                            \
+    struct ui_css_stylesheet *sh = NULL;                                       \
+    struct ui_css_rule *r = NULL;                                              \
+    struct ui_css_computed_style *s = NULL;                                    \
     struct ui_css_page_properties p;                                           \
+    const char *sz_v = (sz_str);                                               \
+    const char *mk_v = (mk_str);                                               \
     const char *pg_val = (pg_str);                                             \
+    const char *bld_v = (bld_str);                                             \
     ui_css_stylesheet_create(&sh);                                             \
     ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &r);                            \
     ui_css_rule_append_selector(r, UI_CSS_SELECTOR_TYPE_TAG, "div");           \
-    if (sz_str)                                                                \
-      ui_css_rule_append_declaration(r, "size", sz_str, 0);                    \
-    if (mk_str)                                                                \
-      ui_css_rule_append_declaration(r, "marks", mk_str, 0);                   \
+    if (sz_v)                                                                  \
+      ui_css_rule_append_declaration(r, "size", sz_v, 0);                      \
+    if (mk_v)                                                                  \
+      ui_css_rule_append_declaration(r, "marks", mk_v, 0);                     \
     if (pg_val)                                                                \
       ui_css_rule_append_declaration(r, "page", pg_val, 0);                    \
-    if (bld_str)                                                               \
-      ui_css_rule_append_declaration(r, "bleed", bld_str, 0);                  \
+    if (bld_v)                                                                 \
+      ui_css_rule_append_declaration(r, "bleed", bld_v, 0);                    \
     ui_css_stylesheet_append_rule(sh, r);                                      \
     ui_css_resolve_style(sh, node, &s);                                        \
     ui_css_page_parse(s, &p);                                                  \
@@ -90,7 +91,7 @@ static void test_page_parse_cases(void) {
     ui_css_page_properties_cleanup(&p);                                        \
     ui_css_computed_style_destroy(s);                                          \
     ui_css_stylesheet_destroy(sh);                                             \
-  } while (0)
+  }
 
   /* Sizes */
   TEST_PAGE_PROPS("portrait", UI_CSS_PAGE_SIZE_PORTRAIT, NULL,
@@ -152,9 +153,9 @@ static void test_page_parse_cases(void) {
 
   /* OOM for page name */
   {
-    struct ui_css_stylesheet *sh;
-    struct ui_css_rule *r;
-    struct ui_css_computed_style *s;
+    struct ui_css_stylesheet *sh = NULL;
+    struct ui_css_rule *r = NULL;
+    struct ui_css_computed_style *s = NULL;
     struct ui_css_page_properties p;
     ui_css_stylesheet_create(&sh);
     ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &r);
@@ -174,9 +175,9 @@ static void test_page_parse_cases(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    struct ui_css_stylesheet *sh;
-    struct ui_css_rule *r;
-    struct ui_css_computed_style *s;
+    struct ui_css_stylesheet *sh = NULL;
+    struct ui_css_rule *r = NULL;
+    struct ui_css_computed_style *s = NULL;
     struct ui_css_page_properties p;
     ui_css_stylesheet_create(&sh);
     ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &r);

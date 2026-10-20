@@ -92,7 +92,7 @@ static int run_normal_tests(void) {
 
   /* Test destroy with inactive trap */
   {
-    struct ui_focus_trap *trap2;
+    struct ui_focus_trap *trap2 = NULL;
     ui_focus_trap_create(&trap2);
     /* never activated */
     ui_focus_trap_destroy(trap2);

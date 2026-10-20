@@ -281,7 +281,7 @@ int main(void) {
 
   /* Re-append for next tests */
   {
-    struct ui_dom_node *child3;
+    struct ui_dom_node *child3 = NULL;
     ui_dom_node_append_child(root, child1);
     ui_dom_node_append_child(root, child2);
     ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &child3);

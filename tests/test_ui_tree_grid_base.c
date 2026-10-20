@@ -384,7 +384,7 @@ static int test_tree_grid_key_events(void) {
 static int test_tree_grid_render(void) {
   struct ui_tree_grid_base *tree_grid = NULL;
   struct ui_tree_grid_model model;
-  struct ui_dom_node *container;
+  struct ui_dom_node *container = NULL;
   ui_error_t rc;
   int failed = 0;
 

@@ -1206,13 +1206,13 @@ int test_cssom_part6_memory(void) {
         struct ui_css_stylesheet *sheet_tmp = NULL;
         ui_css_stylesheet_create(&sheet_tmp);
         {
-          struct ui_css_rule *media_tmp;
+          struct ui_css_rule *media_tmp = NULL;
           ui_css_rule_create(UI_CSS_RULE_TYPE_MEDIA, &media_tmp);
           media_tmp->media_condition = C_MULTIPLATFORM_STRDUP("(a(b))");
           ui_css_stylesheet_append_rule(sheet_tmp, media_tmp);
 
           {
-            struct ui_css_computed_style *style_tmp;
+            struct ui_css_computed_style *style_tmp = NULL;
             ui_css_resolve_style(sheet_tmp, node_tmp, &style_tmp);
             ui_css_computed_style_destroy(style_tmp);
             ui_css_stylesheet_destroy(sheet_tmp);
@@ -1244,7 +1244,7 @@ int test_cssom_part6_memory(void) {
         struct ui_css_stylesheet *sheet_tmp = NULL;
         ui_css_stylesheet_create(&sheet_tmp);
         {
-          struct ui_css_rule *style_tmp;
+          struct ui_css_rule *style_tmp = NULL;
           ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &style_tmp);
 
           {
@@ -1261,7 +1261,7 @@ int test_cssom_part6_memory(void) {
             ui_css_stylesheet_append_rule(sheet_tmp, style_tmp);
 
             {
-              struct ui_css_computed_style *c_style;
+              struct ui_css_computed_style *c_style = NULL;
               ui_css_resolve_style(sheet_tmp, node_tmp, &c_style);
 
               ui_css_computed_style_destroy(c_style);

@@ -1,9 +1,9 @@
 
 void test_more_layout(void) {
-  struct ui_dom_node *root;
-  struct ui_css_stylesheet *sheet;
-  struct ui_layout_node *lroot;
-  struct ui_css_rule *rule;
+  struct ui_dom_node *root = NULL;
+  struct ui_css_stylesheet *sheet = NULL;
+  struct ui_layout_node *lroot = NULL;
+  struct ui_css_rule *rule = NULL;
 
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
   ui_dom_node_set_tag_name(root, "div");
@@ -104,7 +104,7 @@ void test_coverage_layout(void) {
 
   /* Test inline anon block */
   {
-    struct ui_dom_node *child1, *child2, *child3;
+    struct ui_dom_node *child1 = NULL, *child2 = NULL, *child3 = NULL;
     ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &child1);
     ui_dom_node_set_tag_name(child1, "span");
     ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &child2);
@@ -117,7 +117,7 @@ void test_coverage_layout(void) {
     ui_dom_node_append_child(root, child3);
 
     {
-      struct ui_css_rule *rule2;
+      struct ui_css_rule *rule2 = NULL;
       ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule2);
       ui_css_rule_append_selector(rule2, UI_CSS_SELECTOR_TYPE_TAG, "span");
       ui_css_rule_append_declaration(rule2, "display", "inline", 0);

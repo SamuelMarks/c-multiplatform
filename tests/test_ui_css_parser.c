@@ -804,7 +804,7 @@ int main(void) {
   struct ui_dom_node *node = NULL;
   struct ui_css_computed_style *style = NULL;
   ui_error_t rc;
-  const char *val;
+  const char *val = NULL;
   char css_text[2048];
   char edge_case_css[2048];
   size_t k;
@@ -1097,7 +1097,7 @@ int main(void) {
 
   /* Test :has() by adding a child */
   {
-    struct ui_dom_node *child;
+    struct ui_dom_node *child = NULL;
     rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &child);
     ui_dom_node_set_tag_name(child, "span");
     ui_dom_node_set_attribute(child, "class", "child");
@@ -1129,7 +1129,7 @@ int main(void) {
   }
   /* Test state matchers */
   {
-    struct ui_dom_node *state_node;
+    struct ui_dom_node *state_node = NULL;
     ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &state_node);
     state_node->state_flags |= UI_DOM_NODE_STATE_HOVER;
     ui_dom_node_set_attribute(state_node, "class", "container");
@@ -1179,7 +1179,7 @@ int main(void) {
 
   /* Test Conditional Rules */
   {
-    struct ui_dom_node *cond_node;
+    struct ui_dom_node *cond_node = NULL;
     ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &cond_node);
     ui_dom_node_set_tag_name(cond_node, "div");
     ui_dom_node_set_attribute(cond_node, "id", "cond_main");
@@ -1235,10 +1235,10 @@ int main(void) {
 
   /* Test Scope Rules */
   {
-    struct ui_dom_node *card_node;
-    struct ui_dom_node *child_node;
-    struct ui_dom_node *hole_node;
-    struct ui_dom_node *deep_node;
+    struct ui_dom_node *card_node = NULL;
+    struct ui_dom_node *child_node = NULL;
+    struct ui_dom_node *hole_node = NULL;
+    struct ui_dom_node *deep_node = NULL;
 
     ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &card_node);
     ui_dom_node_set_tag_name(card_node, "div");
@@ -1512,8 +1512,8 @@ int main(void) {
     struct ui_css_value width_val;
     enum ui_css_outline_style outline_style;
     enum ui_css_overscroll_behavior os_behavior;
-    struct ui_css_stylesheet *sheet2;
-    struct ui_css_rule *attr_rule;
+    struct ui_css_stylesheet *sheet2 = NULL;
+    struct ui_css_rule *attr_rule = NULL;
     int layer_order;
 
     rc = ui_css_parse_color("#ff0000", &color);

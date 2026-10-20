@@ -100,11 +100,11 @@ static int test_safe_area_insets(void) {
 }
 
 static int test_safe_area_edge_cases(void) {
-  struct ui_arena *arena;
-  struct ui_safe_area_manager *manager;
+  struct ui_arena *arena = NULL;
+  struct ui_safe_area_manager *manager = NULL;
   ui_error_t rc;
   struct ui_safe_area_insets insets = {0};
-  ui_signal_t *signal;
+  ui_signal_t *signal = NULL;
 
   ui_arena_create(1024 * 1024, &arena);
   ui_safe_area_manager_create(arena, &manager);

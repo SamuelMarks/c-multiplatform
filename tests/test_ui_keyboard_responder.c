@@ -124,6 +124,8 @@ static ui_error_t run_normal_tests(void) {
     return UI_ERROR_UNKNOWN;
   if (g_callback_called != 1)
     return UI_ERROR_UNKNOWN;
+  if (g_callback_node != node)
+    return UI_ERROR_UNKNOWN;
   if (g_callback_user_data != (void *)0x123)
     return UI_ERROR_UNKNOWN;
 

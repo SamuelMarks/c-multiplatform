@@ -169,7 +169,7 @@ int run_normal_tests(void) {
               ui_syntax_surface_base_set_bracket_match(surface, &match));
 
     {
-      ui_signal_t *f_sig, *a_sig;
+      ui_signal_t *f_sig = NULL, *a_sig = NULL;
       ui_syntax_surface_base_get_fold_changed_signal(surface, &f_sig);
       ui_syntax_surface_base_get_active_line_signal(surface, &a_sig);
 

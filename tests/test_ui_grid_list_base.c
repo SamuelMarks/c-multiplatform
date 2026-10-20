@@ -12,7 +12,7 @@ static int run_normal_tests(void) {
   int cols;
   size_t count;
   int rows;
-  const struct ui_grid_list_item *item;
+  const struct ui_grid_list_item *item = NULL;
 
   printf("Testing ui_grid_list_base_create...\n");
   if (ui_grid_list_base_create(NULL, 2) != UI_ERROR_INVALID_ARGUMENT)

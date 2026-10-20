@@ -21,10 +21,10 @@ typedef long HRESULT;
 typedef unsigned long ULONG;
 typedef unsigned int UINT32;
 typedef unsigned long DWORD;
-typedef long long REFERENCE_TIME;
+typedef ui_int64 REFERENCE_TIME;
 typedef unsigned short WORD;
 typedef void *LPVOID;
-typedef long long LONGLONG;
+typedef ui_int64 LONGLONG;
 
 #ifndef S_OK
 #define S_OK ((HRESULT)0L)

@@ -6,13 +6,11 @@
 /* clang-format on */
 
 #define TEST_ASSERT(cond)                                                      \
-  do {                                                                         \
-    if (!(cond)) {                                                             \
-      fprintf(stderr, "Assertion failed: %s at %s:%d\n", #cond, __FILE__,      \
-              __LINE__);                                                       \
-      exit(1);                                                                 \
-    }                                                                          \
-  } while (0)
+  if (!(cond)) {                                                               \
+    fprintf(stderr, "Assertion failed: %s at %s:%d\n", #cond, __FILE__,        \
+            __LINE__);                                                         \
+    exit(1);                                                                   \
+  }
 
 static void test_spatial_nav_cases(void) {
   struct ui_css_stylesheet *sheet = NULL;
@@ -47,22 +45,23 @@ static void test_spatial_nav_cases(void) {
 
   /* Helper to test values */
 #define TEST_SPATIAL_NAV(a_str, a_val, c_str, c_val, f_str, f_val)             \
-  do {                                                                         \
-    struct ui_css_stylesheet *sh;                                              \
-    struct ui_css_rule *r;                                                     \
-    struct ui_css_computed_style *s;                                           \
+  {                                                                            \
+    struct ui_css_stylesheet *sh = NULL;                                       \
+    struct ui_css_rule *r = NULL;                                              \
+    struct ui_css_computed_style *s = NULL;                                    \
     struct ui_css_spatial_nav_properties p;                                    \
+    const char *a_s = (a_str);                                                 \
+    const char *c_s = (c_str);                                                 \
+    const char *f_s = (f_str);                                                 \
     ui_css_stylesheet_create(&sh);                                             \
     ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &r);                            \
     ui_css_rule_append_selector(r, UI_CSS_SELECTOR_TYPE_TAG, "div");           \
-    if (a_str)                                                                 \
-      ui_css_rule_append_declaration(r, "spatial-navigation-action", a_str,    \
-                                     0);                                       \
-    if (c_str)                                                                 \
-      ui_css_rule_append_declaration(r, "spatial-navigation-contain", c_str,   \
-                                     0);                                       \
-    if (f_str)                                                                 \
-      ui_css_rule_append_declaration(r, "spatial-navigation-function", f_str,  \
+    if (a_s)                                                                   \
+      ui_css_rule_append_declaration(r, "spatial-navigation-action", a_s, 0);  \
+    if (c_s)                                                                   \
+      ui_css_rule_append_declaration(r, "spatial-navigation-contain", c_s, 0); \
+    if (f_s)                                                                   \
+      ui_css_rule_append_declaration(r, "spatial-navigation-function", f_s,    \
                                      0);                                       \
     ui_css_stylesheet_append_rule(sh, r);                                      \
     ui_css_resolve_style(sh, node, &s);                                        \
@@ -72,7 +71,7 @@ static void test_spatial_nav_cases(void) {
     TEST_ASSERT(p.function == f_val);                                          \
     ui_css_computed_style_destroy(s);                                          \
     ui_css_stylesheet_destroy(sh);                                             \
-  } while (0)
+  }
 
   /* Actions */
   TEST_SPATIAL_NAV("auto", UI_CSS_SPATIAL_NAV_ACTION_AUTO, NULL,

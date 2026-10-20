@@ -14,10 +14,8 @@ extern int g_component_registry_mock_fail;
 extern int g_malloc_fail_countdown;
 extern int g_mock_strcpy_fail;
 
-static int g_custom_factory_called = 0;
 static ui_error_t custom_factory(void **out_instance,
                                  struct ui_dom_node **out_dom_node) {
-  g_custom_factory_called = 1;
   *out_instance = (void *)0x1234;
   *out_dom_node = NULL;
   return UI_ERROR_NONE;

@@ -78,7 +78,7 @@ static ui_error_t mock_render_node(void *node_id, struct ui_dom_node *cell_node,
 extern int g_malloc_fail_countdown;
 
 static void test_miller_errors(void) {
-  struct ui_arena *arena;
+  struct ui_arena *arena = NULL;
   ui_arena_create(1024, &arena);
   {
     struct ui_tree_model model = {0};
@@ -134,7 +134,7 @@ static void test_miller_errors(void) {
 
       /* Force OOM during signal creation using a small arena */
       {
-        struct ui_arena *small_arena;
+        struct ui_arena *small_arena = NULL;
         struct ui_miller_columns_base *miller_small = NULL;
         /* Create arena with size 1 so every alloc calls malloc */
         if (ui_arena_create(1, &small_arena) == UI_ERROR_NONE) {
@@ -228,7 +228,7 @@ static void test_miller_errors(void) {
 extern int g_malloc_fail_countdown;
 static void test_oom(void) {
 #ifdef UI_TEST_MOCK_ALLOC
-  struct ui_arena *arena;
+  struct ui_arena *arena = NULL;
   ui_arena_create(1024, &arena);
   {
     struct ui_tree_model model = {0};

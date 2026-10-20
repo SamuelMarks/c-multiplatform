@@ -8,9 +8,9 @@
 /* clang-format on */
 
 int main(void) {
-  struct ui_arena *arena;
-  ui_form_builder_t *builder;
-  ui_form_group_t *group;
+  struct ui_arena *arena = NULL;
+  ui_form_builder_t *builder = NULL;
+  ui_form_group_t *group = NULL;
   enum ui_form_status status;
   union ui_signal_payload init;
 

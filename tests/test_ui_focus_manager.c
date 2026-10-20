@@ -667,7 +667,7 @@ int main(void) {
 
 static int run_coverage_focus(void) {
   struct ui_focus_manager *mgr = NULL;
-  struct ui_dom_node *root;
+  struct ui_dom_node *root = NULL;
   struct ui_layout_node lroot;
 
   printf("Running extra focus manager coverage...\n");

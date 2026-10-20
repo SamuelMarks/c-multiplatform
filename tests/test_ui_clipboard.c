@@ -19,7 +19,7 @@ static void check_cond_impl(int cond, int *failed, int line) {
 extern int g_malloc_fail_countdown;
 extern int g_ui_clipboard_force_fallback;
 
-#if defined(_MSC_VER)
+#if defined(_WIN32)
 #define POPEN_CMD _popen
 #define PCLOSE_CMD _pclose
 #else

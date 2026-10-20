@@ -24,33 +24,33 @@ extern int g_split_button_mock_node_destroy_fail;
 #endif
 
 #define ASSERT_SUCCESS(expr)                                                   \
-  do {                                                                         \
+  {                                                                            \
     ui_error_t _err = (expr);                                                  \
     if (_err != UI_ERROR_NONE) {                                               \
       printf("Failed at line %d: %d\n", __LINE__, _err);                       \
       return 1;                                                                \
     }                                                                          \
-  } while (0)
+  }
 
 #define ASSERT_EQ(expr, expected)                                              \
-  do {                                                                         \
+  {                                                                            \
     ui_error_t _err = (expr);                                                  \
     if (_err != (expected)) {                                                  \
       printf("Failed at line %d: expected %d, got %d\n", __LINE__, (expected), \
              _err);                                                            \
       return 1;                                                                \
     }                                                                          \
-  } while (0)
+  }
 
 #define ASSERT_PTR_EQ(expr, expected)                                          \
-  do {                                                                         \
+  {                                                                            \
     void *val = (expr);                                                        \
     if (val != (expected)) {                                                   \
       printf("Failed at line %d: expected %p, got %p\n", __LINE__,             \
              (void *)(expected), (void *)val);                                 \
       return 1;                                                                \
     }                                                                          \
-  } while (0)
+  }
 
 static int test_ui_split_button_base_create_destroy(void) {
   struct ui_split_button_base *btn = NULL;

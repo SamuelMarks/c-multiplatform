@@ -15,45 +15,33 @@
 extern int g_malloc_fail_countdown;
 extern int g_wheel_mock_fail;
 
-static int change_count = 0;
-static int last_selected_index = -1;
-static int touched_count = 0;
-static int cva_change_count = 0;
-static int cva_last_selected_index = -1;
 static int g_cb_fail_on_change = 0;
 static int g_cb_fail_cva_change = 0;
 static int g_cb_fail_touched = 0;
 
 static ui_error_t on_change(struct ui_wheel_picker_base *picker,
                             int selected_index, void *user_data) {
-  void *unused_u = user_data;
-  struct ui_wheel_picker_base *unused_p = picker;
-  picker = unused_p;
-  user_data = unused_u;
+  if (picker || selected_index || user_data) {
+  }
   if (g_cb_fail_on_change)
     return UI_ERROR_UNKNOWN;
-  change_count++;
-  last_selected_index = selected_index;
   return UI_ERROR_NONE;
 }
 
 static ui_error_t cva_on_change(union ui_signal_payload new_value,
                                 void *user_data) {
-  void *unused_u = user_data;
-  user_data = unused_u;
+  if (new_value.int_val || user_data) {
+  }
   if (g_cb_fail_cva_change)
     return UI_ERROR_UNKNOWN;
-  cva_change_count++;
-  cva_last_selected_index = new_value.int_val;
   return UI_ERROR_NONE;
 }
 
 static ui_error_t cva_on_touched(void *user_data) {
-  void *unused_u = user_data;
-  user_data = unused_u;
+  if (user_data) {
+  }
   if (g_cb_fail_touched)
     return UI_ERROR_UNKNOWN;
-  touched_count++;
   return UI_ERROR_NONE;
 }
 

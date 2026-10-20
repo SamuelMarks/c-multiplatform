@@ -15,13 +15,11 @@ extern int g_cupertino_menu_button_mock_button_destroy_fail;
 extern int g_cupertino_menu_button_mock_set_text_fail;
 extern int g_cupertino_menu_button_mock_get_base_fail;
 
-static int g_selected_call_count = 0;
 static ui_error_t dummy_on_select(void *user_data) {
   int *p = (int *)user_data;
   if (p) {
     (*p)++;
   }
-  g_selected_call_count++;
   return UI_ERROR_NONE;
 }
 

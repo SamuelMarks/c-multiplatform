@@ -9,14 +9,12 @@
 extern int g_malloc_fail_countdown;
 
 static int g_change_called = 0;
-static int g_change_val = -1;
 static int g_touched_called = 0;
 
 static ui_error_t dummy_change(union ui_signal_payload new_value,
                                void *user_data) {
   g_change_called++;
-  g_change_val = new_value.int_val;
-  if (user_data) {
+  if (new_value.int_val || user_data) {
   }
   return UI_ERROR_NONE;
 }

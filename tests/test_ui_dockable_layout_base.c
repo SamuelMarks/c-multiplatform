@@ -253,7 +253,7 @@ int main(void) {
     char big_buffer[2048] = {0};
     int i;
     int offset = 0;
-    struct ui_dockable_layout_base *layout;
+    struct ui_dockable_layout_base *layout = NULL;
     ui_dockable_layout_base_create(&layout);
     for (i = 1; i <= 130; i++) {
 #if defined(_MSC_VER)

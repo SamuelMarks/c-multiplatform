@@ -502,7 +502,7 @@ static int run_normal_tests(void) {
 
     payload.int_val = -1;
     {
-      struct ui_component *comp;
+      struct ui_component *comp = NULL;
       ui_listbox_base_get_component(listbox, &comp);
       ui_dom_node_remove_attribute(comp->shadow_root, "aria-multiselectable");
     }

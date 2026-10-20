@@ -24,7 +24,7 @@ static ui_error_t mock_graph_set(struct ui_reactive_node *n, struct ui_reactive_
 extern int g_malloc_fail_countdown;
 
 static ui_error_t failing_effect(void *user_data) {
-  if (sizeof(user_data) == 0) {
+  if (user_data) {
   }
   return UI_ERROR_INVALID_ARGUMENT;
 }
@@ -131,8 +131,8 @@ static int test_effect(void) {
 
   /* Arena */
   {
-    struct ui_arena *arena;
-    void *dummy;
+    struct ui_arena *arena = NULL;
+    void *dummy = NULL;
     ui_arena_create(256, &arena);
 
     ui_effect_create(arena, dummy_effect, &my_data, NULL, &eff);

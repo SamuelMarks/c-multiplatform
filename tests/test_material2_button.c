@@ -18,7 +18,7 @@ extern int g_malloc_fail_countdown;
 
 static ui_error_t dummy_on_click(struct ui_button_base *btn, void *user_data) {
   int *clicked = (int *)user_data;
-  if (sizeof(btn) == 0) {
+  if (btn) {
   }
   if (clicked)
     *clicked = 1;

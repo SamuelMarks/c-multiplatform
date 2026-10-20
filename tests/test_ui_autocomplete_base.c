@@ -318,7 +318,6 @@ static void test_autocomplete_process_event_explicit(void) {
 extern int g_malloc_fail_countdown;
 
 static int text_change_count = 0;
-static int selection_count = 0;
 
 static ui_error_t on_text_change(struct ui_autocomplete_base *autocomplete,
                                  const char *text, void *user_data) {
@@ -344,7 +343,6 @@ static ui_error_t on_selection(struct ui_autocomplete_base *autocomplete,
     int *val = (int *)user_data;
     (*val)++;
   }
-  selection_count++;
   return UI_ERROR_NONE;
 }
 

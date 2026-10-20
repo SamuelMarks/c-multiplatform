@@ -384,7 +384,7 @@ static int test_signal(void) {
 
   /* arena alloc */
   {
-    struct ui_arena *arena;
+    struct ui_arena *arena = NULL;
     ui_arena_create(256, &arena);
     ui_signal_create(arena, val, UI_SIGNAL_TYPE_INT32, eq_fn, dest_fn,
                      UI_SIGNAL_MODE_SINGLE_THREADED, &sig);
@@ -400,7 +400,7 @@ static int test_signal(void) {
 
   /* Arena alloc fail test */
   {
-    struct ui_arena *arena;
+    struct ui_arena *arena = NULL;
     ui_arena_create(256, &arena);
     g_malloc_fail_countdown = 0;
     ui_signal_create(arena, val, UI_SIGNAL_TYPE_INT32, eq_fn, dest_fn,

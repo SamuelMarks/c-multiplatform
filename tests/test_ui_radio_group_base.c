@@ -377,7 +377,7 @@ static int test_radio_group_oom(void) {
   ui_radio_group_base_create(&group, NULL);
 
   for (i = 0; i < 5; i++) {
-    struct ui_toggle_base *t;
+    struct ui_toggle_base *t = NULL;
     ui_error_t rc;
     ui_toggle_base_create(UI_TOGGLE_TYPE_RADIO, &t);
     g_malloc_fail_countdown = 0; /* fail the realloc */

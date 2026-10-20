@@ -70,7 +70,7 @@ static int test_ribbon_lifecycle(void) {
 }
 
 static int test_ribbon_groups(void) {
-  struct ui_arena *arena;
+  struct ui_arena *arena = NULL;
   struct ui_ribbon_base *ribbon = NULL;
   struct ui_ribbon_group_config group1;
   struct ui_ribbon_group_config group2;
@@ -247,7 +247,7 @@ static int test_ribbon_groups(void) {
 }
 
 static int test_ribbon_contextual_tabs(void) {
-  struct ui_arena *arena;
+  struct ui_arena *arena = NULL;
   struct ui_ribbon_base *ribbon = NULL;
   ui_bool_t is_active;
 
@@ -285,7 +285,7 @@ static int test_ribbon_contextual_tabs(void) {
 }
 
 static int test_ribbon_nulls_and_errors(void) {
-  struct ui_arena *arena;
+  struct ui_arena *arena = NULL;
   struct ui_ribbon_base *ribbon = NULL;
   struct ui_ribbon_group_config group;
   enum ui_ribbon_group_collapse_state state;
@@ -386,7 +386,7 @@ static int test_ribbon_nulls_and_errors(void) {
 }
 
 static int test_ribbon_limits(void) {
-  struct ui_arena *arena;
+  struct ui_arena *arena = NULL;
   struct ui_ribbon_base *ribbon = NULL;
   struct ui_ribbon_group_config group;
   int i;

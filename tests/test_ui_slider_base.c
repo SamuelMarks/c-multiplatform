@@ -9,17 +9,10 @@
 
 extern int g_malloc_fail_countdown;
 
-static int g_change_count = 0;
-static float g_last_value = 0.0f;
-
 static ui_error_t on_slider_change(struct ui_slider_base *slider, float value,
                                    void *user_data) {
-  if (slider) {
+  if (slider || value != 0.0f || user_data) {
   }
-  if (user_data) {
-  }
-  g_change_count++;
-  g_last_value = value;
   return UI_ERROR_NONE;
 }
 
@@ -50,8 +43,8 @@ static int run_normal_tests(void) {
   /* Disable internal error prints from missing mock alloc pointers */
   ui_slider_base_destroy(NULL); /* Should be safe */
   {
-    struct ui_slider_base *s;
-    struct ui_component *c;
+    struct ui_slider_base *s = NULL;
+    struct ui_component *c = NULL;
     ui_slider_base_create(&s, NULL);
     ui_slider_base_get_component(s, &c);
     {
@@ -187,7 +180,6 @@ static int run_normal_tests(void) {
   }
 
   /* Limits and Step */
-  g_change_count = 0;
   err = ui_slider_base_set_on_change(slider, on_slider_change, NULL);
   if (err != UI_ERROR_NONE) {
     printf("9\n");
@@ -490,7 +482,7 @@ static ui_error_t mock_on_change_fail(struct ui_slider_base *slider, float val,
 }
 
 static void test_on_change_error(void) {
-  struct ui_slider_base *slider;
+  struct ui_slider_base *slider = NULL;
   ui_slider_base_create(&slider, NULL);
   ui_slider_base_set_on_change(slider, mock_on_change_fail, NULL);
 

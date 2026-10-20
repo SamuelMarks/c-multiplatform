@@ -43,7 +43,7 @@ static int test_badge_formatting(void) {
   /* Test hiding */
   ui_badge_base_set_hidden(badge, 1);
   {
-    const char *hidden_val;
+    const char *hidden_val = NULL;
     ui_dom_node_get_attribute(comp->shadow_root, "aria-hidden", &hidden_val);
     if (!hidden_val || strcmp(hidden_val, "true") != 0)
       return 1;
@@ -79,7 +79,7 @@ extern int g_malloc_fail_countdown;
 
 static int test_badge_nulls_and_errors(void) {
   struct ui_badge_base *badge = NULL;
-  struct ui_component *comp;
+  struct ui_component *comp = NULL;
   int dummy_signal = 0;
 
   if (ui_badge_base_create(NULL) != UI_ERROR_INVALID_ARGUMENT)

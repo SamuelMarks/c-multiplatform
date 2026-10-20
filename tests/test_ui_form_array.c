@@ -10,10 +10,10 @@
 extern int g_malloc_fail_countdown;
 
 static int test_ui_form_array(void) {
-  struct ui_arena *arena;
-  struct ui_arena *tiny_arena;
-  ui_form_array_t *array;
-  ui_form_array_t *dummy_array;
+  struct ui_arena *arena = NULL;
+  struct ui_arena *tiny_arena = NULL;
+  ui_form_array_t *array = NULL;
+  ui_form_array_t *dummy_array = NULL;
   ui_form_control_t *control1 = NULL;
   ui_form_control_t *control2 = NULL;
   ui_form_control_t *control_invalid = NULL;
@@ -26,7 +26,7 @@ static int test_ui_form_array(void) {
   ui_form_node_t out_node;
   union ui_signal_payload init_val = {0};
   enum ui_form_status status;
-  ui_signal_t *status_sig;
+  ui_signal_t *status_sig = NULL;
   int ret = 1;
   int i;
 

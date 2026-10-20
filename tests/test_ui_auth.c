@@ -18,7 +18,7 @@ static int g_auth_success = 0;
 static ui_error_t on_auth_resolved(void *result_ptr, void *user_data,
                                    void **out_result) {
   enum ui_auth_result *res = (enum ui_auth_result *)result_ptr;
-  if (sizeof(out_result) == 0) {
+  if (out_result) {
   }
   if (user_data) {
   }
@@ -34,7 +34,7 @@ static ui_error_t on_auth_resolved(void *result_ptr, void *user_data,
 
 static ui_error_t on_auth_rejected(ui_error_t err, void *user_data,
                                    void **out_result) {
-  if (sizeof(out_result) == 0) {
+  if (out_result) {
   }
   if (user_data) {
   }

@@ -178,8 +178,8 @@ TEST test_table_null_args(void) {
 
 TEST test_table_render_and_aria(void) {
   struct ui_table_model model;
-  struct ui_table_base *table;
-  struct ui_dom_node *container;
+  struct ui_table_base *table = NULL;
+  struct ui_dom_node *container = NULL;
   struct ui_table_sort_config sort_cfg;
   struct ui_selection_model *sel_model = NULL;
   ui_error_t rc;
@@ -310,8 +310,8 @@ TEST test_table_pagination_and_sizing(void) {
 
 TEST test_table_error_branches(void) {
   struct ui_table_model model;
-  struct ui_table_base *table;
-  struct ui_dom_node *container;
+  struct ui_table_base *table = NULL;
+  struct ui_dom_node *container = NULL;
   ui_error_t rc;
   int i;
 

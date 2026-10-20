@@ -106,8 +106,8 @@ static int test_coachmark(void) {
 
   /* Set up open signal for coverage */
   {
-    struct ui_arena *arena;
-    struct ui_signal *sig;
+    struct ui_arena *arena = NULL;
+    struct ui_signal *sig = NULL;
     union ui_signal_payload val;
     val.bool_val = 0;
     ui_arena_create(1024, &arena);

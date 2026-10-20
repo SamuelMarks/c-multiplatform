@@ -16,33 +16,23 @@ struct gles_fallback_context {
 
 static ui_error_t mock_fail_set_viewport(struct ui_renderer_backend *backend,
                                          int x, int y, int width, int height) {
-  if (sizeof(backend) == 0) {
-  }
-  if (sizeof(height) == 0) {
-  }
-  if (sizeof(width) == 0) {
-  }
-  if (sizeof(y) == 0) {
-  }
-  if (sizeof(x) == 0) {
+  if (backend || x || y || width || height) {
   }
   return UI_ERROR_UNKNOWN;
 }
 static ui_error_t mock_fail_clear(struct ui_renderer_backend *backend,
                                   struct ui_color color) {
-  if (sizeof(backend) == 0) {
-  }
-  if (sizeof(color) == 0) {
+  if (backend || color.r != 0.0f) {
   }
   return UI_ERROR_UNKNOWN;
 }
 static ui_error_t mock_fail_flush(struct ui_renderer_backend *backend) {
-  if (sizeof(backend) == 0) {
+  if (backend) {
   }
   return UI_ERROR_UNKNOWN;
 }
 static ui_error_t mock_fail_destroy(struct ui_renderer_backend *backend) {
-  if (sizeof(backend) == 0) {
+  if (backend) {
   }
   return UI_ERROR_UNKNOWN;
 }

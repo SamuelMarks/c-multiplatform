@@ -9,13 +9,11 @@
 extern ui_error_t run_scroll_snap_coverage(void);
 
 #define TEST_ASSERT(cond)                                                      \
-  do {                                                                         \
-    if (!(cond)) {                                                             \
-      fprintf(stderr, "Assertion failed: %s at %s:%d\n", #cond, __FILE__,      \
-              __LINE__);                                                       \
-      exit(1);                                                                 \
-    }                                                                          \
-  } while (0)
+  if (!(cond)) {                                                               \
+    fprintf(stderr, "Assertion failed: %s at %s:%d\n", #cond, __FILE__,        \
+            __LINE__);                                                         \
+    exit(1);                                                                   \
+  }
 
 static void test_scroll_snap_cases(void) {
   struct ui_css_stylesheet *sheet = NULL;
@@ -69,10 +67,10 @@ static void test_scroll_snap_cases(void) {
 
       /* Helper to test values */
 #define TEST_SCROLL_SNAP(decls, chk)                                           \
-  do {                                                                         \
-    struct ui_css_stylesheet *sh;                                              \
-    struct ui_css_rule *r;                                                     \
-    struct ui_css_computed_style *s;                                           \
+  {                                                                            \
+    struct ui_css_stylesheet *sh = NULL;                                       \
+    struct ui_css_rule *r = NULL;                                              \
+    struct ui_css_computed_style *s = NULL;                                    \
     struct ui_css_scroll_snap_properties p;                                    \
     ui_css_stylesheet_create(&sh);                                             \
     ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &r);                            \
@@ -82,7 +80,7 @@ static void test_scroll_snap_cases(void) {
     TEST_ASSERT(ui_css_scroll_snap_parse(s, &p) == UI_ERROR_NONE);             \
     chk ui_css_computed_style_destroy(s);                                      \
     ui_css_stylesheet_destroy(sh);                                             \
-  } while (0)
+  }
 
       /* snap-type: none */
       TEST_SCROLL_SNAP(

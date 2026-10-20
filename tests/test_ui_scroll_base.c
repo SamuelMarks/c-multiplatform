@@ -10,18 +10,12 @@
 extern int g_malloc_fail_countdown;
 
 static int g_change_count = 0;
-static float g_last_x = 0.0f;
-static float g_last_y = 0.0f;
 
 static ui_error_t on_scroll_change(struct ui_scroll_base *scroll, float x,
                                    float y, void *user_data) {
-  if (scroll) {
-  }
-  if (user_data) {
+  if (scroll || x != 0.0f || y != 0.0f || user_data) {
   }
   g_change_count++;
-  g_last_x = x;
-  g_last_y = y;
   return UI_ERROR_NONE;
 }
 

@@ -66,10 +66,10 @@ void test_content_negative(void) {
 /* clang-format on */
 
 static void test_flex_grow_shrink(void) {
-  struct ui_dom_node *root, *c1, *c2;
-  struct ui_css_stylesheet *sheet;
-  struct ui_css_rule *rule;
-  struct ui_layout_node *lroot;
+  struct ui_dom_node *root = NULL, *c1 = NULL, *c2 = NULL;
+  struct ui_css_stylesheet *sheet = NULL;
+  struct ui_css_rule *rule = NULL;
+  struct ui_layout_node *lroot = NULL;
 
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
   ui_dom_node_set_tag_name(root, "div");
@@ -144,9 +144,9 @@ static void test_flex_grow_shrink(void) {
 }
 
 static void test_oom_loop(void) {
-  struct ui_dom_node *root, *c1, *c2, *c3;
-  struct ui_css_stylesheet *sheet;
-  struct ui_css_rule *rule;
+  struct ui_dom_node *root = NULL, *c1 = NULL, *c2 = NULL, *c3 = NULL;
+  struct ui_css_stylesheet *sheet = NULL;
+  struct ui_css_rule *rule = NULL;
 
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
   ui_dom_node_set_tag_name(root, "div");
@@ -212,10 +212,10 @@ static void test_oom_loop(void) {
 }
 
 static void test_clamp_negative_content(void) {
-  struct ui_dom_node *root;
-  struct ui_css_stylesheet *sheet;
-  struct ui_css_rule *rule;
-  struct ui_layout_node *lroot;
+  struct ui_dom_node *root = NULL;
+  struct ui_css_stylesheet *sheet = NULL;
+  struct ui_css_rule *rule = NULL;
+  struct ui_layout_node *lroot = NULL;
 
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
   ui_dom_node_set_tag_name(root, "html");
@@ -241,11 +241,11 @@ static void test_clamp_negative_content(void) {
 }
 
 static void test_flex_col_justify(void) {
-  struct ui_dom_node *root;
-  struct ui_dom_node *c1, *c2;
-  struct ui_css_stylesheet *sheet;
-  struct ui_css_rule *rule;
-  struct ui_layout_node *lroot;
+  struct ui_dom_node *root = NULL;
+  struct ui_dom_node *c1 = NULL, *c2 = NULL;
+  struct ui_css_stylesheet *sheet = NULL;
+  struct ui_css_rule *rule = NULL;
+  struct ui_layout_node *lroot = NULL;
 
   const char *aligns[] = {"flex-end", "center", "space-between", "space-around",
                           "space-evenly"};
@@ -413,10 +413,10 @@ void test_all_invalid_properties(void) {
         "cover",         "auto", "min-content", "max-content", "fit-content"};
     size_t j;
     for (j = 0; j < sizeof(edge_cases) / sizeof(edge_cases[0]); j++) {
-      struct ui_dom_node *root;
-      struct ui_css_stylesheet *sheet;
+      struct ui_dom_node *root = NULL;
+      struct ui_css_stylesheet *sheet = NULL;
       struct ui_layout_node *lroot = NULL;
-      struct ui_css_rule *rule;
+      struct ui_css_rule *rule = NULL;
 
       ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
       ui_dom_node_set_tag_name(root, "div");

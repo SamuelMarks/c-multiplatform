@@ -7,13 +7,11 @@
 /* clang-format on */
 
 #define TEST_ASSERT(cond)                                                      \
-  do {                                                                         \
-    if (!(cond)) {                                                             \
-      fprintf(stderr, "Assertion failed: %s at %s:%d\n", #cond, __FILE__,      \
-              __LINE__);                                                       \
-      exit(1);                                                                 \
-    }                                                                          \
-  } while (0)
+  if (!(cond)) {                                                               \
+    fprintf(stderr, "Assertion failed: %s at %s:%d\n", #cond, __FILE__,        \
+            __LINE__);                                                         \
+    exit(1);                                                                   \
+  }
 
 static void test_page_floats_cases(void) {
   struct ui_css_stylesheet *sheet = NULL;
@@ -56,20 +54,23 @@ static void test_page_floats_cases(void) {
   /* Helper to test a set of properties */
 #define TEST_PAGE_FLOATS_PROPS(ref_str, ref_val, def_str, def_type, def_val,   \
                                clr_str, clr_val)                               \
-  do {                                                                         \
-    struct ui_css_stylesheet *sh;                                              \
-    struct ui_css_rule *r;                                                     \
-    struct ui_css_computed_style *s;                                           \
+  {                                                                            \
+    struct ui_css_stylesheet *sh = NULL;                                       \
+    struct ui_css_rule *r = NULL;                                              \
+    struct ui_css_computed_style *s = NULL;                                    \
     struct ui_css_page_floats_properties p;                                    \
+    const char *ref_s = (ref_str);                                             \
+    const char *def_s = (def_str);                                             \
+    const char *clr_s = (clr_str);                                             \
     ui_css_stylesheet_create(&sh);                                             \
     ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &r);                            \
     ui_css_rule_append_selector(r, UI_CSS_SELECTOR_TYPE_TAG, "div");           \
-    if (ref_str)                                                               \
-      ui_css_rule_append_declaration(r, "float-reference", ref_str, 0);        \
-    if (def_str)                                                               \
-      ui_css_rule_append_declaration(r, "float-defer", def_str, 0);            \
-    if (clr_str)                                                               \
-      ui_css_rule_append_declaration(r, "clear-after", clr_str, 0);            \
+    if (ref_s)                                                                 \
+      ui_css_rule_append_declaration(r, "float-reference", ref_s, 0);          \
+    if (def_s)                                                                 \
+      ui_css_rule_append_declaration(r, "float-defer", def_s, 0);              \
+    if (clr_s)                                                                 \
+      ui_css_rule_append_declaration(r, "clear-after", clr_s, 0);              \
     ui_css_stylesheet_append_rule(sh, r);                                      \
     ui_css_resolve_style(sh, node, &s);                                        \
     ui_css_page_floats_parse(s, &p);                                           \
@@ -79,7 +80,7 @@ static void test_page_floats_cases(void) {
     TEST_ASSERT(p.clear_after == clr_val);                                     \
     ui_css_computed_style_destroy(s);                                          \
     ui_css_stylesheet_destroy(sh);                                             \
-  } while (0)
+  }
 
   /* float-reference */
   TEST_PAGE_FLOATS_PROPS("column", UI_CSS_FLOAT_REFERENCE_COLUMN, NULL,

@@ -34,42 +34,30 @@ extern int g_toggle_mock_fail;
 extern int g_toggle_mock_remove_attr_fail_target;
 extern int g_toggle_mock_set_attr_fail_target;
 
-static int g_change_called = 0;
-static int g_change_val = -1;
-static int g_touched_called = 0;
 static int g_mock_cb_fail = 0;
 
 static ui_error_t on_change(struct ui_toggle_base *toggle, int checked,
                             void *user) {
-  int unused_c = checked;
-  void *unused_u = user;
-  struct ui_toggle_base *unused_t = toggle;
-  toggle = unused_t;
-  checked = unused_c;
-  user = unused_u;
+  if (toggle || checked || user) {
+  }
   if (g_mock_cb_fail == 1)
     return UI_ERROR_UNKNOWN;
-  g_change_called++;
-  g_change_val = checked;
   return UI_ERROR_NONE;
 }
 
 static ui_error_t on_cva_change(union ui_signal_payload val, void *user) {
-  void *unused_u = user;
-  user = unused_u;
+  if (val.int_val || user) {
+  }
   if (g_mock_cb_fail == 2)
     return UI_ERROR_UNKNOWN;
-  g_change_called++;
-  g_change_val = val.int_val;
   return UI_ERROR_NONE;
 }
 
 static ui_error_t on_cva_touched(void *user) {
-  void *unused_u = user;
-  user = unused_u;
+  if (user) {
+  }
   if (g_mock_cb_fail == 3)
     return UI_ERROR_UNKNOWN;
-  g_touched_called++;
   return UI_ERROR_NONE;
 }
 
@@ -212,7 +200,6 @@ TEST test_toggle_lifecycle_and_features(void) {
   rc = ui_toggle_base_process_event(chk, &ev, 10.0);
   ASSERT_EQ(UI_ERROR_NONE, rc);
   ev.type = UI_EVENT_MOUSE_UP;
-  g_change_called = 0;
   rc = ui_toggle_base_process_event(chk, &ev, 15.0);
   ASSERT_EQ(UI_ERROR_NONE, rc);
 

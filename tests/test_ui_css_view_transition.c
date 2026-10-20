@@ -7,23 +7,23 @@
 /* clang-format on */
 
 #define EXPECT_EQ(expected, actual)                                            \
-  do {                                                                         \
+  {                                                                            \
     if ((expected) != (actual)) {                                              \
-      fprintf(stderr,                                                          \
-              "%s:%d: EXPECT_EQ failed: %" UI_PRId64 " != %" UI_PRId64 "\n",   \
-              __FILE__, __LINE__, (ui_int64)(expected), (ui_int64)(actual));   \
+      fprintf(stderr, "%s:%d: EXPECT_EQ failed: %ld != %ld\n", __FILE__,       \
+              __LINE__, (long)(ui_intptr)(expected),                           \
+              (long)(ui_intptr)(actual));                                      \
       exit(1);                                                                 \
     }                                                                          \
-  } while (0)
+  }
 
 #define EXPECT_STR_EQ(expected, actual)                                        \
-  do {                                                                         \
+  {                                                                            \
     if (strcmp((expected), (actual)) != 0) {                                   \
       fprintf(stderr, "%s:%d: EXPECT_STR_EQ failed: %s != %s\n", __FILE__,     \
               __LINE__, (expected), (actual));                                 \
       exit(1);                                                                 \
     }                                                                          \
-  } while (0)
+  }
 
 static ui_error_t test_parse_view_transition_name(void) {
   struct ui_css_view_transition_name name;

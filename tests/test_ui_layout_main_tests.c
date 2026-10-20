@@ -651,11 +651,13 @@ int main(void) {
     /* 5. Cleanup */
     {
       /* 4.13 Positioning and Z-Index Tests */
-      struct ui_dom_node *z_root;
-      struct ui_layout_node *z_layout;
-      struct ui_css_rule *rule_static, *rule_rel, *rule_abs, *rule_fixed,
-          *rule_sticky;
-      struct ui_dom_node *n_static, *n_rel, *n_abs, *n_fixed, *n_sticky;
+      struct ui_dom_node *z_root = NULL;
+      struct ui_layout_node *z_layout = NULL;
+      struct ui_css_rule *rule_static = NULL, *rule_rel = NULL,
+                         *rule_abs = NULL, *rule_fixed = NULL,
+                         *rule_sticky = NULL;
+      struct ui_dom_node *n_static = NULL, *n_rel = NULL, *n_abs = NULL,
+                         *n_fixed = NULL, *n_sticky = NULL;
       struct ui_layout_node *c1, *c2, *c3, *c4, *c5;
 
       ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &z_root);
@@ -764,15 +766,16 @@ int main(void) {
     /* 5. Cleanup */
     {
       /* 4.14 Stacking Context Tests */
-      struct ui_dom_node *s_root;
-      struct ui_layout_node *s_layout;
-      struct ui_css_rule *rule_op, *rule_tx, *rule_z;
+      struct ui_dom_node *s_root = NULL;
+      struct ui_layout_node *s_layout = NULL;
+      struct ui_css_rule *rule_op = NULL, *rule_tx = NULL, *rule_z = NULL;
 
       ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &s_root);
       ui_dom_node_set_tag_name(s_root, "div");
 
       {
-        struct ui_dom_node *n_op, *n_tx, *n_z, *n_no;
+        struct ui_dom_node *n_op = NULL, *n_tx = NULL, *n_z = NULL,
+                           *n_no = NULL;
         struct ui_layout_node *s1, *s2, *s3, *s4;
 
         ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &n_op);
@@ -899,7 +902,7 @@ int main(void) {
 
     /* Explicit missing branches */
     {
-      struct ui_css_rule *rule;
+      struct ui_css_rule *rule = NULL;
       root = NULL;
       sheet = NULL;
       lroot = NULL;
@@ -929,7 +932,7 @@ int main(void) {
     }
 
     {
-      struct ui_css_rule *rule;
+      struct ui_css_rule *rule = NULL;
       root = NULL;
       sheet = NULL;
       lroot = NULL;
@@ -959,7 +962,7 @@ int main(void) {
     }
 
     {
-      struct ui_css_rule *rule;
+      struct ui_css_rule *rule = NULL;
       root = NULL;
       sheet = NULL;
       lroot = NULL;
@@ -980,7 +983,7 @@ int main(void) {
         ui_css_stylesheet_append_rule(sheet, rule);
 
         {
-          struct ui_dom_node *t1, *t2;
+          struct ui_dom_node *t1 = NULL, *t2 = NULL;
           ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &t1);
           ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &t2);
           ui_dom_node_append_child(root, t1);

@@ -18,7 +18,7 @@ static void test_anonymous_box_cleanup(void) {
   ui_dom_node_set_tag_name(child_inline1, "span");
   ui_dom_node_set_attribute(child_inline1, "class", "inl");
   {
-    struct ui_dom_node *t1;
+    struct ui_dom_node *t1 = NULL;
     ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &t1);
     ui_dom_node_append_child(child_inline1, t1);
     ui_dom_node_append_child(root, child_inline1);
@@ -27,7 +27,7 @@ static void test_anonymous_box_cleanup(void) {
     ui_dom_node_set_tag_name(child_block, "div");
     ui_dom_node_set_attribute(child_block, "class", "blk");
     {
-      struct ui_dom_node *t2;
+      struct ui_dom_node *t2 = NULL;
       ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &t2);
       ui_dom_node_append_child(child_block, t2);
       ui_dom_node_append_child(root, child_block);
@@ -3506,7 +3506,7 @@ static void test_anonymous_box(void) {
   ui_dom_node_set_tag_name(child_inline1, "span");
   ui_dom_node_set_attribute(child_inline1, "class", "inl");
   {
-    struct ui_dom_node *t1;
+    struct ui_dom_node *t1 = NULL;
     ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &t1);
     ui_dom_node_append_child(child_inline1, t1);
     ui_dom_node_append_child(root, child_inline1);
@@ -3515,7 +3515,7 @@ static void test_anonymous_box(void) {
     ui_dom_node_set_tag_name(child_block, "div");
     ui_dom_node_set_attribute(child_block, "class", "blk");
     {
-      struct ui_dom_node *t2;
+      struct ui_dom_node *t2 = NULL;
       ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &t2);
       ui_dom_node_append_child(child_block, t2);
       ui_dom_node_append_child(root, child_block);
@@ -3524,7 +3524,7 @@ static void test_anonymous_box(void) {
       ui_dom_node_set_tag_name(child_inline2, "span");
       ui_dom_node_set_attribute(child_inline2, "class", "inl");
       {
-        struct ui_dom_node *t3;
+        struct ui_dom_node *t3 = NULL;
         ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &t3);
         ui_dom_node_append_child(child_inline2, t3);
         ui_dom_node_append_child(root, child_inline2);
@@ -3622,7 +3622,7 @@ static void test_anonymous_box_oom(void) {
   ui_dom_node_set_tag_name(child_inline1, "span");
   ui_dom_node_set_attribute(child_inline1, "class", "inl");
   {
-    struct ui_dom_node *t1;
+    struct ui_dom_node *t1 = NULL;
     ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &t1);
     ui_dom_node_append_child(child_inline1, t1);
     ui_dom_node_append_child(root, child_inline1);
@@ -3631,7 +3631,7 @@ static void test_anonymous_box_oom(void) {
     ui_dom_node_set_tag_name(child_block, "div");
     ui_dom_node_set_attribute(child_block, "class", "blk");
     {
-      struct ui_dom_node *t2;
+      struct ui_dom_node *t2 = NULL;
       ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &t2);
       ui_dom_node_append_child(child_block, t2);
       ui_dom_node_append_child(root, child_block);

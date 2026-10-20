@@ -82,7 +82,7 @@ extern int g_malloc_fail_countdown;
 
 static int test_ink_oom_and_args(void) {
   struct ui_ink_base *ink = NULL;
-  struct ui_component *comp;
+  struct ui_component *comp = NULL;
   ui_error_t rc;
   struct ui_ink_event ev1 = {0.0f, 0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 1000.0};
   size_t count;
@@ -138,7 +138,7 @@ static int test_ink_oom_and_args(void) {
 
   /* Destroy with null component using pointer arithmetic (opaque struct) */
   {
-    struct ui_ink_base *ink2;
+    struct ui_ink_base *ink2 = NULL;
     ui_ink_base_create(&ink2);
     ui_ink_base_get_component(ink2, &comp);
     {
@@ -173,7 +173,7 @@ static int test_ink_oom_and_args(void) {
   /* Hit the `ink->raw_count == 1` and `ink->raw_count == 2` branches inside
    * `ui_ink_base_finish_stroke` */
   {
-    struct ui_ink_base *ink3;
+    struct ui_ink_base *ink3 = NULL;
     struct ui_ink_event ev2 = {10.0f, 0.0f, 0.6f, 0.0f, 0.0f, 0.0f, 1010.0};
     ui_ink_base_create(&ink3);
     ui_ink_base_add_event(ink3, &ev1);
@@ -199,7 +199,7 @@ static int test_ink_oom_and_args(void) {
 
   /* Test OOM paths inside finish_stroke and append_smoothed_segment */
   {
-    struct ui_ink_base *ink_oom;
+    struct ui_ink_base *ink_oom = NULL;
     struct ui_ink_event ev_tmp = {10.0f, 0.0f, 0.6f, 0.0f, 0.0f, 0.0f, 1010.0};
     int j;
 
@@ -228,7 +228,7 @@ static int test_ink_oom_and_args(void) {
     /* OOM inside add_event when raw_count == 1 (first event smoothed
      * allocation) */
     {
-      struct ui_ink_base *ink_first;
+      struct ui_ink_base *ink_first = NULL;
       ui_ink_base_create(&ink_first);
 
       /* First event does 1 raw realloc (cap 16) and 1 smoothed realloc (cap 32)
@@ -250,7 +250,7 @@ static int test_ink_oom_and_args(void) {
 
     /* OOM inside finish_stroke when raw_count == 2 */
     {
-      struct ui_ink_base *ink_two;
+      struct ui_ink_base *ink_two = NULL;
       ui_ink_base_create(&ink_two);
       ui_ink_base_add_event(ink_two, &ev_tmp);
       ui_ink_base_add_event(ink_two, &ev_tmp);

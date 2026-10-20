@@ -11,14 +11,14 @@ extern int g_malloc_fail_countdown;
 extern int g_mock_strcpy_fail;
 
 #define EXPECT_EQ(expected, actual)                                            \
-  do {                                                                         \
+  {                                                                            \
     if ((expected) != (actual)) {                                              \
-      fprintf(stderr,                                                          \
-              "%s:%d: EXPECT_EQ failed: %" UI_PRId64 " != %" UI_PRId64 "\n",   \
-              __FILE__, __LINE__, (ui_int64)(expected), (ui_int64)(actual));   \
+      fprintf(stderr, "%s:%d: EXPECT_EQ failed: %ld != %ld\n", __FILE__,       \
+              __LINE__, (long)(ui_intptr)(expected),                           \
+              (long)(ui_intptr)(actual));                                      \
       exit(1);                                                                 \
     }                                                                          \
-  } while (0)
+  }
 
 static int float_eq(float a, float b) { return fabs(a - b) < 0.001; }
 

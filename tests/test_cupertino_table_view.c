@@ -16,14 +16,11 @@ extern int g_cupertino_table_view_mock_list_base_destroy_fail;
 extern int g_malloc_fail_countdown;
 #endif
 
-static int g_action_called = 0;
-
 static ui_error_t dummy_swipe_action(void *user_data) {
   int *flag = (int *)user_data;
   if (flag != NULL) {
     *flag = 1;
   }
-  g_action_called = 1;
   return UI_ERROR_NONE;
 }
 

@@ -8,19 +8,13 @@
 
 extern int g_malloc_fail_countdown;
 
-static int g_change_count = 0;
-static int g_last_selected_index = -1;
 static int g_open_change_count = 0;
 static int g_last_open_state = 0;
 
 static ui_error_t on_select_change(struct ui_select_base *select, int index,
                                    void *user_data) {
-  if (select) {
+  if (select || index || user_data) {
   }
-  if (user_data) {
-  }
-  g_change_count++;
-  g_last_selected_index = index;
   return UI_ERROR_NONE;
 }
 
@@ -300,9 +294,6 @@ static int run_normal_tests(void) {
   ui_select_base_set_disabled(select, 0);
 
   /* Keyboard navigation */
-  g_change_count = 0;
-  g_last_selected_index = -1;
-
   ui_select_base_set_on_change(select, on_select_change, NULL);
 
   /* Test index clamping before items added */

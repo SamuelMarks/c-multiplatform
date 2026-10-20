@@ -412,7 +412,7 @@ static void test_cva_errors(void) {
 
   /* --- TOUCHED ERROR TESTS --- */
   {
-    struct ui_slide_toggle_base *toggle;
+    struct ui_slide_toggle_base *toggle = NULL;
     struct ui_control_value_accessor cva;
     ui_slide_toggle_base_create(&toggle, &cva);
     cva.register_on_change(toggle, NULL, NULL);
@@ -436,7 +436,7 @@ static void test_cva_errors(void) {
   }
 
   {
-    struct ui_slide_toggle_base *toggle;
+    struct ui_slide_toggle_base *toggle = NULL;
     struct ui_control_value_accessor cva;
     ui_slide_toggle_base_create(&toggle, &cva);
     cva.register_on_change(toggle, NULL, NULL);
@@ -459,7 +459,7 @@ static void test_cva_errors(void) {
 
   /* --- CHANGE ERROR TESTS --- */
   {
-    struct ui_slide_toggle_base *toggle;
+    struct ui_slide_toggle_base *toggle = NULL;
     struct ui_control_value_accessor cva;
     ui_slide_toggle_base_create(&toggle, &cva);
     cva.register_on_touched(toggle, NULL, NULL);
@@ -483,7 +483,7 @@ static void test_cva_errors(void) {
   }
 
   {
-    struct ui_slide_toggle_base *toggle;
+    struct ui_slide_toggle_base *toggle = NULL;
     struct ui_control_value_accessor cva;
     ui_slide_toggle_base_create(&toggle, &cva);
     cva.register_on_touched(toggle, NULL, NULL);

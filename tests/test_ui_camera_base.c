@@ -9,8 +9,6 @@ extern int g_camera_mock_fail;
 
 extern int g_malloc_fail_countdown;
 
-static int frame_received = 0;
-
 static ui_error_t test_frame_callback(struct ui_camera_base *camera,
                                       const void *frame_data, size_t size,
                                       int width, int height, void *user_data) {
@@ -27,7 +25,6 @@ static ui_error_t test_frame_callback(struct ui_camera_base *camera,
   if (user_data != (void *)0x9999) {
     return UI_ERROR_UNKNOWN;
   }
-  frame_received = 1;
   return UI_ERROR_NONE;
 }
 

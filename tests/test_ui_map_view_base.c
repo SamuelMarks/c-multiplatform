@@ -9,11 +9,7 @@
 extern int g_malloc_fail_countdown;
 static ui_error_t mock_eq_fail(union ui_signal_payload a,
                                union ui_signal_payload b, ui_bool_t *eq) {
-  if (sizeof(a) == 0) {
-  }
-  if (sizeof(eq) == 0) {
-  }
-  if (sizeof(b) == 0) {
+  if (a.ptr_val || b.ptr_val || eq) {
   }
   return UI_ERROR_UNKNOWN;
 }
@@ -147,7 +143,7 @@ static void test_map_errors_and_methods(void) {
   }
 
   {
-    struct ui_arena *arena;
+    struct ui_arena *arena = NULL;
     ui_arena_create(1024, &arena);
     {
       union ui_signal_payload dummy_payload = {0};

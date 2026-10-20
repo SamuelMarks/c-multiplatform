@@ -254,12 +254,12 @@ static ui_error_t dummy_cva_on_change(union ui_signal_payload new_value,
 extern int g_malloc_fail_countdown;
 
 static int test_manager_state(void) {
-  struct ui_color_picker_base *picker;
+  struct ui_color_picker_base *picker = NULL;
   struct ui_control_value_accessor cva;
   struct ui_color_rgb rgb = {0};
   struct ui_color_hsv hsv = {0};
   union ui_signal_payload val;
-  struct ui_color_picker_base *p2;
+  struct ui_color_picker_base *p2 = NULL;
 
   if (ui_color_picker_base_create(NULL, NULL) != UI_ERROR_INVALID_ARGUMENT)
     return 1;

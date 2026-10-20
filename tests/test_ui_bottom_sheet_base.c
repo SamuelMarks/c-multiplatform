@@ -719,20 +719,21 @@ static ui_error_t run_mock_fail_tests(void) {
 
 /* Helper macro to test a specific mock failure safely */
 #define TEST_MOCK(fail_id, action)                                             \
-  do {                                                                         \
+  {                                                                            \
+    int f_id = (fail_id);                                                      \
     struct ui_bottom_sheet_base *sheet = NULL;                                 \
     ui_bottom_sheet_base_create(&sheet);                                       \
     ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);                       \
     ui_overlay_director_create(root, &director);                               \
     ui_bottom_sheet_base_set_overlay_director(sheet, director);                \
-    g_bottom_sheet_mock_fail = (fail_id);                                      \
+    g_bottom_sheet_mock_fail = f_id;                                           \
     action;                                                                    \
     g_bottom_sheet_mock_fail = 0;                                              \
-    if ((fail_id) != 8 && (fail_id) != 9 && (fail_id) != 10)                   \
+    if (f_id != 8 && f_id != 9 && f_id != 10)                                  \
       ui_bottom_sheet_base_destroy(sheet);                                     \
     ui_overlay_director_destroy(director);                                     \
     ui_dom_node_destroy(root);                                                 \
-  } while (0)
+  }
 
   TEST_MOCK(4, ui_bottom_sheet_base_set_open(sheet, 1));
   TEST_MOCK(5, {

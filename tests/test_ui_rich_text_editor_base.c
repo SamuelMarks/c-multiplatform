@@ -457,15 +457,13 @@ void test_ui_rte_extra(void) {
 }
 static ui_error_t dummy_on_change(union ui_signal_payload value,
                                   void *user_data) {
-  if (sizeof(value) == 0) {
-  }
-  if (sizeof(user_data) == 0) {
+  if (value.ptr_val || user_data) {
   }
   return UI_ERROR_NONE;
 }
 
 static ui_error_t dummy_on_touched(void *user_data) {
-  if (sizeof(user_data) == 0) {
+  if (user_data) {
   }
   return UI_ERROR_NONE;
 }
@@ -555,14 +553,12 @@ void test_ui_rte_cva2(void) {
 
 static ui_error_t failing_cva_on_change(union ui_signal_payload payload,
                                         void *user_data) {
-  if (sizeof(payload) == 0) {
-  }
-  if (sizeof(user_data) == 0) {
+  if (payload.ptr_val || user_data) {
   }
   return UI_ERROR_NOT_FOUND;
 }
 static ui_error_t failing_cva_on_touched(void *user_data) {
-  if (sizeof(user_data) == 0) {
+  if (user_data) {
   }
   return UI_ERROR_NOT_FOUND;
 }

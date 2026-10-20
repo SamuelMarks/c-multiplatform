@@ -97,7 +97,7 @@ int main(void) {
 static int run_extra_form_node(void) {
   ui_form_node_t node;
   enum ui_form_status status;
-  struct ui_arena *arena;
+  struct ui_arena *arena = NULL;
   union ui_signal_payload default_payload;
 
   memset(&node, 0, sizeof(node));

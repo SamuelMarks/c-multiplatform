@@ -120,7 +120,7 @@ static int test_subscribers(void) {
 
   /* Trigger notify without subscribers */
   {
-    ui_computed_t *comp2;
+    ui_computed_t *comp2 = NULL;
     ui_computed_create(NULL, dummy_compute, &my_data, UI_SIGNAL_TYPE_INT32,
                        UI_SIGNAL_MODE_SINGLE_THREADED, &comp2);
     {
@@ -250,7 +250,7 @@ static int test_computed(void) {
 
   /* Arena */
   {
-    struct ui_arena *arena;
+    struct ui_arena *arena = NULL;
     ui_arena_create(256, &arena);
 
     comp = NULL;

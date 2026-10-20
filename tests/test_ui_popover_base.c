@@ -48,11 +48,11 @@ static int test_popover_lifecycle(void) {
 }
 
 static int test_popover_open_close(void) {
-  struct ui_popover_base *popover;
-  struct ui_overlay_director *director;
-  struct ui_focus_manager *focus_mgr;
-  struct ui_dom_node *root_node;
-  struct ui_dom_node *content_node;
+  struct ui_popover_base *popover = NULL;
+  struct ui_overlay_director *director = NULL;
+  struct ui_focus_manager *focus_mgr = NULL;
+  struct ui_dom_node *root_node = NULL;
+  struct ui_dom_node *content_node = NULL;
   struct ui_layout_node trigger;
   struct ui_anchor_config anchor;
   ui_error_t rc;
@@ -150,10 +150,10 @@ static int test_popover_open_close(void) {
 }
 
 static int test_popover_click_outside(void) {
-  struct ui_popover_base *popover;
-  struct ui_overlay_director *director;
-  struct ui_dom_node *root_node;
-  struct ui_dom_node *content_node;
+  struct ui_popover_base *popover = NULL;
+  struct ui_overlay_director *director = NULL;
+  struct ui_dom_node *root_node = NULL;
+  struct ui_dom_node *content_node = NULL;
   struct ui_layout_node trigger;
   struct ui_anchor_config anchor;
   struct ui_event ev;
@@ -324,13 +324,13 @@ static int test_popover_nulls(void) {
 
 static int test_popover_oom_and_errors(void) {
   struct ui_popover_base *popover = NULL;
-  struct ui_overlay_director *director;
-  struct ui_dom_node *root_node;
-  struct ui_dom_node *content_node;
+  struct ui_overlay_director *director = NULL;
+  struct ui_dom_node *root_node = NULL;
+  struct ui_dom_node *content_node = NULL;
   struct ui_dom_node *dummy_parent = NULL;
   struct ui_layout_node trigger;
   struct ui_anchor_config anchor;
-  struct ui_focus_manager *focus_mgr;
+  struct ui_focus_manager *focus_mgr = NULL;
   int i;
 
   g_malloc_fail_countdown = 0;

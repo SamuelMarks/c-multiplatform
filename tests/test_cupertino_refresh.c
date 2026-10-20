@@ -22,7 +22,7 @@ static int g_refresh_invoked = 0;
 static ui_error_t mock_on_refresh_cb(struct ui_pull_to_refresh_base *ptr,
                                      void *user_data) {
   int *flag = (int *)user_data;
-  if (sizeof(ptr) == 0) {
+  if (ptr) {
   }
   if (flag) {
     *flag = 1;

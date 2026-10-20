@@ -31,6 +31,7 @@ static size_t g_cmd_pos = 0;
 static size_t g_cmd_capacity = WEB_CMD_BUFFER_SIZE / sizeof(ui_uint32);
 
 #ifdef UI_TEST_MOCK_ALLOC
+extern int g_malloc_fail_countdown;
 int g_web_bridge_mock_fail = 0;
 
 /**
@@ -56,8 +57,13 @@ static ui_error_t mock_web_bridge_flush(void) {
  */
 static ui_error_t ensure_buffer(size_t words_needed) {
   if (!g_cmd_buffer) {
-    g_cmd_buffer = (ui_uint32 *)C_MULTIPLATFORM_MALLOC((size_t)g_cmd_capacity *
-                                                       sizeof(ui_uint32));
+#ifdef UI_TEST_MOCK_ALLOC
+    if (g_malloc_fail_countdown == 0) {
+      return UI_ERROR_OUT_OF_MEMORY;
+    }
+#endif
+    g_cmd_buffer =
+        (ui_uint32 *)malloc((size_t)g_cmd_capacity * sizeof(ui_uint32));
     if (!g_cmd_buffer) {
       return UI_ERROR_OUT_OF_MEMORY;
     }
@@ -320,7 +326,7 @@ static ui_error_t flush_to_js(ui_uint32 *buf, ui_uint32 len) {
  */
 ui_error_t ui_web_bridge_shutdown(void) {
   if (g_cmd_buffer) {
-    C_MULTIPLATFORM_FREE(g_cmd_buffer);
+    free(g_cmd_buffer);
     g_cmd_buffer = NULL;
   }
   g_cmd_pos = 0;

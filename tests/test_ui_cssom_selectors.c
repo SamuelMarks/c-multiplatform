@@ -117,12 +117,12 @@ int test_cssom_part1_selectors(void) {
 
   /* Anonymous layer */
   {
-    struct ui_css_rule *anon_layer;
+    struct ui_css_rule *anon_layer = NULL;
     rc = ui_css_rule_create(UI_CSS_RULE_TYPE_LAYER, &anon_layer);
     rc = ui_css_stylesheet_append_rule(sheet, anon_layer);
 
     {
-      struct ui_css_rule *nested_anon_layer;
+      struct ui_css_rule *nested_anon_layer = NULL;
       {
         ui_error_t rc_cleanup =
             ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &nested_anon_layer);

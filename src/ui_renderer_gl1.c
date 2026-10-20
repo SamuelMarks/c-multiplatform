@@ -32,6 +32,7 @@
 int g_mock_gl1_glyph_box = 0;
 int g_mock_gl1_glyph_metrics_fail = 0;
 
+#if !defined(__EMSCRIPTEN__)
 static ui_error_t
 mock_ui_font_get_glyph_metrics(struct ui_font *font, int codepoint,
                                float font_size,
@@ -53,6 +54,7 @@ mock_ui_font_get_glyph_metrics(struct ui_font *font, int codepoint,
 /** @cond */
 #define ui_font_get_glyph_metrics mock_ui_font_get_glyph_metrics
 /** @endcond */
+#endif
 #endif
 
 #if !defined(__EMSCRIPTEN__) &&                                                \

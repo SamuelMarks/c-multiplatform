@@ -39,11 +39,11 @@ static int test_theme_manager_lifecycle(void) {
 }
 
 static int test_theme_manager_mode(void) {
-  struct ui_arena *arena;
-  struct ui_theme_manager *manager;
+  struct ui_arena *arena = NULL;
+  struct ui_theme_manager *manager = NULL;
   ui_error_t rc;
   enum ui_theme_mode mode;
-  ui_signal_t *signal;
+  ui_signal_t *signal = NULL;
   union ui_signal_payload payload;
   int failed = 0;
 

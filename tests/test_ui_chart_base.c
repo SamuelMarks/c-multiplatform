@@ -14,8 +14,8 @@ extern int g_chart_mock_fail;
 
 static void test_chart_mock_failures(void) {
 #ifdef UI_TEST_MOCK_ALLOC
-  struct ui_arena *arena;
-  struct ui_chart_base *chart;
+  struct ui_arena *arena = NULL;
+  struct ui_chart_base *chart = NULL;
   struct ui_dom_rect bounds = {10.0f, 10.0f, 100.0f, 100.0f,
                                0.0f,  0.0f,  0.0f,   0.0f};
   struct ui_dom_point pixel_pt;
@@ -88,7 +88,7 @@ static void test_chart_mock_failures(void) {
 }
 
 static void test_chart_coord_missing(void) {
-  struct ui_arena *arena;
+  struct ui_arena *arena = NULL;
   ui_arena_create(1024 * 16, &arena);
   {
     struct ui_chart_base *chart = NULL;
@@ -318,7 +318,7 @@ int main(void) {
 
       /* Test 8: Arena alloc failure / Signal create failure */
       {
-        struct ui_arena *small_arena;
+        struct ui_arena *small_arena = NULL;
         struct ui_chart_base *temp_chart = NULL;
         ui_arena_create(8, &small_arena); /* Too small for chart struct */
         ui_chart_base_create(small_arena, UI_CHART_COORDINATE_CARTESIAN,

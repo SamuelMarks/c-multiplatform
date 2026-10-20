@@ -49,15 +49,11 @@ struct ui_window {
 #include <objc/runtime.h>
 
 static int g_test_resize_called = 0;
-static int g_test_resize_w = 0;
-static int g_test_resize_h = 0;
 
 static ui_error_t test_resize_callback(void *user_data, int w, int h) {
-  if (user_data) {
+  if (user_data || w || h) {
   }
   g_test_resize_called++;
-  g_test_resize_w = w;
-  g_test_resize_h = h;
   return UI_ERROR_NONE;
 }
 
@@ -70,16 +66,12 @@ static ui_error_t test_resize_fail_callback(void *user_data, int w, int h) {
 }
 
 static int g_test_dpi_called = 0;
-static float g_test_dpi_old = 0.0f;
-static float g_test_dpi_new = 0.0f;
 
 static ui_error_t test_dpi_callback(void *user_data, float old_scale,
                                     float new_scale) {
-  if (user_data) {
+  if (user_data || old_scale != 0.0f || new_scale != 0.0f) {
   }
   g_test_dpi_called++;
-  g_test_dpi_old = old_scale;
-  g_test_dpi_new = new_scale;
   return UI_ERROR_NONE;
 }
 

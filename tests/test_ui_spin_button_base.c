@@ -23,27 +23,19 @@ extern ui_error_t ui_test_sb_update_aria(struct ui_spin_button_base *sb);
 extern int g_malloc_fail_countdown;
 
 static int g_change_called = 0;
-static double g_last_val = 0.0;
-static int g_cva_change_called = 0;
-static float g_cva_last_val = 0.0f;
 static int g_cva_touched_called = 0;
 
 static ui_error_t on_change(struct ui_spin_button_base *sb, double val,
                             void *user) {
-  if (sb) {
-  }
-  if (user) {
+  if (sb || val != 0.0 || user) {
   }
   g_change_called++;
-  g_last_val = val;
   return UI_ERROR_NONE;
 }
 
 static ui_error_t on_cva_change(union ui_signal_payload val, void *user) {
-  if (user) {
+  if (val.float_val != 0.0f || user) {
   }
-  g_cva_change_called++;
-  g_cva_last_val = val.float_val;
   return UI_ERROR_NONE;
 }
 
@@ -761,7 +753,7 @@ static int run_edge_cases(void) {
   }
 
   {
-    struct ui_component *comp;
+    struct ui_component *comp = NULL;
     ui_spin_button_base_get_component(sb, &comp);
 
     if (comp && comp->shadow_root) {

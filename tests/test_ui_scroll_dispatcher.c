@@ -10,12 +10,11 @@ extern int g_malloc_fail_countdown;
 static int g_callback_called = 0;
 static float g_last_scroll_x = -1.0f;
 static float g_last_scroll_y = -1.0f;
-static void *g_callback_user_data = NULL;
 
 static ui_error_t test_callback(struct ui_scroll_dispatcher *dispatcher,
                                 const struct ui_scroll_info *info,
                                 void *user_data) {
-  if (dispatcher) {
+  if (dispatcher || user_data) {
   }
   g_callback_called++;
   if (info) {
@@ -23,7 +22,6 @@ static ui_error_t test_callback(struct ui_scroll_dispatcher *dispatcher,
     g_last_scroll_y = info->scroll_y;
     return UI_ERROR_NONE;
   }
-  g_callback_user_data = user_data;
   return UI_ERROR_NONE;
 }
 

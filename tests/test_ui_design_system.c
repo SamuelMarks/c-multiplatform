@@ -10,7 +10,6 @@
 
 static int g_mock_init_called = 0;
 static int g_mock_init_fail = 0;
-static int g_mock_shutdown_called = 0;
 
 static ui_error_t mock_ds_init(struct ui_engine *engine) {
   if (!engine) {
@@ -27,7 +26,6 @@ static ui_error_t mock_ds_shutdown(struct ui_engine *engine) {
   if (!engine) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
-  g_mock_shutdown_called++;
   return UI_ERROR_NONE;
 }
 

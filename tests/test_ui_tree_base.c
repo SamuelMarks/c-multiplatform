@@ -149,8 +149,8 @@ extern int g_malloc_fail_countdown;
 
 static int test_tree_render(void) {
   struct ui_tree_model model;
-  struct ui_tree_base *tree;
-  struct ui_dom_node *container;
+  struct ui_tree_base *tree = NULL;
+  struct ui_dom_node *container = NULL;
   ui_error_t rc;
   int failed = 0;
 
@@ -291,14 +291,14 @@ static int test_tree_render(void) {
 
     /* Select a node */
     {
-      struct ui_selection_model *sm;
+      struct ui_selection_model *sm = NULL;
       ui_tree_base_get_selection_model(tree, &sm);
       ui_selection_model_toggle(sm, &root1);
     }
 
     /* test get_selection_model */
     {
-      struct ui_selection_model *sm;
+      struct ui_selection_model *sm = NULL;
       EXPECT_EQ(ui_tree_base_get_selection_model(tree, &sm), UI_ERROR_NONE);
     }
 
@@ -523,7 +523,7 @@ static int test_tree_navigation(void) {
 
     /* Test DOWN on empty tree */
     {
-      struct ui_tree_base *empty_tree;
+      struct ui_tree_base *empty_tree = NULL;
       struct ui_tree_model empty_model = model;
       empty_model.get_root_count = mock_get_root_count_empty;
       ui_tree_base_create(&empty_tree, &empty_model);

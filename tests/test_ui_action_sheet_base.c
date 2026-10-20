@@ -134,7 +134,7 @@ static void test_action_sheet_edge_cases(void) {
 
   /* Replace cancel action */
   {
-    struct ui_component *cancel2;
+    struct ui_component *cancel2 = NULL;
     ui_component_create(&cancel2);
     ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &cancel2->shadow_root);
     ui_action_sheet_base_set_cancel_action(sheet, cancel2);

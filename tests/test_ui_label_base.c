@@ -112,7 +112,7 @@ static ui_error_t test_label_set_for(void) {
   /* Test with broken shadow_root to hit paths */
   rc = ui_label_base_create(&lbl);
   if (rc == UI_ERROR_NONE) {
-    struct ui_component *comp;
+    struct ui_component *comp = NULL;
     ui_label_base_get_component(lbl, &comp);
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(comp->shadow_root);

@@ -7,18 +7,14 @@
 extern int g_malloc_fail_countdown;
 
 static int callback_fire_count = 0;
-static int last_fired_id = -1;
-static int last_fired_state = -1;
 
 static ui_error_t observer_callback(struct ui_layout_observer *observer,
                                     int breakpoint_id, int is_active,
                                     void *user_data) {
-  if (observer) {
+  if (observer || breakpoint_id || is_active) {
   }
 
   callback_fire_count++;
-  last_fired_id = breakpoint_id;
-  last_fired_state = is_active;
 
   if (user_data) {
     int *val = (int *)user_data;
@@ -285,7 +281,7 @@ static ui_error_t failing_callback(struct ui_layout_observer *observer,
 }
 
 static void test_failing_callback_coverage(void) {
-  struct ui_layout_observer *obs;
+  struct ui_layout_observer *obs = NULL;
   int bp_id;
   ui_layout_observer_create(&obs);
   ui_layout_observer_add_breakpoint(obs, -1, 500, -1, -1, &bp_id);

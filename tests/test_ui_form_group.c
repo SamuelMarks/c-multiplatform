@@ -10,10 +10,10 @@
 extern int g_malloc_fail_countdown;
 
 static int test_ui_form_group(void) {
-  struct ui_arena *arena;
-  struct ui_arena *tiny_arena;
-  ui_form_group_t *group;
-  ui_form_group_t *dummy_group;
+  struct ui_arena *arena = NULL;
+  struct ui_arena *tiny_arena = NULL;
+  ui_form_group_t *group = NULL;
+  ui_form_group_t *dummy_group = NULL;
   ui_form_control_t *control1 = NULL;
   ui_form_control_t *control2 = NULL;
   ui_form_control_t *control_invalid = NULL;
@@ -24,11 +24,11 @@ static int test_ui_form_group(void) {
   ui_form_node_t node_pending = {0};
   ui_form_node_t node_null_ctrl = {0};
   ui_form_node_t out_node;
-  ui_form_control_t *out_ctrl;
+  ui_form_control_t *out_ctrl = NULL;
   union ui_signal_payload init_val = {0};
   enum ui_form_status status;
   ui_bool_t is_valid;
-  ui_signal_t *status_sig;
+  ui_signal_t *status_sig = NULL;
   ui_error_t rc;
   int ret = 1;
   int i;

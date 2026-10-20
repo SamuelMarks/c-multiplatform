@@ -10,24 +10,24 @@
 extern int g_malloc_fail_countdown;
 
 #define EXPECT_EQ(expected, actual)                                            \
-  do {                                                                         \
+  {                                                                            \
     if ((expected) != (actual)) {                                              \
-      fprintf(stderr,                                                          \
-              "%s:%d: EXPECT_EQ failed: %" UI_PRId64 " != %" UI_PRId64 "\n",   \
-              __FILE__, __LINE__, (ui_int64)(expected), (ui_int64)(actual));   \
+      fprintf(stderr, "%s:%d: EXPECT_EQ failed: %ld != %ld\n", __FILE__,       \
+              __LINE__, (long)(ui_intptr)(expected),                           \
+              (long)(ui_intptr)(actual));                                      \
       exit(1);                                                                 \
     }                                                                          \
-  } while (0)
+  }
 
 #define EXPECT_FLOAT_EQ(expected, actual)                                      \
-  do {                                                                         \
+  {                                                                            \
     float diff = (expected) - (actual);                                        \
     if (diff < -0.001f || diff > 0.001f) {                                     \
       fprintf(stderr, "%s:%d: EXPECT_FLOAT_EQ failed: %f != %f\n", __FILE__,   \
               __LINE__, (float)(expected), (float)(actual));                   \
       exit(1);                                                                 \
     }                                                                          \
-  } while (0)
+  }
 
 static ui_error_t test_parse_outline(void) {
   struct ui_css_outline outline;

@@ -8,18 +8,21 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-#ifndef _WIN32
+#if defined(_WIN32)
+__declspec(dllimport) void __stdcall Sleep(unsigned long dwMilliseconds);
+#elif !defined(__EMSCRIPTEN__)
 #include <sys/select.h>
 #include <sys/time.h>
 #include <unistd.h>
-#else
-__declspec(dllimport) void __stdcall Sleep(unsigned long dwMilliseconds);
 #endif
 /* clang-format on */
 
 static void test_usleep(unsigned long usec) {
-#ifdef _WIN32
+#if defined(_WIN32)
   Sleep(usec / 1000UL);
+#elif defined(__EMSCRIPTEN__)
+  if (usec) {
+  }
 #else
   struct timeval tv;
   tv.tv_sec = (long)(usec / 1000000UL);
@@ -60,7 +63,7 @@ static ui_error_t sync_validator_err_false(struct ui_form_control *control,
                                            union ui_signal_payload value,
                                            void *user_data,
                                            ui_bool_t *out_is_valid) {
-  if (sizeof(value) == 0) {
+  if (value.ptr_val) {
   }
   if (control) {
   }
@@ -119,47 +122,39 @@ static ui_error_t dummy_async_err(struct ui_form_control *control,
 }
 
 static ui_error_t s_cva_write_val_last_rc = UI_ERROR_NONE;
-static union ui_signal_payload s_cva_last_written_val;
 static ui_error_t mock_cva_write_value(void *comp,
                                        union ui_signal_payload val) {
-  if (comp) {
+  if (comp || val.int_val) {
   }
-  s_cva_last_written_val = val;
   return s_cva_write_val_last_rc;
 }
 
 static ui_error_t s_cva_reg_change_rc = UI_ERROR_NONE;
 static ui_error_t (*s_cva_on_change_cb)(union ui_signal_payload, void *) = NULL;
-static void *s_cva_on_change_ud = NULL;
 static ui_error_t mock_cva_register_on_change(
     void *comp,
     ui_error_t (*callback)(union ui_signal_payload new_value, void *user_data),
     void *user_data) {
-  if (comp) {
+  if (comp || user_data) {
   }
   s_cva_on_change_cb = callback;
-  s_cva_on_change_ud = user_data;
   return s_cva_reg_change_rc;
 }
 
 static ui_error_t s_cva_reg_touch_rc = UI_ERROR_NONE;
 static ui_error_t (*s_cva_on_touch_cb)(void *) = NULL;
-static void *s_cva_on_touch_ud = NULL;
 static ui_error_t mock_cva_register_on_touched(
     void *comp, ui_error_t (*callback)(void *user_data), void *user_data) {
-  if (comp) {
+  if (comp || user_data) {
   }
   s_cva_on_touch_cb = callback;
-  s_cva_on_touch_ud = user_data;
   return s_cva_reg_touch_rc;
 }
 
 static ui_error_t s_cva_set_dis_rc = UI_ERROR_NONE;
-static ui_bool_t s_cva_last_disabled = UI_FALSE;
 static ui_error_t mock_cva_set_disabled_state(void *comp, ui_bool_t disabled) {
-  if (comp) {
+  if (comp || disabled) {
   }
-  s_cva_last_disabled = disabled;
   return s_cva_set_dis_rc;
 }
 
@@ -345,12 +340,12 @@ static void run_cva_and_edge_tests(void) {
 }
 
 static int run_extra_control(void) {
-  struct ui_arena *arena;
-  ui_form_control_t *control;
-  struct ui_thread_pool *pool;
-  struct ui_reactor *reactor;
+  struct ui_arena *arena = NULL;
+  ui_form_control_t *control = NULL;
+  struct ui_thread_pool *pool = NULL;
+  struct ui_reactor *reactor = NULL;
   union ui_signal_payload dummy = {0};
-  ui_signal_t *sig;
+  ui_signal_t *sig = NULL;
 
   ui_arena_create(1024, &arena);
   ui_thread_pool_create(2, &pool);
@@ -462,10 +457,10 @@ static int run_extra_control(void) {
 }
 
 static int run_extra_control2_all(void) {
-  struct ui_arena *arena;
-  ui_form_control_t *control;
-  ui_form_control_t *control2;
-  ui_form_control_t *control3;
+  struct ui_arena *arena = NULL;
+  ui_form_control_t *control = NULL;
+  ui_form_control_t *control2 = NULL;
+  ui_form_control_t *control3 = NULL;
   union ui_signal_payload dummy = {0};
 
   ui_arena_create(1024, &arena);
@@ -502,7 +497,7 @@ static int run_extra_control2_all(void) {
   ui_form_control_create(arena, dummy, UI_SIGNAL_TYPE_INT32, NULL, NULL,
                          UI_SIGNAL_MODE_SINGLE_THREADED, &control2);
   {
-    struct ui_thread_pool *pool;
+    struct ui_thread_pool *pool = NULL;
     ui_thread_pool_create(2, &pool);
     ui_form_control_add_async_validator(control2, dummy_async_valid, NULL, pool,
                                         NULL);
@@ -546,8 +541,8 @@ static int run_extra_control2_all(void) {
 }
 
 static int run_extra_control3_all(void) {
-  struct ui_arena *arena;
-  ui_form_control_t *control;
+  struct ui_arena *arena = NULL;
+  ui_form_control_t *control = NULL;
   union ui_signal_payload dummy = {0};
 
   ui_arena_create(1024, &arena);
@@ -555,7 +550,7 @@ static int run_extra_control3_all(void) {
                          UI_SIGNAL_MODE_SINGLE_THREADED, &control);
 
   {
-    struct ui_thread_pool *pool;
+    struct ui_thread_pool *pool = NULL;
     ui_thread_pool_create(2, &pool);
 
     ui_form_control_add_async_validator(control, dummy_async_err, NULL, pool,
@@ -589,7 +584,7 @@ static int run_extra_control3_all(void) {
 
 static int run_oom_tests_control(void) {
 #ifdef UI_TEST_MOCK_ALLOC
-  struct ui_arena *small_arena;
+  struct ui_arena *small_arena = NULL;
   ui_form_control_t *control = NULL;
   union ui_signal_payload dummy = {0};
 
@@ -653,8 +648,8 @@ static int run_oom_tests_control(void) {
       dummy); /* Should trigger run_validation which fails to malloc task */
 
   {
-    struct ui_thread_pool *pool;
-    struct ui_reactor *reactor;
+    struct ui_thread_pool *pool = NULL;
+    struct ui_reactor *reactor = NULL;
     ui_form_control_t *control4 = NULL;
     g_malloc_fail_countdown = -1;
     ui_thread_pool_create(2, &pool);
@@ -1069,9 +1064,9 @@ int main(void) {
 
   {
     int i;
-    struct ui_arena *arena2;
-    struct ui_thread_pool *pool2;
-    struct ui_reactor *reactor2;
+    struct ui_arena *arena2 = NULL;
+    struct ui_thread_pool *pool2 = NULL;
+    struct ui_reactor *reactor2 = NULL;
     ui_arena_create(1024, &arena2);
     ui_thread_pool_create(2, &pool2);
     ui_reactor_create(&reactor2);

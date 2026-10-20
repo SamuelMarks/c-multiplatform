@@ -21,7 +21,7 @@ typedef long HRESULT;
 typedef unsigned long ULONG;
 typedef unsigned int UINT32;
 typedef unsigned long DWORD;
-typedef long long REFERENCE_TIME;
+typedef ui_int64 REFERENCE_TIME;
 typedef unsigned short WORD;
 typedef void *LPVOID;
 
@@ -270,7 +270,8 @@ static ui_error_t wasapi_create_sink(struct ui_audio_sink_backend *backend,
   sink->is_co_init = 0;
 
   hr = g_wasapi.CoInitializeEx(NULL, 0); /* COINIT_MULTITHREADED */
-  if (hr == S_OK || hr == 0x80010106L) { /* S_OK or RPC_E_CHANGED_MODE */
+  if (hr == S_OK ||
+      hr == (HRESULT)0x80010106L) { /* S_OK or RPC_E_CHANGED_MODE */
     sink->is_co_init = 1;
   }
 

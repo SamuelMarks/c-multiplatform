@@ -47,11 +47,11 @@ static ui_error_t mock_factory_success(const struct ui_route_request *req,
 static ui_error_t mock_factory_fail(const struct ui_route_request *req,
                                     void *user_data,
                                     struct ui_component **out_screen) {
-  if (sizeof(req) == 0) {
+  if (req) {
   }
-  if (sizeof(user_data) == 0) {
+  if (user_data) {
   }
-  if (sizeof(out_screen) == 0) {
+  if (out_screen) {
   }
   return UI_ERROR_UNKNOWN;
 }
@@ -351,7 +351,7 @@ static int run_oom_tests(void) {
   /* Push reallocation OOM */
   /* Force stack growth (initial capacity is 8) */
   for (i = 0; i < 8; i++) {
-    struct ui_component *s;
+    struct ui_component *s = NULL;
     ui_component_create(&s);
     ui_router_push(router, s);
   }
@@ -448,7 +448,7 @@ static ui_error_t cov_factory(const struct ui_route_request *req,
                               void *user_data,
                               struct ui_component **out_screen) {
   const char *path = NULL;
-  if (sizeof(user_data) == 0) {
+  if (user_data) {
   }
   {
     void *state = NULL;
@@ -535,7 +535,7 @@ void test_ui_router_stack_realloc(void) {
   if (router) {
     int i;
     for (i = 0; i < 30; i++) {
-      struct ui_component *cmp;
+      struct ui_component *cmp = NULL;
       ui_component_create(&cmp);
       ui_router_push(router, cmp);
     }
@@ -565,9 +565,9 @@ void test_ui_router_oom_add2(void) {
 static ui_error_t cov_factory3(const struct ui_route_request *req,
                                void *user_data,
                                struct ui_component **out_screen) {
-  const char *val;
+  const char *val = NULL;
   ui_route_request_get_param(req, "nonexistent", &val);
-  if (sizeof(user_data) == 0) {
+  if (user_data) {
   }
   return ui_component_create(out_screen);
 }

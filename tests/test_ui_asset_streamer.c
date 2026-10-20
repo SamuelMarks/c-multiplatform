@@ -7,7 +7,7 @@
 
 #if defined(_WIN32)
 __declspec(dllimport) void __stdcall Sleep(unsigned long dwMilliseconds);
-#else
+#elif !defined(__EMSCRIPTEN__)
 #include <sys/select.h>
 #include <sys/time.h>
 #include <unistd.h>
@@ -23,6 +23,9 @@ extern int g_malloc_fail_countdown;
 static ui_error_t sleep_ms(int ms) {
 #if defined(_WIN32)
   Sleep((unsigned long)ms);
+#elif defined(__EMSCRIPTEN__)
+  if (ms) {
+  }
 #else
   struct timeval tv;
   tv.tv_sec = (long)(ms / 1000);
@@ -93,7 +96,7 @@ static int run_test(const char *name, int (*test_fn)(void)) {
 static ui_error_t on_resolve(void *result, void *user_data, void **out_result) {
   struct ui_asset *asset = (struct ui_asset *)result;
   int *completed = (int *)user_data;
-  if (sizeof(out_result) == 0) {
+  if (out_result) {
   }
   *completed = 1;
   ui_asset_destroy(asset);
@@ -103,7 +106,7 @@ static ui_error_t on_resolve(void *result, void *user_data, void **out_result) {
 static ui_error_t on_reject(ui_error_t err, void *user_data,
                             void **out_result) {
   int *completed = (int *)user_data;
-  if (sizeof(out_result) == 0) {
+  if (out_result) {
   }
   *completed = -1; /* -1 means rejected */
   if (err != UI_ERROR_NONE) {
@@ -433,8 +436,7 @@ static int test_edge_cases(void) {
       {
         int wait_limit = 0;
         while (completed == 0 && ++wait_limit < 2000) {
-          ui_execution_context_tick(ctx);
-          sleep_ms(10);
+          wait_tick(ctx, pool);
         }
         wait_pool_barrier(ctx, pool);
         {

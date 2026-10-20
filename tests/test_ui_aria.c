@@ -123,7 +123,7 @@ TEST test_ui_aria_state_parse_empty(void) {
 }
 
 TEST test_ui_aria_state_parse_implicit(void) {
-  struct ui_dom_node *node;
+  struct ui_dom_node *node = NULL;
   struct ui_aria_state state;
   const char *headings[] = {"h1", "h2", "h3", "h4", "h5", "h6"};
   int i;

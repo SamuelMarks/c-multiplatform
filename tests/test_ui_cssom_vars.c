@@ -41,12 +41,12 @@ int test_cssom_part7_vars(void) {
     struct ui_css_stylesheet *sheet_tmp = NULL;
     ui_css_stylesheet_create(&sheet_tmp);
     {
-      struct ui_css_rule *r5_tmp;
+      struct ui_css_rule *r5_tmp = NULL;
       ui_css_rule_create(UI_CSS_RULE_TYPE_SCOPE, &r5_tmp);
       r5_tmp->scope_start = NULL;
       r5_tmp->scope_end = NULL;
       {
-        struct ui_css_rule *r5_nested_tmp;
+        struct ui_css_rule *r5_nested_tmp = NULL;
         ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &r5_nested_tmp);
         ui_css_rule_append_selector(r5_nested_tmp, UI_CSS_SELECTOR_TYPE_TAG,
                                     "div");
@@ -63,7 +63,7 @@ int test_cssom_part7_vars(void) {
             ui_dom_node_set_tag_name(child_tmp, "div");
 
             {
-              struct ui_css_computed_style *style_tmp;
+              struct ui_css_computed_style *style_tmp = NULL;
               ui_css_resolve_style(sheet_tmp, child_tmp, &style_tmp);
 
               ui_css_computed_style_destroy(style_tmp);
@@ -83,7 +83,7 @@ int test_cssom_part7_vars(void) {
 
     /* 1. @scope (div) to (span) */
     {
-      struct ui_css_rule *scope_r;
+      struct ui_css_rule *scope_r = NULL;
       ui_css_rule_create(UI_CSS_RULE_TYPE_SCOPE, &scope_r);
 
       {
@@ -99,7 +99,7 @@ int test_cssom_part7_vars(void) {
           scope_r->scope_end = s_end;
 
           {
-            struct ui_css_rule *scope_inner;
+            struct ui_css_rule *scope_inner = NULL;
             ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &scope_inner);
             ui_css_rule_append_selector(scope_inner, UI_CSS_SELECTOR_TYPE_CLASS,
                                         "target");
@@ -112,7 +112,7 @@ int test_cssom_part7_vars(void) {
             ui_css_stylesheet_register_layer(s, "layer2", NULL);
 
             {
-              struct ui_css_rule *where_r;
+              struct ui_css_rule *where_r = NULL;
               ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &where_r);
               where_r->layer_name =
                   my_strdup("layer2"); /* to test layer iteration */
@@ -133,7 +133,7 @@ int test_cssom_part7_vars(void) {
 
                   /* 6. STYLE rule with nested rules */
                   {
-                    struct ui_css_rule *nested_style;
+                    struct ui_css_rule *nested_style = NULL;
                     ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &nested_style);
                     ui_css_rule_append_selector(nested_style,
                                                 UI_CSS_SELECTOR_TYPE_TAG, "p");
@@ -146,7 +146,7 @@ int test_cssom_part7_vars(void) {
 
                     /* 3. ID selector on node without ID */
                     {
-                      struct ui_css_rule *id_r;
+                      struct ui_css_rule *id_r = NULL;
                       ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &id_r);
                       ui_css_rule_append_selector(id_r, UI_CSS_SELECTOR_TYPE_ID,
                                                   "does-not-exist");
@@ -154,7 +154,7 @@ int test_cssom_part7_vars(void) {
 
                       /* 5. :checked testing */
                       {
-                        struct ui_css_rule *checked_r;
+                        struct ui_css_rule *checked_r = NULL;
                         ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &checked_r);
                         {
                           struct ui_css_selector *chk_sel =
@@ -168,7 +168,7 @@ int test_cssom_part7_vars(void) {
 
                           /* 8. Universal selector * */
                           {
-                            struct ui_css_rule *univ_r;
+                            struct ui_css_rule *univ_r = NULL;
                             ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &univ_r);
                             ui_css_rule_append_selector(
                                 univ_r, UI_CSS_SELECTOR_TYPE_UNIVERSAL, "*");
@@ -178,7 +178,7 @@ int test_cssom_part7_vars(void) {
 
                             /* 9. ancestor_matched test for nested rules */
                             {
-                              struct ui_css_rule *ancestor_r;
+                              struct ui_css_rule *ancestor_r = NULL;
                               ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE,
                                                  &ancestor_r);
                               ui_css_rule_append_selector(
@@ -188,7 +188,7 @@ int test_cssom_part7_vars(void) {
                                   ancestor_r, UI_CSS_SELECTOR_TYPE_TAG, "div");
 
                               {
-                                struct ui_css_rule *ancestor_nested_r;
+                                struct ui_css_rule *ancestor_nested_r = NULL;
                                 ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE,
                                                    &ancestor_nested_r);
                                 ui_css_rule_append_selector(
@@ -202,10 +202,15 @@ int test_cssom_part7_vars(void) {
 
                                 /* Build DOM */
                                 {
-                                  struct ui_dom_node *n_div, *n_article,
-                                      *n_span, *n_p;
-                                  struct ui_css_computed_style *style_art,
-                                      *style_span, *style_p;
+                                  struct ui_dom_node *n_div = NULL,
+                                                     *n_article = NULL,
+                                                     *n_span = NULL,
+                                                     *n_p = NULL;
+                                  struct ui_css_computed_style *style_art =
+                                                                   NULL,
+                                                               *style_span =
+                                                                   NULL,
+                                                               *style_p = NULL;
                                   const char *non_exist_val = NULL;
                                   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT,
                                                      &n_div);

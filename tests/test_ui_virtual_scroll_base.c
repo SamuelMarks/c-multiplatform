@@ -157,9 +157,9 @@ static int test_variable_size_math(void) {
 }
 
 static int test_dom_recycling(void) {
-  struct ui_virtual_scroll_base *vs;
+  struct ui_virtual_scroll_base *vs = NULL;
   struct ui_virtual_scroll_config config;
-  struct ui_dom_node *container;
+  struct ui_dom_node *container = NULL;
   ui_error_t rc;
   int failed = 0;
 
@@ -205,9 +205,9 @@ static int test_dom_recycling(void) {
 }
 
 static int test_dom_recycling_variable(void) {
-  struct ui_virtual_scroll_base *vs;
+  struct ui_virtual_scroll_base *vs = NULL;
   struct ui_virtual_scroll_config config;
-  struct ui_dom_node *container;
+  struct ui_dom_node *container = NULL;
   ui_error_t rc;
   int failed = 0;
 
@@ -253,21 +253,19 @@ static int test_dom_recycling_variable(void) {
 }
 
 #define CHECK_FAIL(cond)                                                       \
-  do {                                                                         \
-    if (cond) {                                                                \
-      printf("test_error_handling failed at %d\n", __LINE__);                  \
-      failed = 1;                                                              \
-    }                                                                          \
-  } while (0)
+  if (cond) {                                                                  \
+    printf("test_error_handling failed at %d\n", __LINE__);                    \
+    failed = 1;                                                                \
+  }
 
 static int test_error_handling(void) {
-  struct ui_virtual_scroll_base *vs;
+  struct ui_virtual_scroll_base *vs = NULL;
   struct ui_virtual_scroll_config config;
   float th;
   size_t start, end;
   float offset;
   int failed = 0;
-  struct ui_dom_node *container;
+  struct ui_dom_node *container = NULL;
 
   memset(&config, 0, sizeof(config));
   CHECK_FAIL(ui_virtual_scroll_base_create(NULL, &config) !=
@@ -418,7 +416,7 @@ static int test_error_handling(void) {
 }
 
 static int test_empty_scroll(void) {
-  struct ui_virtual_scroll_base *vs;
+  struct ui_virtual_scroll_base *vs = NULL;
   struct ui_virtual_scroll_config config;
   size_t start, end;
   float offset_y;
@@ -448,7 +446,7 @@ static int test_empty_scroll(void) {
 }
 
 static int test_empty_scroll_variable(void) {
-  struct ui_virtual_scroll_base *vs;
+  struct ui_virtual_scroll_base *vs = NULL;
   struct ui_virtual_scroll_config config;
   size_t start, end;
   float offset_y;
@@ -480,7 +478,7 @@ static int test_empty_scroll_variable(void) {
 static ui_error_t create_mock_node_fail(size_t index,
                                         struct ui_dom_node **out_node,
                                         void *user_data) {
-  if (sizeof(out_node) == 0) {
+  if (out_node) {
   }
   if (index) {
   }
@@ -490,9 +488,9 @@ static ui_error_t create_mock_node_fail(size_t index,
 }
 
 static int test_render_fail(void) {
-  struct ui_virtual_scroll_base *vs;
+  struct ui_virtual_scroll_base *vs = NULL;
   struct ui_virtual_scroll_config config;
-  struct ui_dom_node *container;
+  struct ui_dom_node *container = NULL;
   ui_error_t rc;
   int failed = 0;
 
@@ -538,9 +536,9 @@ static ui_error_t update_mock_node_fail(size_t index, struct ui_dom_node *node,
 }
 
 static int test_render_update_fail(void) {
-  struct ui_virtual_scroll_base *vs;
+  struct ui_virtual_scroll_base *vs = NULL;
   struct ui_virtual_scroll_config config;
-  struct ui_dom_node *container;
+  struct ui_dom_node *container = NULL;
   ui_error_t rc;
   int failed = 0;
 
@@ -576,9 +574,9 @@ static int test_render_update_fail(void) {
 }
 
 static int test_horizontal_orientation(void) {
-  struct ui_virtual_scroll_base *vs;
+  struct ui_virtual_scroll_base *vs = NULL;
   struct ui_virtual_scroll_config config;
-  struct ui_dom_node *container;
+  struct ui_dom_node *container = NULL;
   ui_error_t rc;
   int failed = 0;
 
