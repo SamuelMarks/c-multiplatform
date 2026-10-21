@@ -596,7 +596,6 @@ ui_error_t render_all_selection_controls(const struct md3_color_scheme *s,
   struct canvas *c = NULL;
   ui_error_t rc = UI_ERROR_NONE;
   int i;
-  (void)i;
   if (!s || !opts || !opts->output_dir)
     return UI_ERROR_INVALID_ARGUMENT;
 
@@ -838,7 +837,6 @@ ui_error_t render_all_containment_and_cards(const struct md3_color_scheme *s,
   struct canvas *c = NULL;
   ui_error_t rc = UI_ERROR_NONE;
   int i;
-  (void)i;
   if (!s || !opts || !opts->output_dir)
     return UI_ERROR_INVALID_ARGUMENT;
 
@@ -1136,8 +1134,6 @@ ui_error_t render_all_navigation(const struct md3_color_scheme *s,
   char path[512];
   struct canvas *c = NULL;
   ui_error_t rc = UI_ERROR_NONE;
-  int i;
-  (void)i;
   if (!s || !opts || !opts->output_dir)
     return UI_ERROR_INVALID_ARGUMENT;
 
@@ -1876,7 +1872,6 @@ ui_error_t render_all_progress_and_shapes(const struct md3_color_scheme *s,
   struct canvas *c = NULL;
   ui_error_t rc = UI_ERROR_NONE;
   int i;
-  (void)i;
   if (!s || !opts || !opts->output_dir)
     return UI_ERROR_INVALID_ARGUMENT;
 

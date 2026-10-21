@@ -142,7 +142,8 @@ static int run_normal_tests(void) {
   const char *test_str = "Hello, Cross-Platform Clipboard!";
   int failed = 0;
 
-#if !defined(__linux__) && !(defined(__unix__) && !defined(__APPLE__))
+#if defined(_WIN32) || defined(__CYGWIN__) || defined(__MINGW32__) ||          \
+    defined(__APPLE__) || (!defined(__linux__) && !defined(__unix__))
   mock_system_wl("wl-copy");
   mock_system_wl("wl-paste");
   mock_system_wl("other");

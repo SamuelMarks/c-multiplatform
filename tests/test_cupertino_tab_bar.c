@@ -417,6 +417,7 @@ TEST test_tab_bar_adaptive_sidebar(void) {
 }
 
 TEST test_tab_bar_mock_failures(void) {
+#ifdef UI_TEST_MOCK_ALLOC
   struct cupertino_tab_bar_descriptor desc;
   struct cupertino_tab_item_descriptor item_desc;
   struct cupertino_tab_bar *tab_bar = NULL;
@@ -428,7 +429,6 @@ TEST test_tab_bar_mock_failures(void) {
   memset(&item_desc, 0, sizeof(item_desc));
   item_desc.label = "Tab1";
 
-#ifdef UI_TEST_MOCK_ALLOC
   /* 1. Base create fail */
   g_cupertino_tab_bar_mock_base_create_fail = 1;
   rc = cupertino_tab_bar_create(dummy_engine, &desc, &tab_bar);
@@ -527,11 +527,6 @@ TEST test_tab_bar_mock_failures(void) {
   ASSERT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
   ASSERT(tab_bar == NULL);
   g_cupertino_tab_bar_mock_append_fail = 0;
-#else
-  (void)dummy_engine;
-  (void)tab_bar;
-  (void)idx;
-  (void)rc;
 #endif
 
   PASS();

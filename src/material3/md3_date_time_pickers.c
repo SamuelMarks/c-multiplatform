@@ -362,7 +362,6 @@ ui_error_t md3_time_picker_create(struct ui_engine *engine,
                                   struct md3_time_picker **out_picker) {
   struct md3_time_picker *picker;
   ui_error_t rc;
-  (void)format;
 
   if (!engine || !out_picker) {
     return UI_ERROR_INVALID_ARGUMENT;

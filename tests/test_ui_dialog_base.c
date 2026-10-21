@@ -394,7 +394,6 @@ static int test_oom_open(void) {
   struct ui_overlay_director *director = NULL;
   struct ui_focus_manager *focus_manager = NULL;
   struct ui_dom_node *root_node = NULL;
-  (void)rc;
 
   for (i = 0; i < 20; i++) {
     ui_dialog_base_create(&dialog);
@@ -408,6 +407,9 @@ static int test_oom_open(void) {
     g_malloc_fail_countdown = i;
     rc = ui_dialog_base_set_open(dialog, 1);
     g_malloc_fail_countdown = -1;
+    if (rc != UI_ERROR_NONE && rc != UI_ERROR_OUT_OF_MEMORY) {
+      return 1;
+    }
 
     {
       ui_error_t rc_cleanup = ui_dialog_base_destroy(dialog);

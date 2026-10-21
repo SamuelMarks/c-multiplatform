@@ -132,12 +132,19 @@ TEST test_md3_accordion_and_panel(void) {
   ASSERT_EQ(0, acc->multi_expand);
 
   /* Clean up */
-  for (i = 0; i < acc->panel_count; i++) {
-    rc = md3_expansion_panel_destroy(acc->panels[i]);
+  {
+    struct md3_expansion_panel *saved_panels[32];
+    size_t saved_count = acc->panel_count;
+    for (i = 0; i < saved_count; i++) {
+      saved_panels[i] = acc->panels[i];
+    }
+    rc = md3_accordion_destroy(acc);
     ASSERT_EQ(UI_ERROR_NONE, rc);
+    for (i = 0; i < saved_count; i++) {
+      rc = md3_expansion_panel_destroy(saved_panels[i]);
+      ASSERT_EQ(UI_ERROR_NONE, rc);
+    }
   }
-  rc = md3_accordion_destroy(acc);
-  ASSERT_EQ(UI_ERROR_NONE, rc);
 
   PASS();
 }

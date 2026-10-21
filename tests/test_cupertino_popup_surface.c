@@ -358,6 +358,7 @@ TEST test_popup_surface_presets_and_properties(void) {
 }
 
 TEST test_popup_surface_mock_failures(void) {
+#ifdef UI_TEST_MOCK_ALLOC
   struct cupertino_popup_surface_descriptor desc;
   struct cupertino_popup_surface *surface = NULL;
   struct ui_engine *dummy_engine = (struct ui_engine *)0x1234;
@@ -366,7 +367,6 @@ TEST test_popup_surface_mock_failures(void) {
   memset(&desc, 0, sizeof(desc));
   desc.preset = CUPERTINO_POPUP_SURFACE_PRESET_ALERT;
 
-#ifdef UI_TEST_MOCK_ALLOC
   /* Fail ui_surface_base_create */
   g_cupertino_popup_surface_mock_surface_create_fail = 1;
   rc = cupertino_popup_surface_create(dummy_engine, &desc, &surface);
@@ -409,10 +409,6 @@ TEST test_popup_surface_mock_failures(void) {
 
   rc = cupertino_popup_surface_destroy(surface);
   ASSERT_EQ(UI_ERROR_NONE, rc);
-#else
-  (void)dummy_engine;
-  (void)surface;
-  (void)rc;
 #endif
 
   PASS();
