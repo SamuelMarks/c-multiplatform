@@ -101,7 +101,8 @@ static void macos_on_window_did_resize(id self, SEL _cmd, id notif) {
   if (!win) {
     return;
   }
-  w = (struct ui_window *)objc_getAssociatedObject(win, "ui_window_ptr");
+  w = (struct ui_window *)objc_getAssociatedObject(
+      win, sel_registerName("ui_window_ptr"));
   if (!w) {
     return;
   }
@@ -150,7 +151,8 @@ static void macos_on_window_will_close(id self, SEL _cmd, id notif) {
   if (!win) {
     return;
   }
-  w = (struct ui_window *)objc_getAssociatedObject(win, "ui_window_ptr");
+  w = (struct ui_window *)objc_getAssociatedObject(
+      win, sel_registerName("ui_window_ptr"));
   if (w) {
     w->is_closing = 1;
   }
@@ -167,6 +169,7 @@ static Class macos_get_window_delegate_class(void) {
     delCls = objc_allocateClassPair(superCls, "UIWindowDelegate", 0);
 #ifdef UI_TEST_MOCK_ALLOC
     if (g_mock_macos_fail_allocate_class) {
+      objc_disposeClassPair(delCls);
       delCls = (Class)0;
     }
 #endif
@@ -373,7 +376,7 @@ static ui_error_t macos_create_window(struct ui_window_backend *backend,
 #endif
     if (del) {
       if (win) {
-        objc_setAssociatedObject(win, "ui_window_ptr", (id)w,
+        objc_setAssociatedObject(win, sel_registerName("ui_window_ptr"), (id)w,
                                  OBJC_ASSOCIATION_ASSIGN);
         ((void (*)(id, SEL, id))objc_msgSend)(
             win, sel_registerName("setDelegate:"), del);
@@ -552,12 +555,22 @@ static ui_error_t macos_poll_events(struct ui_window_backend *backend,
   event = ((id(*)(id, SEL, unsigned long, id, id, BOOL))objc_msgSend)(
       app, sel_registerName("nextEventMatchingMask:untilDate:inMode:dequeue:"),
       (unsigned long)-1, date, modeStr, (BOOL)1);
+#ifdef UI_TEST_MOCK_ALLOC
+  if (g_mock_macos_event_type < 0) {
+    event = (id)0;
+  }
+#endif
 
   if (event) {
     ((void (*)(id, SEL, id))objc_msgSend)(app, sel_registerName("sendEvent:"),
                                           event);
     evtType = ((unsigned long (*)(id, SEL))objc_msgSend)(
         event, sel_registerName("type"));
+#ifdef UI_TEST_MOCK_ALLOC
+    if (g_mock_macos_event_type > 0) {
+      evtType = (unsigned long)g_mock_macos_event_type;
+    }
+#endif
     if (evtType == 1 || evtType == 2) {
       CGPoint loc;
       loc = ((CGPoint(*)(id, SEL))objc_msgSend)(
