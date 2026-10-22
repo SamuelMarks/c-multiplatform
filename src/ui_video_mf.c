@@ -266,11 +266,13 @@ static ui_error_t mf_decode_packet(struct ui_video_decoder_backend *backend,
                                    const void *packet_data, size_t packet_size,
                                    ui_int64 pts) {
   HRESULT hr;
+  size_t unused_size = packet_size;
+  ui_int64 unused_pts = pts;
+  packet_size = unused_size;
+  pts = unused_pts;
   if (!backend || !decoder || !packet_data) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
-  (void)packet_size;
-  (void)pts;
 
   /* we would create an IMFSample and push it via ProcessInput */
   hr = decoder->mft->lpVtbl->ProcessInput(decoder->mft, 0, NULL, 0);

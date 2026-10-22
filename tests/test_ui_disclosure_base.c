@@ -48,7 +48,6 @@ static int run_normal_tests(void) {
   }
   {
     int is_expanded = 0;
-    (void)is_expanded;
     if (ui_disclosure_base_is_expanded(NULL, &is_expanded) !=
         UI_ERROR_INVALID_ARGUMENT)
       return 1;
@@ -138,7 +137,6 @@ static int run_normal_tests(void) {
 
   {
     int is_expanded = 0;
-    (void)is_expanded;
     ui_disclosure_base_is_expanded(disclosure, &is_expanded);
     if (is_expanded) {
       printf("Disclosure should start collapsed\n");
@@ -181,7 +179,6 @@ static int run_normal_tests(void) {
 
   {
     int is_expanded = 0;
-    (void)is_expanded;
     ui_disclosure_base_is_expanded(disclosure, &is_expanded);
     if (!is_expanded) {
       printf("Disclosure should be expanded\n");
@@ -211,7 +208,6 @@ static int run_normal_tests(void) {
 
   {
     int is_expanded = 0;
-    (void)is_expanded;
     ui_disclosure_base_is_expanded(disclosure, &is_expanded);
     if (is_expanded) {
       printf("Disclosure should be collapsed again\n");
@@ -243,7 +239,6 @@ static int run_normal_tests(void) {
 
   {
     int is_expanded = 0;
-    (void)is_expanded;
     ui_disclosure_base_is_expanded(disclosure, &is_expanded);
     if (!is_expanded) {
       printf("Space key should expand disclosure\n");
@@ -263,7 +258,6 @@ static int run_normal_tests(void) {
 
   {
     int is_expanded = 0;
-    (void)is_expanded;
     ui_disclosure_base_is_expanded(disclosure, &is_expanded);
     if (is_expanded) {
       printf("Enter key should collapse disclosure\n");
@@ -279,7 +273,6 @@ static int run_normal_tests(void) {
   ui_disclosure_base_process_event(disclosure, &ev, 0.0);
   {
     int is_expanded = 0;
-    (void)is_expanded;
     ui_disclosure_base_is_expanded(disclosure, &is_expanded);
     if (is_expanded) {
       printf("FAILED AT LINE 155\n");
@@ -302,7 +295,6 @@ static int run_normal_tests(void) {
   }
   {
     int is_expanded = 0;
-    (void)is_expanded;
     ui_disclosure_base_is_expanded(disclosure, &is_expanded);
     if (is_expanded) {
       printf("FAILED AT LINE 171\n");
@@ -325,7 +317,6 @@ static int run_normal_tests(void) {
   ui_disclosure_base_process_event(disclosure, &ev, 5.0);
   {
     int is_expanded = 0;
-    (void)is_expanded;
     ui_disclosure_base_is_expanded(disclosure, &is_expanded);
     if (is_expanded) {
       return 1;
@@ -336,7 +327,6 @@ static int run_normal_tests(void) {
   ui_disclosure_base_process_event(disclosure, &ev, 10.0); /* Completes tap */
   {
     int is_expanded = 0;
-    (void)is_expanded;
     ui_disclosure_base_is_expanded(disclosure, &is_expanded);
     if (!is_expanded) {
       printf("FAILED AT LINE 187\n");

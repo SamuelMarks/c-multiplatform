@@ -110,7 +110,7 @@ int main(void) {
   if (rc != UI_ERROR_NONE)
     return 1;
 
-#if !defined(_WIN32) && !defined(__CYGWIN__)
+#if !defined(_WIN32)
   write(pipes[1], "A", 1);
 #endif
 
@@ -146,7 +146,7 @@ int main(void) {
   if (rc != UI_ERROR_NONE)
     return 1;
 
-#if !defined(_WIN32) && !defined(__CYGWIN__)
+#if !defined(_WIN32)
   if ((test_val & UI_REACTOR_EVENT_READ) == 0) {
     printf("Read event not triggered!\n");
     return 1;
@@ -250,7 +250,7 @@ int main(void) {
   if (rc != UI_ERROR_NONE)
     return 1;
 
-#if !defined(_WIN32) && !defined(__CYGWIN__)
+#if !defined(_WIN32)
   close(pipes[0]);
   close(pipes[1]);
 #endif

@@ -60,8 +60,10 @@ static OSStatus (*g_captured_render_callback)(void *,
 static AudioComponent
 my_AudioComponentFindNext(AudioComponent inComponent,
                           const AudioComponentDescription *inDesc) {
-  (void)inComponent;
-  (void)inDesc;
+  AudioComponent u_comp = inComponent;
+  const AudioComponentDescription *u_desc = inDesc;
+  inComponent = u_comp;
+  inDesc = u_desc;
   if (mock_comp_ret == (AudioComponent)-1) {
     return (AudioComponent)0xdeadbeef;
   }
@@ -70,7 +72,8 @@ my_AudioComponentFindNext(AudioComponent inComponent,
 static OSStatus
 my_AudioComponentInstanceNew(AudioComponent inComponent,
                              AudioComponentInstance *outInstance) {
-  (void)inComponent;
+  AudioComponent u_comp = inComponent;
+  inComponent = u_comp;
   if (mock_new_instance_null) {
     *outInstance = NULL;
     return noErr;
@@ -84,15 +87,18 @@ my_AudioComponentInstanceNew(AudioComponent inComponent,
 }
 static OSStatus
 my_AudioComponentInstanceDispose(AudioComponentInstance inInstance) {
-  (void)inInstance;
+  AudioComponentInstance u_inst = inInstance;
+  inInstance = u_inst;
   return mock_dispose_ret;
 }
 static OSStatus my_AudioUnitInitialize(AudioUnit inUnit) {
-  (void)inUnit;
+  AudioUnit u_unit = inUnit;
+  inUnit = u_unit;
   return mock_init_ret;
 }
 static OSStatus my_AudioUnitUninitialize(AudioUnit inUnit) {
-  (void)inUnit;
+  AudioUnit u_unit = inUnit;
+  inUnit = u_unit;
   return mock_uninit_ret;
 }
 static OSStatus my_AudioUnitSetProperty(AudioUnit inUnit,
@@ -100,12 +106,18 @@ static OSStatus my_AudioUnitSetProperty(AudioUnit inUnit,
                                         AudioUnitScope inScope,
                                         AudioUnitElement inElement,
                                         const void *inData, UInt32 inDataSize) {
-  (void)inUnit;
-  (void)inID;
-  (void)inScope;
-  (void)inElement;
-  (void)inData;
-  (void)inDataSize;
+  AudioUnit u_unit = inUnit;
+  AudioUnitPropertyID u_id = inID;
+  AudioUnitScope u_scope = inScope;
+  AudioUnitElement u_elem = inElement;
+  const void *u_data = inData;
+  UInt32 u_size = inDataSize;
+  inUnit = u_unit;
+  inID = u_id;
+  inScope = u_scope;
+  inElement = u_elem;
+  inData = u_data;
+  inDataSize = u_size;
   if (inID == kAudioUnitProperty_SetRenderCallback && inData) {
     const AURenderCallbackStruct *cb = (const AURenderCallbackStruct *)inData;
     g_captured_render_callback = cb->inputProc;
@@ -119,11 +131,13 @@ static OSStatus my_AudioUnitSetProperty(AudioUnit inUnit,
   return mock_setprop_ret;
 }
 static OSStatus my_AudioOutputUnitStart(AudioUnit inUnit) {
-  (void)inUnit;
+  AudioUnit u_unit = inUnit;
+  inUnit = u_unit;
   return mock_start_ret;
 }
 static OSStatus my_AudioOutputUnitStop(AudioUnit inUnit) {
-  (void)inUnit;
+  AudioUnit u_unit = inUnit;
+  inUnit = u_unit;
   return mock_stop_ret;
 }
 

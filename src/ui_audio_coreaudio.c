@@ -74,11 +74,16 @@ static OSStatus render_callback(void *inRefCon,
      (render_callback) CoreAudio. A real implementation needs a thread-safe
      ringbuffer. For now, we just zero the buffer to prevent noise since this is
      a stub/skeleton. */
-  (void)inRefCon;
-  (void)ioActionFlags;
-  (void)inTimeStamp;
-  (void)inBusNumber;
-  (void)inNumberFrames;
+  void *unused_ref = inRefCon;
+  AudioUnitRenderActionFlags *unused_flags = ioActionFlags;
+  const AudioTimeStamp *unused_ts = inTimeStamp;
+  UInt32 unused_bus = inBusNumber;
+  UInt32 unused_frames = inNumberFrames;
+  inRefCon = unused_ref;
+  ioActionFlags = unused_flags;
+  inTimeStamp = unused_ts;
+  inBusNumber = unused_bus;
+  inNumberFrames = unused_frames;
 
   if (ioData && ioData->mNumberBuffers > 0) {
     memset(ioData->mBuffers[0].mData, 0, ioData->mBuffers[0].mDataByteSize);

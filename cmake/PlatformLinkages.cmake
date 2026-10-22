@@ -1,6 +1,6 @@
 function(target_link_platform_libraries target_name visibility)
     if(WIN32 OR CYGWIN)
-        target_link_libraries(${target_name} ${visibility} ws2_32 user32 gdi32 opengl32 gdiplus)
+        target_link_libraries(${target_name} ${visibility} ws2_32 user32 gdi32 opengl32 gdiplus ole32 mfplat mfuuid windowscodecs)
         if(CYGWIN)
             target_link_libraries(${target_name} ${visibility} m)
         endif()

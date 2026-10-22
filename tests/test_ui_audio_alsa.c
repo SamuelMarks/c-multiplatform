@@ -52,9 +52,12 @@ static int mock_pcm_drop_ret = 0;
 static int mock_pcm_close_ret = 0;
 
 static int my_snd_pcm_open(void **pcm, const char *name, int stream, int mode) {
-  (void)name;
-  (void)stream;
-  (void)mode;
+  const char *u_name = name;
+  int u_stream = stream;
+  int u_mode = mode;
+  name = u_name;
+  stream = u_stream;
+  mode = u_mode;
   if (mock_pcm_open_ret == 0) {
     *pcm = (void *)0xdeadbeef;
   }
@@ -67,79 +70,110 @@ static int my_snd_pcm_hw_params_malloc(void **params) {
   return mock_hw_params_malloc_ret;
 }
 static int my_snd_pcm_hw_params_any(void *pcm, void *params) {
-  (void)pcm;
-  (void)params;
+  void *u_pcm = pcm;
+  void *u_params = params;
+  pcm = u_pcm;
+  params = u_params;
   return mock_hw_params_any_ret;
 }
 static int my_snd_pcm_hw_params_set_access(void *pcm, void *params,
                                            int access) {
-  (void)pcm;
-  (void)params;
-  (void)access;
+  void *u_pcm = pcm;
+  void *u_params = params;
+  int u_access = access;
+  pcm = u_pcm;
+  params = u_params;
+  access = u_access;
   return mock_hw_params_set_access_ret;
 }
 static int my_snd_pcm_hw_params_set_format(void *pcm, void *params,
                                            int format) {
-  (void)pcm;
-  (void)params;
-  (void)format;
+  void *u_pcm = pcm;
+  void *u_params = params;
+  int u_format = format;
+  pcm = u_pcm;
+  params = u_params;
+  format = u_format;
   return mock_hw_params_set_format_ret;
 }
 static int my_snd_pcm_hw_params_set_rate_near(void *pcm, void *params,
                                               unsigned int *val, int *dir) {
-  (void)pcm;
-  (void)params;
-  (void)val;
-  (void)dir;
+  void *u_pcm = pcm;
+  void *u_params = params;
+  unsigned int *u_val = val;
+  int *u_dir = dir;
+  pcm = u_pcm;
+  params = u_params;
+  val = u_val;
+  dir = u_dir;
   return mock_hw_params_set_rate_near_ret;
 }
 static int my_snd_pcm_hw_params_set_channels(void *pcm, void *params,
                                              unsigned int val) {
-  (void)pcm;
-  (void)params;
-  (void)val;
+  void *u_pcm = pcm;
+  void *u_params = params;
+  unsigned int u_val = val;
+  pcm = u_pcm;
+  params = u_params;
+  val = u_val;
   return mock_hw_params_set_channels_ret;
 }
 static int my_snd_pcm_hw_params(void *pcm, void *params) {
-  (void)pcm;
-  (void)params;
+  void *u_pcm = pcm;
+  void *u_params = params;
+  pcm = u_pcm;
+  params = u_params;
   return mock_hw_params_ret;
 }
-static void my_snd_pcm_hw_params_free(void *params) { (void)params; }
+static void my_snd_pcm_hw_params_free(void *params) {
+  void *u_params = params;
+  params = u_params;
+}
 static int my_snd_pcm_prepare(void *pcm) {
-  (void)pcm;
+  void *u_pcm = pcm;
+  pcm = u_pcm;
   return mock_pcm_prepare_ret;
 }
 static long my_snd_pcm_writei(void *pcm, const void *buffer,
                               unsigned long size) {
-  (void)pcm;
-  (void)buffer;
-  (void)size;
+  void *u_pcm = pcm;
+  const void *u_buf = buffer;
+  unsigned long u_size = size;
+  pcm = u_pcm;
+  buffer = u_buf;
+  size = u_size;
   return mock_pcm_writei_ret;
 }
 static int my_snd_pcm_recover(void *pcm, int err, int silent) {
-  (void)pcm;
-  (void)err;
-  (void)silent;
+  void *u_pcm = pcm;
+  int u_err = err;
+  int u_silent = silent;
+  pcm = u_pcm;
+  err = u_err;
+  silent = u_silent;
   return mock_pcm_recover_ret;
 }
 static int my_snd_pcm_delay(void *pcm, long *delayp) {
-  (void)pcm;
+  void *u_pcm = pcm;
+  pcm = u_pcm;
   if (mock_pcm_delay_ret == 0) {
     *delayp = 44100;
   }
   return mock_pcm_delay_ret;
 }
 static int my_snd_pcm_drop(void *pcm) {
-  (void)pcm;
+  void *u_pcm = pcm;
+  pcm = u_pcm;
   return mock_pcm_drop_ret;
 }
 static int my_snd_pcm_close(void *pcm) {
-  (void)pcm;
+  void *u_pcm = pcm;
+  pcm = u_pcm;
   return mock_pcm_close_ret;
 }
 static const char *my_snd_strerror(int errnum) {
-  (void)errnum;
+  int u_err = errnum;
+  errnum = u_err;
   return "mock error";
 }
 

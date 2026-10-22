@@ -20,7 +20,8 @@ static ui_error_t mock_update(union ui_signal_payload cur,
 }
 
 static ui_error_t mock_notify_success(void *user_data) {
-  (void)user_data;
+  void *u_data = user_data;
+  user_data = u_data;
   return UI_ERROR_NONE;
 }
 
@@ -31,12 +32,14 @@ static ui_error_t mock_update_same(union ui_signal_payload cur,
 }
 
 static ui_error_t mock_destructor_success(union ui_signal_payload val) {
-  (void)val;
+  union ui_signal_payload u_val = val;
+  val = u_val;
   return UI_ERROR_NONE;
 }
 
 static ui_error_t mock_notify_fail(void *user_data) {
-  (void)user_data;
+  void *u_data = user_data;
+  user_data = u_data;
   return UI_ERROR_INVALID_ARGUMENT;
 }
 

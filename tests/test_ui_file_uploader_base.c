@@ -14,7 +14,8 @@ extern int g_malloc_fail_countdown;
 static ui_error_t dummy_on_change(union ui_signal_payload value,
                                   void *user_data) {
   int *called = (int *)user_data;
-  (void)value;
+  union ui_signal_payload u_val = value;
+  value = u_val;
   *called = 1;
   return UI_ERROR_NONE;
 }
@@ -311,12 +312,15 @@ static int run_oom_tests(void) {
 }
 
 static ui_error_t mock_touch_fail(void *ud) {
-  (void)ud;
+  void *u_ud = ud;
+  ud = u_ud;
   return UI_ERROR_INVALID_ARGUMENT;
 }
 static ui_error_t mock_change_fail(union ui_signal_payload v, void *ud) {
-  (void)v;
-  (void)ud;
+  union ui_signal_payload u_v = v;
+  void *u_ud = ud;
+  v = u_v;
+  ud = u_ud;
   return UI_ERROR_INVALID_ARGUMENT;
 }
 

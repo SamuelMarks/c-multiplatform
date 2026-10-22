@@ -65,8 +65,10 @@ struct ui_audio_sink {
 };
 
 static void bq_callback(SLAndroidSimpleBufferQueueItf bq, void *context) {
-  (void)bq;
-  (void)context;
+  SLAndroidSimpleBufferQueueItf unused_bq = bq;
+  void *unused_ctx = context;
+  bq = unused_bq;
+  context = unused_ctx;
 }
 
 static ui_error_t sl_create_sink(struct ui_audio_sink_backend *backend,

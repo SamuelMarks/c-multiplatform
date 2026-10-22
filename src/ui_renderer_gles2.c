@@ -122,28 +122,18 @@ static ui_error_t load_gl_extensions(void) {
 #include <OpenGL/OpenGL.h>
 #include <OpenGL/gl.h>
 #include <OpenGL/glext.h>
-/** @brief internal */
-#define load_gl_extensions()
 #elif defined(__EMSCRIPTEN__)
 #include <GLES2/gl2.h>
-/** @brief internal */
-#define load_gl_extensions()
 #elif defined(__linux__) || defined(__unix__)
 #if defined(HAVE_GLES2)
 #include <GLES2/gl2.h>
-/** @brief internal */
-#define load_gl_extensions()
 #elif defined(HAVE_OPENGL)
 /** @brief internal */
 #define GL_GLEXT_PROTOTYPES 1
 #include <GL/gl.h>
 #include <GL/glext.h>
-/** @brief internal */
-#define load_gl_extensions()
 #else
 #include <stddef.h>
-/** @brief internal */
-#define load_gl_extensions()
 typedef unsigned int GLuint;
 typedef int GLint;
 typedef unsigned int GLenum;
@@ -172,8 +162,8 @@ typedef ptrdiff_t GLintptr;
 #endif
 
 #if defined(UI_TEST_MOCK_ALLOC) ||                                             \
-    (!defined(_WIN32) && !defined(__APPLE__) && !defined(__EMSCRIPTEN__) &&    \
-     !defined(HAVE_GLES2) && !defined(HAVE_OPENGL))
+    (!defined(_WIN32) && !defined(__CYGWIN__) && !defined(__APPLE__) &&        \
+     !defined(__EMSCRIPTEN__) && !defined(HAVE_GLES2) && !defined(HAVE_OPENGL))
 /** @brief HAS_GLES2_MOCK macro definition. */
 #define HAS_GLES2_MOCK 1
 
@@ -955,7 +945,12 @@ static ui_error_t gles2_init(struct ui_renderer_backend *backend,
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  load_gl_extensions();
+#if defined(_WIN32) || defined(__CYGWIN__)
+  vs_rc = load_gl_extensions();
+  if (vs_rc != UI_ERROR_NONE) {
+    return vs_rc;
+  }
+#endif
 
   data = (struct gles2_renderer_data *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct gles2_renderer_data));

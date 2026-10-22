@@ -65,28 +65,31 @@ ui_error_t md2_fab_create(struct ui_engine *engine, enum md2_fab_size size,
      extended, we can just treat the icon as a string for now. A more thorough
      integration would use an icon component or text_node. */
   if (size == MD2_FAB_SIZE_EXTENDED && label) {
-    ui_button_base_set_text(main_button, label);
+    rc = ui_button_base_set_text(main_button, label);
   } else if (icon) {
-    ui_button_base_set_text(main_button, icon);
+    rc = ui_button_base_set_text(main_button, icon);
   }
 
-  ui_fab_base_set_main_button(fab->base, main_button);
+  rc = ui_fab_base_set_main_button(fab->base, main_button);
 
   *out_fab = fab;
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 /** @brief md2_fab_destroy function. */
 ui_error_t md2_fab_destroy(struct md2_fab *fab) {
+  ui_error_t rc;
+  ui_error_t rc2;
+
   if (!fab) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  ui_fab_base_destroy(fab->base);
-  ui_component_destroy(fab->component);
+  rc = ui_fab_base_destroy(fab->base);
+  rc2 = ui_component_destroy(fab->component);
 
   C_MULTIPLATFORM_FREE(fab);
-  return UI_ERROR_NONE;
+  return rc != UI_ERROR_NONE ? rc : rc2;
 }
 
 /** @brief md2_fab_set_on_click function. */
@@ -94,12 +97,16 @@ ui_error_t md2_fab_set_on_click(struct md2_fab *fab,
                                 ui_button_on_click_t on_click,
                                 void *user_data) {
   struct ui_button_base *main_button = NULL;
+  ui_error_t rc;
 
   if (!fab || !fab->base) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  ui_fab_base_get_main_button(fab->base, &main_button);
+  rc = ui_fab_base_get_main_button(fab->base, &main_button);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
 
   return ui_button_base_set_on_click(main_button, on_click, user_data);
 }

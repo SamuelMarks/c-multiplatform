@@ -732,7 +732,7 @@ if(TARGET cfs AND MSVC)
 endif()
 
 target_link_libraries(c-multiplatform-cdk PRIVATE c-abstract-http cfs c-orm)
-if(WIN32 OR MSVC)
+if(WIN32 OR CYGWIN OR MSVC)
     target_link_libraries(c-multiplatform-cdk PRIVATE mfplat mfuuid ole32 user32 gdi32 gdiplus opengl32 windowscodecs)
 endif()
 target_include_directories(c-multiplatform-cdk PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>" "$<INSTALL_INTERFACE:include>")
@@ -813,7 +813,7 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
     endif()
 
     target_link_libraries(c-multiplatform-cdk_test PRIVATE c-abstract-http cfs c-orm)
-    if(WIN32 OR MSVC)
+    if(WIN32 OR CYGWIN OR MSVC)
         target_link_libraries(c-multiplatform-cdk_test PRIVATE mfplat mfuuid ole32 user32 gdi32 gdiplus opengl32 windowscodecs)
     endif()
 

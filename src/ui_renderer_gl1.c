@@ -59,7 +59,8 @@ mock_ui_font_get_glyph_metrics(struct ui_font *font, int codepoint,
 
 #if !defined(__EMSCRIPTEN__) &&                                                \
     (defined(UI_TEST_MOCK_ALLOC) ||                                            \
-     (!defined(_WIN32) && !defined(__APPLE__) && !defined(HAVE_OPENGL)))
+     (!defined(_WIN32) && !defined(__CYGWIN__) && !defined(__APPLE__) &&       \
+      !defined(HAVE_OPENGL)))
 /** @brief mock_glViewport function. */
 static void mock_glViewport(int x, int y, int w, int h) {
   int ux = x, uy = y, uw = w, uh = h;

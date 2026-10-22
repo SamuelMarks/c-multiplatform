@@ -23,8 +23,10 @@ static ui_error_t mock_cva_on_touched(void *user_data) {
 static ui_error_t mock_on_select(struct ui_calendar_base *calendar,
                                  const struct ui_date *date, void *user_data) {
   int *called = (int *)user_data;
-  (void)calendar;
-  (void)date;
+  struct ui_calendar_base *u_cal = calendar;
+  const struct ui_date *u_date = date;
+  calendar = u_cal;
+  date = u_date;
   if (called)
     (*called)++;
   return UI_ERROR_NONE;
@@ -33,9 +35,12 @@ static ui_error_t mock_on_select(struct ui_calendar_base *calendar,
 static ui_error_t mock_on_select_fail(struct ui_calendar_base *calendar,
                                       const struct ui_date *date,
                                       void *user_data) {
-  (void)calendar;
-  (void)date;
-  (void)user_data;
+  struct ui_calendar_base *u_cal = calendar;
+  const struct ui_date *u_date = date;
+  void *u_data = user_data;
+  calendar = u_cal;
+  date = u_date;
+  user_data = u_data;
   return UI_ERROR_OUT_OF_MEMORY;
 }
 
@@ -205,7 +210,8 @@ static int test_calendar_math(void) {
 static ui_error_t mock_cva_on_change(union ui_signal_payload value,
                                      void *user_data) {
   int *called = (int *)user_data;
-  (void)value;
+  union ui_signal_payload u_val = value;
+  value = u_val;
   if (user_data == (void *)1)
     return UI_ERROR_UNKNOWN;
   if (called)
@@ -753,7 +759,8 @@ static struct ui_control_value_accessor g_mock_cva_for_reentrancy;
 
 static ui_error_t mock_dp_cva_change(union ui_signal_payload val, void *data) {
   int *c = (int *)data;
-  (void)val;
+  union ui_signal_payload u_val = val;
+  val = u_val;
   if (c)
     (*c)++;
 
@@ -1001,7 +1008,9 @@ static int test_calendar_missing_branches(void) {
   struct ui_date min_dt = {2024, 1, 1};
   struct ui_date max_dt = {2024, 12, 1};
   int g_calendar_mock_fail = 0;
-  (void)g_calendar_mock_fail;
+  if (g_calendar_mock_fail != 0) {
+    return 1;
+  }
 
   /* 228: cva_on_touched fails */
   {

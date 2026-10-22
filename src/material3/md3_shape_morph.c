@@ -40,8 +40,10 @@ generate_radial_shape(size_t vertex_count,
 
 /** @brief circle_radius function. */
 static float circle_radius(float angle, void *ctx) {
-  (void)angle;
-  (void)ctx;
+  float unused_angle = angle;
+  void *unused_ctx = ctx;
+  angle = unused_angle;
+  ctx = unused_ctx;
   return 1.0f;
 }
 
@@ -82,31 +84,36 @@ static float flower_radius(float angle, void *ctx) {
 
 /** @brief burst_radius function. */
 static float burst_radius(float angle, void *ctx) {
-  (void)ctx;
+  void *unused_ctx = ctx;
+  ctx = unused_ctx;
   return 0.75f + 0.25f * (float)sin(16.0f * angle);
 }
 
 /** @brief sunny_radius function. */
 static float sunny_radius(float angle, void *ctx) {
-  (void)ctx;
+  void *unused_ctx = ctx;
+  ctx = unused_ctx;
   return 0.7f + 0.3f * (float)cos(8.0f * angle);
 }
 
 /** @brief cookie_radius function. */
 static float cookie_radius(float angle, void *ctx) {
-  (void)ctx;
+  void *unused_ctx = ctx;
+  ctx = unused_ctx;
   return 0.85f + 0.15f * (float)sin(9.0f * angle);
 }
 
 /** @brief puff_radius function. */
 static float puff_radius(float angle, void *ctx) {
-  (void)ctx;
+  void *unused_ctx = ctx;
+  ctx = unused_ctx;
   return 0.8f + 0.2f * (float)cos(5.0f * angle);
 }
 
 /** @brief wave_radius function. */
 static float wave_radius(float angle, void *ctx) {
-  (void)ctx;
+  void *unused_ctx = ctx;
+  ctx = unused_ctx;
   return 0.85f + 0.15f * (float)sin(3.0f * angle);
 }
 

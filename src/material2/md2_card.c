@@ -48,7 +48,7 @@ ui_error_t md2_card_create(struct ui_engine *engine,
     return rc;
   }
 
-  ui_card_base_get_component(card->base, &comp);
+  rc = ui_card_base_get_component(card->base, &comp);
 
   cls = (variant == MD2_CARD_OUTLINED) ? "md2-card md2-card-outlined"
                                        : "md2-card md2-card-elevated";

@@ -10,7 +10,8 @@ extern int g_malloc_fail_countdown;
 static ui_error_t mock_on_change(struct ui_selection_model *model,
                                  void *user_data) {
   int *count = (int *)user_data;
-  (void)model;
+  struct ui_selection_model *u_model = model;
+  model = u_model;
   (*count)++;
   return UI_ERROR_NONE;
 }

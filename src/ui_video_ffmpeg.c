@@ -187,11 +187,13 @@ static ui_error_t ff_decode_packet(struct ui_video_decoder_backend *backend,
                                    struct ui_video_decoder *decoder,
                                    const void *packet_data, size_t packet_size,
                                    ui_int64 pts) {
+  size_t unused_size = packet_size;
+  ui_int64 unused_pts = pts;
+  packet_size = unused_size;
+  pts = unused_pts;
   if (!backend || !decoder || !packet_data) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
-  (void)packet_size;
-  (void)pts;
 
   /* we would populate pkt here and send it */
   if (g_ff.avcodec_send_packet(decoder->ctx, decoder->pkt) < 0) {

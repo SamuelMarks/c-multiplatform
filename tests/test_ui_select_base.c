@@ -729,17 +729,23 @@ static int run_oom_tests(void) {
 }
 static ui_error_t on_select_change_fail(struct ui_select_base *select,
                                         int index, void *user_data) {
-  (void)select;
-  (void)index;
-  (void)user_data;
+  struct ui_select_base *u_sel = select;
+  int u_idx = index;
+  void *u_data = user_data;
+  select = u_sel;
+  index = u_idx;
+  user_data = u_data;
   return UI_ERROR_UNKNOWN;
 }
 
 static ui_error_t on_select_open_change_fail(struct ui_select_base *select,
                                              int is_open, void *user_data) {
-  (void)select;
-  (void)is_open;
-  (void)user_data;
+  struct ui_select_base *u_sel = select;
+  int u_open = is_open;
+  void *u_data = user_data;
+  select = u_sel;
+  is_open = u_open;
+  user_data = u_data;
   return UI_ERROR_UNKNOWN;
 }
 

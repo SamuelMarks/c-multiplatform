@@ -51,10 +51,14 @@ static OSStatus my_VTDecompressionSessionCreate(
     CFDictionaryRef destinationImageBufferAttributes,
     const VTDecompressionOutputCallbackRecord *outputCallback,
     VTDecompressionSessionRef *decompressionSessionOut) {
-  (void)allocator;
-  (void)videoFormatDescription;
-  (void)videoDecoderSpecification;
-  (void)destinationImageBufferAttributes;
+  CFAllocatorRef u_alloc = allocator;
+  CMVideoFormatDescriptionRef u_fmt = videoFormatDescription;
+  CFDictionaryRef u_spec = videoDecoderSpecification;
+  CFDictionaryRef u_attr = destinationImageBufferAttributes;
+  allocator = u_alloc;
+  videoFormatDescription = u_fmt;
+  videoDecoderSpecification = u_spec;
+  destinationImageBufferAttributes = u_attr;
   if (outputCallback) {
     captured_output_callback = outputCallback->decompressionOutputCallback;
   }
@@ -72,18 +76,24 @@ static OSStatus my_VTDecompressionSessionCreate(
 
 static void
 my_VTDecompressionSessionInvalidate(VTDecompressionSessionRef session) {
-  (void)session;
+  VTDecompressionSessionRef u_sess = session;
+  session = u_sess;
 }
 
 static OSStatus my_VTDecompressionSessionDecodeFrame(
     VTDecompressionSessionRef session, CMSampleBufferRef sampleBuffer,
     VTDecodeFrameFlags decodeFlags, void *sourceFrameRefCon,
     VTDecodeInfoFlags *infoFlagsOut) {
-  (void)session;
-  (void)sampleBuffer;
-  (void)decodeFlags;
-  (void)sourceFrameRefCon;
-  (void)infoFlagsOut;
+  VTDecompressionSessionRef u_sess = session;
+  CMSampleBufferRef u_buf = sampleBuffer;
+  VTDecodeFrameFlags u_flags = decodeFlags;
+  void *u_ref = sourceFrameRefCon;
+  VTDecodeInfoFlags *u_out = infoFlagsOut;
+  session = u_sess;
+  sampleBuffer = u_buf;
+  decodeFlags = u_flags;
+  sourceFrameRefCon = u_ref;
+  infoFlagsOut = u_out;
   return mock_decode_ret;
 }
 

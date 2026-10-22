@@ -34,7 +34,8 @@ static int mock_send_ret = 0;
 static int mock_recv_ret = 0;
 
 static void *my_avcodec_alloc_context3(const void *codec) {
-  (void)codec;
+  const void *u_codec = codec;
+  codec = u_codec;
   if (mock_alloc_ret)
     return (void *)0xcafebabe;
   return NULL;
@@ -44,15 +45,19 @@ static void my_avcodec_free_context(void **avctx) {
     *avctx = NULL;
 }
 static const void *my_avcodec_find_decoder(int id) {
-  (void)id;
+  int u_id = id;
+  id = u_id;
   if (mock_find_ret)
     return (const void *)0xdeadbeef;
   return NULL;
 }
 static int my_avcodec_open2(void *avctx, const void *codec, void **options) {
-  (void)avctx;
-  (void)codec;
-  (void)options;
+  void *u_ctx = avctx;
+  const void *u_codec = codec;
+  void **u_opts = options;
+  avctx = u_ctx;
+  codec = u_codec;
+  options = u_opts;
   return mock_open_ret;
 }
 static void *my_av_packet_alloc(void) {
@@ -65,8 +70,10 @@ static void my_av_packet_free(void **pkt) {
     *pkt = NULL;
 }
 static int my_avcodec_send_packet(void *avctx, const void *avpkt) {
-  (void)avctx;
-  (void)avpkt;
+  void *u_ctx = avctx;
+  const void *u_pkt = avpkt;
+  avctx = u_ctx;
+  avpkt = u_pkt;
   return mock_send_ret;
 }
 static void *my_av_frame_alloc(void) {
@@ -79,8 +86,10 @@ static void my_av_frame_free(void **frame) {
     *frame = NULL;
 }
 static int my_avcodec_receive_frame(void *avctx, void *frame) {
-  (void)avctx;
-  (void)frame;
+  void *u_ctx = avctx;
+  void *u_frame = frame;
+  avctx = u_ctx;
+  frame = u_frame;
   return mock_recv_ret;
 }
 

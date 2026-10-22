@@ -70,13 +70,20 @@ static void output_callback(void *decompressionOutputRefCon,
                             CVImageBufferRef imageBuffer,
                             CMTime presentationTimeStamp,
                             CMTime presentationDuration) {
-  (void)decompressionOutputRefCon;
-  (void)sourceFrameRefCon;
-  (void)status;
-  (void)infoFlags;
-  (void)imageBuffer;
-  (void)presentationTimeStamp;
-  (void)presentationDuration;
+  void *unused_decomp = decompressionOutputRefCon;
+  void *unused_src = sourceFrameRefCon;
+  OSStatus unused_status = status;
+  VTDecodeInfoFlags unused_flags = infoFlags;
+  CVImageBufferRef unused_img = imageBuffer;
+  CMTime unused_pts = presentationTimeStamp;
+  CMTime unused_dur = presentationDuration;
+  decompressionOutputRefCon = unused_decomp;
+  sourceFrameRefCon = unused_src;
+  status = unused_status;
+  infoFlags = unused_flags;
+  imageBuffer = unused_img;
+  presentationTimeStamp = unused_pts;
+  presentationDuration = unused_dur;
 }
 
 static ui_error_t
@@ -131,12 +138,13 @@ static ui_error_t avf_decode_packet(struct ui_video_decoder_backend *backend,
                                     const void *packet_data, size_t packet_size,
                                     ui_int64 pts) {
   OSStatus err;
+  size_t unused_size = packet_size;
+  ui_int64 unused_pts = pts;
+  packet_size = unused_size;
+  pts = unused_pts;
   if (!backend || !decoder || !packet_data) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
-
-  (void)packet_size;
-  (void)pts;
 
   err = g_vt.VTDecompressionSessionDecodeFrame(decoder->session, NULL, 0, NULL,
                                                NULL);
