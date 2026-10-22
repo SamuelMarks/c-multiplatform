@@ -17,7 +17,7 @@
 
 #if defined(__APPLE__) && defined(__MACH__)
 #include "ui_window_backend_macos.h"
-#elif defined(_WIN32) || defined(__CYGWIN__)
+#elif defined(_WIN32)
 #include "ui_window_backend_win32.h"
 #elif defined(__linux__) || defined(__unix__)
 #include "ui_window_backend_linux.h"
@@ -39,7 +39,7 @@ static ui_error_t destroy_active_backend(struct ui_window_backend *backend) {
   }
 #if defined(__APPLE__) && defined(__MACH__)
   return ui_window_backend_macos_destroy(backend);
-#elif defined(_WIN32) || defined(__CYGWIN__)
+#elif defined(_WIN32)
   return ui_window_backend_win32_destroy(backend);
 #elif defined(__linux__) || defined(__unix__)
   return ui_window_backend_linux_destroy(backend);
@@ -191,7 +191,7 @@ static ui_error_t test_window_creation_and_screenshot(void) {
   ui_error_t clean_rc = UI_ERROR_NONE;
   int win_w = 400;
   int win_h = 300;
-#if defined(_WIN32) || defined(__CYGWIN__)
+#if defined(_WIN32)
   int is_wine = 0;
 #if defined(_MSC_VER)
   char *wine_val = NULL;
@@ -203,7 +203,7 @@ static ui_error_t test_window_creation_and_screenshot(void) {
 
 #if defined(__APPLE__) && defined(__MACH__)
   rc = ui_window_backend_macos_create(&backend);
-#elif defined(_WIN32) || defined(__CYGWIN__)
+#elif defined(_WIN32)
   rc = ui_window_backend_win32_create(&backend);
 #elif defined(__linux__) || defined(__unix__)
   rc = ui_window_backend_linux_create(&backend);
@@ -217,7 +217,7 @@ static ui_error_t test_window_creation_and_screenshot(void) {
     return UI_ERROR_NONE;
   }
 
-#if defined(_WIN32) || defined(__CYGWIN__)
+#if defined(_WIN32)
 #if defined(_MSC_VER)
   if (_dupenv_s(&wine_val, &wine_len, "WINELOADER") == 0 && wine_val != NULL) {
     is_wine = 1;

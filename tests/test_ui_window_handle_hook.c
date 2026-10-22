@@ -22,7 +22,7 @@
 #include <CoreGraphics/CoreGraphics.h>
 #include <objc/message.h>
 #include <objc/runtime.h>
-#elif defined(_WIN32) || defined(__CYGWIN__)
+#elif defined(_WIN32)
 #include "ui_window_backend_win32.h"
 #elif defined(__linux__) || defined(__unix__)
 #include "ui_window_backend_linux.h"
@@ -370,7 +370,7 @@ TEST test_backend_handle_hook(void) {
 
 #if defined(__APPLE__) && defined(__MACH__)
   rc = ui_window_backend_macos_create(&backend);
-#elif defined(_WIN32) || defined(__CYGWIN__)
+#elif defined(_WIN32)
   rc = ui_window_backend_win32_create(&backend);
 #elif defined(__linux__) || defined(__unix__)
   rc = ui_window_backend_linux_create(&backend);
@@ -420,7 +420,7 @@ TEST test_backend_handle_hook(void) {
       rc = backend->destroy_window(backend, window);
 #if defined(__APPLE__) && defined(__MACH__)
       ui_window_backend_macos_destroy(backend);
-#elif defined(_WIN32) || defined(__CYGWIN__)
+#elif defined(_WIN32)
       ui_window_backend_win32_destroy(backend);
 #elif defined(__linux__) || defined(__unix__)
       ui_window_backend_linux_destroy(backend);
@@ -433,7 +433,7 @@ TEST test_backend_handle_hook(void) {
   if (rc != UI_ERROR_NONE || !window) {
 #if defined(__APPLE__) && defined(__MACH__)
     ui_window_backend_macos_destroy(backend);
-#elif defined(_WIN32) || defined(__CYGWIN__)
+#elif defined(_WIN32)
     ui_window_backend_win32_destroy(backend);
 #elif defined(__linux__) || defined(__unix__)
     ui_window_backend_linux_destroy(backend);
@@ -447,7 +447,7 @@ TEST test_backend_handle_hook(void) {
       backend->destroy_window(backend, window);
 #if defined(__APPLE__) && defined(__MACH__)
       ui_window_backend_macos_destroy(backend);
-#elif defined(_WIN32) || defined(__CYGWIN__)
+#elif defined(_WIN32)
       ui_window_backend_win32_destroy(backend);
 #elif defined(__linux__) || defined(__unix__)
       ui_window_backend_linux_destroy(backend);
@@ -464,7 +464,7 @@ TEST test_backend_handle_hook(void) {
       backend->destroy_window(backend, window);
 #if defined(__APPLE__) && defined(__MACH__)
       ui_window_backend_macos_destroy(backend);
-#elif defined(_WIN32) || defined(__CYGWIN__)
+#elif defined(_WIN32)
       ui_window_backend_win32_destroy(backend);
 #elif defined(__linux__) || defined(__unix__)
       ui_window_backend_linux_destroy(backend);
@@ -485,7 +485,7 @@ TEST test_backend_handle_hook(void) {
 
 #if defined(__APPLE__) && defined(__MACH__)
   rc = ui_window_backend_macos_destroy(backend);
-#elif defined(_WIN32) || defined(__CYGWIN__)
+#elif defined(_WIN32)
   rc = ui_window_backend_win32_destroy(backend);
 #elif defined(__linux__) || defined(__unix__)
   rc = ui_window_backend_linux_destroy(backend);
