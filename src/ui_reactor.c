@@ -578,12 +578,12 @@ ui_error_t ui_reactor_poll(struct ui_reactor *reactor, int timeout_ms) {
 
   if (max_fd == -1) {
     /* Nothing to poll, wait or return */
+    if (timeout_ms != 0) {
 #if defined(_WIN32)
-    Sleep(timeout_ms >= 0 ? (DWORD)timeout_ms : (DWORD)100);
+      Sleep(timeout_ms > 0 ? (DWORD)timeout_ms : (DWORD)100);
 #else
-    {
       struct timeval wtv;
-      if (timeout_ms >= 0) {
+      if (timeout_ms > 0) {
         wtv.tv_sec = timeout_ms / 1000;
         wtv.tv_usec = (timeout_ms % 1000) * 1000;
       } else {
@@ -591,8 +591,8 @@ ui_error_t ui_reactor_poll(struct ui_reactor *reactor, int timeout_ms) {
         wtv.tv_usec = 100000;
       }
       select(0, NULL, NULL, NULL, &wtv);
-    }
 #endif
+    }
   } else {
     if (timeout_ms >= 0) {
       tv.tv_sec = timeout_ms / 1000;
