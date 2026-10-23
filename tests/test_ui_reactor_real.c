@@ -230,8 +230,7 @@ int main(void) {
       }
       close(old_fd);
     }
-#endif
-#if defined(__linux__)
+#elif defined(__linux__)
     if (bad_reactor) {
       int old_fd = bad_reactor->epoll_fd;
       bad_reactor->epoll_fd = -1;
@@ -243,6 +242,13 @@ int main(void) {
       }
       close(old_fd);
     }
+#else
+    if (bad_reactor) {
+      ui_error_t rc_cleanup = ui_reactor_destroy(bad_reactor);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        return 1;
+      }
+    }
 #endif
   }
 
@@ -251,8 +257,16 @@ int main(void) {
     return 1;
 
 #if !defined(_WIN32)
-  close(pipes[0]);
+  {
+    char drain_buf[16];
+    if (read(pipes[0], drain_buf, sizeof(drain_buf)) < 0) {
+    }
+  }
   close(pipes[1]);
+  close(pipes[0]);
+#else
+  _close(pipes[1]);
+  _close(pipes[0]);
 #endif
 
   /* Test lock contention in schedule and poll */

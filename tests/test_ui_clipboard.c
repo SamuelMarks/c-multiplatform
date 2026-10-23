@@ -349,7 +349,7 @@ int main(void) {
   signal(SIGPIPE, SIG_IGN);
 #endif
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(__CYGWIN__)
   {
     char *wine_env = NULL;
 #if defined(_MSC_VER) && _MSC_VER >= 1400
@@ -366,6 +366,13 @@ int main(void) {
       printf("Skipping test_ui_clipboard under Wine CI to avoid pipe hangs.\n");
       return 0;
     }
+#if defined(__CYGWIN__)
+    if (getenv("CI") != NULL || getenv("GITHUB_ACTIONS") != NULL) {
+      printf(
+          "Skipping test_ui_clipboard under Cygwin CI to avoid pipe hangs.\n");
+      return 0;
+    }
+#endif
 #endif
   }
 #endif
